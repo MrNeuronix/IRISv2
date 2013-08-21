@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact name="Core:jar">
+    <output-path>X:/</output-path>
+    <root id="root">
+      <element id="archive" name="Core.jar">
+        <element id="module-output" name="Core" />
+        <element id="module-output" name="Common" />
+      </element>
+      <element id="directory" name="conf">
+        <element id="dir-copy" path="$PROJECT_DIR$/Core/conf" />
+      </element>
+    </root>
+  </artifact>
+</component>

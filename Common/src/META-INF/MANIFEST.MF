@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Class-Path: lib/slf4j-simple-1.7.2.jar lib/slf4j-api-1.7.2.jar lib/jet
+ ty-all-8.1.6.v20120903.jar lib/jsoup-1.6.0.jar lib/qpid-common-0.20.j
+ ar lib/httpasyncclient-4.0-alpha2.jar lib/mysql-connector-java-5.1.22
+ -bin.jar lib/velocity-1.7-dep.jar lib/servlet-api-3.0.jar lib/qpid-al
+ l.jar lib/commons-logging-1.1.1.jar lib/commons-lang-2.6.jar lib/java
+ FlacEncoder-0.1.jar lib/httpclient-4.1.1.jar lib/lombok.jar lib/qpid-
+ client-0.20.jar lib/jl1.0.1.jar lib/commons-codec-1.4.jar lib/org.apa
+ che.httpcomponents.httpclient_4.1.1.jar lib/httpcore-4.1.1.jar lib/gs
+ on-1.7.1.jar lib/javax.jms.jar lib/sqltool.jar lib/httpcore-nio-4.1.1
+ .jar
+

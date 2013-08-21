@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact name="Speak:jar">
+    <output-path>X:/</output-path>
+    <root id="root">
+      <element id="archive" name="Speak.jar">
+        <element id="module-output" name="Speak" />
+        <element id="module-output" name="Common" />
+      </element>
+    </root>
+  </artifact>
+</component>

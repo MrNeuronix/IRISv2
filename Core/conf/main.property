@@ -1,0 +1,11 @@
+microphones=1
+microphoneDevice2=hw2,0
+microphoneDevice3=hw3,0
+httpPort=16101
+httpHost=192.168.10.150
+httpUser=admin
+httpPassword=access
+mysqlHost=127.0.0.1
+mysqlDatabase=irisx
+mysqlUser=root
+mysqlPassword=access
