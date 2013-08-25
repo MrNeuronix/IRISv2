@@ -217,7 +217,7 @@ void agocontrol::AgoConnection::run() {
 							}
 						}
 
-						// printf("command for id %s found, calling handler\n", internalid.c_str());
+						 printf("command for id %s found, calling handler\n", internalid.c_str());
 						if (internalid.size() > 0) content["internalid"] = internalid;
 						string status = commandHandler(content);
 						if (status != "") {

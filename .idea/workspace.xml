@@ -7,29 +7,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="75a291f7-9666-495a-bb2a-4156a745c2c1" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ZWave/cpp/CDataFile.cpp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ZWave/cpp/CDataFile.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ZWave/src/META-INF/MANIFEST.MF" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ZWave/cpp/Makefile" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ZWave/cpp/ZWApi.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ZWave/ZWave.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ZWave/cpp/ZWaveNode.cpp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ZWave/cpp/ZWaveNode.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/artifacts/ZWave_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ZWave/cpp/client.cpp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ZWave/cpp/client.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ZWave/cpp/config.ini" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/ZWave/cpp/zwave.cpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README" afterPath="$PROJECT_DIR$/README" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ZWave/cpp/client.cpp" afterPath="$PROJECT_DIR$/ZWave/cpp/client.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ZWave/cpp/zwave.cpp" afterPath="$PROJECT_DIR$/ZWave/cpp/zwave.cpp" />
     </list>
     <ignored path="IRISv2.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377122012030" ignored="false" />
+    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377424148015" ignored="false" />
     <file path="/README" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377123201288" ignored="false" />
     <file path="/Makefile" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377162449416" ignored="false" />
-    <file path="/zwave.cpp" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377165302869" ignored="false" />
+    <file path="/zwave.cpp" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377178274409" ignored="false" />
     <file path="/client.cpp" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377164274377" ignored="false" />
     <file path="/config.ini" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377165407604" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -46,6 +33,7 @@
     <disable_hints />
   </component>
   <component name="DebuggerManager">
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -82,7 +70,6 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </breakpoint_any>
-    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -96,37 +83,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="client.cpp" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="client.cpp" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ZWave/cpp/client.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="15" column="118" selection-start="298" selection-end="298" vertical-scroll-proportion="-10.2">
+            <state line="219" column="24" selection-start="6306" selection-end="6306" vertical-scroll-proportion="1.663701">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="config.ini" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ZWave/cpp/config.ini">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="0" column="42" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="client.h" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ZWave/cpp/client.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="35" column="120" selection-start="1044" selection-end="1044" vertical-scroll-proportion="-6.46">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="zwave.cpp" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="zwave.cpp" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ZWave/cpp/zwave.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="650" column="114" selection-start="20773" selection-end="20773" vertical-scroll-proportion="0.124304265">
+            <state line="271" column="60" selection-start="7710" selection-end="7710" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -153,16 +122,17 @@
         <option value="$PROJECT_DIR$/README" />
         <option value="$PROJECT_DIR$/ZWave/cpp/Makefile" />
         <option value="$PROJECT_DIR$/ZWave/cpp/client.h" />
-        <option value="$PROJECT_DIR$/ZWave/cpp/client.cpp" />
         <option value="$PROJECT_DIR$/ZWave/cpp/config.ini" />
         <option value="$PROJECT_DIR$/ZWave/cpp/zwave.cpp" />
+        <option value="$PROJECT_DIR$/ZWave/cpp/client.cpp" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="10" />
-    <option name="width" value="1346" />
-    <option name="height" value="724" />
+    <option name="x" value="-4" />
+    <option name="y" value="-4" />
+    <option name="width" value="1374" />
+    <option name="height" value="732" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -394,11 +364,15 @@
       <created>1377122047868</created>
       <updated>1377122047868</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="ZWave C++ files">
+      <created>1377165527140</created>
+      <updated>1377165527140</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="10" y="0" width="1346" height="724" extended-state="0" />
+    <frame x="-4" y="-4" width="1374" height="732" extended-state="0" />
     <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -409,16 +383,16 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298969" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.6701031" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24469697" sideWeight="0.6701031" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298969" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
@@ -465,7 +439,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial commit with project files for Idea" />
+    <option name="LAST_COMMIT_MESSAGE" value="ZWave C++ files" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -480,6 +454,7 @@
     <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
     <MESSAGE value="Initial commit with project files for Idea" />
+    <MESSAGE value="ZWave C++ files" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -489,86 +464,94 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/README">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/IRISv2.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="20" selection-start="20" selection-end="20" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ZWave/cpp/Makefile">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="0" selection-start="714" selection-end="714" vertical-scroll-proportion="0.72007364">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ZWave/cpp/ZWaveNode.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="12" selection-start="84" selection-end="85" vertical-scroll-proportion="0.08097929">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ZWave/cpp/ZWaveNode.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="13" selection-start="12" selection-end="13" vertical-scroll-proportion="-0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ZWave/cpp/ZWApi.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="19" column="25" selection-start="971" selection-end="972" vertical-scroll-proportion="0.62355214">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ZWave/cpp/CDataFile.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.27517986">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ZWave/cpp/client.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="35" column="120" selection-start="1044" selection-end="1044" vertical-scroll-proportion="-6.46">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ZWave/cpp/client.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="15" column="118" selection-start="298" selection-end="298" vertical-scroll-proportion="-10.2">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ZWave/cpp/config.ini">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="42" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ZWave/cpp/zwave.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="650" column="114" selection-start="20773" selection-end="20773" vertical-scroll-proportion="0.124304265">
+        <state line="271" column="60" selection-start="7710" selection-end="7710" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ZWave/cpp/client.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ZWave/cpp/zwave.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="650" column="114" selection-start="20773" selection-end="20773" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/IRISv2.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="20" selection-start="20" selection-end="20" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ZWave/cpp/Makefile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="29" column="0" selection-start="714" selection-end="714" vertical-scroll-proportion="0.72007364" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ZWave/cpp/ZWApi.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="25" selection-start="971" selection-end="972" vertical-scroll-proportion="0.62355214" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ZWave/cpp/CDataFile.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.27517986" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ZWave/cpp/client.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="120" selection-start="1044" selection-end="1044" vertical-scroll-proportion="0.6434263" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ZWave/cpp/config.ini">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="42" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ZWave/cpp/ZWaveNode.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="12" selection-start="84" selection-end="85" vertical-scroll-proportion="-0.07400722" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ZWave/cpp/ZWaveNode.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="13" selection-start="12" selection-end="13" vertical-scroll-proportion="-0.0" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ZWave/cpp/zwave.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="271" column="60" selection-start="7710" selection-end="7710" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ZWave/cpp/client.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="219" column="24" selection-start="6306" selection-end="6306" vertical-scroll-proportion="1.663701">
           <folding />
         </state>
       </provider>

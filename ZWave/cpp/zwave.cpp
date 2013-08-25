@@ -265,6 +265,17 @@ void OnNotification
 							}
 						}
 					break;
+					case COMMAND_CLASS_ALARM:
+						if (label == "Alarm Level") {
+							if ((device = devices.findId(tempstring)) != NULL) {
+								device->addValue(label, id);
+							} else {
+								device = new ZWaveNode(tempstring, "alarmsensor");
+								device->addValue(label, id);
+								devices.add(device);
+							}
+						}
+					break;
 					case COMMAND_CLASS_SENSOR_MULTILEVEL:
 						if (label == "Luminance") {
 							device = new ZWaveNode(tempstring, "brightnesssensor");
