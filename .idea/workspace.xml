@@ -7,18 +7,64 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="75a291f7-9666-495a-bb2a-4156a745c2c1" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ZWave/cpp/client.cpp" afterPath="$PROJECT_DIR$/ZWave/cpp/client.cpp" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\Web.iml" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\src\META-INF\MANIFEST.MF" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\src\ru\phsystems\irisv2\webservice\AudioHandler.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\src\ru\phsystems\irisv2\webservice\ControlHandler.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\src\ru\phsystems\irisv2\webservice\HTMLHandler.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\src\ru\phsystems\irisv2\webservice\PagesContext.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\src\ru\phsystems\irisv2\webservice\Service.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\src\ru\phsystems\irisv2\webservice\VideoHandler.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\src\ru\phsystems\irisv2\webservice\WebService.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\templates\cams.html" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\templates\devices.html" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\templates\index.html" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\templates\schedule.html" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\bootstrap-responsive.min.css" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\bootstrap.min.css" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ajax-loader.gif" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ui-bg_diagonals-thick_18_b81900_40x40.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ui-bg_diagonals-thick_20_666666_40x40.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ui-bg_flat_10_000000_40x100.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ui-bg_glass_100_f6f6f6_1x400.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ui-bg_glass_100_fdf5ce_1x400.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ui-bg_glass_65_ffffff_1x400.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ui-bg_gloss-wave_35_f6a828_500x100.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ui-bg_highlight-soft_100_eeeeee_1x100.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ui-bg_highlight-soft_75_ffe45c_1x100.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ui-icons_222222_256x240.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ui-icons_228ef1_256x240.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ui-icons_ef8c08_256x240.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ui-icons_ffd27a_256x240.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\images\ui-icons_ffffff_256x240.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\jquery-ui.min.css" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\jquery.dialog2.css" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\css\pnot.css" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\ico\favicon.ico" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\img\glyphicons-halflings-white.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\img\glyphicons-halflings.png" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\img\logo.jpg" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\js\bootstrap.min.js" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\js\cambozola.jar" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\js\jquery-ui.min.js" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\js\jquery.dialog2.helpers.js" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\js\jquery.dialog2.js" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\js\jquery.min.js" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\js\player.jar" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Web\www\js\pnot.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ZWave/cpp/zwave.cpp" afterPath="$PROJECT_DIR$/ZWave/cpp/zwave.cpp" />
     </list>
     <ignored path="IRISv2.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377424148015" ignored="false" />
-    <file path="/README" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377123201288" ignored="false" />
+    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378400720250" ignored="false" />
+    <file path="/README" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378400169147" ignored="false" />
     <file path="/Makefile" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377162449416" ignored="false" />
     <file path="/zwave.cpp" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377178274409" ignored="false" />
     <file path="/client.cpp" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377164274377" ignored="false" />
     <file path="/config.ini" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377165407604" ignored="false" />
+    <file path="$PROJECT_DIR$/../Iris-Web/README" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378400169147" ignored="false" />
+    <file path="/fragment.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378400720250" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -86,7 +132,7 @@
       <file leaf-file-name="client.cpp" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ZWave/cpp/client.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="219" column="24" selection-start="6306" selection-end="6306" vertical-scroll-proportion="1.663701">
+            <state line="219" column="24" selection-start="6306" selection-end="6306" vertical-scroll-proportion="0.03107861">
               <folding />
             </state>
           </provider>
@@ -129,8 +175,8 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-4" />
-    <option name="y" value="-4" />
+    <option name="x" value="82" />
+    <option name="y" value="40" />
     <option name="width" value="1374" />
     <option name="height" value="732" />
   </component>
@@ -178,38 +224,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ZWave" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ZWave" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="cpp" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
       <pane id="Scope" />
@@ -227,7 +241,9 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
+    <property name="FullScreen" value="false" />
     <property name="GoToClass.includeLibraries" value="false" />
     <property name="options.searchVisible" value="true" />
     <property name="options.splitter.details.proportions" value="0.2" />
@@ -270,6 +286,7 @@
       <method />
     </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
@@ -297,6 +314,7 @@
       <method />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <option name="MAIN_CLASS_NAME" />
       <option name="VM_PARAMETERS" />
       <option name="PROGRAM_PARAMETERS" />
@@ -311,6 +329,7 @@
       <method />
     </configuration>
     <configuration default="true" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="" />
       <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
       <option name="ALTERNATIVE_JRE_PATH" />
@@ -372,12 +391,12 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="-4" width="1374" height="732" extended-state="0" />
+    <frame x="82" y="40" width="1374" height="732" extended-state="0" />
     <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -387,9 +406,10 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24469697" sideWeight="0.6701031" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.24466464" sideWeight="0.6701031" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3298969" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -551,7 +571,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ZWave/cpp/client.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="219" column="24" selection-start="6306" selection-end="6306" vertical-scroll-proportion="1.663701">
+        <state line="219" column="24" selection-start="6306" selection-end="6306" vertical-scroll-proportion="0.03107861">
           <folding />
         </state>
       </provider>
