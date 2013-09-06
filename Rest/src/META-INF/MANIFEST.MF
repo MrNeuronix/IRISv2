@@ -6,5 +6,5 @@ Class-Path: lib/commons-codec-1.4.jar lib/commons-lang-2.6.jar lib/com
  5.1.22-bin.jar lib/qpid-all.jar lib/qpid-client-0.20.jar lib/qpid-com
  mon-0.20.jar lib/slf4j-api-1.7.2.jar lib/slf4j-simple-1.7.2.jar lib/s
  qltool.jar lib/asm.jar Common.jar
-Main-Class: ru.phsystems.irisv2.Service
+Main-Class: ru.iris.restful.Service
 

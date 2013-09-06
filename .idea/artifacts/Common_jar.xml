@@ -6,7 +6,7 @@
         <element id="module-output" name="Common" />
       </element>
       <element id="directory" name="lib">
-        <element id="library" level="project" name="lib" />
+        <element id="dir-copy" path="$PROJECT_DIR$/Common/lib" />
       </element>
       <element id="directory" name="data">
         <element id="file-copy" path="$PROJECT_DIR$/README" />

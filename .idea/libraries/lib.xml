@@ -1,32 +1,10 @@
 <component name="libraryTable">
   <library name="lib">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/Common/lib/slf4j-simple-1.7.2.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/slf4j-api-1.7.2.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/jetty-all-8.1.6.v20120903.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/jsoup-1.6.0.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/qpid-common-0.20.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/httpasyncclient-4.0-alpha2.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/mysql-connector-java-5.1.22-bin.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/velocity-1.7-dep.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/servlet-api-3.0.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/qpid-all.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/commons-logging-1.1.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/commons-lang-2.6.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/javaFlacEncoder-0.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/httpclient-4.1.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/lombok.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/qpid-client-0.20.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/jl1.0.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/commons-codec-1.4.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/org.apache.httpcomponents.httpclient_4.1.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/httpcore-4.1.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/gson-1.7.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/javax.jms.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/sqltool.jar!/" />
-      <root url="jar://$PROJECT_DIR$/Common/lib/httpcore-nio-4.1.1.jar!/" />
+      <root url="file://$PROJECT_DIR$/Common/lib" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/Common/lib" recursive="false" />
   </library>
 </component>

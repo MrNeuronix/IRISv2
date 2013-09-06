@@ -1,9 +1,9 @@
 <component name="ArtifactManager">
-  <artifact name="Speak:jar">
+  <artifact name="Rest:jar">
     <output-path>X:/</output-path>
     <root id="root">
-      <element id="archive" name="Speak.jar">
-        <element id="module-output" name="Speak" />
+      <element id="archive" name="Rest.jar">
+        <element id="module-output" name="Rest" />
       </element>
     </root>
   </artifact>

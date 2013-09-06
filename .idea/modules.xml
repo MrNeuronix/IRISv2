@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/Common/Common.iml" filepath="$PROJECT_DIR$/Common/Common.iml" />
       <module fileurl="file://$PROJECT_DIR$/Core/Core.iml" filepath="$PROJECT_DIR$/Core/Core.iml" />
       <module fileurl="file://$PROJECT_DIR$/IRISv2.iml" filepath="$PROJECT_DIR$/IRISv2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Rest/Rest.iml" filepath="$PROJECT_DIR$/Rest/Rest.iml" />
       <module fileurl="file://$PROJECT_DIR$/Speak/Speak.iml" filepath="$PROJECT_DIR$/Speak/Speak.iml" />
       <module fileurl="file://$PROJECT_DIR$/ZWave/ZWave.iml" filepath="$PROJECT_DIR$/ZWave/ZWave.iml" />
     </modules>
