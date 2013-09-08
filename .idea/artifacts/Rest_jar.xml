@@ -1,10 +1,8 @@
 <component name="ArtifactManager">
-  <artifact name="Rest:jar">
+  <artifact type="jar" name="Rest:jar">
     <output-path>X:/</output-path>
-    <root id="root">
-      <element id="archive" name="Rest.jar">
-        <element id="module-output" name="Rest" />
-      </element>
+    <root id="archive" name="Rest.jar">
+      <element id="module-output" name="Rest" />
     </root>
   </artifact>
 </component>

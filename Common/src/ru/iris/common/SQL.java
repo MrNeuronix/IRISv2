@@ -9,18 +9,11 @@ package ru.iris.common;
  * Time: 13:27
  */
 
-import com.mysql.jdbc.jdbc2.optional.MysqlDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Properties;
+import java.sql.*;
 
 public class SQL {
 
@@ -31,16 +24,16 @@ public class SQL {
 
         // Загружаем класс драйвера
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("org.h2.Driver").newInstance();
         } catch (ClassNotFoundException e) {
             log.info("[sql] Error while loading DB driver");
             e.printStackTrace();
             System.exit(1);
+        } catch (InstantiationException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
-
-        Properties prop = new Properties();
-        InputStream is = new FileInputStream("./conf/main.property");
-        prop.load(is);
 
         // Cоздаем соединение, здесь dbpath это путь к папке где будут хранится
         // файлы БД. dbname имя базы данных. SA это имя пользователя который
@@ -48,19 +41,9 @@ public class SQL {
         // такой базы данных нет она будет автоматически создана.
 
         try {
-
-            MysqlDataSource dataSource = new MysqlDataSource();
-            dataSource.setServerName(prop.getProperty("mysqlHost"));
-            dataSource.setDatabaseName(prop.getProperty("mysqlDatabase"));
-            dataSource.setUser(prop.getProperty("mysqlUser"));
-            dataSource.setPassword(prop.getProperty("mysqlPassword"));
-            dataSource.setRetainStatementAfterResultSetClose(true);
-            dataSource.setZeroDateTimeBehavior("convertToNull");
-
-            connection = dataSource.getConnection();
-
+            connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/./conf/iris", "sa", "");
         } catch (SQLException e) {
-            log.info("[sql] Cant open connection");
+            log.info("[sql] Cant open connection to H2 database!");
             e.printStackTrace();
             System.exit(1);
         }

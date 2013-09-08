@@ -26,7 +26,6 @@ public class Service
     public static HashMap<String, String> config;
     public static SQL sql;
     private static Logger log = LoggerFactory.getLogger (Service.class);
-    static final String BASE_URI = "http://192.168.10.150:16101/";
 
     public static void main(String[] args) throws IOException, SQLException {
 
@@ -35,7 +34,7 @@ public class Service
         sql = new SQL ();
 
         try {
-            HttpServer server = HttpServerFactory.create(BASE_URI);
+            HttpServer server = HttpServerFactory.create("http://" + config.get("httpHost") + ":" + config.get("httpPort") + "/");
             server.start();
         } catch (IllegalArgumentException e) {
             e.printStackTrace();

@@ -4,82 +4,46 @@
     <artifacts-to-build>
       <artifact name="Common:jar" />
       <artifact name="Core:jar" />
+      <artifact name="Devices:jar" />
       <artifact name="Rest:jar" />
       <artifact name="Speak:jar" />
-      <artifact name="ZWave:jar" />
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="75a291f7-9666-495a-bb2a-4156a745c2c1" name="Default" comment="Add RESTful service, remove some jar's and some more stuff">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Common/lib/asm.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Common/lib/jersey-bundle-1.17.1.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Common/src/ru/iris/common/Base64Coder.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Common/src/ru/iris/common/Config.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Common/src/ru/iris/common/JpegFormat.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Rest/src/META-INF/MANIFEST.MF" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Common/src/ru/iris/common/Messaging.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Common/src/ru/iris/common/MjpegFormat.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Common/src/ru/iris/common/MjpegFrame.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Common/src/ru/iris/common/MjpegInputStream.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Common/src/ru/iris/common/Module.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/RecordService.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Rest/Rest.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/artifacts/Rest_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Common/src/ru/iris/common/SQL.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Rest/src/ru/iris/restful/Service.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/Service.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/SpeakHandler.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/SpeakService.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/Synthesizer.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Common/src/ru/iris/common/Utils.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/httpGET.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/httpPOST.java" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\.idea\artifacts\Web_jar.xml" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\lib\gson-1.7.1.jar" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\lib\httpasyncclient-4.0-alpha2.jar" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\lib\httpcore-nio-4.1.1.jar" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\lib\jetty-all-8.1.6.v20120903.jar" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\lib\lombok.jar" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\lib\org.apache.httpcomponents.httpclient_4.1.1.jar" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\lib\servlet-api-3.0.jar" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\lib\velocity-1.7-dep.jar" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\src\ru\phsystems\irisv2\common\Base64Coder.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\src\ru\phsystems\irisv2\common\Config.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\src\ru\phsystems\irisv2\common\JpegFormat.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\src\ru\phsystems\irisv2\common\Messaging.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\src\ru\phsystems\irisv2\common\MjpegFormat.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\src\ru\phsystems\irisv2\common\MjpegFrame.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\src\ru\phsystems\irisv2\common\MjpegInputStream.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\src\ru\phsystems\irisv2\common\Module.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\src\ru\phsystems\irisv2\common\SQL.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\src\ru\phsystems\irisv2\common\Utils.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Core\src\ru\phsystems\irisv2\Service.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Speak\src\ru\phsystems\irisv2\speak\RecordService.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Speak\src\ru\phsystems\irisv2\speak\Service.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Speak\src\ru\phsystems\irisv2\speak\SpeakHandler.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Speak\src\ru\phsystems\irisv2\speak\SpeakService.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Speak\src\ru\phsystems\irisv2\speak\Synthesizer.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Speak\src\ru\phsystems\irisv2\speak\httpGET.java" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Speak\src\ru\phsystems\irisv2\speak\httpPOST.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/Common_jar.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/Common_jar.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/Core.iml" afterPath="$PROJECT_DIR$/Core/Core.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/IRISv2.iml" afterPath="$PROJECT_DIR$/IRISv2.iml" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Common/lib/h2-1.3.173.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/conf/iris.h2.db-clean" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/conf/iris.h2.db" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Common\lib\mysql-connector-java-5.1.22-bin.jar" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Common/src/META-INF/MANIFEST.MF" afterPath="$PROJECT_DIR$/Common/src/META-INF/MANIFEST.MF" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/src/META-INF/MANIFEST.MF" afterPath="$PROJECT_DIR$/Core/src/META-INF/MANIFEST.MF" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Rest/src/META-INF/MANIFEST.MF" afterPath="$PROJECT_DIR$/Rest/src/META-INF/MANIFEST.MF" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/src/META-INF/MANIFEST.MF" afterPath="$PROJECT_DIR$/Speak/src/META-INF/MANIFEST.MF" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ZWave/src/META-INF/MANIFEST.MF" afterPath="$PROJECT_DIR$/ZWave/src/META-INF/MANIFEST.MF" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/README" afterPath="$PROJECT_DIR$/README" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/Speak.iml" afterPath="$PROJECT_DIR$/Speak/Speak.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/Speak_jar.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/Speak_jar.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ZWave/ZWave.iml" afterPath="$PROJECT_DIR$/ZWave/ZWave.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/libraries/lib.xml" afterPath="$PROJECT_DIR$/.idea/libraries/lib.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/Rest_jar.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/Rest_jar.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Common/src/ru/iris/common/SQL.java" afterPath="$PROJECT_DIR$/Common/src/ru/iris/common/SQL.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Rest/src/ru/iris/restful/Service.java" afterPath="$PROJECT_DIR$/Rest/src/ru/iris/restful/Service.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/conf/main.property" afterPath="$PROJECT_DIR$/Core/conf/main.property" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MOVED" beforePath="D:\Developing\IRISv2\.idea\artifacts\ZWave_jar.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/Devices_jar.xml" />
+      <change type="MOVED" beforePath="D:\Developing\IRISv2\ZWave\ZWave.iml" afterPath="$PROJECT_DIR$/Devices/Devices.iml" />
+      <change type="MOVED" beforePath="D:\Developing\IRISv2\ZWave\cpp\CDataFile.cpp" afterPath="$PROJECT_DIR$/Devices/cpp/CDataFile.cpp" />
+      <change type="MOVED" beforePath="D:\Developing\IRISv2\ZWave\cpp\CDataFile.h" afterPath="$PROJECT_DIR$/Devices/cpp/CDataFile.h" />
+      <change type="MOVED" beforePath="D:\Developing\IRISv2\ZWave\cpp\Makefile" afterPath="$PROJECT_DIR$/Devices/cpp/Makefile" />
+      <change type="MOVED" beforePath="D:\Developing\IRISv2\ZWave\cpp\ZWApi.h" afterPath="$PROJECT_DIR$/Devices/cpp/ZWApi.h" />
+      <change type="MOVED" beforePath="D:\Developing\IRISv2\ZWave\cpp\ZWaveNode.cpp" afterPath="$PROJECT_DIR$/Devices/cpp/ZWaveNode.cpp" />
+      <change type="MOVED" beforePath="D:\Developing\IRISv2\ZWave\cpp\ZWaveNode.h" afterPath="$PROJECT_DIR$/Devices/cpp/ZWaveNode.h" />
+      <change type="MOVED" beforePath="D:\Developing\IRISv2\ZWave\cpp\client.cpp" afterPath="$PROJECT_DIR$/Devices/cpp/client.cpp" />
+      <change type="MOVED" beforePath="D:\Developing\IRISv2\ZWave\cpp\client.h" afterPath="$PROJECT_DIR$/Devices/cpp/client.h" />
+      <change type="MOVED" beforePath="D:\Developing\IRISv2\ZWave\cpp\config.ini" afterPath="$PROJECT_DIR$/Devices/cpp/config.ini" />
+      <change type="MOVED" beforePath="D:\Developing\IRISv2\ZWave\cpp\zwave.cpp" afterPath="$PROJECT_DIR$/Devices/cpp/zwave.cpp" />
+      <change type="MOVED" beforePath="D:\Developing\IRISv2\ZWave\src\META-INF\MANIFEST.MF" afterPath="$PROJECT_DIR$/Devices/src/META-INF/MANIFEST.MF" />
     </list>
     <ignored path="IRISv2.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378479425479" ignored="false" />
+    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378649346745" ignored="false" />
     <file path="/README" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378473430689" ignored="false" />
     <file path="/Makefile" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377162449416" ignored="false" />
     <file path="/zwave.cpp" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377178274409" ignored="false" />
@@ -88,9 +52,15 @@
     <file path="$USER_HOME$/Iris-Web/README" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378400169147" ignored="false" />
     <file path="/fragment.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378400720250" ignored="false" />
     <file path="/Config.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378473199994" ignored="false" />
-    <file path="/Service.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378477925772" ignored="false" />
+    <file path="/Service.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378551630012" ignored="false" />
     <file path="/RESTService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378476204483" ignored="false" />
     <file path="/SpeakHandler.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378474977205" ignored="false" />
+    <file path="/File Header.txt.ft" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378549914738" ignored="false" />
+    <file path="/SQL.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378665893928" ignored="false" />
+    <file path="/Launcher.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378668941510" ignored="false" />
+    <file path="/a.sql" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378667754473" ignored="false" />
+    <file path="/Data Source" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378667318184" ignored="false" />
+    <file path="/dummy.sql" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378667699956" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -109,8 +79,12 @@
   <component name="DaemonCodeAnalyzer">
     <disable_hints />
   </component>
+  <component name="DatabaseView">
+    <flatten value="false" />
+    <groupTables value="false" />
+    <sortChildren value="false" />
+  </component>
   <component name="DebuggerManager">
-    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_any default_suspend_policy="SuspendAll" default_condition_enabled="true">
       <breakpoint>
         <option name="NOTIFY_CAUGHT" value="true" />
@@ -147,6 +121,7 @@
         <option name="LOG_MESSAGE" value="" />
       </breakpoint>
     </breakpoint_any>
+    <ui_properties default_suspend_policy="SuspendAll" default_condition_enabled="true" />
     <breakpoint_rules />
     <ui_properties />
   </component>
@@ -163,18 +138,16 @@
       <file leaf-file-name="Service.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/Service.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="28" column="64" selection-start="734" selection-end="734" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state line="36" column="127" selection-start="989" selection-end="989" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="JpegFormat.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/JpegFormat.java">
+      <file leaf-file-name="main.property" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Core/conf/main.property">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="17" column="66" selection-start="355" selection-end="355" vertical-scroll-proportion="0.33333334">
+            <state line="6" column="19" selection-start="135" selection-end="135" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -183,7 +156,29 @@
       <file leaf-file-name="RESTService.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="8" selection-start="401" selection-end="401" vertical-scroll-proportion="0.0">
+            <state line="56" column="0" selection-start="1467" selection-end="1467" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SQL.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/SQL.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="36" column="9" selection-start="1086" selection-end="1086" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Launcher.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Core/src/ru/iris/Launcher.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="37" column="30" selection-start="1049" selection-end="1049" vertical-scroll-proportion="0.727758">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -209,11 +204,6 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/Common/src/ru/iris/common/MjpegInputStream.java" />
-        <option value="$PROJECT_DIR$/Common/src/ru/iris/common/Module.java" />
-        <option value="$PROJECT_DIR$/Common/src/ru/iris/common/SQL.java" />
-        <option value="$PROJECT_DIR$/Common/src/ru/iris/common/Utils.java" />
-        <option value="$PROJECT_DIR$/Core/src/ru/iris/Service.java" />
         <option value="$PROJECT_DIR$/README" />
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/httpPOST.java" />
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/SpeakService.java" />
@@ -223,15 +213,20 @@
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/httpGET.java" />
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/SpeakHandler.java" />
         <option value="$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java" />
-        <option value="$PROJECT_DIR$/Rest/src/ru/iris/restful/Service.java" />
         <option value="$PROJECT_DIR$/Common/src/ru/iris/common/JpegFormat.java" />
+        <option value="$PROJECT_DIR$/Core/src/Launcher.java" />
+        <option value="db-console:/7c43b20/27760a85-2bfb-484a-9712-91d46e338d2d/" />
+        <option value="$PROJECT_DIR$/Common/src/ru/iris/common/SQL.java" />
+        <option value="$PROJECT_DIR$/Rest/src/ru/iris/restful/Service.java" />
+        <option value="$PROJECT_DIR$/Core/conf/main.property" />
+        <option value="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="-8" />
     <option name="y" value="-8" />
-    <option name="width" value="1932" />
+    <option name="width" value="1936" />
     <option name="height" value="1056" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
@@ -321,20 +316,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="ZWave" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
         </subPane>
       </pane>
     </panes>
@@ -345,15 +326,17 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="MemberChooser.sorted" value="false" />
-    <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/Common/lib" />
+    <property name="options.lastSelected" value="editor.preferences.appearance" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Devices/cpp" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="Database.TableEditor.Splitter" value="0.9" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="FullScreen" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
+    <property name="dynamic.classpath" value="false" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
   </component>
@@ -458,6 +441,12 @@
       <patterns />
       <method />
     </configuration>
+    <configuration default="true" type="com.intellij.persistence.run.ConsoleRunConfigurationType" factoryName="Query Language Console">
+      <option name="VM_PARAMETERS" value="" />
+      <option name="USER_CFG_CLASS" />
+      <option name="CONTEXT_PROVIDER" />
+      <method />
+    </configuration>
     <list size="0" />
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
       <Host>localhost</Host>
@@ -500,23 +489,24 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1932" height="1056" extended-state="0" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
     <editor active="false" />
     <layout>
+      <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32998884" sideWeight="0.5" order="-1" side_tool="false" content_ui="tabs" />
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32977587" sideWeight="0.67001116" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32887402" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32998884" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32887402" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32814237" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2497332" sideWeight="0.74693424" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.171123" sideWeight="0.67112595" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17075774" sideWeight="0.67001116" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -594,103 +584,75 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/Messaging.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="11" selection-start="11" selection-end="11" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/Config.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="7" column="32" selection-start="199" selection-end="199" vertical-scroll-proportion="0.13547647">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/Base64Coder.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="4" column="19" selection-start="66" selection-end="66" vertical-scroll-proportion="0.078071184">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/Synthesizer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="8" column="24" selection-start="164" selection-end="164" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/ru/iris/Service.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="14" column="36" selection-start="0" selection-end="808" vertical-scroll-proportion="0.36842105">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="99" selection-start="99" selection-end="99" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/SpeakService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="46" selection-start="0" selection-end="1896" vertical-scroll-proportion="0.47368422">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
+        <state line="18" column="46" selection-start="0" selection-end="1896" vertical-scroll-proportion="0.47368422" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/SpeakHandler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="0" selection-start="612" selection-end="740" vertical-scroll-proportion="0.5694444">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
+        <state line="29" column="0" selection-start="612" selection-end="740" vertical-scroll-proportion="0.5694444" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/httpGET.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="12" column="0" selection-start="224" selection-end="224" vertical-scroll-proportion="0.35416666">
-          <folding />
-        </state>
+        <state line="12" column="0" selection-start="224" selection-end="224" vertical-scroll-proportion="0.35416666" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/httpPOST.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="11" column="22" selection-start="199" selection-end="199" vertical-scroll-proportion="0.3246528">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/conf/main.property">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="3" column="0" selection-start="62" selection-end="70" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="11" column="22" selection-start="199" selection-end="199" vertical-scroll-proportion="0.3246528" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/Service.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="29" column="0" selection-start="622" selection-end="698" vertical-scroll-proportion="0.088541664">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state line="29" column="0" selection-start="622" selection-end="698" vertical-scroll-proportion="0.088541664" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/JpegFormat.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="66" selection-start="355" selection-end="355" vertical-scroll-proportion="0.029411765">
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/RecordService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="36" column="22" selection-start="753" selection-end="807" vertical-scroll-proportion="0.74245113">
+        <state line="177" column="0" selection-start="8006" selection-end="8006" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="e#1309#8616#0" expanded="false" />
+            <element signature="e#8597#8598#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Devices/Devices.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="dbDummy://dbtable:/7c43b20/27760a85-2bfb-484a-9712-91d46e338d2d/IRIS.PUBLIC.CONFIG">
+      <provider selected="true" editor-type-id="com.intellij.persistence.database.editor.DatabaseTableFileEditorProvider">
+        <state />
+      </provider>
+    </entry>
+    <entry file="dbDummy://dbtable:/7c43b20/27760a85-2bfb-484a-9712-91d46e338d2d/IRIS.PUBLIC.SCHEDULER">
+      <provider selected="true" editor-type-id="com.intellij.persistence.database.editor.DatabaseTableFileEditorProvider">
+        <state />
+      </provider>
+    </entry>
+    <entry file="dbDummy://db-console:/7c43b20/27760a85-2bfb-484a-9712-91d46e338d2d/">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="24" column="0" selection-start="537" selection-end="1431" vertical-scroll-proportion="0.2912088">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/SQL.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="36" column="9" selection-start="1086" selection-end="1086" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -699,7 +661,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="8" selection-start="401" selection-end="401" vertical-scroll-proportion="0.0">
+        <state line="56" column="0" selection-start="1467" selection-end="1467" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -708,17 +670,24 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/Service.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="28" column="64" selection-start="734" selection-end="734" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state line="36" column="127" selection-start="989" selection-end="989" vertical-scroll-proportion="0.0">
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/JpegFormat.java">
+    <entry file="file://$PROJECT_DIR$/Core/conf/main.property">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="17" column="66" selection-start="355" selection-end="355" vertical-scroll-proportion="0.33333334">
+        <state line="6" column="19" selection-start="135" selection-end="135" vertical-scroll-proportion="0.0">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/ru/iris/Launcher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="37" column="30" selection-start="1049" selection-end="1049" vertical-scroll-proportion="0.727758">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -728,7 +697,7 @@
       <state key="ArtifactsStructureConfigurable.UI">
         <settings>
           <artifact-editor />
-          <last-edited>Rest:jar</last-edited>
+          <last-edited>Common:jar</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -781,6 +750,7 @@
             <option name="proportions">
               <list>
                 <option value="0.2" />
+                <option value="0.5" />
               </list>
             </option>
           </splitter-proportions>

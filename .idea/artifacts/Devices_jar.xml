@@ -1,14 +1,14 @@
 <component name="ArtifactManager">
-  <artifact name="ZWave:jar">
+  <artifact name="Devices:jar">
     <output-path>X:/</output-path>
     <root id="root">
       <element id="directory" name="drivers">
         <element id="directory" name="zwave">
-          <element id="dir-copy" path="$PROJECT_DIR$/ZWave/cpp" />
+          <element id="dir-copy" path="$PROJECT_DIR$/Devices/cpp" />
         </element>
       </element>
-      <element id="archive" name="ZWave.jar">
-        <element id="module-output" name="ZWave" />
+      <element id="archive" name="Devices.jar">
+        <element id="module-output" name="Devices" />
       </element>
     </root>
   </artifact>
