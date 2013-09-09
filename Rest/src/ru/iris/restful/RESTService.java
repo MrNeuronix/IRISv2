@@ -6,9 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.zwave.ZWaveDevice;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.jms.JMSException;
+import javax.jms.MapMessage;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 /**
@@ -44,4 +44,26 @@ public class RESTService
 
             return jsonOutput;
         }
+
+    /////////////////////////////////////
+    // Тут - синтез речи
+    /////////////////////////////////////
+
+    @GET
+    @Path("/speak/{text}")
+    @Consumes(MediaType.TEXT_PLAIN)
+    public String speak(@PathParam("text") String text) throws JMSException {
+
+        MapMessage message = Service.session.createMapMessage();
+
+        message.setString ("text", text);
+        message.setDouble ("confidence", 100);
+        message.setStringProperty ("qpid.subject", "event.speak");
+
+        Service.messageProducer.send (message);
+
+        return "done";
     }
+
+
+}

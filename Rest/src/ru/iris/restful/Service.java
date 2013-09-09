@@ -12,12 +12,19 @@ package ru.iris.restful;
 
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.net.httpserver.HttpServer;
+import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.Config;
+import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
 
+import javax.jms.JMSException;
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.HashMap;
 
@@ -26,12 +33,21 @@ public class Service
     public static HashMap<String, String> config;
     public static SQL sql;
     private static Logger log = LoggerFactory.getLogger (Service.class);
+    public static MessageConsumer messageConsumer;
+    public static MessageProducer messageProducer;
+    public static Messaging msg;
+    public static Session session;
 
-    public static void main(String[] args) throws IOException, SQLException {
+    public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException {
 
         Config cfg = new Config ();
         config = cfg.getConfig ();
         sql = new SQL ();
+
+        msg = new Messaging ();
+        messageConsumer = msg.getConsumer ();
+        messageProducer = msg.getProducer ();
+        session = msg.getSession ();
 
         try {
             HttpServer server = HttpServerFactory.create("http://" + config.get("httpHost") + ":" + config.get("httpPort") + "/");
