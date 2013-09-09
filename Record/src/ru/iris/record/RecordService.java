@@ -1,8 +1,9 @@
-package ru.iris.speak;
+package ru.iris.record;
 
 import javaFlacEncoder.FLAC_FileEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.httpPOST;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;

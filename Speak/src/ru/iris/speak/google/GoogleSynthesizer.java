@@ -1,4 +1,4 @@
-package ru.iris.speak;
+package ru.iris.speak.google;
 
 /**
  * Created with IntelliJ IDEA.
@@ -14,6 +14,7 @@ import javazoom.jl.player.FactoryRegistry;
 import javazoom.jl.player.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.httpGET;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -37,7 +38,7 @@ import java.util.regex.Pattern;
  * Speed Test: Single Thread 4.3 seconds vs Multi-Threaded 1.2 Seconds
  */
 
-public class Synthesizer implements Runnable
+public class GoogleSynthesizer implements Runnable
 {
 
     /* Synthesizer Data Fields
@@ -58,14 +59,14 @@ public class Synthesizer implements Runnable
     private final ExecutorService exs;
     private final String GOOGLE_TRANSLATE_TTS_URL = "http://translate.google.com/translate_tts?tl=ru&q=";
     private final Future<AudioDevice> futureAudioLine;
-    private static Logger log = LoggerFactory.getLogger (Synthesizer.class.getName ());
+    private static Logger log = LoggerFactory.getLogger (GoogleSynthesizer.class.getName ());
 
     /** Constructor: Will submit the AudioDeviceLoader to the executor */
 
     /**
      * Constructor for Synthesizer Object*
      */
-    public Synthesizer(ExecutorService executor)
+    public GoogleSynthesizer(ExecutorService executor)
     {
         //Assign executor
         this.exs = executor;
@@ -353,7 +354,7 @@ public class Synthesizer implements Runnable
             try
             {
                 //
-                mp3_chunk = httpGET.downloadToByteArray (GOOGLE_TRANSLATE_TTS_URL + text, this);
+                mp3_chunk = httpGET.downloadToByteArray(GOOGLE_TRANSLATE_TTS_URL + text, this);
             } catch (Exception ee)
             {
                 ee.printStackTrace ();

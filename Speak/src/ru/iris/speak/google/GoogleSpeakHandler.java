@@ -1,4 +1,4 @@
-package ru.iris.speak;
+package ru.iris.speak.google;
 /**
  * IRIS-X Project
  * Author: Nikolay A. Viguro
@@ -19,12 +19,12 @@ import java.util.concurrent.Executors;
 
 // Класс отвечает за озвучивание переданной в POST фразы
 
-public class SpeakHandler
+public class GoogleSpeakHandler
 {
 
     public Properties prop = null;
 
-    public SpeakHandler() throws IOException
+    public GoogleSpeakHandler() throws IOException
     {
 
         prop = new Properties ();
@@ -33,7 +33,7 @@ public class SpeakHandler
 
         // TODO Make qpid complaince
         ExecutorService exs = Executors.newFixedThreadPool (10);
-        Synthesizer speak = new Synthesizer (exs);
+        GoogleSynthesizer speak = new GoogleSynthesizer(exs);
 
         String words = "";
 

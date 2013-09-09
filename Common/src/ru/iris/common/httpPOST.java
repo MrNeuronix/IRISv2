@@ -1,4 +1,4 @@
-package ru.iris.speak;
+package ru.iris.common;
 
 /**
  * Created with IntelliJ IDEA.

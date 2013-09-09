@@ -1,4 +1,4 @@
-package ru.iris.speak;
+package ru.iris.speak.voicerss;
 
 /**
  * IRISv2 Project
@@ -12,19 +12,20 @@ package ru.iris.speak;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.speak.Service;
 
 import javax.jms.MapMessage;
 import javax.jms.Message;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SpeakService implements Runnable
+public class VoiceRSSSpeakService implements Runnable
 {
 
     Thread t = null;
-    private static Logger log = LoggerFactory.getLogger (SpeakService.class.getName ());
+    private static Logger log = LoggerFactory.getLogger (VoiceRSSSpeakService.class.getName ());
 
-    public SpeakService()
+    public VoiceRSSSpeakService()
     {
         t = new Thread (this);
         t.start ();
@@ -39,7 +40,7 @@ public class SpeakService implements Runnable
     public synchronized void run()
     {
 
-        log.info ("[speak] Service started");
+        log.info ("[speak] Service started (TTS: VoiceRSS)");
 
         Message message = null;
         MapMessage m = null;
@@ -59,7 +60,7 @@ public class SpeakService implements Runnable
                     log.info ("Text: " + m.getString ("text"));
                     log.info ("-------------------------------\n");
 
-                    Synthesizer Voice = new Synthesizer (exs);
+                    VoiceRSSSynthesizer Voice = new VoiceRSSSynthesizer(exs);
                     Voice.setAnswer (m.getString ("text"));
                     exs.submit (Voice).get ();
                 }

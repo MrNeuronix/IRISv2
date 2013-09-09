@@ -36,7 +36,10 @@ public class Launcher {
         // Запускаем сервис REST
         //Process rest = Runtime.getRuntime().exec("java -jar Rest.jar");
 
-        // Запускаем синтез и захват звука
+        // Запускаем захват звука
+        //Process speak = Runtime.getRuntime().exec("java -jar Record.jar");
+
+        // Запускаем синтез звука
         //Process speak = Runtime.getRuntime().exec("java -jar Speak.jar");
     }
 }

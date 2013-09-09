@@ -1,17 +1,19 @@
-package ru.iris.speak;
+package ru.iris.record;
 
+import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.Config;
 import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
-import ru.iris.speak.google.GoogleSpeakService;
-import ru.iris.speak.nuance.NuanceSpeakService;
-import ru.iris.speak.voicerss.VoiceRSSSpeakService;
 
+import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.sql.SQLException;
 import java.util.HashMap;
 
 /**
@@ -34,7 +36,8 @@ public class Service
 
     private static Logger log = LoggerFactory.getLogger (Service.class);
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException
+    {
 
         Config cfg = new Config ();
         config = cfg.getConfig ();
@@ -46,25 +49,9 @@ public class Service
         session = msg.getSession ();
 
         log.info ("[iris] ----------------------------------");
-        log.info ("[iris] Speak service starting");
+        log.info ("[iris] Record service starting");
         log.info ("[iris] ----------------------------------");
 
-        if(config.get("ttsEngine").equals("google"))
-        {
-            new GoogleSpeakService();
-        }
-        else if(config.get("ttsEngine").equals("nuance"))
-        {
-            new NuanceSpeakService();
-        }
-        else if(config.get("ttsEngine").equals("voicerss"))
-        {
-            new VoiceRSSSpeakService();
-        }
-        else
-        {
-            log.info("[speak] No TTS system specified in config file!");
-        }
-
+        new RecordService ();
     }
 }
