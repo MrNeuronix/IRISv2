@@ -1,11 +1,13 @@
 package ru.iris.restful;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.zwave.ZWaveDevice;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -27,30 +29,19 @@ public class RESTService
     private static Logger log = LoggerFactory.getLogger(RESTService.class.getName());
 
         @GET
-        @Path("/add/{a}/{b}")
-        @Produces(MediaType.TEXT_PLAIN)
-        public String addPlainText(@PathParam("a") double a, @PathParam("b") double b) {
-            return (a + b) + "";
-        }
+        @Path("/get")
+        @Produces(MediaType.APPLICATION_JSON)
+        public String device() {
 
-        @GET
-        @Path("/sub/{a}/{b}")
-        @Produces(MediaType.TEXT_PLAIN)
-        public String subPlainText(@PathParam("a") double a, @PathParam("b") double b) {
-            return (a - b) + "";
-        }
+            ZWaveDevice dev = new ZWaveDevice();
+            dev.setValue("test", 255);
+            dev.setValue("more", 12);
+            dev.setName("test device");
+            dev.setNode(134);
 
-        @GET
-        @Path("/add/{a}/{b}")
-        @Produces(MediaType.TEXT_XML)
-        public String add(@PathParam("a") double a, @PathParam("b") double b) {
-            return "<?xml version=\"1.0\"?>" + "<result>" +  (a + b) + "</result>";
-        }
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String jsonOutput = gson.toJson(dev);
 
-        @GET
-        @Path("/sub/{a}/{b}")
-        @Produces(MediaType.TEXT_XML)
-        public String sub(@PathParam("a") double a, @PathParam("b") double b) {
-            return "<?xml version=\"1.0\"?>" + "<result>" +  (a - b) + "</result>";
+            return jsonOutput;
         }
     }

@@ -26,13 +26,17 @@ public class Launcher {
 
     public static void main(String[] args) throws IOException, SQLException, InstantiationException, IllegalAccessException {
 
+        log.info ("----------------------------------------");
+        log.info ("----       IRISv2 is starting       ----");
+        log.info ("----------------------------------------");
+
         // Запускаем TCP сервер H2
         Server server = Server.createTcpServer().start();
 
         // Запускаем сервис REST
-        Process rest = Runtime.getRuntime().exec("java -jar Rest.jar");
+        //Process rest = Runtime.getRuntime().exec("java -jar Rest.jar");
 
         // Запускаем синтез и захват звука
-        Process speak = Runtime.getRuntime().exec("java -jar Speak.jar");
+        //Process speak = Runtime.getRuntime().exec("java -jar Speak.jar");
     }
 }
