@@ -16,6 +16,7 @@ import ru.iris.speak.Service;
 
 import javax.jms.MapMessage;
 import javax.jms.Message;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -45,6 +46,16 @@ public class GoogleSpeakService implements Runnable
         Message message = null;
         MapMessage m = null;
         ExecutorService exs = Executors.newFixedThreadPool (10);
+
+        GoogleSynthesizer Start = new GoogleSynthesizer(exs);
+        Start.setAnswer ("Модуль синтеза загружен!");
+        try {
+            exs.submit (Start).get ();
+        } catch (InterruptedException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (ExecutionException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
 
         try
         {

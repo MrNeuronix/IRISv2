@@ -12,13 +12,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="75a291f7-9666-495a-bb2a-4156a745c2c1" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java" afterPath="$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Rest/src/ru/iris/restful/Service.java" afterPath="$PROJECT_DIR$/Rest/src/ru/iris/restful/Service.java" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Speak\src\ru\iris\speak\nuance\NuanceSpeakService.java" afterPath="" />
+      <change type="DELETED" beforePath="D:\Developing\IRISv2\Speak\src\ru\iris\speak\nuance\TTSHTTPClient.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakService.java" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" afterPath="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/src/ru/iris/speak/Service.java" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/Service.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSpeakService.java" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSpeakService.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/conf/main.property" afterPath="$PROJECT_DIR$/Core/conf/main.property" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="IRISv2.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378727714838" ignored="false" />
+    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378742339141" ignored="false" />
     <file path="/README" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378473430689" ignored="false" />
     <file path="/Makefile" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377162449416" ignored="false" />
     <file path="/zwave.cpp" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377178274409" ignored="false" />
@@ -32,17 +37,18 @@
     <file path="/SpeakHandler.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378474977205" ignored="false" />
     <file path="/File Header.txt.ft" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378549914738" ignored="false" />
     <file path="/SQL.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378665893928" ignored="false" />
-    <file path="/Launcher.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378724226363" ignored="false" />
+    <file path="/Launcher.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378747722178" ignored="false" />
     <file path="/a.sql" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378667754473" ignored="false" />
     <file path="/Data Source" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378667318184" ignored="false" />
     <file path="/dummy.sql" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378667699956" ignored="false" />
     <file path="/ZWaveDevice.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378711848968" ignored="false" />
-    <file path="/main.property" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378726610817" ignored="false" />
+    <file path="/main.property" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378745573671" ignored="false" />
     <file path="/GoogleSynthesizer.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378724348014" ignored="false" />
     <file path="/NuanceSpeakService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378726193480" ignored="false" />
-    <file path="/GoogleSpeakService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378725058142" ignored="false" />
+    <file path="/GoogleSpeakService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378742755092" ignored="false" />
     <file path="/VoiceRSSSynthesizer.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378726751765" ignored="false" />
-    <file path="/TTSHTTPClient.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378727680280" ignored="false" />
+    <file path="/TTSHTTPClient.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378745424445" ignored="false" />
+    <file path="/VoiceRSSSpeakService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378742611098" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,10 +123,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="RESTService.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="RESTService.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="56" column="61" selection-start="1390" selection-end="1390" vertical-scroll-proportion="0.70264065">
+            <state line="26" column="13" selection-start="490" selection-end="490" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -128,10 +134,19 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="GoogleSpeakService.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakService.java">
+      <file leaf-file-name="VoiceRSSSpeakService.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSpeakService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="55" column="57" selection-start="1208" selection-end="1219" vertical-scroll-proportion="0.0">
+            <state line="49" column="0" selection-start="1053" selection-end="1535" vertical-scroll-proportion="0.1216992">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Messaging.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/Messaging.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="30" column="159" selection-start="802" selection-end="802" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -155,22 +170,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" />
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/GoogleSynthesizer.java" />
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSynthesizer.java" />
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/SpeakHandler.java" />
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/GoogleSpeakHandler.java" />
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakHandler.java" />
-        <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakService.java" />
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/GoogleSpeakService.java" />
-        <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/Service.java" />
-        <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSpeakService.java" />
-        <option value="$PROJECT_DIR$/Core/conf/main.property" />
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSynthesizer.java" />
-        <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/nuance/NuanceSpeakService.java" />
-        <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/nuance/TTSHTTPClient.java" />
         <option value="$PROJECT_DIR$/Rest/src/ru/iris/restful/Service.java" />
         <option value="$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java" />
+        <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSpeakService.java" />
+        <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakService.java" />
+        <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/nuance/NuanceSpeakService.java" />
+        <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/nuance/TTSHTTPClient.java" />
+        <option value="$PROJECT_DIR$/Core/conf/main.property" />
+        <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/Service.java" />
+        <option value="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" />
       </list>
     </option>
   </component>
@@ -206,6 +221,48 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope">
+        <subPane subId="Project Files">
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="Speak">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="Speak">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="Speak">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="Speak">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="src">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -283,32 +340,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="voicerss" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Speak" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="speak" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="nuance" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -464,46 +495,58 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
-        </subPane>
-      </pane>
-      <pane id="Scope">
-        <subPane subId="Project Files">
           <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="Speak">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="Speak">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
-            <PATH_ELEMENT USER_OBJECT="Root">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="Speak">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="Speak">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Common" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-            <PATH_ELEMENT USER_OBJECT="src">
-              <option name="myItemId" value="" />
-              <option name="myItemType" value="" />
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
         </subPane>
@@ -524,24 +567,24 @@
     <property name="Database.TableEditor.Splitter" value="0.9" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="FullScreen" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
+    <property name="FullScreen" value="false" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="dynamic.classpath" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="dynamic.classpath" value="false" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\nikolay.viguro\IRISv2\Speak\src\ru\iris\speak\voicerss" />
       <recent name="D:\Develop\IRISv2\ZWave\cpp" />
     </key>
-    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
-      <recent name="ru.iris.common" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\Develop\IRISv2\ZWave\cpp" />
       <recent name="D:\Develop\IRISv2" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="ru.iris.common" />
     </key>
   </component>
   <component name="RunManager">
@@ -557,6 +600,19 @@
       <option name="SHMEM_ADDRESS" value="javadebug" />
       <option name="HOST" value="localhost" />
       <option name="PORT" value="5005" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
@@ -585,19 +641,6 @@
       <envs />
       <properties />
       <listeners />
-      <method />
-    </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -697,11 +740,11 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.19797225" sideWeight="0.7424749" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19797225" sideWeight="0.6722408" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2575251" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -712,7 +755,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2497332" sideWeight="0.74693424" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.17022412" sideWeight="0.7424749" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16435432" sideWeight="0.6722408" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32998884" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -803,15 +846,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/ru/iris/Launcher.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="68" selection-start="1287" selection-end="1287" vertical-scroll-proportion="0.7616823">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakHandler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="33" column="23" selection-start="807" selection-end="807" vertical-scroll-proportion="0.41744548">
@@ -821,32 +855,7 @@
     </entry>
     <entry file="jar://C:/Program Files/Java/jdk1.7.0_25/src.zip!/java/lang/System.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="19" selection-start="1243" selection-end="1243" vertical-scroll-proportion="0.33333334">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSpeakService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="57" selection-start="872" selection-end="872" vertical-scroll-proportion="-0.08566978">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/conf/main.property">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="6" column="30" selection-start="135" selection-end="135" vertical-scroll-proportion="0.1588785">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/nuance/NuanceSpeakService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="80" column="70" selection-start="2696" selection-end="2696" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="false" />
-          </folding>
-        </state>
+        <state line="54" column="19" selection-start="1243" selection-end="1243" vertical-scroll-proportion="0.33333334" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSynthesizer.java">
@@ -859,30 +868,6 @@
     <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSynthesizer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="346" column="16" selection-start="11472" selection-end="11472" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/nuance/TTSHTTPClient.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="266" column="44" selection-start="10443" selection-end="10443" vertical-scroll-proportion="-0.009375">
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#7176#7191#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/Service.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="45" column="73" selection-start="1251" selection-end="1251" vertical-scroll-proportion="0.39494833">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/Service.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="46" column="25" selection-start="1322" selection-end="1322" vertical-scroll-proportion="0.58553386">
           <folding />
         </state>
       </provider>
@@ -903,19 +888,67 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/Service.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="25" selection-start="1322" selection-end="1322" vertical-scroll-proportion="0.58553386">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/Service.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="53" column="9" selection-start="1496" selection-end="1496" vertical-scroll-proportion="0.6486797">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/ru/iris/Launcher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="34" column="34" selection-start="930" selection-end="930" vertical-scroll-proportion="0.66360503">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/conf/main.property">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="7" column="18" selection-start="154" selection-end="154" vertical-scroll-proportion="0.13662457">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/Messaging.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="30" column="159" selection-start="802" selection-end="802" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="55" column="57" selection-start="1208" selection-end="1219" vertical-scroll-proportion="0.0">
-          <folding />
+        <state line="50" column="44" selection-start="1138" selection-end="1138" vertical-scroll-proportion="0.1216992">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="56" column="61" selection-start="1390" selection-end="1390" vertical-scroll-proportion="0.70264065">
+        <state line="26" column="13" selection-start="490" selection-end="490" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSpeakService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="49" column="0" selection-start="1053" selection-end="1535" vertical-scroll-proportion="0.1216992">
+          <folding />
         </state>
       </provider>
     </entry>

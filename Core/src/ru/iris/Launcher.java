@@ -3,7 +3,6 @@ package ru.iris;
 import org.h2.tools.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.iris.common.SQL;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -21,10 +20,9 @@ import java.util.HashMap;
 public class Launcher {
 
     public static HashMap<String, String> config;
-    public static SQL sql;
     private static Logger log = LoggerFactory.getLogger(Launcher.class);
 
-    public static void main(String[] args) throws IOException, SQLException, InstantiationException, IllegalAccessException {
+    public static void main(String[] args) throws IOException, SQLException {
 
         log.info ("----------------------------------------");
         log.info ("----       IRISv2 is starting       ----");
@@ -34,12 +32,12 @@ public class Launcher {
         Server server = Server.createTcpServer().start();
 
         // Запускаем сервис REST
-        //Process rest = Runtime.getRuntime().exec("java -jar Rest.jar");
+        Process rest = Runtime.getRuntime().exec("java -jar Rest.jar");
 
         // Запускаем захват звука
-        //Process speak = Runtime.getRuntime().exec("java -jar Record.jar");
+        Process record = Runtime.getRuntime().exec("java -jar Record.jar");
 
         // Запускаем синтез звука
-        //Process speak = Runtime.getRuntime().exec("java -jar Speak.jar");
+        Process speak = Runtime.getRuntime().exec("java -jar Speak.jar");
     }
 }

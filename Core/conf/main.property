@@ -6,6 +6,4 @@ httpHost=192.168.10.150
 httpUser=admin
 httpPassword=access
 ttsEngine=voicerss
-nuanceID=NMDPTRIAL_Neuronix20130909134747
-nuanceKey=1c8fba4e13849db6a9d35efa067b8021716cd0015d3a93d467fca3146d4eb089dd6bd7f0ef74a6984705924d80126ff17e3ff2dc7a85b0e18153f5eea1a6777e
 voicerssAPI=a07e6a0dd3884deb978d02d2f1d7ee76

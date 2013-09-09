@@ -6,7 +6,6 @@ import ru.iris.common.Config;
 import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
 import ru.iris.speak.google.GoogleSpeakService;
-import ru.iris.speak.nuance.NuanceSpeakService;
 import ru.iris.speak.voicerss.VoiceRSSSpeakService;
 
 import javax.jms.MessageConsumer;
@@ -52,10 +51,6 @@ public class Service
         if(config.get("ttsEngine").equals("google"))
         {
             new GoogleSpeakService();
-        }
-        else if(config.get("ttsEngine").equals("nuance"))
-        {
-            new NuanceSpeakService();
         }
         else if(config.get("ttsEngine").equals("voicerss"))
         {
