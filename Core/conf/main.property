@@ -5,5 +5,5 @@ httpPort=16101
 httpHost=192.168.10.150
 httpUser=admin
 httpPassword=access
-ttsEngine=google
+ttsEngine=voicerss
 voicerssAPI=a07e6a0dd3884deb978d02d2f1d7ee76

@@ -54,7 +54,7 @@ public class Service
         if(config.get("ttsEngine").equals("google"))
         {
             new GoogleSpeakService();
-            speak.add("Модуль синтеза речи Google запущен");
+            speak.add("Модуль синтеза речи Гугл запущен");
         }
         else if(config.get("ttsEngine").equals("voicerss"))
         {

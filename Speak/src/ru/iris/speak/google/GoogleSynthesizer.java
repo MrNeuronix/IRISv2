@@ -122,8 +122,6 @@ public class GoogleSynthesizer implements Runnable
         // Tokenize userText and Retreive number of Files;
         UserText = smartTokenize (rawText);
         Files = UserText.size ();
-
-        log.info ("[voice] " + rawText);
     }
 
     /**

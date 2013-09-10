@@ -58,7 +58,7 @@ public class VoiceRSSSynthesizer implements Runnable
     private AudioDevice AudioLine;
 
     private final ExecutorService exs;
-    private final String SPEAK_URL = "http://api.voicerss.org/?key=" + Service.config.get("voicerssAPI") + "&hl=ru-ru&f=48khz_16bit_mono&c=mp3&src=";
+    private final String SPEAK_URL = "http://api.voicerss.org/?key=" + Service.config.get("voicerssAPI") + "&hl=ru-ru&f=48khz_16bit_stereo&c=mp3&src=";
     private final Future<AudioDevice> futureAudioLine;
     private static Logger log = LoggerFactory.getLogger (VoiceRSSSynthesizer.class.getName ());
 
@@ -123,8 +123,6 @@ public class VoiceRSSSynthesizer implements Runnable
         // Tokenize userText and Retreive number of Files;
         UserText = smartTokenize (rawText);
         Files = UserText.size ();
-
-        log.info ("[voice] " + rawText);
     }
 
     /**

@@ -4,12 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.iris.zwave.ZWaveDevice;
+import ru.iris.devices.zwave.ZWaveDevice;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * IRISv2 Project
@@ -31,7 +33,7 @@ public class RESTService
         @GET
         @Path("/get")
         @Produces(MediaType.APPLICATION_JSON)
-        public String device() {
+        public String device() throws IOException, SQLException {
 
             ZWaveDevice dev = new ZWaveDevice();
             dev.setValue("test", 255);
@@ -56,8 +58,8 @@ public class RESTService
 
         MapMessage message = Service.session.createMapMessage();
 
-        message.setStringProperty ("text", text);
-        message.setDoubleProperty ("confidence", 100);
+        message.setStringProperty("text", text);
+        message.setDoubleProperty("confidence", 100);
         message.setStringProperty ("qpid.subject", "event.speak");
 
         Service.messageProducer.send (message);

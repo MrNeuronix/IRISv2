@@ -4,10 +4,7 @@ import org.h2.tools.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.HashMap;
 
@@ -42,32 +39,16 @@ public class Launcher {
 
         // Запускаем синтез звука
         runModule("java -jar Speak.jar");
+
+        // Запускаем модуль для работы с устройствами
+        runModule("java -jar Devices.jar");
     }
 
     private static void runModule(String cmd) throws IOException {
 
         String[] splited = cmd.split("\\s+");
 
-        ProcessBuilder builder = new ProcessBuilder(splited).redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectErrorStream(true);;
+        ProcessBuilder builder = new ProcessBuilder(splited).redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectErrorStream(true);
         Process process = builder.start();
-
-        final InputStream stdout = process.getInputStream();
-
-        new Thread(new Runnable(){
-            public void run(){
-
-                BufferedReader reader = new BufferedReader (new InputStreamReader(stdout));
-                String line = null;
-
-                try {
-
-                    while ((line = reader.readLine()) != null) {
-                        log.info(line);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-                }
-            }
-        }).start();
     }
 }

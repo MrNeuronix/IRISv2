@@ -54,14 +54,21 @@ public class VoiceRSSSpeakService implements Runnable
 
                 if(m.getStringProperty("qpid.subject").equals ("event.speak"))
                 {
-                    log.info ("------------- Speak -------------");
-                    log.info ("Confidence: " + m.getDoubleProperty("confidence"));
-                    log.info ("Text: " + m.getStringProperty("text"));
-                    log.info ("-------------------------------\n");
+                    if(Service.config.get("silence").equals("0"))
+                    {
+                        log.info ("[speak] -----------------------");
+                        log.info ("[speak] Confidence: " + m.getDoubleProperty("confidence"));
+                        log.info ("[speak] Text: " + m.getStringProperty("text"));
+                        log.info ("[speak] -----------------------");
 
-                    VoiceRSSSynthesizer Voice = new VoiceRSSSynthesizer(exs);
-                    Voice.setAnswer (m.getStringProperty("text"));
-                    exs.submit (Voice).get ();
+                        VoiceRSSSynthesizer Voice = new VoiceRSSSynthesizer(exs);
+                        Voice.setAnswer (m.getStringProperty("text"));
+                        exs.submit (Voice).get ();
+                    }
+                    else
+                    {
+                        log.info("[speak] Silence mode enabled! Ignore speak request");
+                    }
                 }
             }
 

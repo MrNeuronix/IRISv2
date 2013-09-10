@@ -36,7 +36,7 @@ public class Messaging
         connection.start ();
 
         session = connection.createSession (false, Session.AUTO_ACKNOWLEDGE);
-        destination = new AMQAnyDestination ("ADDR:irisv2; {create: always, node: {type: topic}}");
+        destination = new AMQAnyDestination ("ADDR:iris; {create: always, node: {type: topic}}");
         messageConsumer = session.createConsumer (destination);
         messageProducer = session.createProducer (destination);
 
