@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import ru.iris.common.Config;
 import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
+import ru.iris.common.Speak;
 import ru.iris.speak.google.GoogleSpeakService;
 import ru.iris.speak.voicerss.VoiceRSSSpeakService;
 
@@ -39,6 +40,8 @@ public class Service
         config = cfg.getConfig ();
         sql = new SQL ();
 
+        Speak speak = new Speak();
+
         msg = new Messaging ();
         messageConsumer = msg.getConsumer ();
         messageProducer = msg.getProducer ();
@@ -51,10 +54,12 @@ public class Service
         if(config.get("ttsEngine").equals("google"))
         {
             new GoogleSpeakService();
+            speak.add("Модуль синтеза речи Google запущен");
         }
         else if(config.get("ttsEngine").equals("voicerss"))
         {
             new VoiceRSSSpeakService();
+            speak.add("Модуль синтеза речи VoiceRSS запущен");
         }
         else
         {

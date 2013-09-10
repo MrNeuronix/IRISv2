@@ -4,7 +4,10 @@ import org.h2.tools.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
 import java.util.HashMap;
 
@@ -31,13 +34,40 @@ public class Launcher {
         // Запускаем TCP сервер H2
         Server server = Server.createTcpServer().start();
 
-        // Запускаем сервис REST
-        Process rest = Runtime.getRuntime().exec("java -jar Rest.jar");
+        // Запускаем сервис REST;
+        runModule("java -jar Rest.jar");
 
         // Запускаем захват звука
-        Process record = Runtime.getRuntime().exec("java -jar Record.jar");
+        runModule("java -jar Record.jar");
 
         // Запускаем синтез звука
-        Process speak = Runtime.getRuntime().exec("java -jar Speak.jar");
+        runModule("java -jar Speak.jar");
+    }
+
+    private static void runModule(String cmd) throws IOException {
+
+        String[] splited = cmd.split("\\s+");
+
+        ProcessBuilder builder = new ProcessBuilder(splited).redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectErrorStream(true);;
+        Process process = builder.start();
+
+        final InputStream stdout = process.getInputStream();
+
+        new Thread(new Runnable(){
+            public void run(){
+
+                BufferedReader reader = new BufferedReader (new InputStreamReader(stdout));
+                String line = null;
+
+                try {
+
+                    while ((line = reader.readLine()) != null) {
+                        log.info(line);
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+        }).start();
     }
 }

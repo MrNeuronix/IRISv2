@@ -16,7 +16,6 @@ import ru.iris.speak.Service;
 
 import javax.jms.MapMessage;
 import javax.jms.Message;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -40,22 +39,11 @@ public class GoogleSpeakService implements Runnable
     @Override
     public synchronized void run()
     {
-
         log.info ("[speak] Service started (TTS: Google)");
 
         Message message = null;
         MapMessage m = null;
         ExecutorService exs = Executors.newFixedThreadPool (10);
-
-        GoogleSynthesizer Start = new GoogleSynthesizer(exs);
-        Start.setAnswer ("Модуль синтеза загружен!");
-        try {
-            exs.submit (Start).get ();
-        } catch (InterruptedException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (ExecutionException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
 
         try
         {
@@ -64,15 +52,15 @@ public class GoogleSpeakService implements Runnable
             {
                 m = (MapMessage) message;
 
-                if(m.getString ("qpid.subject").equals ("event.speak"))
+                if(m.getStringProperty("qpid.subject").equals ("event.speak"))
                 {
                     log.info ("------------- Speak -------------");
-                    log.info ("Confidence: " + m.getDouble ("confidence"));
-                    log.info ("Text: " + m.getString ("text"));
+                    log.info ("Confidence: " + m.getDoubleProperty("confidence"));
+                    log.info ("Text: " + m.getStringProperty("text"));
                     log.info ("-------------------------------\n");
 
                     GoogleSynthesizer Voice = new GoogleSynthesizer (exs);
-                    Voice.setAnswer (m.getString ("text"));
+                    Voice.setAnswer (m.getStringProperty("text"));
                     exs.submit (Voice).get ();
                 }
             }

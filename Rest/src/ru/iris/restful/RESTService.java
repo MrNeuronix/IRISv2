@@ -56,8 +56,8 @@ public class RESTService
 
         MapMessage message = Service.session.createMapMessage();
 
-        message.setString ("text", text);
-        message.setDouble ("confidence", 100);
+        message.setStringProperty ("text", text);
+        message.setDoubleProperty ("confidence", 100);
         message.setStringProperty ("qpid.subject", "event.speak");
 
         Service.messageProducer.send (message);
