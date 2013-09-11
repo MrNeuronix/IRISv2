@@ -12,17 +12,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="75a291f7-9666-495a-bb2a-4156a745c2c1" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/conf/iris.h2.db" afterPath="$PROJECT_DIR$/Core/conf/iris.h2.db" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java" afterPath="$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Devices/src/ru/iris/devices/Service.java" afterPath="$PROJECT_DIR$/Devices/src/ru/iris/devices/Service.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveDevice.java" afterPath="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveDevice.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java" afterPath="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources.xml" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/conf/main.property" afterPath="$PROJECT_DIR$/Core/conf/main.property" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="IRISv2.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378827684906" ignored="false" />
+    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378894607319" ignored="false" />
     <file path="/README" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378473430689" ignored="false" />
     <file path="/Makefile" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377162449416" ignored="false" />
     <file path="/zwave.cpp" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377178274409" ignored="false" />
@@ -32,7 +29,7 @@
     <file path="/fragment.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378805766214" ignored="false" />
     <file path="/Config.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378473199994" ignored="false" />
     <file path="/Service.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378888591715" ignored="false" />
-    <file path="/RESTService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378893859315" ignored="false" />
+    <file path="/RESTService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378895536649" ignored="false" />
     <file path="/SpeakHandler.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378474977205" ignored="false" />
     <file path="/File Header.txt.ft" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378805374998" ignored="false" />
     <file path="/SQL.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378665893928" ignored="false" />
@@ -41,7 +38,7 @@
     <file path="/Data Source" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378667318184" ignored="false" />
     <file path="/dummy.sql" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378877142824" ignored="false" />
     <file path="/ZWaveDevice.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378893164724" ignored="false" />
-    <file path="/main.property" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378807025015" ignored="false" />
+    <file path="/main.property" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378896743701" ignored="false" />
     <file path="/GoogleSynthesizer.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378724348014" ignored="false" />
     <file path="/NuanceSpeakService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378726193480" ignored="false" />
     <file path="/GoogleSpeakService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378809427303" ignored="false" />
@@ -49,7 +46,7 @@
     <file path="/TTSHTTPClient.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378745424445" ignored="false" />
     <file path="/VoiceRSSSpeakService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378800015791" ignored="false" />
     <file path="/Speak.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378800216820" ignored="false" />
-    <file path="/ZWaveService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378893438441" ignored="false" />
+    <file path="/ZWaveService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378896310316" ignored="false" />
     <file path="/client.h" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378808355801" ignored="false" />
     <file path="/zwave.ini" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378808423514" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -126,24 +123,24 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="RESTService.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="RESTService.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="105" column="26" selection-start="2854" selection-end="2854" vertical-scroll-proportion="0.7383016">
+            <state line="113" column="35" selection-start="3233" selection-end="3233" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ZWaveService.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="ZWaveService.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="648" column="47" selection-start="32339" selection-end="32339" vertical-scroll-proportion="0.0">
+            <state line="77" column="88" selection-start="2615" selection-end="2615" vertical-scroll-proportion="0.3986135">
               <folding>
                 <element signature="imports" expanded="true" />
                 <element signature="e#920#941#0" expanded="true" />
-                <element signature="e#2677#30192#0" expanded="true" />
-                <element signature="e#30181#30182#0" expanded="true" />
+                <element signature="e#2745#30260#0" expanded="true" />
+                <element signature="e#30249#30250#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -179,7 +176,6 @@
         <option value="$PROJECT_DIR$/Devices/cpp/config.ini" />
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/Service.java" />
         <option value="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" />
-        <option value="$PROJECT_DIR$/Core/conf/main.property" />
         <option value="$PROJECT_DIR$/Devices/zwave-cpp/config.ini" />
         <option value="$PROJECT_DIR$/Devices/zwave-cpp/client.h" />
         <option value="$PROJECT_DIR$/Core/conf/zwave.ini" />
@@ -190,8 +186,9 @@
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakService.java" />
         <option value="$PROJECT_DIR$/Devices/src/ru/iris/devices/Service.java" />
         <option value="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveDevice.java" />
-        <option value="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java" />
         <option value="$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java" />
+        <option value="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java" />
+        <option value="$PROJECT_DIR$/Core/conf/main.property" />
       </list>
     </option>
   </component>
@@ -402,6 +399,38 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="conf" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -679,12 +708,16 @@
       <created>1378827710049</created>
       <updated>1378827710049</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Rework Devices module again. Added REST section for control devices by level">
+      <created>1378894617999</created>
+      <updated>1378894617999</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -692,7 +725,7 @@
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19370331" sideWeight="0.6722408" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3277592" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3277592" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17058824" sideWeight="0.2865106" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3277592" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -752,7 +785,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Rework Devices module. Remove c++ zwave handler, add java-based." />
+    <option name="LAST_COMMIT_MESSAGE" value="Rework Devices module again. Added REST section for control devices by level" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -774,6 +807,7 @@
     <MESSAGE value="Little fixes" />
     <MESSAGE value="Make communications between REST and Speak modules" />
     <MESSAGE value="Rework Devices module. Remove c++ zwave handler, add java-based." />
+    <MESSAGE value="Rework Devices module again. Added REST section for control devices by level" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -783,11 +817,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSynthesizer.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="148" column="42" selection-start="4666" selection-end="4666" vertical-scroll-proportion="0.684271" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSynthesizer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="123" column="33" selection-start="3835" selection-end="3835" vertical-scroll-proportion="0.25373134" />
@@ -860,6 +889,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="113" column="35" selection-start="3233" selection-end="3233" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveDevice.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="41" column="36" selection-start="954" selection-end="954" vertical-scroll-proportion="0.0">
@@ -867,22 +903,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java">
+    <entry file="file://$PROJECT_DIR$/Core/conf/main.property">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="648" column="47" selection-start="32339" selection-end="32339" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#920#941#0" expanded="true" />
-            <element signature="e#2677#30192#0" expanded="true" />
-            <element signature="e#30181#30182#0" expanded="true" />
-          </folding>
+        <state line="4" column="37" selection-start="137" selection-end="137" vertical-scroll-proportion="0.11785095">
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java">
+    <entry file="file://$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="105" column="26" selection-start="2854" selection-end="2854" vertical-scroll-proportion="0.7383016">
-          <folding />
+        <state line="77" column="88" selection-start="2615" selection-end="2615" vertical-scroll-proportion="0.3986135">
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#920#941#0" expanded="true" />
+            <element signature="e#2745#30260#0" expanded="true" />
+            <element signature="e#30249#30250#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

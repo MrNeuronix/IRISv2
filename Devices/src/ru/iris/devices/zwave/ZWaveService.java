@@ -74,8 +74,8 @@ public class ZWaveService implements Runnable
 
         NativeLibraryLoader.loadLibrary(ZWave4j.LIBRARY_NAME, ZWave4j.class);
 
-        final Options options = Options.create("./conf/zwave-conf", "", "");
-        options.addOptionBool("ConsoleOutput", false);
+        final Options options = Options.create(Service.config.get("openzwaveCfgPath"), "", "");
+        options.addOptionBool("ConsoleOutput", Boolean.parseBoolean(Service.config.get("zwaveDebug")));
         options.lock();
 
         final Manager manager = Manager.create();
@@ -588,7 +588,7 @@ public class ZWaveService implements Runnable
 
         String controllerPort = "/dev/ttyUSB0";
 
-        manager.addDriver(controllerPort);
+        manager.addDriver(Service.config.get("zwavePort"));
 
         log.info("[zwave] Not Ready!");
 
@@ -640,15 +640,26 @@ public class ZWaveService implements Runnable
                     {
                         log.info("[zwave] Setting level "+m.getShortProperty("level")+" on UUID "+uuid);
                         manager.setNodeLevel(homeId, node, m.getShortProperty("level"));
-                    } else if (cmd.equals("enable"))
+                    }
+                    else if (cmd.equals("enable"))
                     {
                         log.info("[zwave] Enabling UUID "+uuid);
                         manager.setNodeOn(homeId, node);
-                    } else if (cmd.equals("disable"))
+                    }
+                    else if (cmd.equals("disable"))
                     {
                         log.info("[zwave] Disabling UUID "+uuid);
                         manager.setNodeOff(homeId, node);
-                    } else
+                    }
+                    else if (cmd.equals("allon"))
+                    {
+                         manager.switchAllOn(homeId);
+                    }
+                    else if (cmd.equals("alloff"))
+                    {
+                        manager.switchAllOff(homeId);
+                    }
+                    else
                     {
                         log.info("[zwave] Unknown command \""+cmd+"\"");
                     }

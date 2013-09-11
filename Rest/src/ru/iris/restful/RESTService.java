@@ -119,5 +119,20 @@ public class RESTService
         return "done";
     }
 
+    @GET
+    @Path("/device/all/{state}")
+    @Consumes(MediaType.TEXT_PLAIN)
+    public String devAllState(@PathParam("state") String state) throws JMSException {
+
+        MapMessage message = Service.session.createMapMessage();
+
+        message.setStringProperty("command", "all"+state);
+        message.setStringProperty ("qpid.subject", "event.devices.setvalue");
+
+        Service.messageProducer.send (message);
+
+        return "done";
+    }
+
 
 }
