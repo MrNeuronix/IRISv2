@@ -9,6 +9,9 @@ package ru.iris.devices.zwave;
  * Time: 9:52
  */
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 import ru.iris.common.SQL;
 
 import java.io.IOException;
@@ -19,18 +22,28 @@ import java.util.Map;
 
 public class ZWaveDevice {
 
-        private String name;
-        private short node = 0;
-        private int zone = 0;
-        private String type;
-        private String internalType;
-        private String manufName;
-        private String uuid;
-        private String status;
-        private String source = "zwave";
-        private SQL sql;
+    @Expose
+    private String name = "not set";
+    @Expose
+    private short node = 0;
+    @Expose
+    private int zone = 0;
+    @Expose
+    private String type = "unknown";
+    @Expose
+    private String internalType = "unknown";
+    @Expose
+    private String manufName = "unknown";
+    @Expose
+    private String uuid = "unknown";
+    @Expose
+    private String status = "unknown";
+    @Expose
+    private String source = "zwave";
+    @Expose
+    private Map<String, Object> LabelsValues = new HashMap<String, Object>();
 
-        private Map<String, Object> LabelsValues = new HashMap<String, Object>();
+    private SQL sql;
 
         public ZWaveDevice() throws IOException, SQLException {
             sql = new SQL();
@@ -122,20 +135,8 @@ public class ZWaveDevice {
         @Override
         public String toString()
         {
-            if (this.type == null)
-                this.type = "undefined";
-
-            if (this.manufName == null)
-                this.manufName = "undefined";
-
-            if (this.status == null)
-                this.status = "unknown";
-
-            if (this.name == null)
-                this.name = "not set";
-
-           return "Device\n\t[\n\t\tName: " + name + "\n\t\tUUID: " + uuid + "\n\t\tNode: " + node + "\n\t\tZone: " + zone + "\n\t\tType: " + type +
-                   "\n\t\tInternal type: " + internalType + "\n\t\tManufacture name: " + manufName + "\n\t\tStatus: " + status + "\n\t]\n";
+            Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().create();
+            return gson.toJson(this);
         }
 
         public void save() throws SQLException {
@@ -160,7 +161,17 @@ public class ZWaveDevice {
             Iterator it = LabelsValues.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry pairs = (Map.Entry)it.next();
-                sql.doQuery("INSERT INTO DEVICELABELS (UUID, LABEL, VALUE) VALUES ('"+this.uuid+"','"+pairs.getKey()+"','"+pairs.getValue()+"')");
+
+                String label = String.valueOf(pairs.getKey());
+                String value = String.valueOf(pairs.getValue());
+
+                if(label.isEmpty())
+                    label = "none";
+
+                if(value.isEmpty())
+                    value = "none";
+
+                sql.doQuery("INSERT INTO DEVICELABELS (UUID, LABEL, VALUE) VALUES ('"+this.uuid+"','"+label+"','"+value+"')");
                 it.remove();
             }
         }

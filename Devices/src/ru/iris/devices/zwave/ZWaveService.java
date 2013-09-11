@@ -66,9 +66,9 @@ public class ZWaveService implements Runnable
             rs.close();
 
         } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
 
 
@@ -577,7 +577,6 @@ public class ZWaveService implements Runnable
                         ));
                         break;
                     case NOTIFICATION:
-                        System.out.println("Notification");
                         break;
                     default:
                         System.out.println(notification.getType().name());
@@ -585,8 +584,6 @@ public class ZWaveService implements Runnable
                 }
             }
         });
-
-        String controllerPort = "/dev/ttyUSB0";
 
         manager.addDriver(Service.config.get("zwavePort"));
 
