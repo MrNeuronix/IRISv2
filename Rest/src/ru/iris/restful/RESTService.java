@@ -39,7 +39,6 @@ public class RESTService
             dev.setValue("test", 255);
             dev.setValue("more", 12);
             dev.setName("test device");
-            dev.setNode(134);
 
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             String jsonOutput = gson.toJson(dev);
@@ -48,7 +47,7 @@ public class RESTService
         }
 
     /////////////////////////////////////
-    // Тут - синтез речи
+    // Cинтез речи
     /////////////////////////////////////
 
     @GET
@@ -61,6 +60,59 @@ public class RESTService
         message.setStringProperty("text", text);
         message.setDoubleProperty("confidence", 100);
         message.setStringProperty ("qpid.subject", "event.speak");
+
+        Service.messageProducer.send (message);
+
+        return "done";
+    }
+
+    /////////////////////////////////////
+    // Управление значениями устройств
+    /////////////////////////////////////
+
+    @GET
+    @Path("/device/{uuid}/enable")
+    @Consumes(MediaType.TEXT_PLAIN)
+    public String devEnable(@PathParam("uuid") String uuid) throws JMSException {
+
+        MapMessage message = Service.session.createMapMessage();
+
+        message.setStringProperty("command", "enable");
+        message.setStringProperty("uuid", uuid);
+        message.setStringProperty ("qpid.subject", "event.devices.setvalue");
+
+        Service.messageProducer.send (message);
+
+        return "done";
+    }
+
+    @GET
+    @Path("/device/{uuid}/disable")
+    @Consumes(MediaType.TEXT_PLAIN)
+    public String devDisable(@PathParam("uuid") String uuid) throws JMSException {
+
+        MapMessage message = Service.session.createMapMessage();
+
+        message.setStringProperty("command", "disable");
+        message.setStringProperty("uuid", uuid);
+        message.setStringProperty ("qpid.subject", "event.devices.setvalue");
+
+        Service.messageProducer.send (message);
+
+        return "done";
+    }
+
+    @GET
+    @Path("/device/{uuid}/level/{level}")
+    @Consumes(MediaType.TEXT_PLAIN)
+    public String devSetLevel(@PathParam("uuid") String uuid, @PathParam("level") short level) throws JMSException {
+
+        MapMessage message = Service.session.createMapMessage();
+
+        message.setStringProperty("command", "setlevel");
+        message.setShortProperty("level", level);
+        message.setStringProperty("uuid", uuid);
+        message.setStringProperty ("qpid.subject", "event.devices.setvalue");
 
         Service.messageProducer.send (message);
 

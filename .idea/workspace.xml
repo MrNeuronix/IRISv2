@@ -12,42 +12,17 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="75a291f7-9666-495a-bb2a-4156a745c2c1" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Common/lib/zwave4j-0.1-ozw-rev-664.jar" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Devices/src/ru/iris/devices/Service.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Core\conf\iris.h2.db-clean" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Devices\cpp\CDataFile.cpp" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Devices\cpp\CDataFile.h" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Devices\cpp\Makefile" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Devices\cpp\ZWApi.h" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Devices\cpp\ZWaveNode.cpp" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Devices\cpp\ZWaveNode.h" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Devices\cpp\client.cpp" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Devices\cpp\client.h" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Devices\cpp\config.ini" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Devices\cpp\zwave.cpp" afterPath="" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Speak\src\ru\iris\speak\google\GoogleSpeakHandler.java" afterPath="" />
-      <change type="MOVED" beforePath="C:\Users\nikolay.viguro\IRISv2\Devices\src\ru\iris\zwave\ZWaveDevice.java" afterPath="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveDevice.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/conf/iris.h2.db" afterPath="$PROJECT_DIR$/Core/conf/iris.h2.db" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/conf/main.property" afterPath="$PROJECT_DIR$/Core/conf/main.property" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Devices/Devices.iml" afterPath="$PROJECT_DIR$/Devices/Devices.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/Devices_jar.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/Devices_jar.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakService.java" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSynthesizer.java" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSynthesizer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" afterPath="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Devices/src/META-INF/MANIFEST.MF" afterPath="$PROJECT_DIR$/Devices/src/META-INF/MANIFEST.MF" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Common/src/ru/iris/common/Messaging.java" afterPath="$PROJECT_DIR$/Common/src/ru/iris/common/Messaging.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java" afterPath="$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/src/ru/iris/speak/Service.java" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/Service.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSpeakService.java" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSpeakService.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSynthesizer.java" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSynthesizer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Devices/src/ru/iris/devices/Service.java" afterPath="$PROJECT_DIR$/Devices/src/ru/iris/devices/Service.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveDevice.java" afterPath="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveDevice.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java" afterPath="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dataSources.xml" afterPath="$PROJECT_DIR$/.idea/dataSources.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="IRISv2.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378826741074" ignored="false" />
+    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378827684906" ignored="false" />
     <file path="/README" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378473430689" ignored="false" />
     <file path="/Makefile" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377162449416" ignored="false" />
     <file path="/zwave.cpp" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377178274409" ignored="false" />
@@ -56,16 +31,16 @@
     <file path="$USER_HOME$/Iris-Web/README" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378400169147" ignored="false" />
     <file path="/fragment.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378805766214" ignored="false" />
     <file path="/Config.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378473199994" ignored="false" />
-    <file path="/Service.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378807226656" ignored="false" />
-    <file path="/RESTService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378728323655" ignored="false" />
+    <file path="/Service.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378888591715" ignored="false" />
+    <file path="/RESTService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378893859315" ignored="false" />
     <file path="/SpeakHandler.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378474977205" ignored="false" />
     <file path="/File Header.txt.ft" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378805374998" ignored="false" />
     <file path="/SQL.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378665893928" ignored="false" />
     <file path="/Launcher.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378807007499" ignored="false" />
-    <file path="/a.sql" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378827464742" ignored="false" />
+    <file path="/a.sql" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378877142824" ignored="false" />
     <file path="/Data Source" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378667318184" ignored="false" />
-    <file path="/dummy.sql" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378827443655" ignored="false" />
-    <file path="/ZWaveDevice.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378824828863" ignored="false" />
+    <file path="/dummy.sql" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378877142824" ignored="false" />
+    <file path="/ZWaveDevice.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378893164724" ignored="false" />
     <file path="/main.property" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378807025015" ignored="false" />
     <file path="/GoogleSynthesizer.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378724348014" ignored="false" />
     <file path="/NuanceSpeakService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378726193480" ignored="false" />
@@ -74,7 +49,7 @@
     <file path="/TTSHTTPClient.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378745424445" ignored="false" />
     <file path="/VoiceRSSSpeakService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378800015791" ignored="false" />
     <file path="/Speak.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378800216820" ignored="false" />
-    <file path="/ZWaveService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378824547738" ignored="false" />
+    <file path="/ZWaveService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378893438441" ignored="false" />
     <file path="/client.h" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378808355801" ignored="false" />
     <file path="/zwave.ini" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378808423514" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -151,10 +126,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="RESTService.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="RESTService.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="37" column="37" selection-start="842" selection-end="842" vertical-scroll-proportion="0.0">
+            <state line="105" column="26" selection-start="2854" selection-end="2854" vertical-scroll-proportion="0.7383016">
               <folding />
             </state>
           </provider>
@@ -163,34 +138,21 @@
       <file leaf-file-name="ZWaveService.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="51" column="32" selection-start="1470" selection-end="1470" vertical-scroll-proportion="0.0">
-              <folding />
+            <state line="648" column="47" selection-start="32339" selection-end="32339" vertical-scroll-proportion="0.0">
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#920#941#0" expanded="true" />
+                <element signature="e#2677#30192#0" expanded="true" />
+                <element signature="e#30181#30182#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ZWaveDevice.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="ZWaveDevice.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveDevice.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="151" column="75" selection-start="4020" selection-end="4020" vertical-scroll-proportion="0.7995338">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SQL.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/SQL.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="65" column="33" selection-start="2197" selection-end="2197" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Config.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/Config.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="39" column="0" selection-start="988" selection-end="1174" vertical-scroll-proportion="0.0">
+            <state line="41" column="36" selection-start="954" selection-end="954" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -218,7 +180,6 @@
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/Service.java" />
         <option value="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" />
         <option value="$PROJECT_DIR$/Core/conf/main.property" />
-        <option value="$PROJECT_DIR$/Devices/src/ru/iris/devices/Service.java" />
         <option value="$PROJECT_DIR$/Devices/zwave-cpp/config.ini" />
         <option value="$PROJECT_DIR$/Devices/zwave-cpp/client.h" />
         <option value="$PROJECT_DIR$/Core/conf/zwave.ini" />
@@ -227,9 +188,10 @@
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSynthesizer.java" />
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSpeakService.java" />
         <option value="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakService.java" />
-        <option value="$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java" />
-        <option value="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java" />
+        <option value="$PROJECT_DIR$/Devices/src/ru/iris/devices/Service.java" />
         <option value="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveDevice.java" />
+        <option value="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java" />
+        <option value="$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java" />
       </list>
     </option>
   </component>
@@ -280,6 +242,86 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Speak" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Speak" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="speak" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Speak" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="speak" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="google" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="IRISv2" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Speak" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -374,28 +416,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="Common" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Common" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="common" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -655,7 +675,11 @@
       <created>1378800986976</created>
       <updated>1378800986976</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Rework Devices module. Remove c++ zwave handler, add java-based.">
+      <created>1378827710049</created>
+      <updated>1378827710049</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -665,10 +689,10 @@
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32998884" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19797225" sideWeight="0.67001116" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19370331" sideWeight="0.6722408" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2575251" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3277592" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17058824" sideWeight="0.2865106" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3277592" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
@@ -676,7 +700,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2497332" sideWeight="0.74693424" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16435432" sideWeight="0.67001116" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.16435432" sideWeight="0.6722408" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32998884" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -728,7 +752,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Make communications between REST and Speak modules" />
+    <option name="LAST_COMMIT_MESSAGE" value="Rework Devices module. Remove c++ zwave handler, add java-based." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -749,6 +773,7 @@
     <MESSAGE value="Rework Speak module - split record and synthesizer, add different backend TTS" />
     <MESSAGE value="Little fixes" />
     <MESSAGE value="Make communications between REST and Speak modules" />
+    <MESSAGE value="Rework Devices module. Remove c++ zwave handler, add java-based." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -758,11 +783,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="dbDummy://dbtable:/6303084b/e3808ec5-1a6e-41b5-81d3-4304b04a7f0c/IRIS.PUBLIC.CONFIG">
-      <provider selected="true" editor-type-id="com.intellij.persistence.database.editor.DatabaseTableFileEditorProvider">
-        <state />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSynthesizer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="148" column="42" selection-start="4666" selection-end="4666" vertical-scroll-proportion="0.684271" />
@@ -773,23 +793,9 @@
         <state line="123" column="33" selection-start="3835" selection-end="3835" vertical-scroll-proportion="0.25373134" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="76" column="47" selection-start="2131" selection-end="2131" vertical-scroll-proportion="1.1561424" />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSpeakService.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="56" column="23" selection-start="1280" selection-end="1280" vertical-scroll-proportion="0.6291619" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Devices/src/ru/iris/devices/Service.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="22" selection-start="1033" selection-end="1033" vertical-scroll-proportion="0.41446614">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/Config.java">
@@ -811,20 +817,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="37" column="37" selection-start="842" selection-end="842" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="51" column="32" selection-start="1470" selection-end="1470" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="dbDummy://db-console:/6303084b/e3808ec5-1a6e-41b5-81d3-4304b04a7f0c/">
       <provider selected="true" editor-type-id="text-editor">
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
@@ -837,6 +829,13 @@
         <state />
       </provider>
     </entry>
+    <entry file="jar://C:/Program Files/Java/jdk1.7.0_25/src.zip!/java/util/Map.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="116" column="17" selection-start="5207" selection-end="5235" vertical-scroll-proportion="0.33333334">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="dbDummy://dbtable:/6303084b/20cdff3b-7b1f-414f-8e30-2cf7f2a3c254/IRIS.PUBLIC.DEVICES">
       <provider selected="true" editor-type-id="com.intellij.persistence.database.editor.DatabaseTableFileEditorProvider">
         <state />
@@ -847,9 +846,42 @@
         <state />
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="41" column="0" selection-start="806" selection-end="2302" vertical-scroll-proportion="0.06641124">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Devices/src/ru/iris/devices/Service.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="38" column="34" selection-start="997" selection-end="997" vertical-scroll-proportion="0.3933589">
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveDevice.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="151" column="75" selection-start="4020" selection-end="4020" vertical-scroll-proportion="0.7995338">
+        <state line="41" column="36" selection-start="954" selection-end="954" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="648" column="47" selection-start="32339" selection-end="32339" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#920#941#0" expanded="true" />
+            <element signature="e#2677#30192#0" expanded="true" />
+            <element signature="e#30181#30182#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="105" column="26" selection-start="2854" selection-end="2854" vertical-scroll-proportion="0.7383016">
           <folding />
         </state>
       </provider>

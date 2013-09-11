@@ -20,9 +20,10 @@ import java.util.Map;
 public class ZWaveDevice {
 
         private String name;
-        private int node = 0;
+        private short node = 0;
         private int zone = 0;
         private String type;
+        private String internalType;
         private String manufName;
         private String uuid;
         private String status;
@@ -47,11 +48,11 @@ public class ZWaveDevice {
             return this.source;
         }
 
-        public void setNode(int node) {
+        public void setNode(short node) {
             this.node = node;
         }
 
-        public int getNode() {
+        public short getNode() {
             return this.node;
         }
 
@@ -76,6 +77,9 @@ public class ZWaveDevice {
         }
 
         public void setValue(String label, Object value) {
+
+            if(label == null) label = "none";
+
             this.LabelsValues.put(label, value);
         }
 
@@ -87,9 +91,17 @@ public class ZWaveDevice {
             return this.type;
         }
 
-        public void setType(String type) {
-            this.type = type;
+        public void setInternalType(String type) {
+            this.internalType = type;
         }
+
+        public String getInternalType() {
+            return this.internalType;
+        }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
         public String getManufName() {
             return this.manufName;
@@ -123,7 +135,7 @@ public class ZWaveDevice {
                 this.name = "not set";
 
            return "Device\n\t[\n\t\tName: " + name + "\n\t\tUUID: " + uuid + "\n\t\tNode: " + node + "\n\t\tZone: " + zone + "\n\t\tType: " + type +
-                   "\n\t\tManufacture name: " + manufName + "\n\t\tStatus: " + status + "\n\t]\n";
+                   "\n\t\tInternal type: " + internalType + "\n\t\tManufacture name: " + manufName + "\n\t\tStatus: " + status + "\n\t]\n";
         }
 
         public void save() throws SQLException {
@@ -143,7 +155,7 @@ public class ZWaveDevice {
             sql.doQuery("DELETE FROM DEVICES WHERE UUID='"+this.uuid+"'");
             sql.doQuery("DELETE FROM DEVICELABELS WHERE UUID='"+this.uuid+"'");
 
-            sql.doQuery("INSERT INTO DEVICES (SOURCE, UUID, TYPE, MANUFNAME, NODE, STATUS, NAME, ZONE) VALUES ('zwave','"+uuid+"','"+type+"','"+manufName+"','"+node+"','"+status+"','"+name+"','"+zone+"')");
+            sql.doQuery("INSERT INTO DEVICES (SOURCE, UUID, internaltype, TYPE, MANUFNAME, NODE, STATUS, NAME, ZONE) VALUES ('zwave','"+uuid+"','"+internalType+"','"+type+"','"+manufName+"','"+node+"','"+status+"','"+name+"','"+zone+"')");
 
             Iterator it = LabelsValues.entrySet().iterator();
             while (it.hasNext()) {
