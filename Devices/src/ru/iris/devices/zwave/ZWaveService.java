@@ -628,32 +628,44 @@ public class ZWaveService implements Runnable
                 {
                     String uuid = m.getStringProperty("uuid");
                     String cmd = m.getStringProperty("command");
+                    short node = 0;
 
-                    ZWaveDevice device = getDeviceByUUID(uuid);
+                    if(!cmd.equals("allon") && !cmd.equals("alloff"))
+                    {
+                        ZWaveDevice device = getDeviceByUUID(uuid);
 
-                    short node = device.getNode();
+                        if(device == null)
+                        {
+                            log.info("[zwave] Cannot find device with UUID: "+uuid);
+                            continue;
+                        }
+
+                        node = device.getNode();
+                    }
 
                     if(cmd.equals("setlevel"))
                     {
-                        log.info("[zwave] Setting level "+m.getShortProperty("level")+" on UUID "+uuid);
+                        log.info("[zwave] Setting level "+m.getShortProperty("level")+" on UUID "+uuid + " (Node "+node+")");
                         manager.setNodeLevel(homeId, node, m.getShortProperty("level"));
                     }
                     else if (cmd.equals("enable"))
                     {
-                        log.info("[zwave] Enabling UUID "+uuid);
+                        log.info("[zwave] Enabling UUID "+uuid + " (Node "+node+")");
                         manager.setNodeOn(homeId, node);
                     }
                     else if (cmd.equals("disable"))
                     {
-                        log.info("[zwave] Disabling UUID "+uuid);
+                        log.info("[zwave] Disabling UUID "+uuid + " (Node "+node+")");
                         manager.setNodeOff(homeId, node);
                     }
                     else if (cmd.equals("allon"))
                     {
-                         manager.switchAllOn(homeId);
+                        log.info("[zwave] Enabling all");
+                        manager.switchAllOn(homeId);
                     }
                     else if (cmd.equals("alloff"))
                     {
+                        log.info("[zwave] Disabling all");
                         manager.switchAllOff(homeId);
                     }
                     else
@@ -735,20 +747,11 @@ public class ZWaveService implements Runnable
 
     private ZWaveDevice getDeviceByUUID(String uuid)
     {
-        HashMap zDv = (HashMap) zDevices.clone();
-
-        Iterator it = zDv.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pairs = (Map.Entry)it.next();
-
-            if(uuid.equals(pairs.getKey()))
-            {
-                return (ZWaveDevice) pairs.getValue();
-            }
-
-            it.remove(); // avoids a ConcurrentModificationException
+        for(ZWaveDevice device : zDevices.values())
+        {
+            if(device.getUUID().equals(uuid))
+                return device;
         }
-
         return null;
     }
 }
