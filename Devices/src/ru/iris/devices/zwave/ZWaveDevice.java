@@ -41,7 +41,7 @@ public class ZWaveDevice {
     @Expose
     private String source = "zwave";
     @Expose
-    private Map<String, Object> LabelsValues = new HashMap<String, Object>();
+    private HashMap<String, Object> LabelsValues = new HashMap<String, Object>();
 
     private SQL sql;
 
@@ -86,14 +86,76 @@ public class ZWaveDevice {
         }
 
         public String getValue(String label) {
-            return this.LabelsValues.get(label).toString();
+
+            if (label == null)
+                label = "none set";
+
+            try {
+                return this.LabelsValues.get(label).toString();
+            } catch (NullPointerException e)
+            {
+                return "none set";
+            }
+
         }
 
         public void setValue(String label, Object value) {
 
-            if(label == null) label = "none";
+            if (label == null)
+                label = "none set";
 
             this.LabelsValues.put(label, value);
+        }
+
+        public void updateValue(String label, Object value) {
+
+            HashMap<String, Object> zDv = new HashMap<>();
+
+            Iterator it = LabelsValues.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pairs = (Map.Entry)it.next();
+
+                String olabel = String.valueOf(pairs.getKey());
+                String ovalue = String.valueOf(pairs.getValue());
+
+                if(label.equals(olabel))
+                {
+                    zDv.put(label, value);
+                }
+                else
+                {
+                    zDv.put(olabel, ovalue);
+                }
+            }
+
+            LabelsValues = zDv;
+        }
+
+        public void removeValue(String label) {
+
+            if (label == null)
+                label = "none set";
+
+            HashMap<String, Object> zDv = new HashMap<>();
+
+            Iterator it = LabelsValues.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pairs = (Map.Entry)it.next();
+
+                String olabel = String.valueOf(pairs.getKey());
+                String ovalue = String.valueOf(pairs.getValue());
+
+                if(label.equals(olabel))
+                {
+                    continue;
+                }
+                else
+                {
+                    zDv.put(olabel, ovalue);
+                }
+            }
+
+            LabelsValues = zDv;
         }
 
         public Map<String, Object> getLabelsValues() {
@@ -172,7 +234,6 @@ public class ZWaveDevice {
                     value = "none";
 
                 sql.doQuery("INSERT INTO DEVICELABELS (UUID, LABEL, VALUE) VALUES ('"+this.uuid+"','"+label+"','"+value+"')");
-                it.remove();
             }
         }
 }

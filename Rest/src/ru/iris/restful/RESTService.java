@@ -33,7 +33,7 @@ public class RESTService
     private static Logger log = LoggerFactory.getLogger(RESTService.class.getName());
 
         @GET
-        @Path("/get/{uuid}")
+        @Path("/device/get/{uuid}")
         @Produces(MediaType.TEXT_PLAIN)
         public String device(@PathParam("uuid") String uuid) throws IOException, SQLException {
 

@@ -39,7 +39,7 @@ voicerssAPI=a07e6a0dd3884deb978d02d2f1d7ee76
 zwavePort=/dev/ttyUSB0
 
 # Вывод на экран отладочной информации zwave
-zwaveDebug=true
+zwaveDebug=false
 
 # Путь до конфигурационных файлов open-zwave
 openzwaveCfgPath=./conf/zwave-conf

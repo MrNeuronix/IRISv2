@@ -79,12 +79,10 @@ public class ZWaveService implements Runnable
         options.lock();
 
         final Manager manager = Manager.create();
+
         manager.addNotificationWatcher(new NotificationWatcher() {
             @Override
             public void onNotification(Notification notification) {
-
-                String label = manager.getValueLabel(notification.getValueId());
-                ZWaveDevice device = null;
 
                 switch (notification.getType()) {
                     case DRIVER_READY:
@@ -142,344 +140,62 @@ public class ZWaveService implements Runnable
                         {
                             case "Portable Remote Controller":
 
-                                //////////////////////////////////
-
-                                if((device = hasInstance("controller/"+notification.getNodeId())) == null)
-                                {
-                                    String uuid = UUID.randomUUID().toString();
-
-                                    try {
-                                        device = new ZWaveDevice();
-                                        device.setInternalType("controller");
-                                        device.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
-                                        device.setNode(notification.getNodeId());
-                                        device.setUUID(uuid);
-                                        device.setValue(label, getValue(notification.getValueId()));
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    } catch (SQLException e) {
-                                        e.printStackTrace();
-                                    }
-
-                                    log.info("[zwave] Add device to array - "+"controller/"+notification.getNodeId());
-                                    zDevices.put("controller/"+notification.getNodeId(), device);
-                                }
-                                else
-                                {
-                                    device.setValue(label, getValue(notification.getValueId()));
-                                }
+                                addDeviceOrValue("controller", notification, manager);
                                 break;
 
                             //////////////////////////////////
 
-
                             case "Multilevel Power Switch":
 
-                                //////////////////////////////////
-
-                                    if((device = hasInstance("dimmer/"+notification.getNodeId())) == null)
-                                    {
-                                        String uuid = UUID.randomUUID().toString();
-
-                                        try {
-                                            device = new ZWaveDevice();
-                                            device.setInternalType("dimmer");
-                                            device.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
-                                            device.setNode(notification.getNodeId());
-                                            device.setUUID(uuid);
-                                            device.setValue(label, getValue(notification.getValueId()));
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        log.info("[zwave] Add device to array - "+"dimmer/"+notification.getNodeId());
-                                        zDevices.put("dimmer/"+notification.getNodeId(), device);
-                                    }
-                                    else
-                                    {
-                                            device.setValue(label, getValue(notification.getValueId()));
-                                    }
+                                addDeviceOrValue("dimmer", notification, manager);
                                 break;
 
-                                //////////////////////////////////
+                            //////////////////////////////////
 
                             case "Routing Alarm Sensor":
 
-                                if((device = hasInstance("alarmsensor/"+notification.getNodeId())) == null)
-                                {
-                                    String uuid = UUID.randomUUID().toString();
-
-                                    try {
-                                        device = new ZWaveDevice();
-                                        device.setInternalType("alarmsensor");
-                                        device.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
-                                        device.setNode(notification.getNodeId());
-                                        device.setUUID(uuid);
-                                        device.setValue(label, getValue(notification.getValueId()));
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    } catch (SQLException e) {
-                                        e.printStackTrace();
-                                    }
-
-                                    log.info("[zwave] Add device to array - "+"alarmsensor/"+notification.getNodeId());
-                                    zDevices.put("alarmsensor/"+notification.getNodeId(), device);
-                                }
-                                else
-                                {
-                                    device.setValue(label, getValue(notification.getValueId()));
-                                }
+                                addDeviceOrValue("alarmsensor", notification, manager);
                                 break;
 
                             case "Binary Power Switch":
-                                //////////////////////////////////
-                                    if((device = hasInstance("switch/"+notification.getNodeId())) == null)
-                                    {
-                                        String uuid = UUID.randomUUID().toString();
 
-                                        try {
-                                            device = new ZWaveDevice();
-                                            device.setInternalType("switch");
-                                            device.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
-                                            device.setNode(notification.getNodeId());
-                                            device.setUUID(uuid);
-                                            device.setValue(label, getValue(notification.getValueId()));
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        log.info("[zwave] Add device to array - "+"switch/"+notification.getNodeId());
-                                    }
-                                    else
-                                    {
-                                        device.setValue(label, getValue(notification.getValueId()));
-                                    }
+                                addDeviceOrValue("switch", notification, manager);
                                 break;
 
                             case "Routing Binary Sensor":
 
-                                //////////////////////////////////
-
-                                    if((device = hasInstance("binarysensor/"+notification.getNodeId())) == null)
-                                    {
-                                        String uuid = UUID.randomUUID().toString();
-
-                                        try {
-                                            device = new ZWaveDevice();
-                                            device.setInternalType("binarysensor");
-                                            device.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
-                                            device.setNode(notification.getNodeId());
-                                            device.setUUID(uuid);
-                                            device.setValue(label, getValue(notification.getValueId()));
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        log.info("[zwave] Add device to array - "+"binarysensor/"+notification.getNodeId());
-                                    }
-                                    else
-                                    {
-                                        device.setValue(label, getValue(notification.getValueId()));
-                                    }
+                                addDeviceOrValue("binarysensor", notification, manager);
                                 break;
 
                             //////////////////////////////////
 
                             case "Routing Multilevel Sensor":
 
-                                //////////////////////////////////
-
-                                if(label.equals("Luminance"))
-                                {
-                                    if((device = hasInstance("brightnesssensor/"+notification.getNodeId())) == null)
-                                    {
-                                        String uuid = UUID.randomUUID().toString();
-
-                                        try {
-                                            device = new ZWaveDevice();
-                                            device.setInternalType("brightnesssensor");
-                                            device.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
-                                            device.setNode(notification.getNodeId());
-                                            device.setUUID(uuid);
-                                            device.setValue(label, getValue(notification.getValueId()));
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        log.info("[zwave] Add device to array - "+"brightnesssensor/"+notification.getNodeId());
-                                        zDevices.put("brightnesssensor/"+notification.getNodeId(), device);
-                                    }
-                                    else
-                                    {
-                                        device.setValue(label, getValue(notification.getValueId()));
-                                    }
-                                } else if (label.equals("Temperature"))
-                                {
-                                    if((device = hasInstance("temperaturesensor/"+notification.getNodeId())) == null)
-                                    {
-                                        String uuid = UUID.randomUUID().toString();
-
-                                        try {
-                                            device = new ZWaveDevice();
-                                            device.setInternalType("temperaturesensor");
-                                            device.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
-                                            device.setNode(notification.getNodeId());
-                                            device.setUUID(uuid);
-                                            device.setValue(label, getValue(notification.getValueId()));
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        log.info("[zwave] Add device to array - "+"temperaturesensor/"+notification.getNodeId());
-                                        zDevices.put("temperaturesensor/"+notification.getNodeId(), device);
-                                    }
-                                    else
-                                    {
-                                        device.setValue(label, getValue(notification.getValueId()));
-                                    }
-
-                                } else {
-
-                                    log.info("[zwave] Unhandled label \""+label+"\" detected. Adding generic multilevel sensor");
-
-                                    if((device = hasInstance("multilevelsensor/"+notification.getNodeId())) == null)
-                                    {
-                                        String uuid = UUID.randomUUID().toString();
-
-                                        try {
-                                            device = new ZWaveDevice();
-                                            device.setInternalType("multilevelsensor)");
-                                            device.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
-                                            device.setNode(notification.getNodeId());
-                                            device.setUUID(uuid);
-                                            device.setValue(label, getValue(notification.getValueId()));
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        log.info("[zwave] Add device to array - "+"multilevelsensor/"+notification.getNodeId());
-                                        zDevices.put("multilevelsensor/"+notification.getNodeId(), device);
-                                    }
-                                    else
-                                    {
-                                        device.setValue(label, getValue(notification.getValueId()));
-                                    }
-
-                                }
+                                addDeviceOrValue("multilevelsensor", notification, manager);
                                 break;
 
                             //////////////////////////////////
 
                             case "Simple Meter":
 
-                                //////////////////////////////////
-
-                                    if((device = hasInstance("metersensor/"+notification.getNodeId())) == null)
-                                    {
-                                        String uuid = UUID.randomUUID().toString();
-
-                                        try {
-                                            device = new ZWaveDevice();
-                                            device.setInternalType("metersensor");
-                                            device.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
-                                            device.setNode(notification.getNodeId());
-                                            device.setUUID(uuid);
-                                            device.setValue(label, getValue(notification.getValueId()));
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        log.info("[zwave] Add device to array - "+"metersensor/"+notification.getNodeId());
-                                        zDevices.put("metersensor/"+notification.getNodeId(), device);
-                                    }
-                                    else
-                                    {
-                                        device.setValue(label, getValue(notification.getValueId()));
-                                    }
-
+                                addDeviceOrValue("metersensor", notification, manager);
                                 break;
 
                             //////////////////////////////////
 
                             case "Simple Window Covering":
 
-                                //////////////////////////////////
-
-                                    if((device = hasInstance("drapes/"+notification.getNodeId())) == null)
-                                    {
-                                        String uuid = UUID.randomUUID().toString();
-
-                                        try {
-                                            device = new ZWaveDevice();
-                                            device.setInternalType("drapes");
-                                            device.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));;
-                                            device.setNode(notification.getNodeId());
-                                            device.setUUID(uuid);
-                                            device.setValue(label, getValue(notification.getValueId()));
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        log.info("[zwave] Add device to array - "+"drapes/"+notification.getNodeId());
-                                        zDevices.put("drapes/"+notification.getNodeId(), device);
-                                    }
-                                    else
-                                    {
-                                        device.setValue(label, getValue(notification.getValueId()));
-                                    }
-
+                                addDeviceOrValue("drapes", notification, manager);
                                 break;
 
                             //////////////////////////////////
 
                             case "Setpoint Thermostat":
 
-                                //////////////////////////////////
-
-                                    if((device = hasInstance("thermostat/"+notification.getNodeId())) == null)
-                                    {
-                                        String uuid = UUID.randomUUID().toString();
-
-                                        try {
-                                            device = new ZWaveDevice();
-                                            device.setInternalType("thermostat");
-                                            device.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
-                                            device.setNode(notification.getNodeId());
-                                            device.setUUID(uuid);
-                                            device.setValue(label, getValue(notification.getValueId()));
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                        log.info("[zwave] Add device to array - "+"thermostat/"+notification.getNodeId());
-                                        zDevices.put("thermostat/"+notification.getNodeId(), device);
-                                    }
-                                    else
-                                    {
-                                        device.setValue(label, getValue(notification.getValueId()));
-                                    }
+                                addDeviceOrValue("thermostat", notification, manager);
                                 break;
 
                             //////////////////////////////////
-
                             //////////////////////////////////
 
                             default:
@@ -487,7 +203,7 @@ public class ZWaveService implements Runnable
                                         ", Type: "+manager.getNodeType(notification.getHomeId(), notification.getNodeId())+
                                         ", Class: "+notification.getValueId().getCommandClassId()+
                                         ", Genre: "+notification.getValueId().getGenre()+
-                                        ", Label: "+label+
+                                        ", Label: "+manager.getValueLabel(notification.getValueId())+
                                         ", Value: "+getValue(notification.getValueId())+
                                         ", Index: "+notification.getValueId().getIndex()+
                                         ", Instance: "+notification.getValueId().getInstance()
@@ -498,30 +214,33 @@ public class ZWaveService implements Runnable
 
                         break;
                     case VALUE_REMOVED:
-                        System.out.println(String.format("Value removed\n" +
-                                "\tnode id: %d\n" +
-                                "\tcommand class: %d\n" +
-                                "\tinstance: %d\n" +
-                                "\tindex: %d",
-                                notification.getNodeId(),
-                                notification.getValueId().getCommandClassId(),
-                                notification.getValueId().getInstance(),
-                                notification.getValueId().getIndex()
-                        ));
+
+                        ZWaveDevice zrdevice = getDeviceByNode(notification.getNodeId());
+
+                        if(zrdevice == null)
+                        {
+                            log.info("[zwave] Error while save value remove. Cannot find device with Node ID: "+notification.getNodeId());
+                            break;
+                        }
+
+                        zrdevice.removeValue(manager.getValueLabel(notification.getValueId()));
+                        log.info("[zwave] Node "+zrdevice.getNode()+": Value \""+manager.getValueLabel(notification.getValueId())+"\" removed");
+
                         break;
                     case VALUE_CHANGED:
-                        System.out.println(String.format("Value changed\n" +
-                                "\tnode id: %d\n" +
-                                "\tcommand class: %d\n" +
-                                "\tinstance: %d\n" +
-                                "\tindex: %d\n" +
-                                "\tvalue: %s",
-                                notification.getNodeId(),
-                                notification.getValueId().getCommandClassId(),
-                                notification.getValueId().getInstance(),
-                                notification.getValueId().getIndex(),
-                                getValue(notification.getValueId())
-                        ));
+
+                        ZWaveDevice zcdevice = getDeviceByNode(notification.getNodeId());
+
+                        if(zcdevice == null)
+                        {
+                            log.info("[zwave] Error while save value change. Cannot find device with Node ID: "+notification.getNodeId());
+                            break;
+                        }
+
+                        String oldValue = zcdevice.getValue(manager.getValueLabel(notification.getValueId()));
+                        zcdevice.updateValue(manager.getValueLabel(notification.getValueId()),getValue(notification.getValueId()));
+                        log.info("[zwave] Node "+zcdevice.getNode()+": Value for label \""+manager.getValueLabel(notification.getValueId())+"\" changed: "+oldValue+" --> "+getValue(notification.getValueId()));
+
                         break;
                     case VALUE_REFRESHED:
                         System.out.println(String.format("Value refreshed\n" +
@@ -610,8 +329,6 @@ public class ZWaveService implements Runnable
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         }
-
-        log.info ("[speak] Service started (TTS: Google)");
 
         Message message = null;
         MapMessage m = null;
@@ -754,5 +471,58 @@ public class ZWaveService implements Runnable
         }
         return null;
     }
-}
 
+    private ZWaveDevice getDeviceByNode(short id)
+    {
+        for(ZWaveDevice device : zDevices.values())
+        {
+            if(device.getNode() == id)
+            {
+                return device;
+            }
+        }
+        return null;
+    }
+
+    private void addDeviceOrValue(String type, Notification notification, Manager manager) {
+
+        ZWaveDevice device = null;
+        String label = manager.getValueLabel(notification.getValueId());
+
+        try {
+            device = new ZWaveDevice();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if((device = hasInstance(type+"/"+notification.getNodeId())) == null)
+        {
+            String uuid = UUID.randomUUID().toString();
+
+            try {
+                device = new ZWaveDevice();
+                device.setManufName(manager.getNodeManufacturerName(notification.getHomeId(), notification.getNodeId()));
+                device.setInternalType(type);
+                device.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
+                device.setNode(notification.getNodeId());
+                device.setUUID(uuid);
+                device.setValue(label, getValue(notification.getValueId()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+            log.info("[zwave] Add device to array - "+type+"/"+notification.getNodeId());
+            zDevices.put(type+"/"+notification.getNodeId(), device);
+        }
+        else
+        {
+            log.info("[zwave] Add value to device: "+label+" --> "+getValue(notification.getValueId()));
+            device.setValue(label, getValue(notification.getValueId()));
+        }
+
+    }
+}
