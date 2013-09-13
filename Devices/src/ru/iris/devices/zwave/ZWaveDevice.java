@@ -129,6 +129,12 @@ public class ZWaveDevice {
             }
 
             LabelsValues = zDv;
+
+            try {
+                save();
+            } catch (SQLException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
         }
 
         public void removeValue(String label) {
@@ -152,6 +158,11 @@ public class ZWaveDevice {
                 else
                 {
                     zDv.put(olabel, ovalue);
+                }
+                try {
+                    save();
+                } catch (SQLException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                 }
             }
 
