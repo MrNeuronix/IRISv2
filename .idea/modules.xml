@@ -9,6 +9,7 @@
       <module fileurl="file://$PROJECT_DIR$/Record/Record.iml" filepath="$PROJECT_DIR$/Record/Record.iml" />
       <module fileurl="file://$PROJECT_DIR$/Rest/Rest.iml" filepath="$PROJECT_DIR$/Rest/Rest.iml" />
       <module fileurl="file://$PROJECT_DIR$/Speak/Speak.iml" filepath="$PROJECT_DIR$/Speak/Speak.iml" />
+      <module fileurl="file://Y:/zwave4j/zwave4j.iml" filepath="Y:/zwave4j/zwave4j.iml" />
     </modules>
   </component>
 </project>

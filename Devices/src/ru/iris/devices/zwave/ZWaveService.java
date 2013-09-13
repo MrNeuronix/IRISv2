@@ -306,29 +306,20 @@ public class ZWaveService implements Runnable
 
         manager.addDriver(Service.config.get("zwavePort"));
 
-        log.info("[zwave] Not Ready!");
+        log.info("[zwave] Waiting ready state from zwave");
 
         // Ждем окончания инициализации
         while(!ready)
         {
             try {
                 Thread.sleep(1000);
-                log.info("[zwave] Waiting");
+                log.info("[zwave] Still waiting");
             } catch (InterruptedException e) {
                 e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
             }
         }
 
-        log.info("[zwave] Initialize complete!");
-
-        // Сохраняем текущую конфигурацию
-        for (ZWaveDevice device : zDevices.values()) {
-            try {
-                device.save();
-            } catch (SQLException e) {
-                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            }
-        }
+        log.info("[zwave] Initialization complete");
 
         Message message = null;
         MapMessage m = null;
@@ -358,6 +349,10 @@ public class ZWaveService implements Runnable
                         }
 
                         node = device.getNode();
+
+                        // Testing. I have one, periodically change state to dead
+                        manager.testNetworkNode(homeId, node, 3);
+                        manager.healNetworkNode(homeId, node, true);
                     }
 
                     if(cmd.equals("setlevel"))
