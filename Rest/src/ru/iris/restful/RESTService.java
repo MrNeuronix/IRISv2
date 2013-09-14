@@ -4,10 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.Module;
 import ru.iris.devices.zwave.ZWaveDevice;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
+import javax.jms.Message;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
@@ -37,8 +39,10 @@ public class RESTService
         @Produces(MediaType.TEXT_PLAIN)
         public String device(@PathParam("uuid") String uuid) throws IOException, SQLException {
 
+            log.info("[rest] Get /device/get/"+uuid);
+
             ResultSet rs = Service.sql.select("SELECT * FROM DEVICES");
-            ArrayList zDevices = new ArrayList<ZWaveDevice>();
+            ArrayList<ZWaveDevice> zDevices = new ArrayList<ZWaveDevice>();
             Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
             try {
@@ -70,12 +74,68 @@ public class RESTService
 
             } catch (SQLException e) {
                 e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            };
+            }
 
             return gson.toJson(zDevices);
         }
+
+    /////////////////////////////////////
+    // Команда
+    /////////////////////////////////////
+
+    @GET
+    @Path("/cmd/{text}")
+    @Consumes(MediaType.TEXT_PLAIN)
+    public String cmd(@PathParam("text") String text) throws JMSException, SQLException {
+
+        log.info("[rest] Get /cmd/"+text);
+
+        MapMessage message = Service.session.createMapMessage();
+
+        message.setStringProperty("cmd", text);
+        message.setStringProperty ("qpid.subject", "event.command");
+
+        Service.messageProducer.send (message);
+
+        Message mess;
+        MapMessage m = null;
+
+        while ((mess = Service.messageConsumer.receive (0)) != null)
+        {
+            m = (MapMessage) mess;
+
+            if(m.getStringProperty("qpid.subject").equals ("event.command"))
+            {
+                log.info ("[rest] Got \""+m.getStringProperty("cmd")+"\" command");
+
+                ResultSet rs = Service.sql.select("SELECT name, command, param FROM modules");
+
+                while (rs.next())
+                {
+                    String name = rs.getString("name");
+                    String comm = rs.getString("command");
+                    String param = rs.getString("param");
+
+                    if (m.getStringProperty("cmd").contains(comm)) {
+                        try {
+
+                            Class cl = Class.forName("modules." + name);
+                            Module execute = (Module) cl.newInstance();
+                            execute.run(param);
+
+                        } catch (Exception e) {
+                            log.info("[module] Error at loading module " + name + " with params \"" + param + "\"!");
+                            e.printStackTrace ();
+                        }
+                    }
+                }
+
+                rs.close();
+            }
+        }
+
+        return "done";
+    }
 
     /////////////////////////////////////
     // Cинтез речи
@@ -85,6 +145,8 @@ public class RESTService
     @Path("/speak/{text}")
     @Consumes(MediaType.TEXT_PLAIN)
     public String speak(@PathParam("text") String text) throws JMSException {
+
+        log.info("[rest] Get /speak/"+text);
 
         MapMessage message = Service.session.createMapMessage();
 
@@ -106,6 +168,8 @@ public class RESTService
     @Consumes(MediaType.TEXT_PLAIN)
     public String devEnable(@PathParam("uuid") String uuid) throws JMSException {
 
+        log.info("[rest] Enable "+uuid+ " device");
+
         MapMessage message = Service.session.createMapMessage();
 
         message.setStringProperty("command", "enable");
@@ -121,6 +185,8 @@ public class RESTService
     @Path("/device/{uuid}/disable")
     @Consumes(MediaType.TEXT_PLAIN)
     public String devDisable(@PathParam("uuid") String uuid) throws JMSException {
+
+        log.info("[rest] Disable "+uuid+ " device");
 
         MapMessage message = Service.session.createMapMessage();
 
@@ -138,6 +204,8 @@ public class RESTService
     @Consumes(MediaType.TEXT_PLAIN)
     public String devSetLevel(@PathParam("uuid") String uuid, @PathParam("level") short level) throws JMSException {
 
+        log.info("[rest] Set level "+level+ " on "+uuid+" device");
+
         MapMessage message = Service.session.createMapMessage();
 
         message.setStringProperty("command", "setlevel");
@@ -153,7 +221,9 @@ public class RESTService
     @GET
     @Path("/device/all/{state}")
     @Consumes(MediaType.TEXT_PLAIN)
-    public String devAllState(@PathParam("state") String state) throws JMSException {
+    public String devAllState(@PathParam("state") String state) throws JMSException
+    {
+        log.info("[rest] Switch all devices to "+state+ " state");
 
         MapMessage message = Service.session.createMapMessage();
 

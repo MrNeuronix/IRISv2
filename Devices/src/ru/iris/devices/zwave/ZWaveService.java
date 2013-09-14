@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -86,35 +84,32 @@ public class ZWaveService implements Runnable
 
                 switch (notification.getType()) {
                     case DRIVER_READY:
-                        System.out.println(String.format("Driver ready\n" +
-                                "\thome id: %d",
-                                notification.getHomeId()
-                        ));
+                        log.info("[zwave] Driver ready, home id: "+notification.getHomeId());
                         homeId = notification.getHomeId();
                         break;
                     case DRIVER_FAILED:
-                        System.out.println("Driver failed");
+                        log.info("[zwave] Driver failed");
                         break;
                     case DRIVER_RESET:
-                        System.out.println("Driver reset");
+                        log.info("[zwave] Driver reset");
                         break;
                     case AWAKE_NODES_QUERIED:
-                        System.out.println("Awake nodes queried");
+                        log.info("[zwave] Awake nodes queried");
                         ready = true;
                         break;
                     case ALL_NODES_QUERIED:
-                        System.out.println("All nodes queried");
+                        log.info("[zwave] All nodes queried");
                         manager.writeConfig(homeId);
                         ready = true;
                         break;
                     case ALL_NODES_QUERIED_SOME_DEAD:
-                        System.out.println("All nodes queried some dead");
+                        log.info("[zwave] All nodes queried some dead");
                         break;
                     case POLLING_ENABLED:
-                        System.out.println("Polling enabled");
+                        log.info("[zwave] Polling enabled");
                         break;
                     case POLLING_DISABLED:
-                        System.out.println("Polling disabled");
+                        log.info("[zwave] Polling disabled");
                         break;
                     case NODE_NEW:
                         break;
@@ -127,6 +122,8 @@ public class ZWaveService implements Runnable
                     case NODE_QUERIES_COMPLETE:
                         break;
                     case NODE_EVENT:
+                        log.info("[zwave] Update info for node "+notification.getNodeId());
+                        manager.refreshNodeInfo(homeId, notification.getNodeId());
                         break;
                     case NODE_NAMING:
                         break;
@@ -257,43 +254,16 @@ public class ZWaveService implements Runnable
                         ));
                         break;
                     case GROUP:
-                        System.out.println(String.format("Group\n" +
-                                "\tnode id: %d\n" +
-                                "\tgroup id: %d",
-                                notification.getNodeId(),
-                                notification.getGroupIdx()
-                        ));
                         break;
-
                     case SCENE_EVENT:
-                        System.out.println(String.format("Scene event\n" +
-                                "\tscene id: %d",
-                                notification.getSceneId()
-                        ));
                         break;
                     case CREATE_BUTTON:
-                        System.out.println(String.format("Button create\n" +
-                                "\tbutton id: %d",
-                                notification.getButtonId()
-                        ));
                         break;
                     case DELETE_BUTTON:
-                        System.out.println(String.format("Button delete\n" +
-                                "\tbutton id: %d",
-                                notification.getButtonId()
-                        ));
                         break;
                     case BUTTON_ON:
-                        System.out.println(String.format("Button on\n" +
-                                "\tbutton id: %d",
-                                notification.getButtonId()
-                        ));
                         break;
                     case BUTTON_OFF:
-                        System.out.println(String.format("Button off\n" +
-                                "\tbutton id: %d",
-                                notification.getButtonId()
-                        ));
                         break;
                     case NOTIFICATION:
                         break;
@@ -319,11 +289,19 @@ public class ZWaveService implements Runnable
             }
         }
 
-        log.info("[zwave] Initialization complete");
+        log.info("[zwave] Initialization complete. Found "+zDevices.size()+" device(s)");
+
+        for(ZWaveDevice device : zDevices.values())
+        {
+            try {
+                device.save();
+            } catch (SQLException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+        }
 
         Message message = null;
         MapMessage m = null;
-        ExecutorService exs = Executors.newFixedThreadPool(10);
 
         try
         {
@@ -331,6 +309,7 @@ public class ZWaveService implements Runnable
             while ((message = Service.messageConsumer.receive (0)) != null)
             {
                 m = (MapMessage) message;
+                ZWaveDevice device = null;
 
                 if(m.getStringProperty("qpid.subject").contains("event.devices.setvalue"))
                 {
@@ -340,7 +319,7 @@ public class ZWaveService implements Runnable
 
                     if(!cmd.equals("allon") && !cmd.equals("alloff"))
                     {
-                        ZWaveDevice device = getDeviceByUUID(uuid);
+                        device = getDeviceByUUID(uuid);
 
                         if(device == null)
                         {
@@ -351,24 +330,27 @@ public class ZWaveService implements Runnable
                         node = device.getNode();
 
                         // Testing. I have one, periodically change state to dead
-                        manager.testNetworkNode(homeId, node, 3);
-                        manager.healNetworkNode(homeId, node, true);
+                        //manager.testNetworkNode(homeId, node, 3);
+                        //manager.healNetworkNode(homeId, node, true);
                     }
 
                     if(cmd.equals("setlevel"))
                     {
                         log.info("[zwave] Setting level "+m.getShortProperty("level")+" on UUID "+uuid + " (Node "+node+")");
                         manager.setNodeLevel(homeId, node, m.getShortProperty("level"));
+                        device.updateValue("Level", m.getShortProperty("level"));
                     }
                     else if (cmd.equals("enable"))
                     {
                         log.info("[zwave] Enabling UUID "+uuid + " (Node "+node+")");
                         manager.setNodeOn(homeId, node);
+                        device.updateValue("Level", 99);
                     }
                     else if (cmd.equals("disable"))
                     {
                         log.info("[zwave] Disabling UUID "+uuid + " (Node "+node+")");
                         manager.setNodeOff(homeId, node);
+                        device.updateValue("Level", 0);
                     }
                     else if (cmd.equals("allon"))
                     {
@@ -379,6 +361,11 @@ public class ZWaveService implements Runnable
                     {
                         log.info("[zwave] Disabling all");
                         manager.switchAllOff(homeId);
+                    }
+                    else if (cmd.equals("updateinfo"))
+                    {
+                        log.info("[zwave] Update info for node "+node);
+                        manager.refreshNodeInfo(homeId, node);
                     }
                     else
                     {
@@ -495,11 +482,16 @@ public class ZWaveService implements Runnable
         if((device = hasInstance(type+"/"+notification.getNodeId())) == null)
         {
             String uuid = UUID.randomUUID().toString();
+            String state = "Not responding";
+
+            if(manager.requestNodeState(homeId, notification.getNodeId()))
+                state = "Listening";
 
             try {
                 device = new ZWaveDevice();
                 device.setManufName(manager.getNodeManufacturerName(notification.getHomeId(), notification.getNodeId()));
                 device.setInternalType(type);
+                device.setStatus(state);
                 device.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
                 device.setNode(notification.getNodeId());
                 device.setUUID(uuid);

@@ -185,9 +185,9 @@ public class ZWaveDevice {
             return this.internalType;
         }
 
-    public void setType(String type) {
-        this.type = type;
-    }
+        public void setType(String type) {
+            this.type = type;
+        }
 
         public String getManufName() {
             return this.manufName;

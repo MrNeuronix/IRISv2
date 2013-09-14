@@ -3,11 +3,17 @@ package ru.iris.record;
 import javaFlacEncoder.FLAC_FileEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.Module;
 import ru.iris.common.httpPOST;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import java.io.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Random;
 
 /**
@@ -38,6 +44,16 @@ public class RecordService implements Runnable
         int threads = Integer.valueOf (Service.config.get ("recordStreams"));
         int micro = Integer.valueOf (Service.config.get ("microphones"));
 
+        Clip clip = null;
+        AudioInputStream audioIn = null;
+        try {
+            audioIn = AudioSystem.getAudioInputStream(new File("./conf/beep.wav"));
+            clip = AudioSystem.getClip();
+            clip.open(audioIn);
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
         log.info ("[record] Configured to run " + threads + " threads on " + micro + " microphones");
 
         for (int m = 1; m <= micro; m++)
@@ -49,6 +65,7 @@ public class RecordService implements Runnable
             {
                 log.info ("[record] Start thread " + i + " on microphone " + finalM);
 
+                final Clip finalClip = clip;
                 new Thread (new Runnable ()
                 {
 
@@ -157,27 +174,66 @@ public class RecordService implements Runnable
                                 {
                                     if(command.contains ("система"))
                                     {
-
-                                        //-----
-
                                         try
                                         {
-                                            MapMessage message = Service.session.createMapMessage ();
+                                            ResultSet rs = Service.sql.select("SELECT name, command, param FROM modules WHERE enabled='1'");
 
-                                            message.setString ("text", command);
-                                            message.setDouble ("confidence", confidence * 100);
-                                            message.setStringProperty ("qpid.subject", "event.record.recognized");
+                                            while (rs.next())
+                                            {
+                                                String name = rs.getString("name");
+                                                String comm = rs.getString("command");
+                                                String param = rs.getString("param");
 
-                                            Service.messageProducer.send (message);
+                                                if (command.contains(comm)) {
+
+                                                    if (busy) {
+                                                        log.info("[command] System is busy. Skipping.");
+                                                        break;
+                                                    }
+
+                                                    busy = true;
+
+                                                    if(!Service.config.get("silence").equals("1"))
+                                                    {
+                                                        finalClip.setFramePosition(0);
+                                                        finalClip.start();
+                                                    }
+
+                                                    log.info("[command] Got \""+command+"\" command");
+
+                                                    MapMessage message = Service.session.createMapMessage ();
+
+                                                    message.setString ("text", command);
+                                                    message.setDouble ("confidence", confidence * 100);
+                                                    message.setStringProperty ("qpid.subject", "event.record.recognized");
+
+                                                    Service.messageProducer.send (message);
+
+                                                    try {
+
+                                                        Class cl = Class.forName("ru.iris.modules." + name);
+                                                        Module execute = (Module) cl.newInstance();
+                                                        execute.run(param);
+
+                                                        Thread.sleep(1000);
+
+                                                        busy = false;
+
+                                                    } catch (Exception e) {
+                                                        log.info("[module] Error at loading module " + name + " with params \"" + param + "\"!");
+                                                        e.printStackTrace();
+                                                    }
+                                                }
+                                            }
+
+                                            rs.close();
 
                                         } catch (JMSException e)
                                         {
                                             e.printStackTrace ();  //To change body of catch statement use File | Settings | File Templates.
+                                        } catch (SQLException e) {
+                                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
                                         }
-
-                                        //-----
-
-
                                     }
                                 }
                             }

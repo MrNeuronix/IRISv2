@@ -1,10 +1,13 @@
 package ru.iris;
 
+import org.apache.qpid.AMQException;
 import org.h2.tools.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.jms.JMSException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.HashMap;
 
@@ -22,14 +25,14 @@ public class Launcher {
     public static HashMap<String, String> config;
     private static Logger log = LoggerFactory.getLogger(Launcher.class);
 
-    public static void main(String[] args) throws IOException, SQLException {
+    public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException {
 
         log.info ("----------------------------------------");
         log.info ("----       IRISv2 is starting       ----");
         log.info ("----------------------------------------");
 
         // Запускаем TCP сервер H2
-        Server server = Server.createTcpServer().start();
+        Server.createTcpServer().start();
 
         // Запускаем сервис REST;
         runModule("java -jar Rest.jar");
@@ -46,9 +49,7 @@ public class Launcher {
 
     private static void runModule(String cmd) throws IOException {
 
-        String[] splited = cmd.split("\\s+");
-
-        ProcessBuilder builder = new ProcessBuilder(splited).redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectErrorStream(true);
-        Process process = builder.start();
+        ProcessBuilder builder = new ProcessBuilder(cmd.split("\\s+")).redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectErrorStream(true);
+        builder.start();
     }
 }

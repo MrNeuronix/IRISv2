@@ -1,5 +1,7 @@
 package ru.iris.common;
 
+import javax.jms.JMSException;
+
 /**
  * Created with IntelliJ IDEA.
  * User: nix
@@ -8,5 +10,5 @@ package ru.iris.common;
  * To change this template use File | Settings | File Templates.
  */
 public interface Module {
-    public void run(String arg);
+    public void run(String arg) throws JMSException;
 }
