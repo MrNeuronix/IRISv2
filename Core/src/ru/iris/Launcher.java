@@ -45,6 +45,12 @@ public class Launcher {
 
         // Запускаем модуль для работы с устройствами
         runModule("java -jar Devices.jar");
+
+        // Запускаем модуль планировщика
+        runModule("java -jar Scheduler.jar");
+
+        // Запускаем модуль для работы c событиями
+        runModule("java -jar Events.jar");
     }
 
     private static void runModule(String cmd) throws IOException {
