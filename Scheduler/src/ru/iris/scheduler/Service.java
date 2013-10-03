@@ -46,6 +46,6 @@ public class Service
         log.info ("[iris] Scheduler starting... ");
         log.info ("[iris] ----------------------------------");
 
-
+        new ScheduleService();
     }
 }

@@ -5,33 +5,33 @@
       <artifact name="Common:jar" />
       <artifact name="Core:jar" />
       <artifact name="Devices:jar" />
+      <artifact name="Events:jar" />
       <artifact name="Record:jar" />
       <artifact name="Rest:jar" />
+      <artifact name="Scheduler:jar" />
       <artifact name="Speak:jar" />
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
     <list default="true" id="75a291f7-9666-495a-bb2a-4156a745c2c1" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Events/Events.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/artifacts/Events_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Events/src/META-INF/MANIFEST.MF" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Scheduler/src/META-INF/MANIFEST.MF" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Scheduler/Scheduler.iml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/artifacts/Scheduler_jar.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Devices/src/ru/iris/device/Service.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Events/src/ru/iris/events/Service.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/Service.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Common/lib/zwave4j-0.2.jar" afterPath="$PROJECT_DIR$/Common/lib/zwave4j-0.2.jar" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/CronExpression.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/ScheduleService.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/Task.java" />
+      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\lib\qpid-all.jar" afterPath="" />
+      <change type="MOVED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\src\ru\iris\modules\Test.java" afterPath="$PROJECT_DIR$/Common/src/ru/iris/modules/Say.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/conf/iris.h2.db" afterPath="$PROJECT_DIR$/Core/conf/iris.h2.db" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSynthesizer.java" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSynthesizer.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" afterPath="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/src/META-INF/MANIFEST.MF" afterPath="$PROJECT_DIR$/Speak/src/META-INF/MANIFEST.MF" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/src/META-INF/MANIFEST.MF" afterPath="$PROJECT_DIR$/Core/src/META-INF/MANIFEST.MF" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/Service.java" afterPath="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/Service.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSynthesizer.java" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSynthesizer.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Common/src/ru/iris/common/httpPOST.java" afterPath="$PROJECT_DIR$/Common/src/ru/iris/common/httpPOST.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/conf/main.property" afterPath="$PROJECT_DIR$/Core/conf/main.property" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="IRISv2.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1380714415221" ignored="false" />
+    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1380785960795" ignored="false" />
     <file path="/README" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378473430689" ignored="false" />
     <file path="/Makefile" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377162449416" ignored="false" />
     <file path="/zwave.cpp" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377178274409" ignored="false" />
@@ -40,13 +40,13 @@
     <file path="$USER_HOME$/Iris-Web/README" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378400169147" ignored="false" />
     <file path="/fragment.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1380717143051" ignored="false" />
     <file path="/Config.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378473199994" ignored="false" />
-    <file path="/Service.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378888591715" ignored="false" />
+    <file path="/Service.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1380787620051" ignored="false" />
     <file path="/RESTService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1379170009115" ignored="false" />
     <file path="/SpeakHandler.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378474977205" ignored="false" />
     <file path="/File Header.txt.ft" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378805374998" ignored="false" />
     <file path="/SQL.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378665893928" ignored="false" />
-    <file path="/Launcher.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1380717431781" ignored="false" />
-    <file path="/a.sql" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378877142824" ignored="false" />
+    <file path="/Launcher.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1380786937629" ignored="false" />
+    <file path="/a.sql" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1380788606326" ignored="false" />
     <file path="/Data Source" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378667318184" ignored="false" />
     <file path="/dummy.sql" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378877142824" ignored="false" />
     <file path="/ZWaveDevice.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1379056660611" ignored="false" />
@@ -69,7 +69,10 @@
     <file path="$USER_HOME$/zwave4j/src/main/java/org/zwave4j/Main.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1379059934114" ignored="false" />
     <file path="/RecordService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1379176875177" ignored="false" />
     <file path="/SwitchControl.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1379170460103" ignored="false" />
-    <file path="/Test.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1379175698436" ignored="false" />
+    <file path="/Test.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1380788808902" ignored="false" />
+    <file path="/CronExpression.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1380787584406" ignored="false" />
+    <file path="/Task.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1380788479966" ignored="false" />
+    <file path="/ScheduleService.java" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1380788060112" ignored="false" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -145,20 +148,9 @@
   <component name="FileEditorManager">
     <leaf>
       <file leaf-file-name="Service.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Events/src/ru/iris/events/Service.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="38" column="25" selection-start="971" selection-end="971" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Service.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/Service.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="38" column="25" selection-start="974" selection-end="974" vertical-scroll-proportion="0.0">
+            <state line="14" column="17" selection-start="318" selection-end="318" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -166,13 +158,22 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Launcher.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Core/src/ru/iris/Launcher.java">
+      <file leaf-file-name="ScheduleService.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/ScheduleService.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="30" column="53" selection-start="847" selection-end="847" vertical-scroll-proportion="0.3881119">
+            <state line="18" column="13" selection-start="325" selection-end="325" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="main.property" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Core/conf/main.property">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="22" column="89" selection-start="504" selection-end="504" vertical-scroll-proportion="0.4293915">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -195,22 +196,22 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/Devices/src/ru/iris/devices/Service.java" />
-        <option value="$PROJECT_DIR$/Rest/src/ru/iris/restful/GsonMessageBodyHandler.java" />
-        <option value="Y:/zwave4j/src/main/cpp/org_zwave4j_Manager.cpp" />
-        <option value="Y:/zwave4j/src/main/java/org/zwave4j/Manager.java" />
-        <option value="$PROJECT_DIR$/Core/src/ru/iris/modules/SwitchControl.java" />
         <option value="$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java" />
         <option value="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java" />
         <option value="$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveDevice.java" />
-        <option value="$PROJECT_DIR$/Common/src/ru/iris/modules/Test.java" />
         <option value="$PROJECT_DIR$/Common/src/ru/iris/modules/SwitchControl.java" />
         <option value="$PROJECT_DIR$/Record/src/ru/iris/record/RecordService.java" />
-        <option value="$PROJECT_DIR$/Core/conf/main.property" />
         <option value="$PROJECT_DIR$/Scheduler/src/ru.iris.scheduler/Service.java" />
-        <option value="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/Service.java" />
         <option value="$PROJECT_DIR$/Events/src/ru/iris/events/Service.java" />
         <option value="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" />
+        <option value="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/CronExpression.java" />
+        <option value="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/Service.java" />
+        <option value="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/ScheduleService.java" />
+        <option value="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/Task.java" />
+        <option value="db-console:/6303084b/e3808ec5-1a6e-41b5-81d3-4304b04a7f0c/" />
+        <option value="$PROJECT_DIR$/Common/src/ru/iris/modules/Test.java" />
+        <option value="$PROJECT_DIR$/Common/src/ru/iris/modules/Say.java" />
+        <option value="$PROJECT_DIR$/Core/conf/main.property" />
       </list>
     </option>
   </component>
@@ -317,60 +318,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="Speak" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Speak" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="speak" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Speak" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="Scheduler" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -425,60 +372,6 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="Events" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Events" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="events" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Events" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
               <option name="myItemId" value="Core" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
@@ -497,29 +390,7 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
             <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="iris" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="IRISv2" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Core" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
+              <option name="myItemId" value="conf" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -555,6 +426,8 @@
       <recent name="ru.iris.devices.zwave" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\nikolay.viguro\IRISv2\Scheduler\src\ru\iris\scheduler" />
+      <recent name="C:\Users\nikolay.viguro\IRISv2\Common\lib" />
       <recent name="C:\Users\nikolay.viguro\IRISv2\Speak\src\ru\iris\speak\voicerss" />
       <recent name="D:\Develop\IRISv2\ZWave\cpp" />
     </key>
@@ -749,7 +622,11 @@
       <created>1379057088433</created>
       <updated>1379057088433</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Add Events and Scheduler skel">
+      <created>1380717552418</created>
+      <updated>1380717552418</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers>
       <GitHub shared="false">
         <commitMessageFormat>{id} {summary}</commitMessageFormat>
@@ -771,24 +648,24 @@
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27534685" sideWeight="0.7168339" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32998884" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23906083" sideWeight="0.67001116" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2831661" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17058824" sideWeight="0.2865106" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17948718" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2497332" sideWeight="0.74693424" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15741728" sideWeight="0.7168339" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.15741728" sideWeight="0.67001116" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Database Console" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32998884" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="JetGradle" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32998884" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.17948718" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2497332" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
@@ -835,7 +712,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added testNetworkNode, testNetwork, healNetworkNode, healNetwork" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add Events and Scheduler skel" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -863,6 +740,7 @@
     <MESSAGE value="Refactoring Devices module" />
     <MESSAGE value="Fix save values into database on change value event" />
     <MESSAGE value="Added testNetworkNode, testNetwork, healNetworkNode, healNetwork" />
+    <MESSAGE value="Add Events and Scheduler skel" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -872,58 +750,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/Core/conf/main.property">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="48" column="31" selection-start="1056" selection-end="1056" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Devices/src/ru/iris/devices/Service.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="34" selection-start="969" selection-end="969" vertical-scroll-proportion="0.39380023">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSpeakService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="43" column="0" selection-start="867" selection-end="2302" vertical-scroll-proportion="0.21928817">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/Module.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="9" column="17" selection-start="154" selection-end="154" vertical-scroll-proportion="0.17566016" />
-      </provider>
-    </entry>
-    <entry file="jar://C:/Program Files/Java/jdk1.7.0_25/src.zip!/java/lang/System.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="54" column="19" selection-start="1243" selection-end="1243" vertical-scroll-proportion="0.33295062" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Rest/src/ru/iris/restful/RESTService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="150" column="0" selection-start="4714" selection-end="4998" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Core/conf/main.property">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="18" column="74" selection-start="444" selection-end="444" vertical-scroll-proportion="0.35051546">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveService.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="486" column="26" selection-start="18392" selection-end="18408" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Devices/src/ru/iris/devices/zwave/ZWaveDevice.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="183" column="31" selection-start="4506" selection-end="4506" vertical-scroll-proportion="0.019767443">
@@ -935,16 +761,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="27" column="56" selection-start="634" selection-end="634" vertical-scroll-proportion="-2.9093022">
           <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/modules/SwitchControl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="13" selection-start="473" selection-end="473" vertical-scroll-proportion="0.44788086">
-          <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -956,18 +773,75 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/modules/Test.java">
+    <entry file="file://$PROJECT_DIR$/Events/src/ru/iris/events/Service.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="13" selection-start="473" selection-end="473" vertical-scroll-proportion="0.44788086">
+        <state line="37" column="25" selection-start="942" selection-end="942" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/src/ru/iris/Launcher.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="98" selection-start="236" selection-end="236" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/CronExpression.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="12" selection-start="209" selection-end="209" vertical-scroll-proportion="-0.3962704">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Events/src/ru/iris/events/Service.java">
+    <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/common/Module.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="25" selection-start="971" selection-end="971" vertical-scroll-proportion="0.0">
+        <state line="11" column="17" selection-start="223" selection-end="223" vertical-scroll-proportion="0.21469575">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/Task.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="120" column="22" selection-start="2651" selection-end="2651" vertical-scroll-proportion="0.74626863">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="dbDummy://db-console:/6303084b/e3808ec5-1a6e-41b5-81d3-4304b04a7f0c/">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="1" selection-start="556" selection-end="556" vertical-scroll-proportion="0.20190024">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/modules/SwitchControl.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="13" selection-start="473" selection-end="473" vertical-scroll-proportion="0.21469575">
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Common/src/ru/iris/modules/Say.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="35" selection-start="344" selection-end="344" vertical-scroll-proportion="0.19977038">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/ScheduleService.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="13" selection-start="325" selection-end="325" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -976,19 +850,27 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/Service.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="38" column="25" selection-start="974" selection-end="974" vertical-scroll-proportion="0.0">
+        <state line="14" column="17" selection-start="318" selection-end="318" vertical-scroll-proportion="0.0">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Core/src/ru/iris/Launcher.java">
+    <entry file="dbDummy://dbtable:/6303084b/20cdff3b-7b1f-414f-8e30-2cf7f2a3c254/IRIS.PUBLIC.SCHEDULER">
+      <provider selected="true" editor-type-id="com.intellij.persistence.database.editor.DatabaseTableFileEditorProvider">
+        <state />
+      </provider>
+    </entry>
+    <entry file="dbDummy://dbtable:/6303084b/e3808ec5-1a6e-41b5-81d3-4304b04a7f0c/IRIS.PUBLIC.SCHEDULER">
+      <provider selected="true" editor-type-id="com.intellij.persistence.database.editor.DatabaseTableFileEditorProvider">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Core/conf/main.property">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="30" column="53" selection-start="847" selection-end="847" vertical-scroll-proportion="0.3881119">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state line="22" column="89" selection-start="504" selection-end="504" vertical-scroll-proportion="0.4293915">
+          <folding />
         </state>
       </provider>
     </entry>

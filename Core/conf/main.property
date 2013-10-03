@@ -26,7 +26,7 @@ httpPassword=access
 #################################
 
 # Тихий режим
-silence=0
+silence=1
 
 # Голосовой движок (google, voicerss)
 ttsEngine=voicerss

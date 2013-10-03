@@ -10,27 +10,20 @@ package ru.iris.modules;
  * License: GPL v3
  */
 import org.apache.qpid.AMQException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.iris.common.Messaging;
 import ru.iris.common.Module;
-import ru.iris.common.SQL;
 
 import javax.jms.*;
 import java.net.URISyntaxException;
 
-// For testing module system
+public class Say implements Module {
 
-public class Test implements Module {
-
-    private static Logger log = LoggerFactory.getLogger(Test.class.getName());
-    public static SQL sql;
     public static MessageConsumer messageConsumer;
     public static MessageProducer messageProducer;
     public static Messaging msg;
     public static Session session;
 
-    public Test()
+    public Say()
     {
         try {
             msg = new Messaging();
@@ -47,16 +40,10 @@ public class Test implements Module {
     }
 
     public void run(String arg) throws JMSException {
-        test();
-    }
-
-    private void test() throws JMSException {
-
-        log.info("[test] Test");
 
         MapMessage message = session.createMapMessage();
 
-        message.setStringProperty("text", "Тест модульной системы!");
+        message.setStringProperty("text", arg);
         message.setDoubleProperty("confidence", 100);
         message.setStringProperty ("qpid.subject", "event.speak");
 

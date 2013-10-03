@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
  * <p/>
  * OUTLINE: Synthesizer Used for Generating Speech Via Google Translate Text-to-Speech API
  * This Class uses a CachedThreadPool To Increase Increase Efficiency
- * Speed Test: Single Thread 4.3 seconds vs Multi-Threaded 1.2 Seconds
+ * Speed Say: Single Thread 4.3 seconds vs Multi-Threaded 1.2 Seconds
  */
 
 public class GoogleSynthesizer implements Runnable

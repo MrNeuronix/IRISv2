@@ -1,14 +1,10 @@
 package ru.iris;
 
-import org.apache.qpid.AMQException;
 import org.h2.tools.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.jms.JMSException;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.sql.SQLException;
 import java.util.HashMap;
 
 /**
@@ -25,7 +21,7 @@ public class Launcher {
     public static HashMap<String, String> config;
     private static Logger log = LoggerFactory.getLogger(Launcher.class);
 
-    public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException {
+    public static void main(String[] args) throws Exception {
 
         log.info ("----------------------------------------");
         log.info ("----       IRISv2 is starting       ----");

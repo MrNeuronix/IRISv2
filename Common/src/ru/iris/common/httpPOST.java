@@ -139,11 +139,11 @@ public class httpPOST
     private final String User_Agent = "Mozilla/5.0";
 
     /**
-     * Test function main...
+     * Say function main...
      */
     public static void main(String[] args)
     {
-        // Test the post Request ...
+        // Say the post Request ...
         httpPOST flacPost = new httpPOST ();
         flacPost.postFile (System.getProperty ("user.dir") + "/recording.flac");
     }
