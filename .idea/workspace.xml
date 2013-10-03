@@ -14,24 +14,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="75a291f7-9666-495a-bb2a-4156a745c2c1" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/CronExpression.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/ScheduleService.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/Task.java" />
-      <change type="DELETED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\lib\qpid-all.jar" afterPath="" />
-      <change type="MOVED" beforePath="C:\Users\nikolay.viguro\IRISv2\Common\src\ru\iris\modules\Test.java" afterPath="$PROJECT_DIR$/Common/src/ru/iris/modules/Say.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/conf/iris.h2.db" afterPath="$PROJECT_DIR$/Core/conf/iris.h2.db" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSynthesizer.java" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/google/GoogleSynthesizer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" afterPath="$PROJECT_DIR$/Core/src/ru/iris/Launcher.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/src/META-INF/MANIFEST.MF" afterPath="$PROJECT_DIR$/Core/src/META-INF/MANIFEST.MF" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/Service.java" afterPath="$PROJECT_DIR$/Scheduler/src/ru/iris/scheduler/Service.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSynthesizer.java" afterPath="$PROJECT_DIR$/Speak/src/ru/iris/speak/voicerss/VoiceRSSSynthesizer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Common/src/ru/iris/common/httpPOST.java" afterPath="$PROJECT_DIR$/Common/src/ru/iris/common/httpPOST.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Core/conf/main.property" afterPath="$PROJECT_DIR$/Core/conf/main.property" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="IRISv2.iws" />
     <ignored path=".idea/workspace.xml" />
-    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1380785960795" ignored="false" />
+    <file path="/Dummy.txt" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1380795500200" ignored="false" />
     <file path="/README" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1378473430689" ignored="false" />
     <file path="/Makefile" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377162449416" ignored="false" />
     <file path="/zwave.cpp" changelist="75a291f7-9666-495a-bb2a-4156a745c2c1" time="1377178274409" ignored="false" />
@@ -186,6 +173,11 @@
     </FindUsagesManager>
   </component>
   <component name="Git.Settings">
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="nv@ph-systems.ru" />
+      </list>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="GitLogSettings">
@@ -626,7 +618,11 @@
       <created>1380717552418</created>
       <updated>1380717552418</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Add Scheduler module implementation">
+      <created>1380795536661</created>
+      <updated>1380795536661</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers>
       <GitHub shared="false">
         <commitMessageFormat>{id} {summary}</commitMessageFormat>
@@ -712,7 +708,7 @@
     <option name="WRAP_WHEN_TYPING_REACHES_RIGHT_MARGIN" value="false" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add Events and Scheduler skel" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add Scheduler module implementation" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="false" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -741,6 +737,7 @@
     <MESSAGE value="Fix save values into database on change value event" />
     <MESSAGE value="Added testNetworkNode, testNetwork, healNetworkNode, healNetwork" />
     <MESSAGE value="Add Events and Scheduler skel" />
+    <MESSAGE value="Add Scheduler module implementation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -809,7 +806,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state line="120" column="22" selection-start="2651" selection-end="2651" vertical-scroll-proportion="0.74626863">
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="imports" expanded="false" />
           </folding>
         </state>
       </provider>
