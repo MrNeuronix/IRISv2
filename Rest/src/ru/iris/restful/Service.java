@@ -19,10 +19,7 @@ import ru.iris.common.Config;
 import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
 
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+import javax.jms.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -56,6 +53,24 @@ public class Service
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        // Check module status
+
+        Message mess;
+        MapMessage m = null;
+
+        msg.simpleSendMessage("status.answer", "alive", "rest");
+
+        while ((mess = Service.messageConsumer.receive (0)) != null)
+        {
+            m = (MapMessage) mess;
+
+            if(m.getStringProperty("qpid.subject").equals ("status.rest") || m.getStringProperty("qpid.subject").equals ("status.all"))
+            {
+                log.info ("[rest] Got status query");
+                msg.simpleSendMessage("status.answer", "alive", "rest");
+            }
         }
 }
 }

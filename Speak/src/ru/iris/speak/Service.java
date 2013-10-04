@@ -9,9 +9,7 @@ import ru.iris.common.Speak;
 import ru.iris.speak.google.GoogleSpeakService;
 import ru.iris.speak.voicerss.VoiceRSSSpeakService;
 
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+import javax.jms.*;
 import java.util.HashMap;
 
 /**
@@ -64,6 +62,24 @@ public class Service
         else
         {
             log.info("[speak] No TTS system specified in config file!");
+        }
+
+        // Check module status
+
+        Message mess;
+        MapMessage m = null;
+
+        msg.simpleSendMessage("status.answer", "alive", "speak");
+
+        while ((mess = Service.messageConsumer.receive (0)) != null)
+        {
+            m = (MapMessage) mess;
+
+            if(m.getStringProperty("qpid.subject").equals ("status.speak") || m.getStringProperty("qpid.subject").equals ("status.all"))
+            {
+                log.info ("[speak] Got status query");
+                msg.simpleSendMessage("status.answer", "alive", "speak");
+            }
         }
 
     }

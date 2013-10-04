@@ -6,9 +6,7 @@ import ru.iris.common.Config;
 import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
 
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+import javax.jms.*;
 import java.util.HashMap;
 
 /**
@@ -45,6 +43,25 @@ public class Service
         log.info ("[iris] ----------------------------------");
         log.info ("[iris] Events engine starting... ");
         log.info ("[iris] ----------------------------------");
+
+
+        // Check module status
+
+        Message mess;
+        MapMessage m = null;
+
+        msg.simpleSendMessage("status.answer", "alive", "events");
+
+        while ((mess = Service.messageConsumer.receive (0)) != null)
+        {
+            m = (MapMessage) mess;
+
+            if(m.getStringProperty("qpid.subject").equals ("status.events") || m.getStringProperty("qpid.subject").equals ("status.all"))
+            {
+                log.info ("[events] Got status query");
+                msg.simpleSendMessage("status.answer", "alive", "events");
+            }
+        }
 
 
     }

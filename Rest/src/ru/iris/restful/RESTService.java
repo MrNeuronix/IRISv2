@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * IRISv2 Project
@@ -90,12 +91,7 @@ public class RESTService
 
         log.info("[rest] Get /cmd/"+text);
 
-        MapMessage message = Service.session.createMapMessage();
-
-        message.setStringProperty("cmd", text);
-        message.setStringProperty ("qpid.subject", "event.command");
-
-        Service.messageProducer.send (message);
+        Service.msg.simpleSendMessage("event.command", "cmd", text);
 
         Message mess;
         MapMessage m = null;
@@ -224,15 +220,65 @@ public class RESTService
     public String devAllState(@PathParam("state") String state) throws JMSException
     {
         log.info("[rest] Switch all devices to "+state+ " state");
-
-        MapMessage message = Service.session.createMapMessage();
-
-        message.setStringProperty("command", "all"+state);
-        message.setStringProperty ("qpid.subject", "event.devices.setvalue");
-
-        Service.messageProducer.send (message);
+        Service.msg.simpleSendMessage("event.devices.setvalue", "command", "all"+state);
 
         return "done";
+    }
+
+    @GET
+    @Path("/status/module/{name}")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String status(@PathParam("name") String name) throws IOException, SQLException {
+
+        log.info("[rest] Get /status/module/"+name);
+
+        ResultSet rs = Service.sql.select("SELECT * FROM MODULESTATUS WHERE name='"+name+"'");
+        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
+
+        HashMap<String,Object> result = new HashMap<>();
+
+        try {
+            while (rs.next()) {
+                result.put("id",rs.getInt("id"));
+                result.put("name",rs.getString("name"));
+                result.put("lastseen",rs.getString("lastseen"));
+            }
+
+            rs.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return gson.toJson(result);
+    }
+
+    @GET
+    @Path("/status/module/all")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String status() throws IOException, SQLException {
+
+        log.info("[rest] Get /status/module/all");
+
+        ResultSet rs = Service.sql.select("SELECT * FROM MODULESTATUS");
+        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
+
+        HashMap<String,Object> result = new HashMap<>();
+
+        try {
+            while (rs.next()) {
+                result.put("id",rs.getInt("id"));
+                result.put("name",rs.getString("name"));
+                result.put("lastseen",rs.getString("lastseen"));
+            }
+
+            rs.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return gson.toJson(result);
     }
 
 

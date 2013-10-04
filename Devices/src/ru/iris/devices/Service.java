@@ -18,10 +18,7 @@ import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
 import ru.iris.devices.zwave.ZWaveService;
 
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+import javax.jms.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -63,5 +60,24 @@ public class Service {
         {
             log.info("[1-wire] 1-wire support is enabled. Starting.");
         }
+
+        // Check module status
+
+        Message mess;
+        MapMessage m = null;
+
+        msg.simpleSendMessage("status.answer", "alive", "devices");
+
+        while ((mess = Service.messageConsumer.receive (0)) != null)
+        {
+            m = (MapMessage) mess;
+
+            if(m.getStringProperty("qpid.subject").equals ("status.devices") || m.getStringProperty("qpid.subject").equals ("status.all"))
+            {
+                log.info ("[devices] Got status query");
+                msg.simpleSendMessage("status.answer", "alive", "devices");
+            }
+        }
+
     }
 }

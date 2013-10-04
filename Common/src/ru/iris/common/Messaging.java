@@ -69,4 +69,16 @@ public class Messaging
         return session;
     }
 
+    public void simpleSendMessage(String topic, String key, String value)
+    {
+        try {
+            MapMessage message = session.createMapMessage();
+            message.setStringProperty(key, value);
+            message.setStringProperty ("qpid.subject", topic);
+            messageProducer.send (message);
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

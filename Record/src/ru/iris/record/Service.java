@@ -7,10 +7,7 @@ import ru.iris.common.Config;
 import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
 
-import javax.jms.JMSException;
-import javax.jms.MessageConsumer;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
+import javax.jms.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -53,5 +50,23 @@ public class Service
         log.info ("[iris] ----------------------------------");
 
         new RecordService ();
+
+        // Check module status
+
+        Message mess;
+        MapMessage m = null;
+
+        msg.simpleSendMessage("status.answer", "alive", "record");
+
+        while ((mess = Service.messageConsumer.receive (0)) != null)
+        {
+            m = (MapMessage) mess;
+
+            if(m.getStringProperty("qpid.subject").equals ("status.record") || m.getStringProperty("qpid.subject").equals ("status.all"))
+            {
+                log.info ("[record] Got status query");
+                msg.simpleSendMessage("status.answer", "alive", "record");
+            }
+        }
     }
 }
