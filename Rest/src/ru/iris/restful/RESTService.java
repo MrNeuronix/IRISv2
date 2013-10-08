@@ -263,13 +263,17 @@ public class RESTService
         ResultSet rs = Service.sql.select("SELECT * FROM MODULESTATUS");
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
-        HashMap<String,Object> result = new HashMap<>();
+        HashMap<String,Object> obj = new HashMap<>();
+        ArrayList result = new ArrayList();
 
         try {
             while (rs.next()) {
-                result.put("id",rs.getInt("id"));
-                result.put("name",rs.getString("name"));
-                result.put("lastseen",rs.getString("lastseen"));
+                obj.put("id", rs.getInt("id"));
+                obj.put("name",rs.getString("name"));
+                obj.put("lastseen",rs.getString("lastseen"));
+
+                result.add(obj.clone());
+                obj.clear();
             }
 
             rs.close();

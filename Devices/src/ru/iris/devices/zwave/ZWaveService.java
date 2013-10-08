@@ -3,10 +3,12 @@ package ru.iris.devices.zwave;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zwave4j.*;
+import ru.iris.common.Messaging;
 import ru.iris.devices.Service;
 
 import javax.jms.MapMessage;
 import javax.jms.Message;
+import javax.jms.MessageConsumer;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -305,8 +307,9 @@ public class ZWaveService implements Runnable
 
         try
         {
+            MessageConsumer messageConsumer = new Messaging().getConsumer();
 
-            while ((message = Service.messageConsumer.receive (0)) != null)
+            while ((message = messageConsumer.receive (0)) != null)
             {
                 m = (MapMessage) message;
                 ZWaveDevice device = null;
@@ -373,8 +376,6 @@ public class ZWaveService implements Runnable
                     }
                 }
             }
-
-            Service.msg.close ();
 
         } catch (Exception e)
         {

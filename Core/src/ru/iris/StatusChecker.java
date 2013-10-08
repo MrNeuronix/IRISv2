@@ -41,6 +41,7 @@ public class StatusChecker implements Runnable
                         String module = m.getStringProperty("alive");
                         log.info ("[status] Got status answer from "+module);
 
+                        Launcher.sql.doQuery("DELETE FROM MODULESTATUS WHERE NAME='"+module+"'");
                         Launcher.sql.doQuery("INSERT INTO MODULESTATUS (NAME, LASTSEEN) VALUES ('"+module+"',NOW())");
                     }
             }

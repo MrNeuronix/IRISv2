@@ -38,10 +38,6 @@ public class Launcher {
         log.info ("----       IRISv2 is starting       ----");
         log.info ("----------------------------------------");
 
-        Config cfg = new Config ();
-        config = cfg.getConfig ();
-        sql = new SQL();
-
         msg = new Messaging();
         messageConsumer = msg.getConsumer ();
         messageProducer = msg.getProducer ();
@@ -49,6 +45,14 @@ public class Launcher {
 
         // Запускаем TCP сервер H2
         Server.createTcpServer().start();
+
+        // Конфигурация
+        Config cfg = new Config ();
+        config = cfg.getConfig ();
+        sql = new SQL();
+
+        // Опрос модулей
+        new StatusChecker();
 
         // Запускаем сервис REST;
         runModule("java -jar Rest.jar");

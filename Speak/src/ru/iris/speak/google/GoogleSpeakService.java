@@ -12,10 +12,12 @@ package ru.iris.speak.google;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.Messaging;
 import ru.iris.speak.Service;
 
 import javax.jms.MapMessage;
 import javax.jms.Message;
+import javax.jms.MessageConsumer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -47,8 +49,9 @@ public class GoogleSpeakService implements Runnable
 
         try
         {
+            MessageConsumer messageConsumer = new Messaging().getConsumer();
 
-            while ((message = Service.messageConsumer.receive (0)) != null)
+            while ((message = messageConsumer.receive (0)) != null)
             {
                 m = (MapMessage) message;
 
