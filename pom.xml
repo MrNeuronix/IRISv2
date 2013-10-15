@@ -44,10 +44,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
             </plugin>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-            </plugin>
+            </plugin>-->
         </plugins>
     </build>
 
@@ -56,14 +56,14 @@
 
 
     <modules>
-        <module>common</module>
-        <module>core</module>
-        <module>devices</module>
-        <module>events</module>
-        <module>record</module>
-        <module>rest</module>
-        <module>scheduler</module>
-        <module>speak</module>
+        <module>Common</module>
+        <module>Core</module>
+        <module>Devices</module>
+        <module>Events</module>
+        <module>Record</module>
+        <module>Rest</module>
+        <module>Scheduler</module>
+        <module>Speak</module>
     </modules>
 
 </project>
