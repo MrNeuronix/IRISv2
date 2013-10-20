@@ -1,0 +1,2 @@
+# Module org.agocontrol.site.AgoControlSiteWidgetset
+# RPC service class, partial path of RPC policy file

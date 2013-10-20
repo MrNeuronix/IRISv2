@@ -1,0 +1,14 @@
+[Unit]
+Description=ago control Vaadin Site
+
+[Service]
+ExecStart=/usr/bin/java -jar /opt/agocontrol/site/ago-control-vaadin-site.jar
+WorkingDirectory=/opt/agocontrol/site
+StandardOutput=syslog
+StandardError=syslog
+Restart=always
+RestartSec=2
+User=agocontrol
+
+[Install]
+WantedBy=multi-user.target
