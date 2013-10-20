@@ -169,15 +169,15 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
             company = CompanyDao.getCompany(entityManager, "*");
         }
         siteContext.putObject(Company.class, company);
+
+        final SecurityProviderSessionImpl securityProvider = new SecurityProviderSessionImpl(
+                Arrays.asList("administrator", "user"));
+
         final Map<String, Boolean> statuses = new LinkedHashMap<String, Boolean>();
         statuses.put("database", true);
         statuses.put("connectivity", false);
         statuses.put("inventory", false);
-        statuses.put("authentication", false);
         siteContext.putObject("statuses", statuses);
-
-        final SecurityProviderSessionImpl securityProvider = new SecurityProviderSessionImpl(
-                Arrays.asList("administrator", "user"));
 
         return new Site(SiteMode.PRODUCTION, contentProvider, localizationProvider, securityProvider, siteContext);
     }
@@ -187,9 +187,9 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
         final List<ViewDescriptor> viewDescriptors = new ArrayList<ViewDescriptor>();
 
         viewDescriptors.add(new ViewDescriptor("master", null, null, new ViewVersion(0, null, "Master", "",
-                "This is a master view.", FixedWidthView.class.getCanonicalName(), new String[]{"admin"},
+                "This is a master view.", WideView.class.getCanonicalName(), new String[]{"admin"},
                 Arrays.asList(
-                        new ViewletDescriptor("logo", "Logo", "This is logo.", "ago-control-logo.png",
+                        new ViewletDescriptor("logo", "Logo", "This is logo.", "ceci.png",
                                 ImageViewlet.class.getCanonicalName()),
                         new ViewletDescriptor("header", "Header", "This is header.", null,
                                 CompanyHeaderViewlet.class.getCanonicalName()),
@@ -205,14 +205,16 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
                         new ViewletDescriptor("logo", "Logo", "This is logo.", "ceci.png",
                         LargeImageViewlet.class.getCanonicalName()),
                         new ViewletDescriptor(
-                                "content", "Status", "Show status.", null,
-                                StatusViewlet.class.getCanonicalName())
+                                "status", "Status", "Providers status ui.", null,
+                                StatusViewlet.class.getCanonicalName()),
+                        new ViewletDescriptor("navigation", "NavigationDescriptor", "This is navigation.", null,
+                                fi.ceci.ui.viewlet.NavigationViewlet.class.getCanonicalName())
                 )
         )));
 
         viewDescriptors.add(new ViewDescriptor("buses", null, null, new ViewVersion(
                 0, "master", "Buses", "", "This is buses page.",
-                FixedWidthView.class.getCanonicalName(), new String[]{"administrator"},
+                WideView.class.getCanonicalName(), new String[]{"administrator"},
                 Arrays.asList(new ViewletDescriptor(
                         "content", "Buses Viewlet", "This is Buses viewlet.", null,
                         BusFlowViewlet.class.getCanonicalName())
@@ -220,7 +222,7 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
 
         viewDescriptors.add(new ViewDescriptor("elements", null, null, new ViewVersion(
                 0, "master", "Elements", "", "This is elements page.",
-                FixedWidthView.class.getCanonicalName(), new String[]{"administrator"},
+                WideView.class.getCanonicalName(), new String[]{"administrator"},
                 Arrays.asList(new ViewletDescriptor(
                         "content", "Elements Viewlet", "This is Elements viewlet.", null,
                          ElementFlowViewlet.class.getCanonicalName())
@@ -228,7 +230,7 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
 
         viewDescriptors.add(new ViewDescriptor("records", null, null, new ViewVersion(
                 0, "master", "Records", "", "This is records page.",
-                FixedWidthView.class.getCanonicalName(), new String[]{"administrator"},
+                WideView.class.getCanonicalName(), new String[]{"administrator"},
                 Arrays.asList(new ViewletDescriptor(
                         "content", "Records Viewlet", "This is Records viewlet.", null,
                         RecordFlowViewlet.class.getCanonicalName())
@@ -236,7 +238,7 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
 
         viewDescriptors.add(new ViewDescriptor("record-sets", null, null, new ViewVersion(
                 0, "master", "Record Sets", "", "This is record sets page.",
-                FixedWidthView.class.getCanonicalName(), new String[]{"administrator"},
+                WideView.class.getCanonicalName(), new String[]{"administrator"},
                 Arrays.asList(new ViewletDescriptor(
                         "content", "Record Sets Viewlet", "This is Record Sets viewlet.", null,
                         RecordSetFlowViewlet.class.getCanonicalName())
@@ -244,28 +246,28 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
 
         viewDescriptors.add(new ViewDescriptor("users", null, null, new ViewVersion(
                 0, "master", "Users", "", "This is users page.",
-                FixedWidthView.class.getCanonicalName(), new String[]{"administrator"},
+                WideView.class.getCanonicalName(), new String[]{"administrator"},
                 Arrays.asList(new ViewletDescriptor(
                         "content", "Flowlet Sheet", "This is flow sheet.", null,
                         UserFlowViewlet.class.getCanonicalName())
                 ))));
         viewDescriptors.add(new ViewDescriptor("groups", null, null, new ViewVersion(
                 0, "master", "Groups", "", "This is groups page.",
-                FixedWidthView.class.getCanonicalName(), new String[]{"administrator"},
+                WideView.class.getCanonicalName(), new String[]{"administrator"},
                 Arrays.asList(new ViewletDescriptor(
                         "content", "Flowlet Sheet", "This is flow sheet.", null,
                         GroupFlowViewlet.class.getCanonicalName())
                 ))));
         viewDescriptors.add(new ViewDescriptor("customers", null, null, new ViewVersion(
                 0, "master", "Customers", "customers", "This is customers page.",
-                FixedWidthView.class.getCanonicalName(), new String[]{"administrator"},
+                WideView.class.getCanonicalName(), new String[]{"administrator"},
                 Arrays.asList(new ViewletDescriptor(
                         "content", "Flowlet Sheet", "This is flow sheet.", null,
                         CustomerFlowViewlet.class.getCanonicalName())
                 ))));
         viewDescriptors.add(new ViewDescriptor("companies", null, null, new ViewVersion(
                 0, "master", "Companies", "companies", "This is companies page.",
-                FixedWidthView.class.getCanonicalName(), new String[]{"administrator"},
+                WideView.class.getCanonicalName(), new String[]{"administrator"},
                 Arrays.asList(new ViewletDescriptor(
                         "content", "Flowlet Sheet", "This is flow sheet.", null,
                         CompanyFlowViewlet.class.getCanonicalName())
@@ -273,7 +275,7 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
 
         viewDescriptors.add(new ViewDescriptor("login", null, null, new ViewVersion(
                 0, "master", "Login SiteView", "login page", "This is login page.",
-                FixedWidthView.class.getCanonicalName(), new String[]{"anonymous"},
+                WideView.class.getCanonicalName(), new String[]{"anonymous"},
                 Arrays.asList(
                         new ViewletDescriptor(
                                 "content", "Flowlet Sheet", "This is flow sheet.", null,
@@ -281,7 +283,7 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
                 ))));
         viewDescriptors.add(new ViewDescriptor("validate", null, null, new ViewVersion(
                 0, "master", "Email Validation", "email validation page", "This is email validation page.",
-                FixedWidthView.class.getCanonicalName(), new String[]{"anonymous"},
+                WideView.class.getCanonicalName(), new String[]{"anonymous"},
                 Arrays.asList(
                         new ViewletDescriptor(
                                 "content", "Email Validation", "This is email validation flowlet.", null,

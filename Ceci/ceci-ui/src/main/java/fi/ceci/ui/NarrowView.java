@@ -55,7 +55,7 @@ public final class NarrowView extends AbstractSiteView {
         layout.setRows(rowCount);
         layout.setColumnExpandRatio(0, MARGIN_COLUMN_EXPAND_RATIO);
         layout.setColumnExpandRatio(MARGIN_COLUMN_RIGTH_INDEX, MARGIN_COLUMN_EXPAND_RATIO);
-        layout.setRowExpandRatio(1, 1.0f);
+        layout.setRowExpandRatio(2, 1.0f);
         layout.setSizeFull();
         layout.setMargin(false);
         layout.setSpacing(true);
@@ -64,11 +64,15 @@ public final class NarrowView extends AbstractSiteView {
         headerComponent.setWidth(CONTENT_COLUMN_WIDTH, Unit.PIXELS);
         layout.addComponent(headerComponent, 2, 0);
 
-        final AbstractComponent contentComponent = getComponent("content");
-        contentComponent.setWidth(CONTENT_COLUMN_WIDTH, Unit.PIXELS);
-        contentComponent.setSizeFull();
-        layout.addComponent(contentComponent, 2, 1);
+        final AbstractComponent statusComponent = getComponent("status");
+        statusComponent.setWidth(CONTENT_COLUMN_WIDTH, Unit.PIXELS);
+        //statusComponent.setSizeFull();
+        layout.addComponent(statusComponent, 2, 1);
 
+        final AbstractComponent contentComponent = getComponent("navigation");
+        contentComponent.setWidth(CONTENT_COLUMN_WIDTH, Unit.PIXELS);
+        //contentComponent.setSizeFull();
+        layout.addComponent(contentComponent, 2, 2);
     }
 
 

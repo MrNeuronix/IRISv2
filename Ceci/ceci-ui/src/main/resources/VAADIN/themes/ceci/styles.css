@@ -338,3 +338,15 @@ td.v-datefield-calendarpanel-month,
 .sidebar-menu .selected {
 	text-shadow: 0 1px 0 rgb(46,90,132);
 	}
+
+
+.v-tabsheet-deco, .white .v-tabsheet-deco {
+    border-top: 0px;
+}
+
+.v-label-h1, .v-label h1 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}

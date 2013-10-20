@@ -20,12 +20,13 @@ import java.util.Map;
 public class StatusViewlet extends AbstractViewlet {
     /** Serial version UID. */
     private static final long serialVersionUID = 1L;
+    private HorizontalLayout layout;
 
     @Override
     public void attach() {
         super.attach();
         final VerticalLayout mainLayout = new VerticalLayout();
-        final HorizontalLayout layout = new HorizontalLayout();
+        layout = new HorizontalLayout();
         layout.setMargin(false);
         layout.setSpacing(true);
         mainLayout.addComponent(layout);
@@ -33,17 +34,6 @@ public class StatusViewlet extends AbstractViewlet {
 
         this.setCompositionRoot(mainLayout);
 
-        final SiteContext siteContext = getSite().getSiteContext();
-        final Map<String, Boolean> statuses = siteContext.getObject("statuses");
-
-        for (final String statusKey : statuses.keySet())  {
-            final Embedded embedded = new Embedded(null, new ThemeResource(statusKey + ".png"));
-            embedded.setWidth(48, Unit.PIXELS);
-            embedded.setHeight(48, Unit.PIXELS);
-            embedded.setEnabled(statuses.get(statusKey));
-            layout.addComponent(embedded);
-            layout.setComponentAlignment(embedded, Alignment.MIDDLE_CENTER);
-        }
 
     }
 
@@ -52,7 +42,21 @@ public class StatusViewlet extends AbstractViewlet {
      */
     @Override
     public void enter(final String parameters) {
+        layout.removeAllComponents();
 
+        final SiteContext siteContext = getSite().getSiteContext();
+        final Map<String, Boolean> statuses = siteContext.getObject("statuses");
+        statuses.put("authentication", getSite().getSecurityProvider().getRoles().indexOf("anonymous") == -1);
+
+        for (final String statusKey : statuses.keySet())  {
+            final Embedded embedded = new Embedded(null, new ThemeResource(statusKey + ".png"));
+            embedded.setWidth(48, Unit.PIXELS);
+            embedded.setHeight(48, Unit.PIXELS);
+            embedded.setEnabled(statuses.get(statusKey));
+            embedded.setImmediate(true);
+            layout.addComponent(embedded);
+            layout.setComponentAlignment(embedded, Alignment.MIDDLE_CENTER);
+        }
     }
 
 }
