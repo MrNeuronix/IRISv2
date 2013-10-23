@@ -74,7 +74,7 @@ body.v-ie7 .v-menubar-submenu,
 .v-filterselect-select-button .v-filterselect-input,
 .v-drag-element {
 	font-size: 13px;
-	color: rgb(99,120,255);
+	color: rgb(113, 103, 139);
 	}
 
 .v-app select,
@@ -270,7 +270,7 @@ td.v-datefield-calendarpanel-month,
 .v-popupview-popup a,
 .v-popupview,
 .sidebar-menu .v-label {
-	color: rgb(40,126,206);
+	color: rgb(113, 103, 139);
 	}
 
 .v-button-default,
@@ -319,13 +319,13 @@ td.v-datefield-calendarpanel-month,
 .v-horizontallayout-segment-alternate .v-button-down,
 .v-menubar .v-menubar-menuitem-selected,
 .v-menubar-submenu .v-menubar-menuitem-selected {
-	background-color: rgb(40,126,206);
+	background-color: rgb(113, 103, 139);
 	color: rgb(247,248,249);
 	text-shadow: 0 -1px 0 rgb(46,90,132);
 	}
 
 .v-ie6 .v-progressindicator-indicator {
-	background-color: rgb(40,126,206);
+	background-color: rgb(113, 103, 139);
 	}
 
 .v-panel-caption,
