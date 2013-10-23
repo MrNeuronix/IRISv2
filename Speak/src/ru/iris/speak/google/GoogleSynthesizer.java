@@ -14,7 +14,9 @@ import javazoom.jl.player.FactoryRegistry;
 import javazoom.jl.player.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.I18N;
 import ru.iris.common.httpGET;
+import ru.iris.speak.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -57,9 +59,10 @@ public class GoogleSynthesizer implements Runnable
     private AudioDevice AudioLine;
 
     private final ExecutorService exs;
-    private final String GOOGLE_TRANSLATE_TTS_URL = "http://translate.google.com/translate_tts?tl=ru&q=";
+    private final String GOOGLE_TRANSLATE_TTS_URL = "http://translate.google.com/translate_tts?tl="+ Service.config.get("language")+"&q=";
     private final Future<AudioDevice> futureAudioLine;
     private static Logger log = LoggerFactory.getLogger (GoogleSynthesizer.class.getName ());
+    private static I18N i18n = new I18N();
 
     /** Constructor: Will submit the AudioDeviceLoader to the executor */
 
@@ -111,9 +114,9 @@ public class GoogleSynthesizer implements Runnable
                 .replaceAll ("\\p{InCombiningDiacriticalMarks}+", "");
 
         // Ensure we have only whitespaces that are single spaces characters
-        rawText = rawText.replaceAll ("%", " процент ");
-        rawText = rawText.replaceAll ("&", " и ");
-        rawText = rawText.replaceAll ("\\+", " плюс ");
+        rawText = rawText.replaceAll ("%", i18n.message("percent"));
+        rawText = rawText.replaceAll ("&", i18n.message("and"));
+        rawText = rawText.replaceAll ("\\+", i18n.message("plus"));
 
         rawText = rawText.replaceAll ("\\s", " ");
         rawText = rawText.replaceAll ("\\s{2,}", " ");
@@ -306,7 +309,7 @@ public class GoogleSynthesizer implements Runnable
                 return audio;
             } catch (Exception ee)
             {
-                System.err.println ("[voice] Could not load audio driver");
+                System.err.println (i18n.message("voice.could.not.load.audio.driver"));
                 ee.printStackTrace ();
                 return null;
             }

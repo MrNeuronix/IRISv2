@@ -12,6 +12,7 @@ package ru.iris.devices.zwave;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
+import ru.iris.common.I18N;
 import ru.iris.common.SQL;
 
 import java.io.IOException;
@@ -22,24 +23,26 @@ import java.util.Map;
 
 public class ZWaveDevice {
 
+    private I18N i18n = new I18N();
+
     @Expose
-    private String name = "not set";
+    private String name = i18n.message("not.set");
     @Expose
     private short node = 0;
     @Expose
     private int zone = 0;
     @Expose
-    private String type = "unknown";
+    private String type = i18n.message("unknown");
     @Expose
-    private String internalType = "unknown";
+    private String internalType = i18n.message("unknown");
     @Expose
-    private String manufName = "unknown";
+    private String manufName = i18n.message("unknown");
     @Expose
-    private String uuid = "unknown";
+    private String uuid = i18n.message("unknown");
     @Expose
-    private String status = "unknown";
+    private String status = i18n.message("unknown");
     @Expose
-    private String source = "zwave";
+    private String source = i18n.message("zwave");
     @Expose
     private HashMap<String, Object> LabelsValues = new HashMap<String, Object>();
 
@@ -88,13 +91,13 @@ public class ZWaveDevice {
         public String getValue(String label) {
 
             if (label == null)
-                label = "none set";
+                label = i18n.message("none.set");
 
             try {
                 return this.LabelsValues.get(label).toString();
             } catch (NullPointerException e)
             {
-                return "none set";
+                return i18n.message("none.set");
             }
 
         }
@@ -102,7 +105,7 @@ public class ZWaveDevice {
         public void setValue(String label, Object value) {
 
             if (label == null)
-                label = "none set";
+                label = i18n.message("none.set");
 
             this.LabelsValues.put(label, value);
         }
@@ -140,7 +143,7 @@ public class ZWaveDevice {
         public void removeValue(String label) {
 
             if (label == null)
-                label = "none set";
+                label = i18n.message("none.set");
 
             HashMap<String, Object> zDv = new HashMap<>();
 
@@ -215,36 +218,35 @@ public class ZWaveDevice {
         public void save() throws SQLException {
 
             if (this.type == null)
-                this.type = "undefined";
+                this.type = i18n.message("undefined");
 
             if (this.manufName == null)
-                this.manufName = "undefined";
+                this.manufName = i18n.message("undefined");
 
             if (this.status == null)
-                this.status = "unknown";
+                this.status = i18n.message("unknown");
 
             if (this.name == null)
-                this.name = "not set";
+                this.name = i18n.message("not.set");
 
             sql.doQuery("DELETE FROM DEVICES WHERE UUID='"+this.uuid+"'");
             sql.doQuery("DELETE FROM DEVICELABELS WHERE UUID='"+this.uuid+"'");
 
             sql.doQuery("INSERT INTO DEVICES (SOURCE, UUID, internaltype, TYPE, MANUFNAME, NODE, STATUS, NAME, ZONE) VALUES ('zwave','"+uuid+"','"+internalType+"','"+type+"','"+manufName+"','"+node+"','"+status+"','"+name+"','"+zone+"')");
 
-            Iterator it = LabelsValues.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pairs = (Map.Entry)it.next();
+            for (Map.Entry<String, Object> stringObjectEntry : LabelsValues.entrySet()) {
+                Map.Entry pairs = (Map.Entry) stringObjectEntry;
 
                 String label = String.valueOf(pairs.getKey());
                 String value = String.valueOf(pairs.getValue());
 
-                if(label.isEmpty())
-                    label = "none";
+                if (label.isEmpty())
+                    label = i18n.message("none");
 
-                if(value.isEmpty())
-                    value = "none";
+                if (value.isEmpty())
+                    value = i18n.message("none");
 
-                sql.doQuery("INSERT INTO DEVICELABELS (UUID, LABEL, VALUE) VALUES ('"+this.uuid+"','"+label+"','"+value+"')");
+                sql.doQuery("INSERT INTO DEVICELABELS (UUID, LABEL, VALUE) VALUES ('" + this.uuid + "','" + label + "','" + value + "')");
             }
         }
 }

@@ -1,7 +1,9 @@
 package ru.iris.scheduler;
 
+import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.I18N;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,6 +24,7 @@ import java.util.Date;
 public class Task {
 
     private static Logger log = LoggerFactory.getLogger(Task.class);
+    private static I18N i18n = new I18N();
 
     private int id;
     private Date date;
@@ -39,13 +42,13 @@ public class Task {
         this.id = lastid++;
         rs.close();
 
-        log.debug("[scheduler] Create new task instance with ID [" + id + "]");
+        log.debug(i18n.message("scheduler.create.new.task.instance.with.id.0", id));
     }
 
     public Task(int id) throws SQLException {
-        log.debug("[scheduler] Create task instance from ID [" + id + "]");
+        log.debug(i18n.message("scheduler.create.task.instance.from.id.0", id));
 
-        ResultSet rs = Service.sql.select("SELECT * FROM scheduler WHERE id='" + id + "'");
+        @NonNls ResultSet rs = Service.sql.select("SELECT * FROM scheduler WHERE id='" + id + "'");
 
         rs.next();
 
@@ -126,7 +129,7 @@ public class Task {
     }
 
     public boolean save() {
-        log.info("[scheduler] Saving task [" + id + "]");
+        log.info(i18n.message("scheduler.saving.task.0", id));
 
         if (Service.sql.doQuery("UPDATE scheduler" +
                 "SET id = '" + id + "'," +

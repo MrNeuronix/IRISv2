@@ -14,6 +14,7 @@ import javazoom.jl.player.FactoryRegistry;
 import javazoom.jl.player.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.I18N;
 import ru.iris.common.httpGET;
 import ru.iris.speak.Service;
 
@@ -52,13 +53,15 @@ public class VoiceRSSSynthesizer implements Runnable
       *
       **/
 
+    private static I18N i18n = new I18N();
+
     private LinkedList<String> UserText;
     private Integer Files;
     private boolean IsUnassigned;
     private AudioDevice AudioLine;
 
     private final ExecutorService exs;
-    private final String SPEAK_URL = "http://api.voicerss.org/?key=" + Service.config.get("voicerssAPI") + "&hl=ru-ru&f=48khz_16bit_stereo&c=mp3&src=";
+    private final String SPEAK_URL = "http://api.voicerss.org/?key=" + Service.config.get("voicerssAPI") + "&hl="+Service.config.get("language")+"-"+Service.config.get("language")+"&f=48khz_16bit_stereo&c=mp3&src=";
     private final Future<AudioDevice> futureAudioLine;
     private static Logger log = LoggerFactory.getLogger (VoiceRSSSynthesizer.class.getName ());
 
@@ -112,9 +115,9 @@ public class VoiceRSSSynthesizer implements Runnable
                 .replaceAll ("\\p{InCombiningDiacriticalMarks}+", "");
 
         // Ensure we have only whitespaces that are single spaces characters
-        rawText = rawText.replaceAll ("%", " процент ");
-        rawText = rawText.replaceAll ("&", " и ");
-        rawText = rawText.replaceAll ("\\+", " плюс ");
+        rawText = rawText.replaceAll ("%", i18n.message("percent"));
+        rawText = rawText.replaceAll ("&", i18n.message("and"));
+        rawText = rawText.replaceAll ("\\+", i18n.message("plus"));
 
         rawText = rawText.replaceAll ("\\s", " ");
         rawText = rawText.replaceAll ("\\s{2,}", " ");
@@ -307,7 +310,7 @@ public class VoiceRSSSynthesizer implements Runnable
                 return audio;
             } catch (Exception ee)
             {
-                System.err.println ("[voice] Could not load audio driver");
+                System.err.println (i18n.message("voice.could.not.load.audio.driver"));
                 ee.printStackTrace ();
                 return null;
             }

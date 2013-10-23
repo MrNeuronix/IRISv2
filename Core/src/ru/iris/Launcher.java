@@ -1,9 +1,11 @@
 package ru.iris;
 
 import org.h2.tools.Server;
+import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.Config;
+import ru.iris.common.I18N;
 import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
 
@@ -34,46 +36,49 @@ public class Launcher {
 
     public static void main(String[] args) throws Exception {
 
-        log.info ("----------------------------------------");
-        log.info ("----       IRISv2 is starting       ----");
-        log.info ("----------------------------------------");
+        // Launch H2 TCP server
+        Server.createTcpServer().start();
 
         msg = new Messaging();
         messageConsumer = msg.getConsumer ();
         messageProducer = msg.getProducer ();
         session = msg.getSession ();
 
-        // Запускаем TCP сервер H2
-        Server.createTcpServer().start();
+        // Enable internationalization
+        I18N i18n = new I18N();
 
-        // Конфигурация
+        log.info ("----------------------------------------");
+        log.info (i18n.message("irisv2.is.starting"));
+        log.info ("----------------------------------------");
+
+        // Load configuration
         Config cfg = new Config ();
         config = cfg.getConfig ();
         sql = new SQL();
 
-        // Опрос модулей
+        // Modules poll
         new StatusChecker();
 
-        // Запускаем сервис REST;
+        // Lauch REST service
         runModule("java -jar Rest.jar");
 
-        // Запускаем захват звука
+        // Launch capture sound module
         runModule("java -jar Record.jar");
 
-        // Запускаем синтез звука
+        // Launch speak synth module
         runModule("java -jar Speak.jar");
 
-        // Запускаем модуль для работы с устройствами
+        // Launch module for work with devices
         runModule("java -jar Devices.jar");
 
-        // Запускаем модуль планировщика
+        // Launch schedule module
         runModule("java -jar Scheduler.jar");
 
-        // Запускаем модуль для работы c событиями
+        // Launch events module
         runModule("java -jar Events.jar");
     }
 
-    private static void runModule(String cmd) throws IOException {
+    private static void runModule(@NonNls String cmd) throws IOException {
 
         ProcessBuilder builder = new ProcessBuilder(cmd.split("\\s+")).redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectErrorStream(true);
         builder.start();

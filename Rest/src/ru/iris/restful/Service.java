@@ -13,9 +13,11 @@ package ru.iris.restful;
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.qpid.AMQException;
+import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.Config;
+import ru.iris.common.I18N;
 import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
 
@@ -32,8 +34,10 @@ public class Service
     private static Logger log = LoggerFactory.getLogger (Service.class);
     public static MessageConsumer messageConsumer;
     public static MessageProducer messageProducer;
+    @NonNls
     public static Messaging msg;
     public static Session session;
+    private static I18N i18n = new I18N();
 
     public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException {
 
@@ -58,7 +62,7 @@ public class Service
         // Check module status
 
         Message mess;
-        MapMessage m = null;
+        @NonNls MapMessage m = null;
 
         msg.simpleSendMessage("status.answer", "alive", "rest");
 
@@ -68,7 +72,7 @@ public class Service
 
             if(m.getStringProperty("qpid.subject").equals ("status.rest") || m.getStringProperty("qpid.subject").equals ("status.all"))
             {
-                log.info ("[rest] Got status query");
+                log.info (i18n.message("rest.got.status.query"));
                 msg.simpleSendMessage("status.answer", "alive", "rest");
             }
         }
