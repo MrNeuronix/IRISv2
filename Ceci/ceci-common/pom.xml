@@ -117,9 +117,16 @@
         </dependency>
         <dependency>
             <groupId>org.apache.qpid</groupId>
+            <artifactId>qpid-common</artifactId>
+            <version>0.20</version>
+        </dependency>
+        <!--
+        <dependency>
+            <groupId>org.apache.qpid</groupId>
             <artifactId>qpid-amqp-1-0-client-jms</artifactId>
             <version>0.20</version>
         </dependency>
+        -->
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jms_1.1_spec</artifactId>

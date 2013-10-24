@@ -121,8 +121,6 @@
             <groupId>org.zwave4j</groupId>
             <artifactId>zwave4j</artifactId>
             <version>0.2</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../Common/lib/zwave4j-0.2.jar</systemPath>
         </dependency>
     </dependencies>
 

@@ -92,7 +92,7 @@ public class BusClientManager {
             }
         });
 
-        //managerThread.start();
+        managerThread.start();
     }
 
     /**

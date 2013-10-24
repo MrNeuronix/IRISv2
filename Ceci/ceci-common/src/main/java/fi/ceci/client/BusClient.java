@@ -133,9 +133,6 @@ public class BusClient {
         final String password = bus.getUserPassword();
         final String host = bus.getHost();
         final Integer port = bus.getPort();
-        //final String userName = "agocontrol";
-        //final String password = "letmein";
-
 
         final Properties properties = new Properties();
         properties.put("java.naming.factory.initial",
@@ -236,6 +233,63 @@ public class BusClient {
         connection.close();
         context.close();
         LOGGER.info("Disconnected from bus: " + bus.getName());
+    }
+
+
+    /**
+     * Handle reply.
+     *
+     * @param entityManager the entityManager
+     * @throws Exception if exception occurs.
+     */
+    private void handleReply(final EntityManager entityManager) throws Exception  {
+        final Message message = (Message) replyConsumer.receive();
+        if (message == null) {
+            return;
+        }
+        replyMessageQueue.put(message);
+    }
+
+    /**
+     * Handle event.
+     *
+     * @param entityManager the entityManager
+     * @param owner the owning company
+     * @throws Exception if exception occurs.
+     */
+    private void handleEvent(final EntityManager entityManager, final Company owner) throws Exception  {
+        final Message message = messageConsumer.receive();
+
+        if (message instanceof MapMessage) {
+            final MapMessage mapMessage = (MapMessage) message;
+            if (mapMessage == null) {
+                return;
+            }
+
+            final String subject = mapMessage.getStringProperty("qpid.subject");
+            if (subject == null || !subject.startsWith("event")) {
+                return;
+            }
+            if (subject.equals("event.environment.timechanged")) {
+                return; // Ignore time changed events.
+            }
+
+            final Map<String, Object> map = convertMapMessageToMap(mapMessage);
+
+            map.put("event", subject);
+
+            final String eventJsonString = mapper.writeValueAsString(map);
+            EventDao.saveEvents(entityManager, Collections.singletonList(
+                    new Event(owner, eventJsonString, new Date())));
+            return;
+        }
+
+        if (message instanceof JMSBytesMessage) {
+            LOGGER.warn("Unhandled byte message: " + message.toString());
+            return;
+        }
+
+        LOGGER.warn("Unhandled message type " + message.toString());
     }
 
     /**
@@ -554,62 +608,6 @@ public class BusClient {
             }
 
         }
-    }
-
-    /**
-     * Handle reply.
-     *
-     * @param entityManager the entityManager
-     * @throws Exception if exception occurs.
-     */
-    private void handleReply(final EntityManager entityManager) throws Exception  {
-        final Message message = (Message) replyConsumer.receive();
-        if (message == null) {
-            return;
-        }
-        replyMessageQueue.put(message);
-    }
-
-    /**
-     * Handle event.
-     *
-     * @param entityManager the entityManager
-     * @param owner the owning company
-     * @throws Exception if exception occurs.
-     */
-    private void handleEvent(final EntityManager entityManager, final Company owner) throws Exception  {
-        final Message message = messageConsumer.receive();
-
-        if (message instanceof MapMessage) {
-            final MapMessage mapMessage = (MapMessage) message;
-            if (mapMessage == null) {
-                return;
-            }
-
-            final String subject = mapMessage.getStringProperty("qpid.subject");
-            if (subject == null || !subject.startsWith("event")) {
-                return;
-            }
-            if (subject.equals("event.environment.timechanged")) {
-                return; // Ignore time changed events.
-            }
-
-            final Map<String, Object> map = convertMapMessageToMap(mapMessage);
-
-            map.put("event", subject);
-
-            final String eventJsonString = mapper.writeValueAsString(map);
-            EventDao.saveEvents(entityManager, Collections.singletonList(
-                    new Event(owner, eventJsonString, new Date())));
-            return;
-        }
-
-        if (message instanceof JMSBytesMessage) {
-            LOGGER.warn("Unhandled byte message: " + message.toString());
-            return;
-        }
-
-        LOGGER.warn("Unhandled message type " + message.toString());
     }
 
     /**
