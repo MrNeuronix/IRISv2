@@ -10,8 +10,10 @@ package ru.iris.speak.google;
  * License: GPL v3
  */
 
+import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.I18N;
 import ru.iris.common.Messaging;
 import ru.iris.speak.Service;
 
@@ -26,6 +28,7 @@ public class GoogleSpeakService implements Runnable
 
     Thread t = null;
     private static Logger log = LoggerFactory.getLogger (GoogleSpeakService.class.getName ());
+    private static I18N i18n = new I18N();
 
     public GoogleSpeakService()
     {
@@ -41,10 +44,10 @@ public class GoogleSpeakService implements Runnable
     @Override
     public synchronized void run()
     {
-        log.info ("[speak] Service started (TTS: Google)");
+        log.info (i18n.message("speak.service.started.tts.google"));
 
         Message message = null;
-        MapMessage m = null;
+        @NonNls MapMessage m = null;
         ExecutorService exs = Executors.newFixedThreadPool (10);
 
         try
@@ -60,8 +63,8 @@ public class GoogleSpeakService implements Runnable
                     if(Service.config.get("silence").equals("0"))
                     {
                         log.info ("[speak] -----------------------");
-                        log.info ("[speak] Confidence: " + m.getDoubleProperty("confidence"));
-                        log.info ("[speak] Text: " + m.getStringProperty("text"));
+                        log.info (i18n.message("speak.confidence.0", m.getDoubleProperty("confidence")));
+                        log.info (i18n.message("speak.text.0", m.getStringProperty("text")));
                         log.info ("[speak] -----------------------");
 
                         GoogleSynthesizer Voice = new GoogleSynthesizer (exs);
@@ -70,7 +73,7 @@ public class GoogleSpeakService implements Runnable
                     }
                     else
                     {
-                        log.info("[speak] Silence mode enabled! Ignore speak request");
+                        log.info(i18n.message("speak.silence.mode.enabled.ignore.speak.request"));
                     }
                 }
             }
@@ -80,7 +83,7 @@ public class GoogleSpeakService implements Runnable
         } catch (Exception e)
         {
             e.printStackTrace ();  //To change body of catch statement use File | Settings | File Templates.
-            log.info ("Get error! " + m);
+            log.info (i18n.message("speak.get.error.0", m));
         }
     }
 }

@@ -1,19 +1,23 @@
-# Главный конфигурационный файл
-# Внимание! Некоторые настройки находятся в БД!
+# General configuration file
+# Attention! Some configuration stored in database!
+
+language=ru
+locale=ru-RU
+systemName=cистема
 
 #################################
-# Секция аудионастроек
+# Audio section
 #################################
 
-# Количество подключенных микрофонов
+# Total of connected microphones
 microphones=1
 
-# Название устройства в системе (кол-во ограниченно фантазией ;)
+# Microphone name in system (unlimited)
 microphoneDevice2=hw2,0
 microphoneDevice3=hw3,0
 
 #################################
-# Секция сервиса REST
+# REST section
 #################################
 
 httpPort=16101
@@ -22,28 +26,28 @@ httpUser=admin
 httpPassword=access
 
 #################################
-# Секция синтеза речи
+# Voice synth section
 #################################
 
-# Тихий режим
-silence=1
+# Silence mode
+silence=0
 
-# Голосовой движок (google, voicerss)
-ttsEngine=voicerss
+# Voice engine (google, voicerss)
+ttsEngine=google
 
-# Для VoiceRSS - ключ API (получить можно бесплатно)
+# VoiceRSS API (can be obtain for free)
 voicerssAPI=a07e6a0dd3884deb978d02d2f1d7ee76
 
 #################################
-# Секция zwave
+# Zwave section
 #################################
 
-# Порт контроллера
+# Controller port
 zwavePort=/dev/ttyUSB0
 
-# Вывод на экран отладочной информации zwave
+# Set "true" if you need zwave debug on screen
 zwaveDebug=false
 
-# Путь до конфигурационных файлов open-zwave
+# Path for open-zwave "conf" directory
 openzwaveCfgPath=./conf/zwave-conf
 

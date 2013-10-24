@@ -2,8 +2,10 @@ package ru.iris.restful;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.I18N;
 import ru.iris.common.Module;
 import ru.iris.devices.zwave.ZWaveDevice;
 
@@ -34,15 +36,16 @@ import java.util.HashMap;
 public class RESTService
 {
     private static Logger log = LoggerFactory.getLogger(RESTService.class.getName());
+    private static I18N i18n = new I18N();
 
         @GET
         @Path("/device/get/{uuid}")
         @Produces(MediaType.TEXT_PLAIN)
         public String device(@PathParam("uuid") String uuid) throws IOException, SQLException {
 
-            log.info("[rest] Get /device/get/"+uuid);
+            log.info(i18n.message("rest.get.device.get.0", uuid));
 
-            ResultSet rs = Service.sql.select("SELECT * FROM DEVICES");
+            @NonNls ResultSet rs = Service.sql.select("SELECT * FROM DEVICES");
             ArrayList<ZWaveDevice> zDevices = new ArrayList<ZWaveDevice>();
             Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
@@ -60,7 +63,7 @@ public class RESTService
                     zdevice.setUUID(rs.getString("uuid"));
                     zdevice.setZone(rs.getInt("zone"));
 
-                    ResultSet rsv = Service.sql.select("SELECT * FROM devicelabels WHERE UUID='"+rs.getString("uuid")+"'");
+                    @NonNls ResultSet rsv = Service.sql.select("SELECT * FROM devicelabels WHERE UUID='"+rs.getString("uuid")+"'");
                         while (rsv.next()) {
                             zdevice.setValue(rsv.getString("label"), rsv.getString("value"));
                         }
@@ -89,12 +92,12 @@ public class RESTService
     @Consumes(MediaType.TEXT_PLAIN)
     public String cmd(@PathParam("text") String text) throws JMSException, SQLException {
 
-        log.info("[rest] Get /cmd/"+text);
+        log.info(i18n.message("rest.get.cmd.0", text));
 
         Service.msg.simpleSendMessage("event.command", "cmd", text);
 
         Message mess;
-        MapMessage m = null;
+        @NonNls MapMessage m = null;
 
         while ((mess = Service.messageConsumer.receive (0)) != null)
         {
@@ -102,9 +105,9 @@ public class RESTService
 
             if(m.getStringProperty("qpid.subject").equals ("event.command"))
             {
-                log.info ("[rest] Got \""+m.getStringProperty("cmd")+"\" command");
+                log.info (i18n.message("rest.got.0.command", m.getStringProperty("cmd")));
 
-                ResultSet rs = Service.sql.select("SELECT name, command, param FROM modules");
+                @NonNls ResultSet rs = Service.sql.select("SELECT name, command, param FROM modules");
 
                 while (rs.next())
                 {
@@ -120,7 +123,7 @@ public class RESTService
                             execute.run(param);
 
                         } catch (Exception e) {
-                            log.info("[module] Error at loading module " + name + " with params \"" + param + "\"!");
+                            log.info(i18n.message("module.error.at.loading.module.0.with.params.1", name, param));
                             e.printStackTrace ();
                         }
                     }
@@ -130,7 +133,7 @@ public class RESTService
             }
         }
 
-        return "done";
+        return i18n.message("done");
     }
 
     /////////////////////////////////////
@@ -142,9 +145,9 @@ public class RESTService
     @Consumes(MediaType.TEXT_PLAIN)
     public String speak(@PathParam("text") String text) throws JMSException {
 
-        log.info("[rest] Get /speak/"+text);
+        log.info(i18n.message("rest.get.speak.0", text));
 
-        MapMessage message = Service.session.createMapMessage();
+        @NonNls MapMessage message = Service.session.createMapMessage();
 
         message.setStringProperty("text", text);
         message.setDoubleProperty("confidence", 100);
@@ -152,7 +155,7 @@ public class RESTService
 
         Service.messageProducer.send (message);
 
-        return "done";
+        return i18n.message("done");
     }
 
     /////////////////////////////////////
@@ -164,9 +167,9 @@ public class RESTService
     @Consumes(MediaType.TEXT_PLAIN)
     public String devEnable(@PathParam("uuid") String uuid) throws JMSException {
 
-        log.info("[rest] Enable "+uuid+ " device");
+        log.info(i18n.message("rest.enable.0.device", uuid));
 
-        MapMessage message = Service.session.createMapMessage();
+        @NonNls MapMessage message = Service.session.createMapMessage();
 
         message.setStringProperty("command", "enable");
         message.setStringProperty("uuid", uuid);
@@ -174,7 +177,7 @@ public class RESTService
 
         Service.messageProducer.send (message);
 
-        return "done";
+        return i18n.message("done");
     }
 
     @GET
@@ -182,9 +185,9 @@ public class RESTService
     @Consumes(MediaType.TEXT_PLAIN)
     public String devDisable(@PathParam("uuid") String uuid) throws JMSException {
 
-        log.info("[rest] Disable "+uuid+ " device");
+        log.info(i18n.message("rest.disable.0.device", uuid));
 
-        MapMessage message = Service.session.createMapMessage();
+        @NonNls MapMessage message = Service.session.createMapMessage();
 
         message.setStringProperty("command", "disable");
         message.setStringProperty("uuid", uuid);
@@ -192,7 +195,7 @@ public class RESTService
 
         Service.messageProducer.send (message);
 
-        return "done";
+        return i18n.message("done");
     }
 
     @GET
@@ -200,9 +203,9 @@ public class RESTService
     @Consumes(MediaType.TEXT_PLAIN)
     public String devSetLevel(@PathParam("uuid") String uuid, @PathParam("level") short level) throws JMSException {
 
-        log.info("[rest] Set level "+level+ " on "+uuid+" device");
+        log.info(i18n.message("rest.set.level.0.on.1.device", level, uuid));
 
-        MapMessage message = Service.session.createMapMessage();
+        @NonNls MapMessage message = Service.session.createMapMessage();
 
         message.setStringProperty("command", "setlevel");
         message.setShortProperty("level", level);
@@ -211,7 +214,7 @@ public class RESTService
 
         Service.messageProducer.send (message);
 
-        return "done";
+        return i18n.message("done");
     }
 
     @GET
@@ -219,10 +222,10 @@ public class RESTService
     @Consumes(MediaType.TEXT_PLAIN)
     public String devAllState(@PathParam("state") String state) throws JMSException
     {
-        log.info("[rest] Switch all devices to "+state+ " state");
+        log.info(i18n.message("rest.switch.all.devices.to.0.state", state));
         Service.msg.simpleSendMessage("event.devices.setvalue", "command", "all"+state);
 
-        return "done";
+        return i18n.message("done");
     }
 
     @GET
@@ -230,12 +233,12 @@ public class RESTService
     @Produces(MediaType.TEXT_PLAIN)
     public String status(@PathParam("name") String name) throws IOException, SQLException {
 
-        log.info("[rest] Get /status/module/"+name);
+        log.info(i18n.message("rest.get.status.module.0", name));
 
-        ResultSet rs = Service.sql.select("SELECT * FROM MODULESTATUS WHERE name='"+name+"'");
+        @NonNls ResultSet rs = Service.sql.select("SELECT * FROM MODULESTATUS WHERE name='"+name+"'");
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
-        HashMap<String,Object> result = new HashMap<>();
+        @NonNls HashMap<String,Object> result = new HashMap<>();
 
         try {
             while (rs.next()) {
@@ -258,12 +261,12 @@ public class RESTService
     @Produces(MediaType.TEXT_PLAIN)
     public String status() throws IOException, SQLException {
 
-        log.info("[rest] Get /status/module/all");
+        log.info(i18n.message("rest.get.status.module.all"));
 
-        ResultSet rs = Service.sql.select("SELECT * FROM MODULESTATUS");
+        @NonNls ResultSet rs = Service.sql.select("SELECT * FROM MODULESTATUS");
         Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
-        HashMap<String,Object> obj = new HashMap<>();
+        @NonNls HashMap<String,Object> obj = new HashMap<>();
         ArrayList result = new ArrayList();
 
         try {

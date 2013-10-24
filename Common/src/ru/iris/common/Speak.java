@@ -1,6 +1,7 @@
 package ru.iris.common;
 
 import org.apache.qpid.AMQException;
+import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +26,9 @@ public class Speak {
 
     public static void add(String text) throws AMQException, JMSException, URISyntaxException {
 
+        I18N i18n = new I18N();
         Messaging msg = new Messaging ();
-        MapMessage message = null;
+        @NonNls MapMessage message = null;
         session = msg.getSession ();
         messageProducer = msg.getProducer ();
 
@@ -39,7 +41,7 @@ public class Speak {
 
             messageProducer.send(message);
         } catch (JMSException e) {
-            log.info("[error] Failed speak: " + message);  //To change body of catch statement use File | Settings | File Templates.
+            log.info(i18n.message("error.failed.speak.0", message));  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 }

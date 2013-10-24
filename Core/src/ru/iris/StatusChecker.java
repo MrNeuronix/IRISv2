@@ -1,7 +1,9 @@
 package ru.iris;
 
+import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.I18N;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
@@ -28,7 +30,9 @@ public class StatusChecker implements Runnable
     public synchronized void run()
     {
         Message mess;
-        MapMessage m = null;
+        @NonNls MapMessage m = null;
+
+        I18N i18n = new I18N();
 
         try {
 
@@ -39,7 +43,7 @@ public class StatusChecker implements Runnable
                     if(m.getStringProperty("qpid.subject").equals ("status.answer"))
                     {
                         String module = m.getStringProperty("alive");
-                        log.info ("[status] Got status answer from "+module);
+                        log.info (i18n.message("status.got.status.answer.from.0", module));
 
                         Launcher.sql.doQuery("DELETE FROM MODULESTATUS WHERE NAME='"+module+"'");
                         Launcher.sql.doQuery("INSERT INTO MODULESTATUS (NAME, LASTSEEN) VALUES ('"+module+"',NOW())");

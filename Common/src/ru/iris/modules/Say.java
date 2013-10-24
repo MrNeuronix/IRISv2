@@ -10,6 +10,7 @@ package ru.iris.modules;
  * License: GPL v3
  */
 import org.apache.qpid.AMQException;
+import org.jetbrains.annotations.NonNls;
 import ru.iris.common.Messaging;
 import ru.iris.common.Module;
 
@@ -28,11 +29,11 @@ public class Say implements Module {
         try {
             msg = new Messaging();
         } catch (JMSException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         } catch (URISyntaxException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         } catch (AMQException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         messageConsumer = msg.getConsumer ();
         messageProducer = msg.getProducer ();
@@ -41,7 +42,7 @@ public class Say implements Module {
 
     public void run(String arg) throws JMSException {
 
-        MapMessage message = session.createMapMessage();
+        @NonNls MapMessage message = session.createMapMessage();
 
         message.setStringProperty("text", arg);
         message.setDoubleProperty("confidence", 100);

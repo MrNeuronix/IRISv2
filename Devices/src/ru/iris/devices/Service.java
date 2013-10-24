@@ -11,9 +11,11 @@ package ru.iris.devices;
  */
 
 import org.apache.qpid.AMQException;
+import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.Config;
+import ru.iris.common.I18N;
 import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
 import ru.iris.devices.zwave.ZWaveService;
@@ -26,10 +28,13 @@ import java.util.HashMap;
 
 public class Service {
 
+    @NonNls
     public static HashMap<String, String> config;
+    @NonNls
     public static SQL sql;
     public static MessageConsumer messageConsumer;
     public static MessageProducer messageProducer;
+    @NonNls
     public static Messaging msg;
     public static Session session;
 
@@ -37,6 +42,7 @@ public class Service {
 
     public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException
     {
+        I18N i18n = new I18N();
 
         Config cfg = new Config ();
         config = cfg.getConfig ();
@@ -48,23 +54,23 @@ public class Service {
         session = msg.getSession ();
 
         log.info ("[iris] ----------------------------------");
-        log.info ("[iris] Devices service starting");
+        log.info (i18n.message("iris.devices.service.starting"));
         log.info ("[iris] ----------------------------------");
 
         if(config.get("zwaveEnabled").equals("1"))
         {
-            log.info("[zwave] ZWave support is enabled. Starting.");
+            log.info(i18n.message("zwave.zwave.support.is.enabled.starting"));
             new ZWaveService();
         }
         if(config.get("onewireEnabled").equals("1"))
         {
-            log.info("[1-wire] 1-wire support is enabled. Starting.");
+            log.info(i18n.message("1.wire.1.wire.support.is.enabled.starting"));
         }
 
         // Check module status
 
         Message mess;
-        MapMessage m = null;
+        @NonNls MapMessage m = null;
 
         msg.simpleSendMessage("status.answer", "alive", "devices");
 
@@ -74,7 +80,7 @@ public class Service {
 
             if(m.getStringProperty("qpid.subject").equals ("status.devices") || m.getStringProperty("qpid.subject").equals ("status.all"))
             {
-                log.info ("[devices] Got status query");
+                log.info (i18n.message("devices.got.status.query"));
                 msg.simpleSendMessage("status.answer", "alive", "devices");
             }
         }

@@ -1,5 +1,7 @@
 package ru.iris.common;
 
+import org.jetbrains.annotations.NonNls;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +25,7 @@ public class Config {
     public Config() throws IOException, SQLException {
 
         Properties prop = new Properties();
-        InputStream is = new FileInputStream("./conf/main.property");
+        @NonNls InputStream is = new FileInputStream("./conf/main.property");
         prop.load(is);
 
         Enumeration em = prop.keys();
@@ -33,9 +35,9 @@ public class Config {
             cfg.put(key, (String) prop.get(key));
         }
 
-        SQL sql = new SQL();
+        @NonNls SQL sql = new SQL();
 
-        ResultSet rs = sql.select("SELECT name, param FROM config");
+        @NonNls ResultSet rs = sql.select("SELECT name, param FROM config");
 
         while (rs.next()) {
             String name = rs.getString("name");

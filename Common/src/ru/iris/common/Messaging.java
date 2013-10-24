@@ -13,6 +13,7 @@ package ru.iris.common;
 import org.apache.qpid.AMQException;
 import org.apache.qpid.client.AMQAnyDestination;
 import org.apache.qpid.client.AMQConnection;
+import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,16 +22,19 @@ import java.net.URISyntaxException;
 
 public class Messaging
 {
+    @NonNls
     private Connection connection;
     private Session session;
+    @NonNls
     private Destination destination;
     private MessageConsumer messageConsumer;
     private MessageProducer messageProducer;
     private static Logger log = LoggerFactory.getLogger (Messaging.class);
+    private I18N i18n = new I18N();
 
     public Messaging() throws JMSException, URISyntaxException, AMQException
     {
-        log.info ("[msg] Create AMQP connection and session");
+        log.info (i18n.message("msg.create.amqp.connection.and.session"));
 
         connection = new AMQConnection ("amqp://admin:admin@localhost/?brokerlist='tcp://localhost:5672'");
         connection.start ();
@@ -40,13 +44,13 @@ public class Messaging
         messageConsumer = session.createConsumer (destination);
         messageProducer = session.createProducer (destination);
 
-        log.info ("[msg] Done init");
+        log.info (i18n.message("msg.done.init"));
     }
 
 
     public void close() throws JMSException
     {
-        log.info ("[msg] Disconnect AMQP connection, session, etc...");
+        log.info (i18n.message("msg.disconnect.amqp.connection.session.etc"));
 
         messageConsumer.close ();
         messageProducer.close ();
@@ -72,7 +76,7 @@ public class Messaging
     public void simpleSendMessage(String topic, String key, String value)
     {
         try {
-            MapMessage message = session.createMapMessage();
+            @NonNls MapMessage message = session.createMapMessage();
             message.setStringProperty(key, value);
             message.setStringProperty ("qpid.subject", topic);
             messageProducer.send (message);

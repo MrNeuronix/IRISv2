@@ -10,6 +10,7 @@ package ru.iris.common;
  */
 
 import javazoom.jl.decoder.JavaLayerException;
+import org.jetbrains.annotations.NonNls;
 
 import java.io.*;
 import java.net.URL;
@@ -48,7 +49,7 @@ public class httpGET
         String response = "";
 
         // Set up URL connection
-        java.net.URLConnection urlConnect = new URL (url2get).openConnection ();
+        @NonNls java.net.URLConnection urlConnect = new URL (url2get).openConnection ();
         urlConnect.setRequestProperty ("User-Agent", UserAgent);
 
         // URL connection inputstream is read into response
@@ -73,14 +74,14 @@ public class httpGET
     public static String download(String url2get, Object lock) throws IOException, InterruptedException
     {
         // Set default UserAgent property to Mozilla\5.0
-        String UserAgent = "Mozilla/5.0";
+        @NonNls String UserAgent = "Mozilla/5.0";
         return httpGET.download (url2get, lock, UserAgent);
     }
 
     public static byte[] downloadToByteArray(String url2get, Object lock) throws IOException, InterruptedException, JavaLayerException
     {
         // Set default UserAgent property to Mozilla\5.0
-        String UserAgent = "Mozilla/5.0";
+        @NonNls String UserAgent = "Mozilla/5.0";
         return httpGET.downloadToByteArray (url2get, lock, UserAgent);
     }
 
@@ -97,7 +98,7 @@ public class httpGET
         // Set up URL connection
         int readLength;
         byte[] buffer = new byte[1024];
-        java.net.URLConnection urlConnect = new URL (url2get).openConnection ();
+        @NonNls java.net.URLConnection urlConnect = new URL (url2get).openConnection ();
         urlConnect.setRequestProperty ("User-Agent", UserAgent);
 
         // URL connection inputstream is read into byte array
@@ -129,7 +130,7 @@ public class httpGET
     public static InputStream downloadInputStream(String url2get, Object lock) throws IOException, InterruptedException, JavaLayerException
     {
         // Set default UserAgent property to Mozilla\5.0
-        String UserAgent = "Mozilla/5.0";
+        @NonNls String UserAgent = "Mozilla/5.0";
         return httpGET.downloadInputStream (url2get, lock, UserAgent);
     }
 
@@ -143,7 +144,7 @@ public class httpGET
         }
 
         // Set up URL connection
-        java.net.URLConnection urlConnect = new URL (url2get).openConnection ();
+        @NonNls java.net.URLConnection urlConnect = new URL (url2get).openConnection ();
         urlConnect.setRequestProperty ("User-Agent", UserAgent);
 
         // Open connection and stream to inputStream
