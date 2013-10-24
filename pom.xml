@@ -56,15 +56,15 @@
 
 
     <modules>
-        <module>Common</module>
-        <module>Core</module>
-        <module>Devices</module>
-        <module>Events</module>
-        <module>Record</module>
-        <module>Rest</module>
-        <module>Scheduler</module>
-        <module>Speak</module>
-        <module>Ceci</module>
+        <module>iris-common</module>
+        <module>iris-core</module>
+        <module>iris-devices</module>
+        <module>iris-events</module>
+        <module>iris-record</module>
+        <module>iris-rest</module>
+        <module>iris-scheduler</module>
+        <module>iris-speak</module>
+        <module>ceci</module>
     </modules>
 
 </project>
