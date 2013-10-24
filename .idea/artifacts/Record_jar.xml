@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="Record:jar">
-    <output-path>X:/</output-path>
-    <root id="archive" name="Record.jar">
-      <element id="module-output" name="Record" />
-    </root>
-  </artifact>
-</component>
