@@ -10,8 +10,10 @@ package ru.iris.modules;
  * License: GPL v3
  */
 import org.apache.qpid.AMQException;
+import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.I18N;
 import ru.iris.common.Messaging;
 import ru.iris.common.Module;
 import ru.iris.common.SQL;
@@ -24,38 +26,40 @@ import java.net.URISyntaxException;
 public class SwitchControl implements Module {
 
     private static Logger log = LoggerFactory.getLogger(SwitchControl.class.getName());
-    public static SQL sql;
-    public static MessageConsumer messageConsumer;
-    public static MessageProducer messageProducer;
-    public static Messaging msg;
-    public static Session session;
+    private static SQL sql;
+    private static MessageConsumer messageConsumer;
+    private static MessageProducer messageProducer;
+    private static Messaging msg;
+    private static Session session;
+
+    private static I18N i18n = new I18N();
 
     public SwitchControl()
     {
         try {
             msg = new Messaging();
         } catch (JMSException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         } catch (URISyntaxException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         } catch (AMQException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
         messageConsumer = msg.getConsumer ();
         messageProducer = msg.getProducer ();
         session = msg.getSession ();
     }
 
-    public void run(String arg) throws JMSException {
+    public void run(@NonNls String arg) throws JMSException {
         if (arg.equals("enable")) enableSW();
         if (arg.equals("disable")) disableSW();
     }
 
     private void enableSW() throws JMSException {
 
-        log.info("[switchcontol] Switch all devices to ON state");
+        log.info(i18n.message("switchcontol.switch.all.devices.to.on.state"));
 
-        MapMessage message = session.createMapMessage();
+        @NonNls MapMessage message = session.createMapMessage();
 
         message.setStringProperty("command", "allon");
         message.setStringProperty ("qpid.subject", "event.devices.setvalue");
@@ -65,9 +69,9 @@ public class SwitchControl implements Module {
 
     private void disableSW() throws JMSException {
 
-        log.info("[switchcontol] Switch all devices to OFF state");
+        log.info(i18n.message("switchcontol.switch.all.devices.to.off.state"));
 
-        MapMessage message = session.createMapMessage();
+        @NonNls MapMessage message = session.createMapMessage();
 
         message.setStringProperty("command", "alloff");
         message.setStringProperty ("qpid.subject", "event.devices.setvalue");

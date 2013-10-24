@@ -26,6 +26,7 @@ import java.util.HashMap;
 
 public class Service
 {
+    @NonNls
     public static HashMap<String, String> config;
     public static SQL sql;
     public static MessageConsumer messageConsumer;

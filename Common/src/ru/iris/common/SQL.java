@@ -48,7 +48,7 @@ public class SQL {
 
     public boolean doQuery(@NonNls String sql) {
         try {
-            Statement statement = connection.createStatement();
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             try {
                 statement.executeUpdate(sql);
             } catch (SQLException e) {
@@ -65,7 +65,7 @@ public class SQL {
         ResultSet resultSet = null;
 
         try {
-            Statement statement = connection.createStatement();
+            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             try {
                 resultSet = statement.executeQuery(sql);
             } catch (SQLException e) {

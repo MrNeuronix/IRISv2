@@ -18,10 +18,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.util.EntityUtils;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.sql.SQLException;
+import java.util.HashMap;
 
 /**
  * Using HTTPClient to POST .flac recording file to Google.com Speech API
@@ -32,14 +31,25 @@ import java.io.InputStreamReader;
 public class httpPOST
 {
 
+    public static HashMap<String, String> config;
+
     /**
      * Constructor will setup httpclient, post request method and useragent information as required
      */
     public httpPOST()
     {
+        Config cfg = null;
+        try {
+            cfg = new Config();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        config = cfg.getConfig ();
         httpclient = new DefaultHttpClient ();
         System.setProperty ("http.agent", "");
-        httppost = new HttpPost (speechAPIURL);
+        httppost = new HttpPost ("http://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang="+config.get("locale"));
         HttpProtocolParams.setUserAgent (httpclient.getParams (), User_Agent);
         httppost.setHeader (HeaderType, HeaderContent);
     }
@@ -133,7 +143,6 @@ public class httpPOST
     private String FLACFileName;
 
     // Immutable data members
-    private final String speechAPIURL = "http://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang=ru-RU";
     private final String HeaderType = "Content-Type";
     private final String HeaderContent = "audio/x-flac; rate=16000";
     private final String User_Agent = "Mozilla/5.0";

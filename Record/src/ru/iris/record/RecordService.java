@@ -1,16 +1,16 @@
 package ru.iris.record;
 
 import javaFlacEncoder.FLAC_FileEncoder;
+import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.I18N;
 import ru.iris.common.Module;
 import ru.iris.common.httpPOST;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
+import javax.sound.sampled.*;
 import java.io.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,6 +28,7 @@ public class RecordService implements Runnable
 
     private static Logger log = LoggerFactory.getLogger (RecordService.class.getName ());
     private static boolean busy = false;
+    private static I18N i18n = new I18N();
 
     public RecordService()
     {
@@ -39,22 +40,31 @@ public class RecordService implements Runnable
     public synchronized void run()
     {
 
-        log.info ("[record] Service started");
+        log.info (i18n.message("record.service.started"));
 
         int threads = Integer.valueOf (Service.config.get ("recordStreams"));
         int micro = Integer.valueOf (Service.config.get ("microphones"));
 
         Clip clip = null;
         AudioInputStream audioIn = null;
+
         try {
             audioIn = AudioSystem.getAudioInputStream(new File("./conf/beep.wav"));
-            clip = AudioSystem.getClip();
+            AudioFormat format = audioIn.getFormat();
+            DataLine.Info info = new DataLine.Info(Clip.class, format);
+            clip = (Clip)AudioSystem.getLine(info);
             clip.open(audioIn);
+            clip.start();
+
+            while(clip.isRunning())
+            {
+                Thread.yield();
+            }
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
         }
 
-        log.info ("[record] Configured to run " + threads + " threads on " + micro + " microphones");
+        log.info (i18n.message("record.configured.to.run.0.threads.on.1.microphones", threads, micro));
 
         for (int m = 1; m <= micro; m++)
         {
@@ -63,7 +73,7 @@ public class RecordService implements Runnable
             // Запускам потоки с записью с промежутком в 1с
             for (int i = 1; i <= threads; i++)
             {
-                log.info ("[record] Start thread " + i + " on microphone " + finalM);
+                log.info (i18n.message("record.start.thread.0.on.microphone.1", i, finalM));
 
                 final Clip finalClip = clip;
                 new Thread (new Runnable ()
@@ -77,16 +87,10 @@ public class RecordService implements Runnable
                         {
 
                             Random randomGenerator = new Random ();
-                            String strFilename = "infile-" + randomGenerator.nextInt (1000) + ".wav";
+                            @NonNls String strFilename = "infile-" + randomGenerator.nextInt (1000) + ".wav";
                             File outputFile = new File ("./data/" + strFilename);
 
-                            // Тут захват и обработка звука
-                            //////////////////////////////////
-
-                            // указываем в конструкторе ProcessBuilder,
-                            // что нужно запустить программу  rec (из пакета sox)
-
-                            ProcessBuilder procBuilder = null;
+                            @NonNls ProcessBuilder procBuilder = null;
 
                             if(finalM == 1)
                             {
@@ -96,24 +100,19 @@ public class RecordService implements Runnable
                                 procBuilder = new ProcessBuilder ("rec", "-q", "-c", "1", "-r", "16000", "-d", Service.config.get ("microphoneDevice" + finalM), "./data/" + strFilename, "trim", "0", Service.config.get ("recordDuration"));
                             }
 
-                            // перенаправляем стандартный поток ошибок на
-                            // стандартный вывод
                             procBuilder.redirectErrorStream (true);
 
-                            httpPOST SendFile = new httpPOST ();
+                            @NonNls httpPOST SendFile = new httpPOST ();
 
-                            // запуск программы
                             Process process = null;
                             try
                             {
                                 process = procBuilder.start ();
                             } catch (IOException e)
                             {
-                                e.printStackTrace ();  //To change body of catch statement use File | Settings | File Templates.
+                                e.printStackTrace ();
                             }
 
-                            // читаем стандартный поток вывода
-                            // и выводим на экран
                             InputStream stdout = process.getInputStream ();
                             InputStreamReader isrStdout = new InputStreamReader (stdout);
                             BufferedReader brStdout = new BufferedReader (isrStdout);
@@ -127,29 +126,24 @@ public class RecordService implements Runnable
                                 }
                             } catch (IOException e)
                             {
-                                e.printStackTrace ();  //To change body of catch statement use File | Settings | File Templates.
+                                e.printStackTrace ();
                             }
 
-                            // ждем пока завершится вызванная программа
-                            // и сохраняем код, с которым она завершилась в
-                            // в переменную exitVal
                             try
                             {
                                 int exitVal = process.waitFor ();
                             } catch (InterruptedException e)
                             {
-                                e.printStackTrace ();  //To change body of catch statement use File | Settings | File Templates.
+                                e.printStackTrace ();
                             }
 
-                            // Перекодируем в FLAC
                             FLAC_FileEncoder encoder1 = new FLAC_FileEncoder ();
                             File infile = outputFile;
                             File outfile = new File ("./data/" + strFilename + ".flac");
                             encoder1.useThreads (true);
                             encoder1.encode (infile, outfile);
 
-                            // передаем на обработку в гугл
-                            String googleSpeechAPIResponse = SendFile.postFile (System.getProperty ("user.dir") + "/data/" + strFilename + ".flac");
+                            @NonNls String googleSpeechAPIResponse = SendFile.postFile (System.getProperty ("user.dir") + "/data/" + strFilename + ".flac");
 
                             // debug
                             if(!googleSpeechAPIResponse.contains ("\"utterance\":"))
@@ -167,16 +161,18 @@ public class RecordService implements Runnable
                                 stopIndex = googleSpeechAPIResponse.indexOf ("}]}") - 1;
                                 double confidence = Double.parseDouble (googleSpeechAPIResponse.substring (startIndex, stopIndex));
 
-                                log.info ("[data] Utterance : " + command.toUpperCase ());
-                                log.info ("[data] Confidence Level: " + (confidence * 100));
+                                log.info (i18n.message("data.utterance.0", command.toUpperCase()));
+                                log.info (i18n.message("data.confidence.level.0", confidence * 100));
 
                                 if(confidence * 100 > 65)
                                 {
-                                    if(command.contains ("система"))
+                                    if(command.contains(Service.config.get("systemName")))
                                     {
+                                        log.info(i18n.message("record.system.name.detected"));
+
                                         try
                                         {
-                                            ResultSet rs = Service.sql.select("SELECT name, command, param FROM modules WHERE enabled='1'");
+                                            @NonNls ResultSet rs = Service.sql.select("SELECT name, command, param FROM modules WHERE enabled='1' AND language='"+Service.config.get("language")+"'");
 
                                             while (rs.next())
                                             {
@@ -186,8 +182,10 @@ public class RecordService implements Runnable
 
                                                 if (command.contains(comm)) {
 
+                                                    log.info(i18n.message("record.server.found.exec.command"));
+
                                                     if (busy) {
-                                                        log.info("[command] System is busy. Skipping.");
+                                                        log.info(i18n.message("command.system.is.busy.skipping"));
                                                         break;
                                                     }
 
@@ -199,9 +197,9 @@ public class RecordService implements Runnable
                                                         finalClip.start();
                                                     }
 
-                                                    log.info("[command] Got \""+command+"\" command");
+                                                    log.info(i18n.message("command.got.0.command", command));
 
-                                                    MapMessage message = Service.session.createMapMessage ();
+                                                    @NonNls MapMessage message = Service.session.createMapMessage ();
 
                                                     message.setString ("text", command);
                                                     message.setDouble ("confidence", confidence * 100);
@@ -220,7 +218,7 @@ public class RecordService implements Runnable
                                                         busy = false;
 
                                                     } catch (Exception e) {
-                                                        log.info("[module] Error at loading module " + name + " with params \"" + param + "\"!");
+                                                        log.info(i18n.message("module.error.at.loading.module.0.with.params.11", name, param));
                                                         e.printStackTrace();
                                                     }
                                                 }
@@ -228,23 +226,20 @@ public class RecordService implements Runnable
 
                                             rs.close();
 
-                                        } catch (JMSException e)
+                                        } catch (JMSException | SQLException e)
                                         {
-                                            e.printStackTrace ();  //To change body of catch statement use File | Settings | File Templates.
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                                            e.printStackTrace ();
                                         }
                                     }
                                 }
                             }
 
-                            // Подчищаем за собой
                             try
                             {
                                 outputFile.delete ();
                                 outfile.delete ();
                                 infile.delete ();
-                            } catch (Exception e)
+                            } catch (Exception ignored)
                             {
                             }
 
@@ -253,13 +248,11 @@ public class RecordService implements Runnable
                     }
                 }).start ();
 
-                // Пауза в 1с перед запуском следующего потока
                 try
                 {
                     Thread.sleep (1000);
-                } catch (InterruptedException e)
-                {
-                    e.printStackTrace ();  //To change body of catch statement use File | Settings | File Templates.
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
         }

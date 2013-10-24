@@ -83,9 +83,10 @@ public class ZWaveService implements Runnable
 
         final Manager manager = Manager.create();
 
-        manager.addNotificationWatcher(new NotificationWatcher() {
+        final NotificationWatcher watcher = new NotificationWatcher() {
+
             @Override
-            public void onNotification(Notification notification) {
+            public void onNotification(Notification notification, Object context) {
 
                 switch (notification.getType()) {
                     case DRIVER_READY:
@@ -273,8 +274,9 @@ public class ZWaveService implements Runnable
                         break;
                 }
             }
-        });
+        };
 
+        manager.addWatcher(watcher, null);
         manager.addDriver(Service.config.get("zwavePort"));
 
         log.info(i18n.message("zwave.waiting.ready.state.from.zwave"));
