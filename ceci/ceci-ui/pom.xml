@@ -75,7 +75,7 @@
                             <mainClass>fi.ceci.ui.CeciUI</mainClass>
                         </manifest>
                     </archive>
-                    <finalName>ago-control-vaadin-site</finalName>
+                    <finalName>ceci-ui</finalName>
                 </configuration>
             </plugin>
 

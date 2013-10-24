@@ -60,22 +60,22 @@ public class Launcher {
         new StatusChecker();
 
         // Lauch REST service
-        runModule("java -jar Rest.jar");
+        runModule("java -jar iris-rest.jar");
 
         // Launch capture sound module
-        runModule("java -jar Record.jar");
+        runModule("java -jar iris-record.jar");
 
         // Launch speak synth module
-        runModule("java -jar Speak.jar");
+        runModule("java -jar iris-speak.jar");
 
         // Launch module for work with devices
-        runModule("java -jar Devices.jar");
+        runModule("java -jar iris-devices.jar");
 
         // Launch schedule module
-        runModule("java -jar Scheduler.jar");
+        runModule("java -jar iris-scheduler.jar");
 
         // Launch events module
-        runModule("java -jar Events.jar");
+        runModule("java -jar iris-events.jar");
     }
 
     private static void runModule(@NonNls String cmd) throws IOException {
