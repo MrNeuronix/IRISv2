@@ -3,6 +3,7 @@ package fi.ceci.client;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.qpid.client.AMQAnyDestination;
 import org.apache.qpid.client.AMQConnection;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.jms.*;
@@ -17,6 +18,7 @@ public class QpidClientTest {
     }
 
     @Test
+    @Ignore
     public void statusQueryTest() throws Exception, Throwable {
         final Connection connection = new AMQConnection(
                 "amqp://admin:admin@localhost/?brokerlist='tcp://localhost:5672'");
