@@ -86,16 +86,10 @@
                 <configuration>
                     <strict>true</strict>
                     <force>true</force>
-                    <!-- Enable during development to speed compiling. -->
-                    <!-- <draftCompile>true</draftCompile>
-                    <style>DETAILED</style> -->
-                    <!--<userAgents>ie8</userAgents>-->
-                    <!-- <userAgents>gecko1_8</userAgents> -->
-                    <!-- End development options -->
                     <webappDirectory>src/main/resources/VAADIN/widgetsets</webappDirectory>
-                    <modules>
+                    <!--<modules>
                         <module>org.agocontrol.site.AgoControlSiteWidgetset</module>
-                    </modules>
+                    </modules>-->
                 </configuration>
             </plugin>
 
