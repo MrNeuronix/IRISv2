@@ -149,7 +149,7 @@ public class JsonMessaging {
      * Sends message in JSON encoded format.
      * @param jsonMessage the JSON message
      */
-    public <T> void sendJsonObject(final JsonMessage jsonMessage) {
+    public <T> void sendMessage(final JsonMessage jsonMessage) {
         try {
             final Gson gson = new Gson();
             final String className = jsonMessage.getObject().getClass().getName();
@@ -168,7 +168,7 @@ public class JsonMessaging {
      * Blocking receive to listen for JOSN messages arriving to given topic.
      * @return the JSON message
      */
-    public JsonMessage receiveJsonObject() throws InterruptedException {
+    public JsonMessage receiveMessage() throws InterruptedException {
         return (JsonMessage) jsonReceiveQueue.take();
     }
 

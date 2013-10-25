@@ -20,7 +20,6 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import ru.iris.common.JsonMessaging;
-import ru.iris.common.Messaging;
 
 /**
  * Simple test to verify JSON serialization and deserialization.
@@ -29,7 +28,7 @@ import ru.iris.common.Messaging;
 public class JsonMessagingTest {
 
     @Test
-    public void testGson() {
+    public void testJsonSerialization() {
 
         Gson gson = new Gson();
 
@@ -44,17 +43,21 @@ public class JsonMessagingTest {
 
     @Test
     @Ignore
-    public void testJsonMessage() throws Exception {
+    public void testJsonMessagingWithBlockingReceive() throws Exception {
         final TestKeyValue testKeyValueOriginal = new TestKeyValue("test-key", "test-value");
 
         final JsonMessaging messaging = new JsonMessaging();
-        messaging.subscribeJsonTopic("test");
         messaging.listenJson();
-        messaging.sendJsonObject(new JsonMessaging.JsonMessage("test", testKeyValueOriginal));
+        messaging.subscribeJsonTopic("test");
 
-        final TestKeyValue testKeyValueDeserialized = messaging.receiveJsonObject().getObject();
+        final JsonMessaging.JsonMessage message = new JsonMessaging.JsonMessage("test", testKeyValueOriginal);
 
-        Assert.assertEquals(testKeyValueOriginal, testKeyValueDeserialized);
+        messaging.sendMessage(message);
+
+        final JsonMessaging.JsonMessage receivedMessage = messaging.receiveMessage();
+
+        Assert.assertEquals("test", receivedMessage.getTopic());
+        Assert.assertEquals(testKeyValueOriginal, receivedMessage.getObject());
     }
 
 }
