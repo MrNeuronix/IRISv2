@@ -177,7 +177,7 @@ public class JsonMessaging {
      * @param object the object
      * @param <T> the message class
      */
-    public <T> void send(final String subject, final Object object) {
+    public <T> void broadcast(final String subject, final Object object) {
         try {
             final Gson gson = new Gson();
             final String className = object.getClass().getName();
