@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.JsonMessaging;
 
+import javax.crypto.Cipher;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -103,6 +104,7 @@ public class IrisSecurity {
             final Signature signature = Signature.getInstance("SHA256withRSA", provider);
             signature.initSign(privateKey);
             signature.update(message.getBytes("UTF-8"));
+            LOGGER.info("Signature calculated for: " + message);
             return Hex.encodeHexString(signature.sign());
         } catch (final Exception e) {
             throw new RuntimeException("Error calculating signature for message.", e);
@@ -132,9 +134,59 @@ public class IrisSecurity {
             final Signature signature = Signature.getInstance("SHA256withRSA", provider);
             signature.initVerify(publicKey);
             signature.update(message.getBytes("UTF-8"));
-            return signature.verify(Hex.decodeHex(signatureString.toCharArray()));
+            if (signature.verify(Hex.decodeHex(signatureString.toCharArray()))) {
+                return true;
+            } else {
+                LOGGER.warn("Signature verification failed for: " + message);
+                return false;
+            }
         } catch (final Exception e) {
             throw new RuntimeException("Error verifying signature for message.", e);
+        }
+    }
+
+    /**
+     * Encrypt the plain text using public key indicated by the remote instance ID.
+     *
+     * @param plainText plain text
+     * @param remoteInstanceId the remote instance ID
+     * @return cipher text
+     */
+    public String encrypt(String plainText, final UUID remoteInstanceId) {
+        try {
+            final X509Certificate certificate = (X509Certificate) keystore.getCertificate(remoteInstanceId.toString());
+            if (certificate == null) {
+                throw new RuntimeException("Unknown certificate: " + remoteInstanceId);
+            }
+            if (!certificate.getSubjectDN().toString().equals("CN="+remoteInstanceId)) {
+                throw new RuntimeException("Invalid certificate DN: '" + certificate.getSubjectDN()
+                        + "' for certificate alias: '" + remoteInstanceId + "'");
+            }
+            final PublicKey publicKey = certificate.getPublicKey();
+            final Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
+            byte[] cipherText = cipher.doFinal(plainText.getBytes("UTF-8"));
+            return Hex.encodeHexString(cipherText);
+        } catch (final Exception e) {
+            throw new RuntimeException("Error encrypting plain text.", e);
+        }
+    }
+
+    /**
+     * Decrypts cipher text with this instances private key.
+     * @param cipherText the cipher text
+     * @return the plain text
+     */
+    public String decrypt(String cipherText) {
+        try {
+            final PrivateKey privateKey = (PrivateKey) keystore.getKey(
+                    instanceId.toString(), keystorePassword.toCharArray());
+            final Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.DECRYPT_MODE, privateKey);
+            byte[] plainText = cipher.doFinal(Hex.decodeHex(cipherText.toCharArray()));
+            return new String(plainText, "UTF-8");
+        } catch (final Exception e) {
+            throw new RuntimeException("Error decrypting cipher text.", e);
         }
     }
 

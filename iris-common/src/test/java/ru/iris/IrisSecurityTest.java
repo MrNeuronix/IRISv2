@@ -31,8 +31,7 @@ import java.util.UUID;
 public class IrisSecurityTest {
 
     @Test
-    @Ignore
-    public void testIrisSecurity() {
+    public void testIrisSignatures() {
         final UUID testInstanceId = UUID.randomUUID();
         final String keystorePath = "target/" + testInstanceId + ".jks";
         final IrisSecurity irisSecurity = new IrisSecurity(testInstanceId, keystorePath, "changeit");
@@ -40,6 +39,17 @@ public class IrisSecurityTest {
         final String signature = irisSecurity.calculateSignature(testMessage);
         final boolean signatureValid = irisSecurity.verifySignature(testMessage, signature, testInstanceId);
         Assert.assertTrue(signatureValid);
+    }
+
+    @Test
+    public void testIrisEncryption() {
+        final UUID testInstanceId = UUID.randomUUID();
+        final String keystorePath = "target/" + testInstanceId + ".jks";
+        final IrisSecurity irisSecurity = new IrisSecurity(testInstanceId, keystorePath, "changeit");
+        final String plainText = "test-message";
+        final String ciphterText = irisSecurity.encrypt(plainText, testInstanceId);
+        final String decryptedText = irisSecurity.decrypt(ciphterText);
+        Assert.assertEquals(plainText, decryptedText);
     }
 
 }
