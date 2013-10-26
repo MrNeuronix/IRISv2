@@ -133,7 +133,7 @@ public class RESTService
             }
         }
 
-        return i18n.message("done");
+        return "{ status: "+i18n.message("done")+" }";
     }
 
     /////////////////////////////////////
@@ -155,7 +155,7 @@ public class RESTService
 
         Service.messageProducer.send (message);
 
-        return i18n.message("done");
+        return "{ status: "+i18n.message("done")+" }";
     }
 
     /////////////////////////////////////
@@ -177,7 +177,7 @@ public class RESTService
 
         Service.messageProducer.send (message);
 
-        return i18n.message("done");
+        return "{ status: "+i18n.message("done")+" }";
     }
 
     @GET
@@ -195,7 +195,7 @@ public class RESTService
 
         Service.messageProducer.send (message);
 
-        return i18n.message("done");
+        return "{ status: "+i18n.message("done")+" }";
     }
 
     @GET
@@ -214,7 +214,7 @@ public class RESTService
 
         Service.messageProducer.send (message);
 
-        return i18n.message("done");
+        return "{ status: "+i18n.message("done")+" }";
     }
 
     @GET
@@ -225,7 +225,7 @@ public class RESTService
         log.info(i18n.message("rest.switch.all.devices.to.0.state", state));
         Service.msg.simpleSendMessage("event.devices.setvalue", "command", "all"+state);
 
-        return i18n.message("done");
+        return "{ status: "+i18n.message("done")+" }";
     }
 
     @GET
@@ -287,6 +287,4 @@ public class RESTService
 
         return gson.toJson(result);
     }
-
-
 }
