@@ -48,20 +48,23 @@ public class RecordService implements Runnable
         Clip clip = null;
         AudioInputStream audioIn = null;
 
-        try {
-            audioIn = AudioSystem.getAudioInputStream(new File("./conf/beep.wav"));
-            AudioFormat format = audioIn.getFormat();
-            DataLine.Info info = new DataLine.Info(Clip.class, format);
-            clip = (Clip)AudioSystem.getLine(info);
-            clip.open(audioIn);
-            clip.start();
+        if(Service.config.get("silence").equals("0"))
+        {
+            try {
+                audioIn = AudioSystem.getAudioInputStream(new File("./conf/beep.wav"));
+                AudioFormat format = audioIn.getFormat();
+                DataLine.Info info = new DataLine.Info(Clip.class, format);
+                clip = (Clip)AudioSystem.getLine(info);
+                clip.open(audioIn);
+                clip.start();
 
-            while(clip.isRunning())
-            {
-                Thread.yield();
+                while(clip.isRunning())
+                {
+                    Thread.yield();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         log.info (i18n.message("record.configured.to.run.0.threads.on.1.microphones", threads, micro));

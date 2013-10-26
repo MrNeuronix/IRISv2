@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
 import ru.iris.common.Module;
-import ru.iris.devices.zwave.ZWaveDevice;
+import ru.iris.common.devices.ZWaveDevice;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
