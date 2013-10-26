@@ -13,7 +13,6 @@ import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.iris.common.JsonMessaging;
 
 import javax.crypto.Cipher;
 import java.io.File;
