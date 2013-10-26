@@ -43,17 +43,16 @@ public class JsonMessagingTest {
 
     @Test
     @Ignore
-    public void testJsonMessagingWithBlockingReceive() throws Exception {
+    public void testJsonBroadcast() throws Exception {
         final TestKeyValue testKeyValueOriginal = new TestKeyValue("test-key", "test-value");
 
         final JsonMessaging messaging = new JsonMessaging();
         messaging.listenJson();
         messaging.subscribeJsonSubject("test");
 
-        messaging.send("test", testKeyValueOriginal);
+        messaging.broadcast("test", testKeyValueOriginal);
 
         final JsonMessaging.Envelope receivedEnvelope = messaging.receive();
-
         Assert.assertEquals("test", receivedEnvelope.getSubject());
         Assert.assertEquals(testKeyValueOriginal, receivedEnvelope.getObject());
     }
