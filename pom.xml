@@ -64,6 +64,7 @@
         <module>iris-rest</module>
         <module>iris-scheduler</module>
         <module>iris-speak</module>
+        <module>iris-video</module>
         <module>ceci</module>
     </modules>
 

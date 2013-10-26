@@ -54,6 +54,13 @@
             <includes>
                 <include>*.jar</include>
             </includes>
+            <directory>../iris-video/target</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
             <directory>../iris-rest/target</directory>
         </fileSet>
         <fileSet>
@@ -85,6 +92,7 @@
                 <exclude>ru.iris:iris-record</exclude>
                 <exclude>ru.iris:iris-rest</exclude>
                 <exclude>ru.iris:iris-scheduler</exclude>
+                <exclude>ru.iris:iris-video</exclude>
                 <exclude>ru.iris:iris-speak</exclude>
             </excludes>
         </dependencySet>
