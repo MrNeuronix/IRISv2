@@ -44,7 +44,6 @@ public class JsonMessagingTest {
     }
 
     @Test
-    @Ignore
     public void testJsonBroadcast() throws Exception {
         final UUID testInstanceId = UUID.randomUUID();
         final String keystorePath = "target/" + testInstanceId + ".jks";
@@ -63,7 +62,6 @@ public class JsonMessagingTest {
     }
 
     @Test
-    @Ignore
     public void testJsonRequestResponse() throws Exception {
         final UUID testInstanceId = UUID.randomUUID();
         final String keystorePath = "target/" + testInstanceId + ".jks";

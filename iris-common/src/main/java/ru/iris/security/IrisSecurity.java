@@ -103,6 +103,7 @@ public class IrisSecurity {
             final Signature signature = Signature.getInstance("SHA256withRSA", provider);
             signature.initSign(privateKey);
             signature.update(message.getBytes("UTF-8"));
+            LOGGER.info("Signature calculated for: " + message);
             return Hex.encodeHexString(signature.sign());
         } catch (final Exception e) {
             throw new RuntimeException("Error calculating signature for message.", e);
@@ -132,7 +133,12 @@ public class IrisSecurity {
             final Signature signature = Signature.getInstance("SHA256withRSA", provider);
             signature.initVerify(publicKey);
             signature.update(message.getBytes("UTF-8"));
-            return signature.verify(Hex.decodeHex(signatureString.toCharArray()));
+            if (signature.verify(Hex.decodeHex(signatureString.toCharArray()))) {
+                return true;
+            } else {
+                LOGGER.warn("Signature verification failed for: " + message);
+                return false;
+            }
         } catch (final Exception e) {
             throw new RuntimeException("Error verifying signature for message.", e);
         }
