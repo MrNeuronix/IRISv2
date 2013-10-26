@@ -122,7 +122,7 @@
             <version>2.2.9</version>
         </dependency>
         <dependency>
-            <groupId>zwave4j</groupId>
+            <groupId>org.zwave4j</groupId>
             <artifactId>zwave4j</artifactId>
             <version>0.2</version>
         </dependency>

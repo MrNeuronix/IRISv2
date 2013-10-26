@@ -1,19 +1,13 @@
-package ru.iris.devices.zwave;
+package ru.iris.common.devices;
 
 /**
- * IRIS-X Project
+ * IRISv2 Project
  * Author: Nikolay A. Viguro
  * WWW: smart.ph-systems.ru
  * E-Mail: nv@ph-systems.ru
- * Date: 09.09.13
- * Time: 9:52
+ * Date: 26.10.13
+ * Time: 16:01
  */
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.Expose;
-import ru.iris.common.I18N;
-import ru.iris.common.SQL;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -21,85 +15,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class ZWaveDevice {
-
-    private I18N i18n = new I18N();
-
-    @Expose
-    private String name = i18n.message("not.set");
-    @Expose
-    private short node = 0;
-    @Expose
-    private int zone = 0;
-    @Expose
-    private String type = i18n.message("unknown");
-    @Expose
-    private String internalType = i18n.message("unknown");
-    @Expose
-    private String manufName = i18n.message("unknown");
-    @Expose
-    private String uuid = i18n.message("unknown");
-    @Expose
-    private String status = i18n.message("unknown");
-    @Expose
-    private String source = i18n.message("zwave");
-    @Expose
-    private HashMap<String, Object> LabelsValues = new HashMap<String, Object>();
-
-    private SQL sql;
+public class ZWaveDevice extends Device{
 
         public ZWaveDevice() throws IOException, SQLException {
-            sql = new SQL();
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        public String getSource() {
-            return this.source;
-        }
-
-        public void setNode(short node) {
-            this.node = node;
-        }
-
-        public short getNode() {
-            return this.node;
-        }
-
-        public String getUUID() {
-            return this.uuid;
-        }
-
-        public void setUUID(String uuid) {
-            this.uuid = uuid;
-        }
-
-        public int getZone() {
-            return this.zone;
-        }
-
-        public void setZone(int zone) {
-            this.zone = zone;
-        }
-
-        public String getValue(String label) {
-
-            if (label == null)
-                label = i18n.message("none.set");
-
-            try {
-                return this.LabelsValues.get(label).toString();
-            } catch (NullPointerException e)
-            {
-                return i18n.message("none.set");
-            }
-
+            super();
+            this.source = "zwave";
         }
 
         public void setValue(String label, Object value) {
@@ -170,49 +90,6 @@ public class ZWaveDevice {
             }
 
             LabelsValues = zDv;
-        }
-
-        public Map<String, Object> getLabelsValues() {
-            return this.LabelsValues;
-        }
-
-        public String getType() {
-            return this.type;
-        }
-
-        public void setInternalType(String type) {
-            this.internalType = type;
-        }
-
-        public String getInternalType() {
-            return this.internalType;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public String getManufName() {
-            return this.manufName;
-        }
-
-        public void setManufName(String manufName) {
-            this.manufName = manufName;
-        }
-
-        public String getStatus() {
-            return this.status;
-        }
-
-        public void setStatus(String status) {
-            this.status = status;
-        }
-
-        @Override
-        public String toString()
-        {
-            Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().create();
-            return gson.toJson(this);
         }
 
         public void save() throws SQLException {
