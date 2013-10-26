@@ -22,6 +22,7 @@ import org.apache.qpid.client.AMQAnyDestination;
 import org.apache.qpid.client.AMQConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.security.IrisSecurity;
 
 import javax.jms.*;
 import javax.jms.Queue;
@@ -56,7 +57,8 @@ public class JsonMessaging {
     /** The reply consumer. */
     private MessageConsumer replyConsumer;
 
-
+    /** The instance ID. */
+    private UUID instanceId;
     /** Boolean flag reflecting whether threads should be shutdown. */
     private boolean shutdownThreads = false;
     /** The subjects that has been registered to receive JSON encoded messages. */
@@ -69,6 +71,8 @@ public class JsonMessaging {
     private Thread jsonReplyListenThread;
     /** The replies. */
     private Map<String, Envelope> replies = Collections.synchronizedMap(new HashMap<String, Envelope>());
+    /** The iris security. */
+    private IrisSecurity irisSecurity;
 
     /**
      * Public constructor which setups connectivity and session to AMQP message broker.
@@ -76,7 +80,10 @@ public class JsonMessaging {
      * @throws URISyntaxException
      * @throws AMQException
      */
-    public JsonMessaging() throws JMSException, URISyntaxException, AMQException {
+    public JsonMessaging(final UUID instanceId, final String keystorePath, final String keystorePassword)
+            throws JMSException, URISyntaxException, AMQException {
+        this.instanceId = instanceId;
+        irisSecurity = new IrisSecurity(instanceId, keystorePath, keystorePassword);
         connection = new AMQConnection ("amqp://admin:admin@localhost/?brokerlist='tcp://localhost:5672'");
         connection.start ();
 
@@ -116,6 +123,14 @@ public class JsonMessaging {
      */
     public static class Envelope {
         /**
+         * The sender instance ID.
+         */
+        private UUID senderInstanceId;
+        /**
+         * The receiver instance ID.
+         */
+        private UUID receiverInstanceId;
+        /**
          * The correlation ID.
          */
         private String correlationId;
@@ -137,7 +152,9 @@ public class JsonMessaging {
             this.object = object;
         }
 
-        public Envelope(String correlationId, Destination replyDestination, String subject, Object object) {
+        public Envelope(UUID senderInstanceId, UUID receiverInstanceId, String correlationId, Destination replyDestination, String subject, Object object) {
+            this.senderInstanceId = senderInstanceId;
+            this.receiverInstanceId = receiverInstanceId;
             this.correlationId = correlationId;
             this.replyDestination = replyDestination;
             this.subject = subject;
@@ -160,10 +177,20 @@ public class JsonMessaging {
             return object;
         }
 
+        public UUID getSenderInstanceId() {
+            return senderInstanceId;
+        }
+
+        public UUID getReceiverInstanceId() {
+            return receiverInstanceId;
+        }
+
         @Override
         public String toString() {
             return "Envelope{" +
-                    "correlationId='" + correlationId + '\'' +
+                    "senderInstanceId=" + senderInstanceId +
+                    ", receiverInstanceId=" + receiverInstanceId +
+                    ", correlationId='" + correlationId + '\'' +
                     ", replyDestination=" + replyDestination +
                     ", subject='" + subject + '\'' +
                     ", object=" + object +
@@ -185,6 +212,7 @@ public class JsonMessaging {
             final MapMessage message = session.createMapMessage();
             message.setJMSMessageID("ID:" + UUID.randomUUID().toString());
             message.setJMSReplyTo(replyQueue);
+            message.setStringProperty("sender", instanceId.toString());
             message.setStringProperty("class", className);
             message.setStringProperty("json", jsonString);
             message.setStringProperty ("qpid.subject", subject);
@@ -196,13 +224,14 @@ public class JsonMessaging {
 
     /**
      * Sends request as JSON encoded message with given subject and waits for response.
+     * @param receiverInstanceId receiver instance ID
      * @param subject the subject
      * @param object the object
      * @param timeout the time in millis response is waited for
      * @param <REQ> the request class
      * @param <RESP> the response class
      */
-    public <REQ,RESP> RESP request(final String subject, final REQ object, long timeout)
+    public <REQ,RESP> RESP request(final UUID receiverInstanceId, final String subject, final REQ object, long timeout)
             throws InterruptedException, TimeoutException {
         try {
             final Gson gson = new Gson();
@@ -212,6 +241,10 @@ public class JsonMessaging {
             final String jmsCorrelationId = "ID:" + UUID.randomUUID().toString();
             message.setJMSCorrelationID(jmsCorrelationId);
             message.setJMSReplyTo(replyQueue);
+            message.setStringProperty("sender", instanceId.toString());
+            if (receiverInstanceId != null) {
+                message.setStringProperty("receiver", receiverInstanceId.toString());
+            }
             message.setStringProperty("class", className);
             message.setStringProperty("json", jsonString);
             message.setStringProperty ("qpid.subject", subject);
@@ -257,6 +290,8 @@ public class JsonMessaging {
             //message.setJMSMessageID("ID:" + UUID.randomUUID().toString());
             message.setJMSCorrelationID(receivedEnvelope.getCorrelationId());
             message.setJMSReplyTo(replyQueue);
+            message.setStringProperty("sender", receivedEnvelope.senderInstanceId.toString());
+            message.setStringProperty("receiver", instanceId.toString());
             message.setStringProperty("class", className);
             message.setStringProperty("json", jsonString);
             message.setStringProperty ("qpid.subject", receivedEnvelope.getSubject());
@@ -334,10 +369,15 @@ public class JsonMessaging {
                                 final Class clazz = Class.forName(className);
                                 final Object object = gson.fromJson(jsonString, clazz);
                                 final Envelope envelope = new Envelope(
+                                        UUID.fromString(message.getStringProperty("sender")),
+                                        message.getStringProperty("receiver") != null ?
+                                        UUID.fromString(message.getStringProperty("receiver")) : null,
                                         message.getJMSCorrelationID(), message.getJMSReplyTo(), subject, object);
 
                                 LOGGER.info("Received message with ID: " + message.getJMSMessageID()
                                         + " with correlation ID: " + message.getJMSCorrelationID()
+                                        + " sender: " + envelope.getSenderInstanceId()
+                                        + " receiver: " + envelope.getReceiverInstanceId()
                                         + " to subject: "
                                         + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
 
@@ -376,6 +416,8 @@ public class JsonMessaging {
                             final Class clazz = Class.forName(className);
                             final Object object = gson.fromJson(jsonString, clazz);
                             final Envelope envelope = new Envelope(
+                                    UUID.fromString(message.getStringProperty("sender")),
+                                    UUID.fromString(message.getStringProperty("receiver")),
                                     message.getJMSMessageID(), message.getJMSReplyTo(), subject, object);
                             if (replies.containsKey(message.getJMSCorrelationID())) {
                                 String jmsCorrelationId = null;
@@ -390,6 +432,8 @@ public class JsonMessaging {
                                 }
                                 LOGGER.info("Received response with ID: " + message.getJMSMessageID()
                                         + " with correlation ID: " + message.getJMSCorrelationID()
+                                        + " sender: " + envelope.getSenderInstanceId()
+                                        + " receiver: " + envelope.getReceiverInstanceId()
                                         + " to subject: "
                                         + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
                             } else {

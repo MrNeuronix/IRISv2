@@ -21,6 +21,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 import ru.iris.common.JsonMessaging;
 
+import java.util.UUID;
+
 /**
  * Simple test to verify JSON serialization and deserialization.
  * @author Tommi S.E. Laukkanen
@@ -44,9 +46,12 @@ public class JsonMessagingTest {
     @Test
     @Ignore
     public void testJsonBroadcast() throws Exception {
+        final UUID testInstanceId = UUID.randomUUID();
+        final String keystorePath = "target/" + testInstanceId + ".jks";
+        final JsonMessaging messaging = new JsonMessaging(testInstanceId, keystorePath, "changeit");
+
         final TestKeyValue testKeyValueOriginal = new TestKeyValue("test-key", "test-value");
 
-        final JsonMessaging messaging = new JsonMessaging();
         messaging.listenJson();
         messaging.subscribeJsonSubject("test");
 
@@ -60,12 +65,15 @@ public class JsonMessagingTest {
     @Test
     @Ignore
     public void testJsonRequestResponse() throws Exception {
-        final TestKeyValue testKeyValueRequest = new TestKeyValue("test-key", "test-value");
-        final TestKeyValue testKeyValueResponse = new TestKeyValue("test-key-2", "test-value-2");
+        final UUID testInstanceId = UUID.randomUUID();
+        final String keystorePath = "target/" + testInstanceId + ".jks";
+        final JsonMessaging messaging = new JsonMessaging(testInstanceId, keystorePath, "changeit");
 
-        final JsonMessaging messaging = new JsonMessaging();
         messaging.listenJson();
         messaging.subscribeJsonSubject("test");
+
+        final TestKeyValue testKeyValueRequest = new TestKeyValue("test-key", "test-value");
+        final TestKeyValue testKeyValueResponse = new TestKeyValue("test-key-2", "test-value-2");
 
         final Thread responseThread = new Thread(new Runnable() {
             @Override
@@ -83,7 +91,7 @@ public class JsonMessagingTest {
         });
         responseThread.start();
 
-        final TestKeyValue receivedResponseKeyValue = messaging.request("test", testKeyValueRequest, 10000);
+        final TestKeyValue receivedResponseKeyValue = messaging.request(null, "test", testKeyValueRequest, 10000);
         Assert.assertEquals(testKeyValueResponse, receivedResponseKeyValue);
     }
 }
