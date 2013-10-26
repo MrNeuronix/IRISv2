@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.iris.messaging;
+package ru.iris.common.messaging;
 
 import javax.jms.Destination;
 import java.util.UUID;

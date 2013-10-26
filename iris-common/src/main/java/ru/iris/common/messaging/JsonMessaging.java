@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.iris.messaging;
+package ru.iris.common.messaging;
 
 import com.google.gson.Gson;
 import org.apache.commons.lang.StringUtils;
@@ -24,7 +24,7 @@ import org.apache.qpid.client.AMQAnyDestination;
 import org.apache.qpid.client.AMQConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.iris.security.IrisSecurity;
+import ru.iris.common.security.IrisSecurity;
 
 import javax.jms.*;
 import javax.jms.Queue;
@@ -110,7 +110,7 @@ public class JsonMessaging {
             public void run() {
                 listenBroadcasts();
             }
-        });
+        }, "json-broascast-listen");
         jsonBroadcastListenThread.start();
 
         // Startup listen thread.
@@ -119,7 +119,7 @@ public class JsonMessaging {
             public void run() {
                 listenReplies();
             }
-        });
+        }, "json-reply-listen");
         jsonReplyListenThread.start();
 
         // Add close hook to close the listen thread when JVM exits.
@@ -174,6 +174,7 @@ public class JsonMessaging {
             final Gson gson = new Gson();
             final String className = object.getClass().getName();
             final String jsonString = gson.toJson(object);
+
             final MapMessage message = session.createMapMessage();
             message.setJMSCorrelationID("ID:" + UUID.randomUUID().toString());
             message.setJMSReplyTo(replyQueue);
@@ -181,6 +182,7 @@ public class JsonMessaging {
             message.setStringProperty("class", className);
             message.setStringProperty("json", jsonString);
             message.setStringProperty("qpid.subject", subject);
+
             secureMessage(message);
             messageProducer.send(message);
         } catch (JMSException e) {
@@ -203,8 +205,9 @@ public class JsonMessaging {
             final Gson gson = new Gson();
             final String className = object.getClass().getName();
             final String jsonString = gson.toJson(object);
-            final MapMessage message = session.createMapMessage();
             final String jmsCorrelationId = "ID:" + UUID.randomUUID().toString();
+
+            final MapMessage message = session.createMapMessage();
             message.setJMSCorrelationID(jmsCorrelationId);
             message.setJMSReplyTo(replyQueue);
             message.setStringProperty("sender", instanceId.toString());
@@ -216,9 +219,8 @@ public class JsonMessaging {
             message.setStringProperty ("qpid.subject", subject);
 
             replies.put(jmsCorrelationId, null);
+
             secureMessage(message);
-            LOGGER.info("Sending request with correlation ID: " + message.getJMSCorrelationID() + " to subject: "
-                    + subject + " (" + object.getClass().getSimpleName() + ")");
             messageProducer.send(message);
 
             synchronized (jmsCorrelationId) {
@@ -252,8 +254,8 @@ public class JsonMessaging {
             final Gson gson = new Gson();
             final String className = replyObject.getClass().getName();
             final String jsonString = gson.toJson(replyObject);
+
             final MapMessage message = session.createMapMessage();
-            //message.setJMSMessageID("ID:" + UUID.randomUUID().toString());
             message.setJMSCorrelationID(receivedEnvelope.getCorrelationId());
             message.setJMSReplyTo(replyQueue);
             message.setStringProperty("sender", receivedEnvelope.getSenderInstanceId().toString());
@@ -261,9 +263,7 @@ public class JsonMessaging {
             message.setStringProperty("class", className);
             message.setStringProperty("json", jsonString);
             message.setStringProperty ("qpid.subject", receivedEnvelope.getSubject());
-            LOGGER.info("Sending response with correlation ID: " + message.getJMSCorrelationID()
-                    + " to subject: "
-                    + receivedEnvelope.getSubject() + " (" + replyObject.getClass().getSimpleName() + ")");
+
             secureMessage(message);
             replyProducer.send(receivedEnvelope.getReplyDestination(), message);
         } catch (JMSException e) {
@@ -335,7 +335,7 @@ public class JsonMessaging {
                                 message.getJMSCorrelationID(), message.getJMSReplyTo(), subject, object);
 
                         if (verifyMessageSignature(message)) {
-                            LOGGER.info("Received message with ID: " + message.getJMSMessageID()
+                            LOGGER.debug("Received message with ID: " + message.getJMSMessageID()
                                     + " with correlation ID: " + message.getJMSCorrelationID()
                                     + " sender: " + envelope.getSenderInstanceId()
                                     + " receiver: " + envelope.getReceiverInstanceId()
@@ -343,12 +343,12 @@ public class JsonMessaging {
                                     + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
                             jsonReceiveQueue.put(envelope);
                         } else {
-                            LOGGER.info("Received invalid signature in message with ID: " + message.getJMSMessageID()
-                                    + " with correlation ID: " + message.getJMSCorrelationID()
+                            LOGGER.warn("Received invalid signature in message. ID: " + message.getJMSMessageID()
+                                    + " correlation ID: " + message.getJMSCorrelationID()
                                     + " sender: " + envelope.getSenderInstanceId()
                                     + " receiver: " + envelope.getReceiverInstanceId()
-                                    + " to subject: "
-                                    + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
+                                    + " to subject: " + envelope.getSubject()
+                                    + " class: " + envelope.getObject().getClass().getSimpleName());
                         }
                     }
                 } catch (final JMSException e) {
@@ -381,6 +381,17 @@ public class JsonMessaging {
                         && !StringUtils.isEmpty(jsonString)) {
                     final Class clazz = Class.forName(className);
                     if (replies.containsKey(message.getJMSCorrelationID())) {
+                        if (message.getStringProperty("receiver") != null) {
+                            final UUID receiverInstanceId = UUID.fromString(message.getStringProperty("receiver"));
+                            if (!instanceId.equals(receiverInstanceId)) {
+                                LOGGER.warn("Rejected message not intended to this insance.");
+                                continue;
+                            }
+                        } else {
+                            LOGGER.warn("Rejected message sent to reply queue without received ID defined.");
+                            continue;
+                        }
+
                         String jmsCorrelationId = null;
                         for (final String jmsCorrelationCandidateId : replies.keySet()) {
                             if (jmsCorrelationCandidateId.equals(message.getJMSCorrelationID())) {
@@ -391,11 +402,6 @@ public class JsonMessaging {
 
                             final String plainJsonString;
                             if (message.getStringProperty("receiver") != null) {
-                                final UUID receiverInstanceId = UUID.fromString(message.getStringProperty("receiver"));
-                                if (!instanceId.equals(receiverInstanceId)) {
-                                    LOGGER.warn("Rejected message not intended to this insance.");
-                                    continue;
-                                }
                                 plainJsonString = irisSecurity.decrypt(jsonString);
                             } else {
                                 plainJsonString = jsonString;
@@ -410,18 +416,17 @@ public class JsonMessaging {
                             synchronized (jmsCorrelationId) {
                                 jmsCorrelationId.notify();
                             }
-                            LOGGER.info("Received response with ID: " + message.getJMSMessageID()
-                                    + " with correlation ID: " + message.getJMSCorrelationID()
+                            LOGGER.debug("Received response. ID: " + message.getJMSMessageID()
+                                    + " correlation ID: " + message.getJMSCorrelationID()
                                     + " sender: " + envelope.getSenderInstanceId()
                                     + " receiver: " + envelope.getReceiverInstanceId()
-                                    + " to subject: "
-                                    + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
+                                    + " subject: " + envelope.getSubject()
+                                    + " class: " + envelope.getObject().getClass().getSimpleName());
                         } else {
                             synchronized (jmsCorrelationId) {
                                 jmsCorrelationId.notify();
                             }
-                            LOGGER.info("Received invalid signature in response with ID: "
-                                    + message.getJMSMessageID()
+                            LOGGER.warn("Received invalid signature in response with ID: " + message.getJMSMessageID()
                                     + " with correlation ID: " + message.getJMSCorrelationID());
                         }
                     } else {

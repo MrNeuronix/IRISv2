@@ -1,4 +1,4 @@
-package ru.iris.security;
+package ru.iris.common.security;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.time.DateUtils;
@@ -103,7 +103,7 @@ public class IrisSecurity {
             final Signature signature = Signature.getInstance("SHA256withRSA", provider);
             signature.initSign(privateKey);
             signature.update(message.getBytes("UTF-8"));
-            LOGGER.info("Signature calculated for: " + message);
+            LOGGER.debug("Signature calculated for: " + message);
             return Hex.encodeHexString(signature.sign());
         } catch (final Exception e) {
             throw new RuntimeException("Error calculating signature for message.", e);

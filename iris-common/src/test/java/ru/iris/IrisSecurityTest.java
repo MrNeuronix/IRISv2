@@ -17,7 +17,7 @@ package ru.iris;
 
 import org.junit.Assert;
 import org.junit.Test;
-import ru.iris.security.IrisSecurity;
+import ru.iris.common.security.IrisSecurity;
 
 import java.util.UUID;
 
