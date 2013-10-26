@@ -48,16 +48,43 @@ public class JsonMessagingTest {
 
         final JsonMessaging messaging = new JsonMessaging();
         messaging.listenJson();
-        messaging.subscribeJsonTopic("test");
+        messaging.subscribeJsonSubject("test");
 
-        final JsonMessaging.JsonMessage message = new JsonMessaging.JsonMessage("test", testKeyValueOriginal);
+        messaging.send("test", testKeyValueOriginal);
 
-        messaging.sendMessage(message);
+        final JsonMessaging.Envelope receivedEnvelope = messaging.receive();
 
-        final JsonMessaging.JsonMessage receivedMessage = messaging.receiveMessage();
-
-        Assert.assertEquals("test", receivedMessage.getTopic());
-        Assert.assertEquals(testKeyValueOriginal, receivedMessage.getObject());
+        Assert.assertEquals("test", receivedEnvelope.getSubject());
+        Assert.assertEquals(testKeyValueOriginal, receivedEnvelope.getObject());
     }
 
+    @Test
+    @Ignore
+    public void testJsonRequestResponse() throws Exception {
+        final TestKeyValue testKeyValueRequest = new TestKeyValue("test-key", "test-value");
+        final TestKeyValue testKeyValueResponse = new TestKeyValue("test-key-2", "test-value-2");
+
+        final JsonMessaging messaging = new JsonMessaging();
+        messaging.listenJson();
+        messaging.subscribeJsonSubject("test");
+
+        final Thread responseThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final JsonMessaging.Envelope receivedEnvelope = messaging.receive();
+                    Assert.assertEquals("test", receivedEnvelope.getSubject());
+                    Assert.assertEquals(testKeyValueRequest, receivedEnvelope.getObject());
+
+                    messaging.reply(receivedEnvelope, testKeyValueResponse);
+                } catch(final Exception e) {
+                        e.printStackTrace();
+                }
+            }
+        });
+        responseThread.start();
+
+        final TestKeyValue receivedResponseKeyValue = messaging.request("test", testKeyValueRequest, 10000);
+        Assert.assertEquals(testKeyValueResponse, receivedResponseKeyValue);
+    }
 }
