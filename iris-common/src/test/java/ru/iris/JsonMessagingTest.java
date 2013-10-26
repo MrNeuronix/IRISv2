@@ -17,9 +17,9 @@ package ru.iris;
 
 import com.google.gson.Gson;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
-import ru.iris.common.JsonMessaging;
+import ru.iris.messaging.JsonEnvelope;
+import ru.iris.messaging.JsonMessaging;
 
 import java.util.UUID;
 
@@ -51,12 +51,12 @@ public class JsonMessagingTest {
 
         final TestKeyValue testKeyValueOriginal = new TestKeyValue("test-key", "test-value");
 
-        messaging.listenJson();
+        messaging.start();
         messaging.subscribeJsonSubject("test");
 
         messaging.broadcast("test", testKeyValueOriginal);
 
-        final JsonMessaging.Envelope receivedEnvelope = messaging.receive();
+        final JsonEnvelope receivedEnvelope = messaging.receive();
         Assert.assertEquals("test", receivedEnvelope.getSubject());
         Assert.assertEquals(testKeyValueOriginal, receivedEnvelope.getObject());
     }
@@ -67,7 +67,7 @@ public class JsonMessagingTest {
         final String keystorePath = "target/" + testInstanceId + ".jks";
         final JsonMessaging messaging = new JsonMessaging(testInstanceId, keystorePath, "changeit");
 
-        messaging.listenJson();
+        messaging.start();
         messaging.subscribeJsonSubject("test");
 
         final TestKeyValue testKeyValueRequest = new TestKeyValue("test-key", "test-value");
@@ -77,7 +77,7 @@ public class JsonMessagingTest {
             @Override
             public void run() {
                 try {
-                    final JsonMessaging.Envelope receivedEnvelope = messaging.receive();
+                    final JsonEnvelope receivedEnvelope = messaging.receive();
                     Assert.assertEquals("test", receivedEnvelope.getSubject());
                     Assert.assertEquals(testKeyValueRequest, receivedEnvelope.getObject());
 

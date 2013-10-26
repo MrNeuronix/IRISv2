@@ -15,11 +15,8 @@
  */
 package ru.iris;
 
-import com.google.gson.Gson;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
-import ru.iris.common.JsonMessaging;
 import ru.iris.security.IrisSecurity;
 
 import java.util.UUID;
