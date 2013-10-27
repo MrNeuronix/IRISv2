@@ -12,6 +12,7 @@ package ru.iris.restful;
 
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.net.httpserver.HttpServer;
+import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.qpid.AMQException;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
@@ -39,7 +40,9 @@ public class Service
     public static Session session;
     private static I18N i18n = new I18N();
 
-    public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException {
+    public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException
+    {
+        DOMConfigurator.configure("conf/etc/log4j.xml");
 
         Config cfg = new Config ();
         config = cfg.getConfig ();

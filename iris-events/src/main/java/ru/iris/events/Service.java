@@ -1,5 +1,6 @@
 package ru.iris.events;
 
+import org.apache.log4j.xml.DOMConfigurator;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,8 @@ public class Service
     private static Logger log = LoggerFactory.getLogger (Service.class);
 
     public static void main(String[] args) throws Exception {
+
+        DOMConfigurator.configure("conf/etc/log4j.xml");
 
         Config cfg = new Config ();
         config = cfg.getConfig ();

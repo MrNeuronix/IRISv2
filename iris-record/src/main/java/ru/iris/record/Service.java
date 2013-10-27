@@ -1,5 +1,6 @@
 package ru.iris.record;
 
+import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.qpid.AMQException;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
@@ -40,6 +41,7 @@ public class Service
 
     public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException
     {
+        DOMConfigurator.configure("conf/etc/log4j.xml");
 
         Config cfg = new Config ();
         config = cfg.getConfig ();

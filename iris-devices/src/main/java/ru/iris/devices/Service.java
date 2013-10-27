@@ -10,6 +10,7 @@ package ru.iris.devices;
  * License: GPL v3
  */
 
+import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.qpid.AMQException;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
@@ -42,6 +43,7 @@ public class Service {
 
     public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException
     {
+        DOMConfigurator.configure("conf/etc/log4j.xml");
         I18N i18n = new I18N();
 
         Config cfg = new Config ();

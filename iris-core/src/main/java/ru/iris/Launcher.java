@@ -1,5 +1,8 @@
 package ru.iris;
 
+import org.apache.qpid.server.Broker;
+import org.apache.qpid.server.BrokerOptions;
+import org.apache.qpid.server.Main;
 import org.h2.tools.Server;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
@@ -38,6 +41,13 @@ public class Launcher {
 
         // Launch H2 TCP server
         Server.createTcpServer().start();
+
+        // Launch Apache Qpid broker
+
+        BrokerOptions brokerOptions = new BrokerOptions();
+        brokerOptions.setConfigProperty("qpid.home_dir", "conf/");
+        Broker qpid = new Broker();
+        qpid.startup(brokerOptions);
 
         msg = new Messaging();
         messageConsumer = msg.getConsumer ();
