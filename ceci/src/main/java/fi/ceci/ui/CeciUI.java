@@ -62,7 +62,7 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
     /** The logger. */
     private static final Logger LOGGER = Logger.getLogger(CeciUI.class);
     /** The properties category used in instantiating default services. */
-    private static final String PROPERTIES_CATEGORY = "ceci";
+    private static final String PROPERTIES_CATEGORY = "conf/ceci";
     /** The persistence unit to be used. */
     public static final String PERSISTENCE_UNIT = "ceci";
     /** The localization bundle to be used. */
@@ -106,6 +106,9 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
         context.setDescriptor(webappUrl + "/WEB-INF/web.xml");
         context.setResourceBase(webappUrl);
         context.setParentLoaderPriority(true);
+        context.setWelcomeFiles(new String[] {"/ceci"});
+        //context.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
+        context.setInitParameter("org.eclipse.jetty.servlet.Default.redirectWelcome", "true");
 
         server.setHandler(context);
         server.start();

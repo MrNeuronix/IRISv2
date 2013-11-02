@@ -22,12 +22,9 @@
             <param-value>fi.ceci.ui.CeciUI</param-value>
         </init-param>
     </servlet>
+
     <servlet-mapping>
         <servlet-name>Vaadin Application Servlet</servlet-name>
-        <url-pattern>/ceci/*</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>Vaadin Application Servlet</servlet-name>
-        <url-pattern>/VAADIN/*</url-pattern>
+        <url-pattern>/*</url-pattern>
     </servlet-mapping>
 </web-app>
