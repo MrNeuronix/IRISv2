@@ -145,21 +145,21 @@ public class IrisSecurity {
     }
 
     /**
-     * Encrypt the plain text using public key indicated by the remote instance ID.
+     * Encrypt the plain text using public key indicated by the instance ID.
      *
      * @param plainText plain text
-     * @param remoteInstanceId the remote instance ID
+     * @param instanceId the instance ID
      * @return cipher text
      */
-    public String encrypt(String plainText, final UUID remoteInstanceId) {
+    public String encrypt(String plainText, final UUID instanceId) {
         try {
-            final X509Certificate certificate = (X509Certificate) keystore.getCertificate(remoteInstanceId.toString());
+            final X509Certificate certificate = (X509Certificate) keystore.getCertificate(instanceId.toString());
             if (certificate == null) {
-                throw new RuntimeException("Unknown certificate: " + remoteInstanceId);
+                throw new RuntimeException("Unknown certificate: " + instanceId);
             }
-            if (!certificate.getSubjectDN().toString().equals("CN="+remoteInstanceId)) {
+            if (!certificate.getSubjectDN().toString().equals("CN="+instanceId)) {
                 throw new RuntimeException("Invalid certificate DN: '" + certificate.getSubjectDN()
-                        + "' for certificate alias: '" + remoteInstanceId + "'");
+                        + "' for certificate alias: '" + instanceId + "'");
             }
             final PublicKey publicKey = certificate.getPublicKey();
             final Cipher cipher = Cipher.getInstance("RSA");
