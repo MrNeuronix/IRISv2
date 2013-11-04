@@ -42,7 +42,7 @@ public class ExampleService {
 
     /**
      * The main method.
-     * @param args
+     * @param args the command line arguments
      */
     public static void main(final String[] args) {
         try {
@@ -54,6 +54,7 @@ public class ExampleService {
                 }
             }));
 
+            // Configuring log4j..
             DOMConfigurator.configure("conf/etc/log4j.xml");
 
             final UUID instanceId;
@@ -65,7 +66,11 @@ public class ExampleService {
                 instanceId = UUID.fromString(args[0]);
             }
 
+            // Lets load configuration.
             final Map<String, String > config = new Config().getConfig();
+
+            // Lets instantiate JSON messaging with the selected instance ID for this module using
+            // keystore path and password defined in configuration.
             final JsonMessaging jsonMessaging = new JsonMessaging(instanceId,
                     config.get("keystore-path"),
                     config.get("keystore-password"));
@@ -88,6 +93,7 @@ public class ExampleService {
                 final JsonEnvelope envelope = jsonMessaging.receive(100);
                 if (envelope != null) {
                     if (envelope.getObject() instanceof ServiceAdvertisement) {
+                        // We know of service advertisement. Lets log it properly.
                         final ServiceAdvertisement serviceAdvertisement = envelope.getObject();
                         LOGGER.info("Service '" + serviceAdvertisement.getType()
                                 + "' status: '" + serviceAdvertisement.getStatus()
@@ -96,12 +102,14 @@ public class ExampleService {
                                 + "'"
                         );
                     } else if (envelope.getReceiverInstanceId() == null) {
+                        // We received unknown broadcast message. Lets make generic log entry.
                         LOGGER.info("Received broadcast "
                                 + " from " + envelope.getSenderInstanceId()
                                 + " to " + envelope.getReceiverInstanceId()
                                 + " at '" +  envelope.getSubject()
                                 + ": " + envelope.getObject());
                     } else {
+                        // We received unknown request message. Lets make generic log entry.
                         LOGGER.info("Received request "
                                 + " from " + envelope.getSenderInstanceId()
                                 + " to " + envelope.getReceiverInstanceId()
