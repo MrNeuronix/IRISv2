@@ -26,11 +26,12 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Service {
 
     @NonNls
-    public static HashMap<String, String> config;
+    public static Map<String, String> config;
     @NonNls
     public static SQL sql;
     public static MessageConsumer messageConsumer;

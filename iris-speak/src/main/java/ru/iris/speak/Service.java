@@ -10,6 +10,7 @@ import ru.iris.speak.voicerss.VoiceRSSSpeakService;
 
 import javax.jms.*;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * IRISv2 Project
@@ -23,7 +24,7 @@ import java.util.HashMap;
 public class Service
 {
     @NonNls
-    public static HashMap<String, String> config;
+    public static Map<String, String> config;
     public static SQL sql;
     public static MessageConsumer messageConsumer;
     public static MessageProducer messageProducer;

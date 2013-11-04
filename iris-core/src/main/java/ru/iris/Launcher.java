@@ -17,6 +17,7 @@ import javax.jms.MessageProducer;
 import javax.jms.Session;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * IRISv2 Project
@@ -29,7 +30,7 @@ import java.util.HashMap;
  */
 public class Launcher {
 
-    public static HashMap<String, String> config;
+    public static Map<String, String> config;
     private static Logger log = LoggerFactory.getLogger(Launcher.class);
     public static SQL sql;
     public static MessageConsumer messageConsumer;

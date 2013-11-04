@@ -17,21 +17,15 @@ import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 public class I18N {
 
-    private static HashMap<String, String> config;
+    private static Map<String, String> config;
 
     public I18N() {
-        Config cfg = null;
-        try {
-            cfg = new Config();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        Config cfg = new Config();
         config = cfg.getConfig ();
     }
 

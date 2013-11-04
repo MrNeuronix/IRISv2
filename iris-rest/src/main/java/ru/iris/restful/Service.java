@@ -27,10 +27,11 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Service
 {
-    public static HashMap<String, String> config;
+    public static Map<String, String> config;
     public static SQL sql;
     private static Logger log = LoggerFactory.getLogger (Service.class);
     public static MessageConsumer messageConsumer;

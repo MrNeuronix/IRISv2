@@ -1,54 +1,161 @@
+/**
+ * Copyright 2013 Nikolay A. Viguro, Tommi S.E. Laukkanen
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ru.iris.common;
 
-import org.jetbrains.annotations.NonNls;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: nix
- * Date: 21.10.12
- * Time: 11:44
- * To change this template use File | Settings | File Templates.
+ * Class for loading configuration from properties files and database.
  */
 public class Config {
+    /** The logger. */
+    private static Logger LOGGER = LoggerFactory.getLogger(Config.class);
+    /** The map of loaded properties. */
+    private static HashMap<String, String> propertyMap = null;
 
-    private HashMap<String, String> cfg = new HashMap<String, String>();
-
-    public Config() throws IOException, SQLException {
-
-        Properties prop = new Properties();
-        @NonNls InputStream is = new FileInputStream("./conf/main.property");
-        prop.load(is);
-
-        Enumeration em = prop.keys();
-
-        while (em.hasMoreElements()) {
-            String key = (String) em.nextElement();
-            cfg.put(key, (String) prop.get(key));
+    /**
+     * Default constructor which loads properties from different storages.
+     */
+    public Config() {
+        synchronized (Config.class) {
+            // If already loaded in this JVM then exit.
+            if (propertyMap != null) {
+                return;
+            }
+            propertyMap = new HashMap<String, String>();
+            loadPropertiesFromClassPath("/conf/iris-default.properties");
+            if (!loadPropertiesFromClassPath("/conf/iris-extended.properties")) {
+                if (!loadPropertiesFromFileSystem("/conf/iris-extended.properties")) {
+                    loadPropertiesFromFileSystem("./conf/main.property");
+                }
+            }
+            loadPropertiesFromDatabase();
+            LOGGER.info("Loaded configuration: ");
+            final List<String> keys = new ArrayList<String>(propertyMap.keySet());
+            Collections.sort(keys);
+            for (final String key : keys) {
+                if (key.toLowerCase().contains("password")) {
+                    LOGGER.info(key + " = <HIDDEN>");
+                } else {
+                    LOGGER.info(key + " =" + propertyMap.get(key));
+                }
+            }
         }
-
-        @NonNls SQL sql = new SQL();
-
-        @NonNls ResultSet rs = sql.select("SELECT name, param FROM config");
-
-        while (rs.next()) {
-            String name = rs.getString("name");
-            String val = rs.getString("param");
-
-            cfg.put(name, val);
-        }
-        rs.close();
     }
 
-    public HashMap<String, String> getConfig() {
-        return cfg;
+    /**
+     * Loads given properties file from class path.
+     * @param propertiesFileName the property file name
+     * @return true if file was found and loaded successfully.
+     */
+    private boolean loadPropertiesFromClassPath(final String propertiesFileName) {
+        final InputStream inputStream = Config.class.getResourceAsStream(propertiesFileName);
+        if (inputStream == null) {
+            LOGGER.warn("Properties not found from classpath: " + propertiesFileName);
+            return false;
+        }
+        try {
+            final Properties properties = new Properties();
+            properties.load(inputStream);
+            final Enumeration enumeration = properties.keys();
+            while (enumeration.hasMoreElements()) {
+                final String key = (String) enumeration.nextElement();
+                propertyMap.put(key, (String) properties.get(key));
+            }
+        } catch (final IOException e) {
+            LOGGER.error("Error loading properties from classpath: " + propertiesFileName, e);
+            return false;
+        }
+
+        LOGGER.info("Loaded properties from classpath: " + propertiesFileName);
+        return true;
+    }
+
+    /**
+     * Loads given properties file from file system.
+     * @param propertiesFileName the property file name
+     * @return true if file was found and loaded successfully.
+     */
+    private boolean loadPropertiesFromFileSystem(final String propertiesFileName) {
+        try {
+            final InputStream inputStream = new FileInputStream(propertiesFileName);
+            if (inputStream == null) {
+                return false;
+            }
+
+            final Properties properties = new Properties();
+            properties.load(inputStream);
+            final Enumeration enumeration = properties.keys();
+            while (enumeration.hasMoreElements()) {
+                final String key = (String) enumeration.nextElement();
+                propertyMap.put(key, (String) properties.get(key));
+            }
+
+            LOGGER.info("Loaded properties from file system: " + propertiesFileName);
+            return true;
+        } catch (final IOException e) {
+            LOGGER.warn("Error loading properties from file system: " + propertiesFileName + " : " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Loads properties files from database.
+     * @return true if properties were loaded from database successfully.
+     */
+    private boolean loadPropertiesFromDatabase() {
+        try {
+            final SQL sql = new SQL();
+            final ResultSet rs = sql.select("SELECT name, param FROM config");
+            if (rs == null) {
+                LOGGER.warn("Error loading properties from database.");
+                return false;
+            }
+            while (rs.next()) {
+                String name = rs.getString("name");
+                String val = rs.getString("param");
+
+                propertyMap.put(name, val);
+            }
+            rs.close();
+            sql.close();
+            LOGGER.info("Loaded properties from database.");
+            return true;
+        } catch (final IOException e) {
+            LOGGER.error("Error loading properties from database.", e);
+            return false;
+        } catch (final SQLException e) {
+            LOGGER.warn("Error loading properties from database: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Returns the configuration properties map containing key value pairs.
+     * @return the configuration properties.
+     */
+    public Map<String, String> getConfig() {
+        return Collections.unmodifiableMap(propertyMap);
     }
 }

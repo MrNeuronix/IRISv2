@@ -21,6 +21,7 @@ import org.apache.http.util.EntityUtils;
 import java.io.*;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Using HTTPClient to POST .flac recording file to Google.com Speech API
@@ -31,21 +32,14 @@ import java.util.HashMap;
 public class httpPOST
 {
 
-    public static HashMap<String, String> config;
+    public static Map<String, String> config;
 
     /**
      * Constructor will setup httpclient, post request method and useragent information as required
      */
     public httpPOST()
     {
-        Config cfg = null;
-        try {
-            cfg = new Config();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        Config cfg = new Config();
         config = cfg.getConfig ();
         httpclient = new DefaultHttpClient ();
         System.setProperty ("http.agent", "");

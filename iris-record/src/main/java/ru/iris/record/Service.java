@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * IRISv2 Project
@@ -28,7 +29,7 @@ import java.util.HashMap;
 public class Service
 {
     @NonNls
-    public static HashMap<String, String> config;
+    public static Map<String, String> config;
     public static SQL sql;
     public static MessageConsumer messageConsumer;
     public static MessageProducer messageProducer;

@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.sql.*;
 
 public class SQL {
+    /** The logger. */
+    private static Logger LOGGER = LoggerFactory.getLogger(SQL.class);
 
     private Connection connection = null;
     @NonNls
@@ -69,27 +71,19 @@ public class SQL {
             try {
                 resultSet = statement.executeQuery(sql);
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOGGER.warn("Error executing: " + sql + ": " + e.getMessage());
             }
-            //statement.close();
         } catch (SQLException e1) {
             e1.printStackTrace();
         }
         return resultSet;
     }
 
-    public void doDisconnect() throws SQLException {
-        Statement statement = null;
+    public void close() throws SQLException {
         try {
-            statement = connection.createStatement();
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        try {
-            statement.execute("SHUTDOWN");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        statement.close();
     }
 }
