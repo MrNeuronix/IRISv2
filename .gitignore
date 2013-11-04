@@ -5,3 +5,4 @@ target
 .directory
 *.log
 work
+*.keystore

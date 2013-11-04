@@ -39,13 +39,7 @@ public class SQL {
             e.printStackTrace();
         }
 
-        try {
-            connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/./conf/iris", "sa", "");
-        } catch (SQLException e) {
-            log.info("sql] Cannot open connection to database!");
-            e.printStackTrace();
-            System.exit(1);
-        }
+        connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/./conf/iris", "sa", "");
     }
 
     public boolean doQuery(@NonNls String sql) {

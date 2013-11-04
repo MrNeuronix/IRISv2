@@ -54,7 +54,7 @@ public class JsonMessagingTest {
         final TestKeyValue testKeyValueOriginal = new TestKeyValue("test-key", "test-value");
 
         messaging.start();
-        messaging.subscribeJsonSubject("test");
+        messaging.subscribe("test");
 
         messaging.broadcast("test", testKeyValueOriginal);
 
@@ -71,7 +71,7 @@ public class JsonMessagingTest {
         final JsonMessaging messaging = new JsonMessaging(testInstanceId, keystorePath, "changeit");
 
         messaging.start();
-        messaging.subscribeJsonSubject("test");
+        messaging.subscribe("test");
 
         final TestKeyValue testKeyValueRequest = new TestKeyValue("test-key", "test-value");
         final TestKeyValue testKeyValueResponse = new TestKeyValue("test-key-2", "test-value-2");

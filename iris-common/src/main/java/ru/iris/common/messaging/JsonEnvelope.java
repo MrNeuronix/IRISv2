@@ -76,8 +76,8 @@ public class JsonEnvelope {
         return subject;
     }
 
-    public Object getObject() {
-        return object;
+    public <T> T getObject() {
+        return (T) object;
     }
 
     public UUID getSenderInstanceId() {

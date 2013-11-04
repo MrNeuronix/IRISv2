@@ -33,6 +33,7 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -281,6 +282,14 @@ public class JsonMessaging {
     }
 
     /**
+     * Blocking receive to listen for JOSN messages arriving to given topic.
+     * @return the JSON message
+     */
+    public JsonEnvelope receive(final int timeoutMillis) throws InterruptedException {
+        return (JsonEnvelope) jsonReceiveQueue.poll(timeoutMillis, TimeUnit.MILLISECONDS);
+    }
+
+    /**
      * Gets the JSON message received to subject or null if nothing has been received
      * @return the JSON message or null
      */
@@ -307,7 +316,7 @@ public class JsonMessaging {
      * Method for receiving subscribing to listen JSON objects on a subject.
      * @param subject the subject
      */
-    public void subscribeJsonSubject(final String subject) {
+    public void subscribe(final String subject) {
         jsonSubjects.add(subject);
     }
 
