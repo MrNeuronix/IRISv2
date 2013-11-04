@@ -52,19 +52,6 @@ public class EventPanel extends AbstractViewlet {
      * Default constructor which constructs components.
      */
     public EventPanel() {
-        final VerticalLayout layout = new VerticalLayout();
-        setCompositionRoot(layout);
-        layout.setMargin(true);
-        layout.setSpacing(true);
-        layout.setSizeFull();
-        layout.setStyleName(Reindeer.LAYOUT_WHITE);
-
-        final Label title = new Label("Events");
-        title.setIcon(getSite().getIcon("event"));
-        title.setStyleName(Reindeer.LABEL_H2);
-        layout.addComponent(title);
-        layout.setExpandRatio(title, 0);
-
         final List<FieldDescriptor> fieldDescriptors = CeciFields.getFieldDescriptors(fi.ceci.model.Event.class);
         final List<FilterDescriptor> filterDefinitions = new ArrayList<FilterDescriptor>();
 
@@ -79,11 +66,11 @@ public class EventPanel extends AbstractViewlet {
 
         final Table table = new FormattingTable();
         grid = new Grid(table, container, false);
-        layout.addComponent(grid);
-        layout.setExpandRatio(grid, 1);
+        setCompositionRoot(grid);
 
         grid.setFields(fieldDescriptors);
         grid.setFilters(filterDefinitions);
+        table.setHeight(400, Unit.PIXELS);
         //grid.setSizeUndefined();
         //grid.setSizeUndefined();
 

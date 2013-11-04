@@ -17,6 +17,7 @@ package fi.ceci.ui;
 
 import com.vaadin.ui.AbstractComponent;
 import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.UI;
 import org.vaadin.addons.sitekit.site.AbstractSiteView;
 
 /**
@@ -57,7 +58,6 @@ public final class NarrowView extends AbstractSiteView {
         layout.setColumnExpandRatio(MARGIN_COLUMN_RIGTH_INDEX, MARGIN_COLUMN_EXPAND_RATIO);
         layout.setRowExpandRatio(2, 1.0f);
         layout.setSizeFull();
-        layout.setMargin(false);
         layout.setSpacing(true);
 
         final AbstractComponent headerComponent = getComponent("logo");
@@ -66,13 +66,17 @@ public final class NarrowView extends AbstractSiteView {
 
         final AbstractComponent statusComponent = getComponent("status");
         statusComponent.setWidth(CONTENT_COLUMN_WIDTH, Unit.PIXELS);
-        //statusComponent.setSizeFull();
         layout.addComponent(statusComponent, 2, 1);
 
         final AbstractComponent contentComponent = getComponent("navigation");
         contentComponent.setWidth(CONTENT_COLUMN_WIDTH, Unit.PIXELS);
-        //contentComponent.setSizeFull();
         layout.addComponent(contentComponent, 2, 2);
+
+        final AbstractComponent leftComponent = getComponent("left");
+        layout.addComponent(leftComponent, 0, 0, 0, 0);
+
+        final AbstractComponent rightComponent = getComponent("right");
+        layout.addComponent(rightComponent, MARGIN_COLUMN_RIGTH_INDEX, 0, MARGIN_COLUMN_RIGTH_INDEX, 0);
     }
 
 

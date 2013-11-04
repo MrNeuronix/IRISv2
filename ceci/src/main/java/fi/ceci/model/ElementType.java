@@ -25,8 +25,10 @@ public enum ElementType {
     OTHER,
     /** BUILDING. */
     BUILDING,
-    /** Income account type. */
+    /** ROOM. */
     ROOM,
-    /** Expenses account type. */
-    DEVICE
+    /** DEVICE. */
+    DEVICE,
+    /** SERVICE. */
+    SERVICE
 }

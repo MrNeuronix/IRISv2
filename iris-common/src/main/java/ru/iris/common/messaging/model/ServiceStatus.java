@@ -23,7 +23,7 @@ public enum ServiceStatus {
     /** Service has been started. */
     STARTUP,
     /** Service is available. */
-    AVAIlABLE,
+    AVAILABLE,
     /** Service has encountered critical errors. */
     ERROR,
     /** Service has been shutdown. */

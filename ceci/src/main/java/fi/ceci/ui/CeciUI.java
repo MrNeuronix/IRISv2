@@ -23,6 +23,7 @@ import fi.ceci.client.BusClient;
 import fi.ceci.client.BusClientManager;
 import fi.ceci.client.EventProcessor;
 import fi.ceci.model.Bus;
+import fi.ceci.ui.viewlet.EventViewlet;
 import fi.ceci.ui.viewlet.LargeImageViewlet;
 import fi.ceci.ui.viewlet.StatusViewlet;
 import fi.ceci.ui.viewlet.bus.BusFlowViewlet;
@@ -45,6 +46,12 @@ import org.vaadin.addons.sitekit.viewlet.administrator.user.UserFlowViewlet;
 import org.vaadin.addons.sitekit.viewlet.anonymous.*;
 import org.vaadin.addons.sitekit.viewlet.anonymous.login.LoginFlowViewlet;
 import org.vaadin.addons.sitekit.web.BareSiteFields;
+import ru.iris.common.Config;
+import ru.iris.common.messaging.JsonEnvelope;
+import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.model.ServiceAdvertisement;
+import ru.iris.common.messaging.model.ServiceCapability;
+import ru.iris.common.messaging.model.ServiceStatus;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -67,7 +74,7 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
     public static final String PERSISTENCE_UNIT = "ceci";
     /** The localization bundle to be used. */
     public static final String LOCALIZATION_BUNDLE = "ceci-localization";
-
+    /** The bus client. */
     private static BusClientManager busClientManager;
 
     /**
@@ -78,26 +85,11 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
     public static void main(final String[] args) throws Exception {
         PropertiesUtil.setCategoryRedirection("bare-site", "ceci");
         final Thread mainThread = Thread.currentThread();
-        DOMConfigurator.configure("./log4j.xml");
-
-        /*final Map properties = new HashMap();
-        properties.put(PersistenceUnitProperties.JDBC_DRIVER, PropertiesUtil.getProperty(
-                PROPERTIES_CATEGORY, PersistenceUnitProperties.JDBC_DRIVER));
-        properties.put(PersistenceUnitProperties.JDBC_URL, PropertiesUtil.getProperty(
-                PROPERTIES_CATEGORY, PersistenceUnitProperties.JDBC_URL));
-        properties.put(PersistenceUnitProperties.JDBC_USER, PropertiesUtil.getProperty(
-                PROPERTIES_CATEGORY, PersistenceUnitProperties.JDBC_USER));
-        properties.put(PersistenceUnitProperties.JDBC_PASSWORD, PropertiesUtil.getProperty(
-                PROPERTIES_CATEGORY, PersistenceUnitProperties.JDBC_PASSWORD));
-        properties.put(PersistenceUnitProperties.DDL_GENERATION, PropertiesUtil.getProperty(
-                PROPERTIES_CATEGORY, PersistenceUnitProperties.DDL_GENERATION));
-        entityManagerFactory = Persistence.createEntityManagerFactory(
-                PERSISTENCE_UNIT, properties);*/
+        DOMConfigurator.configure("./conf/etc/log4j.xml");
 
         entityManagerFactory = PersistenceUtil.getEntityManagerFactory(PERSISTENCE_UNIT, PROPERTIES_CATEGORY);
 
         final String webappUrl = CeciUI.class.getClassLoader().getResource("webapp/").toExternalForm();
-
         final int port = Integer.parseInt(PropertiesUtil.getProperty(PROPERTIES_CATEGORY, "port"));
         final Server server = new Server(port);
 
@@ -107,13 +99,13 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
         context.setResourceBase(webappUrl);
         context.setParentLoaderPriority(true);
         context.setWelcomeFiles(new String[] {"/ceci"});
-        //context.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
         context.setInitParameter("org.eclipse.jetty.servlet.Default.redirectWelcome", "true");
 
         server.setHandler(context);
         server.start();
 
         busClientManager = new BusClientManager(entityManagerFactory);
+
         final EventProcessor eventProcessor = new EventProcessor(entityManagerFactory);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -178,7 +170,7 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
 
         final Map<String, Boolean> statuses = new LinkedHashMap<String, Boolean>();
         statuses.put("database", true);
-        statuses.put("connectivity", false);
+        statuses.put("connectivity", busClientManager.isConnected());
         statuses.put("inventory", false);
         siteContext.putObject("statuses", statuses);
 
@@ -206,10 +198,16 @@ public final class CeciUI extends AbstractSiteUI implements ContentProvider {
                 "This is default view.", NarrowView.class.getCanonicalName(), new String[]{},
                 Arrays.asList(
                         new ViewletDescriptor("logo", "Logo", "This is logo.", "ceci.png",
-                        LargeImageViewlet.class.getCanonicalName()),
+                                LargeImageViewlet.class.getCanonicalName()),
                         new ViewletDescriptor(
                                 "status", "Status", "Providers status ui.", null,
                                 StatusViewlet.class.getCanonicalName()),
+                        new ViewletDescriptor(
+                                "left", "Events", "Events.", null,
+                                EventViewlet.class.getCanonicalName()),
+                        new ViewletDescriptor(
+                                "right", "Events", "Events.", null,
+                                EventViewlet.class.getCanonicalName()),
                         new ViewletDescriptor("navigation", "NavigationDescriptor", "This is navigation.", null,
                                 fi.ceci.ui.viewlet.NavigationViewlet.class.getCanonicalName())
                 )

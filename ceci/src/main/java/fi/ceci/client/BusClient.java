@@ -15,8 +15,7 @@
  */
 package fi.ceci.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import fi.ceci.dao.BusDao;
+import com.google.gson.Gson;
 import fi.ceci.dao.ElementDao;
 import fi.ceci.dao.EventDao;
 import fi.ceci.model.Bus;
@@ -24,23 +23,17 @@ import fi.ceci.model.Element;
 import fi.ceci.model.ElementType;
 import fi.ceci.model.Event;
 import org.apache.log4j.Logger;
-import org.apache.qpid.client.AMQAnyDestination;
-import org.apache.qpid.client.message.JMSBytesMessage;
-import org.apache.qpid.messaging.Address;
-import org.vaadin.addons.sitekit.model.Company;
+import ru.iris.common.Config;
+import ru.iris.common.messaging.JsonEnvelope;
+import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.model.ServiceAdvertisement;
+import ru.iris.common.messaging.model.ServiceCapability;
+import ru.iris.common.messaging.model.ServiceStatus;
 
 import javax.jms.*;
-import javax.jms.Queue;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
-import java.nio.charset.Charset;
 import java.util.*;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Ago control qpid client.
@@ -52,70 +45,25 @@ public class BusClient {
     private static final Logger LOGGER = Logger.getLogger(BusClient.class);
     /** Default bus name. */
     private static final String DEFAULT = "Default";
+    /** The service type for IRIS service integration. */
+    public static final String SERVICE_TYPE = "Ceci Web UI";
+    /** The service capabilities for IRIS service integration. */
+    private static final ServiceCapability[] CAPABILITIES = new ServiceCapability[]{};
+
     /**
      * The entityManagerFactory.
      */
-    private EntityManagerFactory entityManagerFactory;
-    /**
-     * JSON object mapper.
-     * */
-    private final ObjectMapper mapper = new ObjectMapper();
-    /**
-     * The context.
-     */
-    private final Context context;
-    /**
-     * The connection factory.
-     */
-    private final ConnectionFactory connectionFactory;
-    /**
-     * The connection.
-     */
-    private final Connection connection;
-    /**
-     * The session.
-     */
-    private final Session session;
-    /**
-     * The reply queue.
-     */
-    private final Queue replyQueue;
-    /**
-     * The message producer.
-     */
-    private final MessageProducer messageProducer;
-    /**
-     * The message consumer.
-     */
-    private final MessageConsumer messageConsumer;
-    /**
-     * The reply consumer.
-     */
-    private final MessageConsumer replyConsumer;
-    /**
-     * Set true to shutdown threads.
-     */
-    private boolean closeRequested = false;
-    /**
-     * Event handler thread.
-     */
-    private final Thread eventHandlerThread;
-    /**
-     * Reply handler thread.
-     */
-    private final Thread replyHandlerThread;
-    /**
-     * Inventory request thread.
-     */
-    private final Thread inventoryRequestThread;
+    private final EntityManagerFactory entityManagerFactory;
     /**
      * The bus this client is connected to.
      */
     private final Bus bus;
-    /**
-     * Reply message queue.
-     */
-    private final BlockingQueue<Message> replyMessageQueue = new LinkedBlockingQueue<Message>(10);
+
+    /** Boolean flag reflecting whether shutdown is in progress. */
+    private boolean shutdown = false;
+    private final JsonMessaging jsonMessaging;
+    private final UUID instanceId;
+    private final Thread busThread;
 
     /**
      * Constructor which sets entityManagerFactory.
@@ -129,167 +77,131 @@ public class BusClient {
         this.entityManagerFactory = entityManagerFactory;
         this.bus = bus;
 
-        final String userName = bus.getUserName();
-        final String password = bus.getUserPassword();
-        final String host = bus.getHost();
-        final Integer port = bus.getPort();
+        final Map<String, String > config = new Config().getConfig();
+        instanceId = UUID.fromString(bus.getBusId());
 
-        final Properties properties = new Properties();
-        properties.put("java.naming.factory.initial",
-                "org.apache.qpid.jndi.PropertiesFileInitialContextFactory");
-        properties.put("connectionfactory.qpidConnectionfactory",
-                "amqp://" + userName + ":" + password + "@agocontrolvaadinsite/client" +
-                        "?brokerlist='tcp://" + host + ":" + port + "'");
+        jsonMessaging = new JsonMessaging(instanceId, config.get("keystore-path"), config.get("keystore-password"));
+        jsonMessaging.subscribe("service.status");
 
-        context = new InitialContext(properties);
-        connectionFactory = (ConnectionFactory) context.lookup("qpidConnectionfactory");
-        connection = connectionFactory.createConnection();
-
-        connection.start();
-
-        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        final Destination sendDestination = new AMQAnyDestination(new Address("agocontrol", "", null));
-        final Destination receiveDestination = new AMQAnyDestination(new Address("agocontrol", "#", null));
-
-        replyQueue = session.createTemporaryQueue();
-
-        messageProducer = session.createProducer(sendDestination);
-        messageConsumer = session.createConsumer(receiveDestination);
-        replyConsumer = session.createConsumer(replyQueue);
-
-        eventHandlerThread = new Thread(new Runnable() {
+        busThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                final EntityManager entityManager = entityManagerFactory.createEntityManager();
-                final Company company = entityManager.getReference(Company.class, bus.getOwner().getCompanyId());
-                while (!closeRequested) {
-                    try {
-                        Thread.sleep(100);
-                        handleEvent(entityManager, company);
-                    } catch (final Throwable t) {
-                        LOGGER.error("Error in handling events.", t);
-                    }
-                }
-                entityManager.close();
+                process();
             }
         });
-        eventHandlerThread.start();
-
-        replyHandlerThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final EntityManager entityManager = entityManagerFactory.createEntityManager();
-                while (!closeRequested) {
-                    try {
-                        Thread.sleep(100);
-                        handleReply(entityManager);
-                    } catch (final Throwable t) {
-                        LOGGER.error("Error in handling events.", t);
-                    }
-                }
-                entityManager.close();
-            }
-        });
-        replyHandlerThread.start();
-
-        inventoryRequestThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                final EntityManager entityManager = entityManagerFactory.createEntityManager();
-                final Company company = entityManager.getReference(Company.class, bus.getOwner().getCompanyId());
-                while (!closeRequested) {
-                    try {
-                        requestInventory(entityManager, company);
-                    } catch (final Throwable t) {
-                        LOGGER.error("Error in inventory request message sending.", t);
-                    }
-                    try {
-                        Thread.sleep(5 * 60 * 1000);
-                    } catch (final Throwable t) {
-                        LOGGER.debug("Interrupted inventory request message send wait.");
-                    }
-                }
-                entityManager.close();
-            }
-        });
-        inventoryRequestThread.start();
-        LOGGER.info("Connected to bus: " + bus.getName());
     }
 
+    /**
+     * Starts client.
+     */
+    public final void start() {
+        jsonMessaging.start();
+        busThread.start();
+
+        jsonMessaging.broadcast("service.status",
+                new ServiceAdvertisement(SERVICE_TYPE, instanceId, ServiceStatus.STARTUP, CAPABILITIES));
+    }
+
+    private final void process() {
+        final EntityManager entityManager = entityManagerFactory.createEntityManager();
+        long lastStatusBroadcastMillis = System.currentTimeMillis();
+        while(!shutdown) {
+            try {
+                // Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
+                final JsonEnvelope envelope = jsonMessaging.receive(100);
+                if (envelope != null) {
+                    if (envelope.getObject() instanceof ServiceAdvertisement) {
+                        // We know of service advertisement. Lets log it properly.
+                        final ServiceAdvertisement serviceAdvertisement = envelope.getObject();
+                        LOGGER.info("Service '" + serviceAdvertisement.getType()
+                                + "' status: '" + serviceAdvertisement.getStatus()
+                                + "' capabilities: " + Arrays.asList(serviceAdvertisement.getCapabilities())
+                                + " instance: '" + serviceAdvertisement.getInstanceId()
+                                + "'"
+                        );
+                        updateService(entityManager, serviceAdvertisement);
+                        saveEvent(entityManager, serviceAdvertisement);
+                    } else if (envelope.getReceiverInstanceId() == null) {
+                        // We received unknown broadcast message. Lets make generic log entry.
+                        LOGGER.info("Received broadcast "
+                                + " from " + envelope.getSenderInstanceId()
+                                + " to " + envelope.getReceiverInstanceId()
+                                + " at '" +  envelope.getSubject()
+                                + ": " + envelope.getObject());
+                    } else {
+                        // We received unknown request message. Lets make generic log entry.
+                        LOGGER.info("Received request "
+                                + " from " + envelope.getSenderInstanceId()
+                                + " to " + envelope.getReceiverInstanceId()
+                                + " at '" +  envelope.getSubject()
+                                + ": " + envelope.getObject());
+                        saveEvent(entityManager, envelope.getObject());
+                    }
+                }
+
+                // If there is more than 60 seconds from last availability broadcasts then lets redo this.
+                if (60000L < System.currentTimeMillis() - lastStatusBroadcastMillis) {
+                    jsonMessaging.broadcast("service.status",
+                            new ServiceAdvertisement(SERVICE_TYPE, instanceId, ServiceStatus.AVAILABLE, CAPABILITIES));
+                    lastStatusBroadcastMillis = System.currentTimeMillis();
+                }
+            } catch (InterruptedException e) {
+                LOGGER.warn("Interrupted while waiting JSON message.");
+            } catch (final Exception e) {
+                LOGGER.error("Unexpected error in bus client process loop.", e);
+            }
+        }
+    }
+
+    /**
+     * Updates service information to database based on service advertisement.
+     *
+     * @param entityManager the entity manager to update with
+     * @param serviceAdvertisement the service advertisement
+     */
+    private final void updateService(final EntityManager entityManager,
+                                     final ServiceAdvertisement serviceAdvertisement) {
+        Element element = ElementDao.getElement(entityManager, serviceAdvertisement.getInstanceId().toString());
+        if (element == null) {
+            element = new Element(
+                serviceAdvertisement.getInstanceId().toString(),
+                null,
+                bus.getOwner(),
+                ElementType.SERVICE,
+                serviceAdvertisement.getType(),
+                serviceAdvertisement.getType());
+        } else {
+            element.setName(serviceAdvertisement.getType());
+            element.setCategory(serviceAdvertisement.getType());
+            element.setModified(new Date());;
+        }
+        ElementDao.saveElements(entityManager, Arrays.asList(element));
+    }
+
+    private void saveEvent(final EntityManager entityManager, final Object object) {
+        Gson gson = new Gson();
+        final Event event = new Event(bus.getOwner(), gson.toJson(
+                Arrays.asList(object.getClass().getCanonicalName(), gson.toJson(object))), new Date());
+        EventDao.saveEvents(entityManager, Arrays.asList(event));
+    }
 
     /**
      * Closes client.
-     *
-     * @throws Exception if exception occurs.
      */
-    public final void close() throws Exception {
-        closeRequested = true;
-        inventoryRequestThread.interrupt();
-        inventoryRequestThread.join();
-        replyHandlerThread.interrupt();
-        replyHandlerThread.join();
-        eventHandlerThread.interrupt();
-        eventHandlerThread.join();
-        connection.close();
-        context.close();
-        LOGGER.info("Disconnected from bus: " + bus.getName());
-    }
-
-
-    /**
-     * Handle reply.
-     *
-     * @param entityManager the entityManager
-     * @throws Exception if exception occurs.
-     */
-    private void handleReply(final EntityManager entityManager) throws Exception  {
-        final Message message = (Message) replyConsumer.receive();
-        if (message == null) {
-            return;
-        }
-        replyMessageQueue.put(message);
-    }
-
-    /**
-     * Handle event.
-     *
-     * @param entityManager the entityManager
-     * @param owner the owning company
-     * @throws Exception if exception occurs.
-     */
-    private void handleEvent(final EntityManager entityManager, final Company owner) throws Exception  {
-        final Message message = messageConsumer.receive();
-
-        if (message instanceof MapMessage) {
-            final MapMessage mapMessage = (MapMessage) message;
-            if (mapMessage == null) {
-                return;
-            }
-
-            final String subject = mapMessage.getStringProperty("qpid.subject");
-            if (subject == null || !subject.startsWith("event")) {
-                return;
-            }
-            if (subject.equals("event.environment.timechanged")) {
-                return; // Ignore time changed events.
-            }
-
-            final Map<String, Object> map = convertMapMessageToMap(mapMessage);
-
-            map.put("event", subject);
-
-            final String eventJsonString = mapper.writeValueAsString(map);
-            EventDao.saveEvents(entityManager, Collections.singletonList(
-                    new Event(owner, eventJsonString, new Date())));
-            return;
+    public final void close() {
+        shutdown = true;
+        try {
+            busThread.join();
+        } catch (InterruptedException e) {
+            LOGGER.warn("Interrupted while waiting bus thread to exit.");
         }
 
-        if (message instanceof JMSBytesMessage) {
-            LOGGER.warn("Unhandled byte message: " + message.toString());
-            return;
-        }
+        // Broadcast that this service is shutdown.
+        jsonMessaging.broadcast("service.status",
+                new ServiceAdvertisement(SERVICE_TYPE, instanceId, ServiceStatus.SHUTDOWN, CAPABILITIES));
 
-        LOGGER.warn("Unhandled message type " + message.toString());
+        // Close JSON messaging.
+        jsonMessaging.close();
     }
 
     /**
@@ -297,17 +209,7 @@ public class BusClient {
      * @return true if inventory synchronization succeeded.
      */
     public final boolean synchronizeInventory() {
-        final EntityManager entityManager = entityManagerFactory.createEntityManager();
-        final Company company = entityManager.getReference(Company.class, bus.getOwner().getCompanyId());
-        try {
-            requestInventory(entityManager, company);
-            return true;
-        } catch (final Throwable t) {
-            LOGGER.error("Error in inventory synchronization.", t);
-            return false;
-        } finally {
-            entityManager.close();
-        }
+        return true;
     }
 
     /**
@@ -316,46 +218,7 @@ public class BusClient {
      * @return true if element save was success.
      */
     public final boolean saveElement(final Element element) {
-        try {
-            switch (element.getType()) {
-                case ROOM: {
-                    final MapMessage commandMessage = createMapMessage();
-                    commandMessage.setJMSMessageID("ID:" + UUID.randomUUID().toString());
-                    commandMessage.setString("command", "setroomname");
-                    commandMessage.setString("uuid", element.getElementId());
-                    commandMessage.setString("name", element.getName());
-                    final Message replyMessage = sendCommand(commandMessage);
-                    LOGGER.error("Room set name response message: " + replyMessage.toString());
-                    break;
-                }
-                case DEVICE: {
-                    {
-                        final MapMessage commandMessage = createMapMessage();
-                        commandMessage.setJMSMessageID("ID:" + UUID.randomUUID().toString());
-                        commandMessage.setString("command", "setdevicename");
-                        commandMessage.setString("uuid", element.getElementId());
-                        commandMessage.setString("name", element.getName());
-                        final Message replyMessage = sendCommand(commandMessage);
-                        LOGGER.error("Device set name response message: " + replyMessage.toString());
-                    }
-                    if (element.getParent() != null && element.getParent().getType() == ElementType.ROOM) {
-                        final MapMessage commandMessage = createMapMessage();
-                        commandMessage.setJMSMessageID("ID:" + UUID.randomUUID().toString());
-                        commandMessage.setString("command", "setdeviceroom");
-                        commandMessage.setString("uuid", element.getElementId());
-                        commandMessage.setString("room", element.getParent().getElementId());
-                        final Message replyMessage = sendCommand(commandMessage);
-                        LOGGER.error("Set device room response message: " + replyMessage.toString());
-                    }
-                    break;
-                }
-                default:
-            }
-            return true;
-        } catch (final Exception e) {
-            LOGGER.error("Error saving element via bus.", e);
-            return false;
-        }
+        return true;
     }
 
     /**
@@ -364,32 +227,7 @@ public class BusClient {
      * @return true if element was success.
      */
     public final boolean removeElement(final Element element) {
-        try {
-            switch (element.getType()) {
-                case ROOM: {
-                    final MapMessage commandMessage = createMapMessage();
-                    commandMessage.setJMSMessageID("ID:" + UUID.randomUUID().toString());
-                    commandMessage.setString("command", "deleteroom");
-                    commandMessage.setString("uuid", element.getElementId());
-                    final Message replyMessage = sendCommand(commandMessage);
-                    LOGGER.error("Room delete response message: " + replyMessage.toString());
-                    break;
-                }
-                case DEVICE: {
-                    final MapMessage commandMessage = createMapMessage();
-                    commandMessage.setJMSMessageID("ID:" + UUID.randomUUID().toString());
-                    commandMessage.setStringProperty("qpid.subject", "event.device.remove");
-                    commandMessage.setString("uuid", element.getElementId());
-                    sendEvent(commandMessage);
-                    break;
-                }
-                default:
-            }
-            return true;
-        } catch (final Exception e) {
-            LOGGER.error("Error removing room via bus.", e);
-            return false;
-        }
+        return true;
     }
 
     /**
@@ -399,13 +237,7 @@ public class BusClient {
      * @return the reply
      */
     public final void sendEvent(final MapMessage eventMessage) {
-        synchronized (messageProducer) {
-            try {
-                messageProducer.send(eventMessage);
-            } catch (Exception e) {
-                throw new RuntimeException("Error in event message sending.", e);
-            }
-        }
+        return;
     }
 
     /**
@@ -415,41 +247,9 @@ public class BusClient {
      * @return the reply
      */
     public final Message sendCommand(final MapMessage commandMessage) {
-        synchronized (messageProducer) {
-            try {
-                replyMessageQueue.clear(); // clear reply queue to remove any unprocessed responses.
-
-                commandMessage.setJMSReplyTo(replyQueue);
-                messageProducer.send(commandMessage);
-
-                final Message replyMessage = replyMessageQueue.poll(5, TimeUnit.SECONDS);
-                if (replyMessage == null) {
-                    throw new TimeoutException("Timeout in command processing.");
-                }
-
-                final Message replyMessageTwo = replyMessageQueue.poll(300, TimeUnit.MILLISECONDS);
-
-                if (replyMessageTwo != null) {
-                    LOGGER.debug("Received two commands responses.");
-                }
-
-                return replyMessageTwo != null ? replyMessageTwo : replyMessage;
-            } catch (Exception e) {
-                throw new RuntimeException("Error in command message sending.", e);
-            }
-        }
+        return null;
     }
 
-    /**
-     * @return the created message
-     */
-    public final MapMessage createMapMessage() {
-        try {
-            return session.createMapMessage();
-        } catch (Exception e) {
-            throw new RuntimeException("Error in message creation.", e);
-        }
-    }
 
     /**
      * Request inventory.
@@ -459,7 +259,7 @@ public class BusClient {
      *
      * @throws Exception exception occurs in inventory request message sending.
      */
-    private void requestInventory(final EntityManager entityManager, final Company owner) throws Exception {
+    /*private void requestInventory(final EntityManager entityManager, final Company owner) throws Exception {
         synchronized (this) {
             final MapMessage commandMessage = session.createMapMessage();
             commandMessage.setJMSMessageID("ID:" + UUID.randomUUID().toString());
@@ -608,53 +408,7 @@ public class BusClient {
             }
 
         }
-    }
+    }*/
 
-    /**
-     * Converts UTF-8 encoded byte to String.
-     *
-     * @param bytes the bytes
-     * @return the string
-     */
-    private String bytesToString(final Object bytes) {
-        if (bytes == null) {
-            return null;
-        }
-        return new String((byte[]) bytes, Charset.forName("UTF-8"));
-    }
 
-    /**
-     * Converts MapMessage to Map.
-     *
-     * @param message the message
-     * @return the map
-     * @throws JMSException if exception occurs in conversion.
-     */
-    private Map<String, Object> convertMapMessageToMap(final MapMessage message) throws JMSException {
-        final Map<String, Object> map = new HashMap<String, Object>();
-
-        final Enumeration<String> keys = message.getMapNames();
-        while (keys.hasMoreElements()) {
-            final String key = keys.nextElement();
-            map.put(key, message.getObject(key));
-        }
-        convertByteArrayValuesToStrings(map);
-        return map;
-    }
-
-    /**
-     * Converts byte array values to string recursively.
-     * @param map the map
-     */
-    private void convertByteArrayValuesToStrings(final Map<String, Object> map) {
-        for (final String key : map.keySet()) {
-            Object object = map.get(key);
-            if (object instanceof Map) {
-                convertByteArrayValuesToStrings((Map) object);
-            }
-            if (object instanceof byte[]) {
-                map.put(key, bytesToString(object));
-            }
-        }
-    }
 }

@@ -118,6 +118,19 @@ public class BusClientManager {
     }
 
     /**
+     * @return true if one or more bus clients is connected.
+     */
+    public final synchronized boolean isConnected() {
+        for (final Bus bus : clients.keySet()) {
+            if (bus.getConnectionStatus() == BusConnectionStatus.Connected ||
+                    bus.getConnectionStatus() == BusConnectionStatus.Synchronizing) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Manages clients.
      * @param entityManager the entityManager
      */
@@ -153,7 +166,9 @@ public class BusClientManager {
         for (final Bus bus : activeBuses) {
             if (!clients.containsKey(bus)) {
                 try {
-                    clients.put(bus, new BusClient(entityManagerFactory, bus));
+                    final BusClient busClient = new BusClient(entityManagerFactory, bus);
+                    busClient.start();
+                    clients.put(bus, busClient);
                     entityManager.refresh(bus);
                     bus.setConnectionStatus(BusConnectionStatus.Connected);
                     BusDao.saveBuses(entityManager, Collections.singletonList(bus));

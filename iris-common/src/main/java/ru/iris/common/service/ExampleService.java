@@ -71,11 +71,8 @@ public class ExampleService {
 
             // Lets instantiate JSON messaging with the selected instance ID for this module using
             // keystore path and password defined in configuration.
-            final JsonMessaging jsonMessaging = new JsonMessaging(instanceId,
-                    config.get("keystore-path"),
-                    config.get("keystore-password"));
-
-
+            final JsonMessaging jsonMessaging = new JsonMessaging(
+                    instanceId, config.get("keystore-path"), config.get("keystore-password"));
             // Lets subscribe to listen service.status subject.
             jsonMessaging.subscribe("service.status");
             // Lets start JSON processing to be able to exchange messages.
@@ -86,7 +83,7 @@ public class ExampleService {
                     "Example Service", instanceId, ServiceStatus.STARTUP,
                     new ServiceCapability[]{ServiceCapability.SPEAK}));
 
-            long lastStatusBroadcastMillis = 0;
+            long lastStatusBroadcastMillis = System.currentTimeMillis();
             while(!shutdown) {
 
                 // Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
@@ -118,10 +115,10 @@ public class ExampleService {
                     }
                 }
 
-                // If there is more than 5 seconds from last availability broadcasts then lets redo this.
-                if (5000L < System.currentTimeMillis() - lastStatusBroadcastMillis) {
+                // If there is more than 60 seconds from last availability broadcasts then lets redo this.
+                if (60000L < System.currentTimeMillis() - lastStatusBroadcastMillis) {
                     jsonMessaging.broadcast("service.status", new ServiceAdvertisement(
-                            "Example Service", instanceId, ServiceStatus.AVAIlABLE,
+                            "Example Service", instanceId, ServiceStatus.AVAILABLE,
                             new ServiceCapability[]{ServiceCapability.SPEAK}));
                     lastStatusBroadcastMillis = System.currentTimeMillis();
                 }
@@ -133,12 +130,14 @@ public class ExampleService {
                     "Example Service", instanceId, ServiceStatus.SHUTDOWN,
                     new ServiceCapability[]{ServiceCapability.SPEAK}));
 
+            // Close JSON messaging.
+            jsonMessaging.close();
+
         } catch (final Throwable t) {
             t.printStackTrace();
             LOGGER.error("Unexpected exception in example service main method.", t);
-        } finally {
-            int i = 0;
         }
+
     }
 
 }

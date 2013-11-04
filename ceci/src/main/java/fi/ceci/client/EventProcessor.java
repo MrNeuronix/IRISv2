@@ -16,6 +16,7 @@
 package fi.ceci.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import fi.ceci.dao.ElementDao;
 import fi.ceci.dao.EventDao;
 import fi.ceci.dao.RecordDao;
@@ -24,6 +25,9 @@ import fi.ceci.model.*;
 import org.apache.log4j.Logger;
 import org.vaadin.addons.sitekit.dao.CompanyDao;
 import org.vaadin.addons.sitekit.model.Company;
+import ru.iris.common.messaging.JsonEnvelope;
+import ru.iris.common.messaging.model.ServiceAdvertisement;
+import ru.iris.common.messaging.model.ServiceStatus;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -98,31 +102,28 @@ public class EventProcessor {
     private void processEvent(final EntityManager entityManager, final Company owner) {
         final List<Event> events = EventDao.getUnprocessedEvents(entityManager, owner);
 
+        final Gson gson = new Gson();
         for (final Event event : events) {
             try {
-                final Map<String, Object> eventMessage = mapper.readValue(event.getContent(), HashMap.class);
+                final ArrayList list = gson.fromJson(event.getContent(), ArrayList.class);
+                final Class clazz = Class.forName((String) list.get(0));
 
-                final String elementId = (String) eventMessage.get("uuid");
-                final String name = (String) eventMessage.get("event");
-                final String unit = (String) eventMessage.get("unit");
-                final String valueString = (String) eventMessage.get("level");
+
+                final ServiceAdvertisement serviceAdvertisement = (ServiceAdvertisement)
+                        gson.fromJson((String) list.get(1), clazz);
+                final String elementId = serviceAdvertisement.getInstanceId().toString();
+                final String name = "availability";
+                final String unit = "";
+                final double value = serviceAdvertisement.getStatus() == ServiceStatus.AVAILABLE ? 1 : 0;
+                RecordType recordType = RecordType.AVAILABILITY;
 
                 final Element element = ElementDao.getElement(entityManager, elementId);
 
-                if (element != null && element.getOwner().equals(owner) && valueString != null
-                        && valueString.length() != 0) {
+                if (element != null && element.getOwner().equals(owner)) {
 
                     RecordSet recordSet = RecordSetDao.getRecordSet(entityManager, element, name);
 
                     if (recordSet == null) {
-                        RecordType recordType = RecordType.OTHER;
-                        if (name.toLowerCase().contains("humidity")) {
-                            recordType = RecordType.HUMIDITY;
-                        } else if (name.toLowerCase().contains("brightness")) {
-                            recordType = RecordType.BRIGHTNESS;
-                        } else if (name.toLowerCase().contains("temperature")) {
-                            recordType = RecordType.TEMPERATURE;
-                        }
                         recordSet = new RecordSet(
                                 owner,
                                 element,
@@ -133,8 +134,6 @@ public class EventProcessor {
                         );
                         RecordSetDao.saveRecordSets(entityManager, Collections.singletonList(recordSet));
                     }
-
-                    final Double value = new Double(valueString);
 
                     RecordDao.saveRecords(entityManager, Collections.singletonList(new Record(
                             owner,
@@ -147,8 +146,9 @@ public class EventProcessor {
                 } else {
                     event.setProcessingError(true);
                 }
+
             } catch (Throwable t) {
-                LOGGER.warn("Error processing event: " + event.getEventId());
+                LOGGER.warn("Error processing event: " + event.getEventId() + " (" + t.getMessage() + ")");
                 event.setProcessingError(true);
             }
             event.setProcessed(new Date());

@@ -27,5 +27,7 @@ public enum RecordType {
     /** HUMIDITY. */
     HUMIDITY,
     /** TEMPERATURE. */
-    TEMPERATURE
+    TEMPERATURE,
+    /** AVAILABILITY */
+    AVAILABILITY
 }
