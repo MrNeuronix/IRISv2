@@ -1,5 +1,5 @@
 language: java
 before_install:
-  - mvn package -Dmaven.test.skip=true
+  - mvn package
 script:
-  - mvn package -Dmaven.test.skip=true
+  - mvn package
