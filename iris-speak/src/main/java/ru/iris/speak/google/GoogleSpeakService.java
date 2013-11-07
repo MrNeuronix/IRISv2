@@ -10,6 +10,8 @@ package ru.iris.speak.google;
  * License: GPL v3
  */
 
+import com.darkprograms.speech.synthesiser.Synthesiser;
+import javazoom.jl.player.Player;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +22,6 @@ import ru.iris.speak.Service;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class GoogleSpeakService implements Runnable
 {
@@ -48,7 +48,6 @@ public class GoogleSpeakService implements Runnable
 
         Message message = null;
         @NonNls MapMessage m = null;
-        ExecutorService exs = Executors.newFixedThreadPool (10);
 
         try
         {
@@ -67,9 +66,10 @@ public class GoogleSpeakService implements Runnable
                         log.info (i18n.message("speak.text.0", m.getStringProperty("text")));
                         log.info ("[speak] -----------------------");
 
-                        GoogleSynthesizer Voice = new GoogleSynthesizer (exs);
-                        Voice.setAnswer (m.getStringProperty("text"));
-                        exs.submit (Voice).get ();
+                        Synthesiser synthesiser = new Synthesiser(Service.config.get("language"));
+                        final Player player = new Player(synthesiser.getMP3Data(m.getStringProperty("text")));
+                        player.play();
+                        player.close();
                     }
                     else
                     {
