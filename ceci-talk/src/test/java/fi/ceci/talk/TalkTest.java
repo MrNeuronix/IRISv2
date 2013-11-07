@@ -4,7 +4,6 @@ import com.darkprograms.speech.microphone.MicrophoneAnalyzer;
 import com.darkprograms.speech.recognizer.GoogleResponse;
 import com.darkprograms.speech.recognizer.Recognizer;
 import com.darkprograms.speech.synthesiser.Synthesiser;
-import javaFlacEncoder.FLACFileWriter;
 import javazoom.jl.player.Player;
 import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;

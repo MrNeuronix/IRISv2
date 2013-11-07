@@ -65,7 +65,8 @@
         <module>iris-scheduler</module>
         <module>iris-speak</module>
         <module>iris-video</module>
-        <module>ceci</module>
+        <module>ceci-web</module>
+        <module>ceci-talk</module>
     </modules>
 
 </project>
