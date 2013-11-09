@@ -72,7 +72,7 @@ public class RecordService implements Runnable
 
         boolean shutdown = false;
         Random randomGenerator = new Random ();
-        @NonNls String strFilename = "infile-" + randomGenerator.nextInt (1000) + ".audio";
+        @NonNls String strFilename = "infile-" + randomGenerator.nextInt (1000) + ".wav";
         File filename = new File ("./data/" + strFilename);
 
         while (!shutdown)
@@ -80,8 +80,8 @@ public class RecordService implements Runnable
             final MicrophoneAnalyzer mic = new MicrophoneAnalyzer(AudioFileFormat.Type.WAVE);
             mic.open();
 
-            final int startThreshold = 40;
-            final int stopThreshold = 30;
+            final int startThreshold = Integer.parseInt(Service.config.get("startThreshold"));
+            final int stopThreshold = Integer.parseInt(Service.config.get("stopThreshold"));
             int avgVolume = 0;
             boolean speaking = false;
             long captureStartMillis = System.currentTimeMillis();

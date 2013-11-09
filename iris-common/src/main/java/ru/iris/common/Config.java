@@ -40,9 +40,10 @@ public class Config {
     public Config() {
         synchronized (Config.class) {
             // If already loaded in this JVM then exit.
-            if (propertyMap != null) {
-                return;
-            }
+            // TODO: If enabled, ZWave module will fail to launch with error: java.lang.NoSuchFieldError: config
+            //if (propertyMap != null) {
+            //   return;
+            //}
             propertyMap = new HashMap<String, String>();
             loadPropertiesFromClassPath("/conf/iris-default.properties");
             if (!loadPropertiesFromClassPath("/conf/iris-extended.properties")) {
@@ -51,14 +52,14 @@ public class Config {
                 }
             }
             loadPropertiesFromDatabase();
-            LOGGER.info("Loaded configuration: ");
+            LOGGER.debug("Loaded configuration: ");
             final List<String> keys = new ArrayList<String>(propertyMap.keySet());
             Collections.sort(keys);
             for (final String key : keys) {
                 if (key.toLowerCase().contains("password")) {
-                    LOGGER.info(key + " = <HIDDEN>");
+                    LOGGER.debug(key + " = <HIDDEN>");
                 } else {
-                    LOGGER.info(key + " =" + propertyMap.get(key));
+                    LOGGER.debug(key + " =" + propertyMap.get(key));
                 }
             }
         }
@@ -72,7 +73,7 @@ public class Config {
     private boolean loadPropertiesFromClassPath(final String propertiesFileName) {
         final InputStream inputStream = Config.class.getResourceAsStream(propertiesFileName);
         if (inputStream == null) {
-            LOGGER.warn("Properties not found from classpath: " + propertiesFileName);
+            LOGGER.debug("Properties not found from classpath: " + propertiesFileName);
             return false;
         }
         try {
@@ -84,11 +85,11 @@ public class Config {
                 propertyMap.put(key, (String) properties.get(key));
             }
         } catch (final IOException e) {
-            LOGGER.error("Error loading properties from classpath: " + propertiesFileName, e);
+            LOGGER.debug("Error loading properties from classpath: " + propertiesFileName, e);
             return false;
         }
 
-        LOGGER.info("Loaded properties from classpath: " + propertiesFileName);
+        LOGGER.debug("Loaded properties from classpath: " + propertiesFileName);
         return true;
     }
 
@@ -112,10 +113,10 @@ public class Config {
                 propertyMap.put(key, (String) properties.get(key));
             }
 
-            LOGGER.info("Loaded properties from file system: " + propertiesFileName);
+            LOGGER.debug("Loaded properties from file system: " + propertiesFileName);
             return true;
         } catch (final IOException e) {
-            LOGGER.warn("Error loading properties from file system: " + propertiesFileName + " : " + e.getMessage());
+            LOGGER.debug("Error loading properties from file system: " + propertiesFileName + " : " + e.getMessage());
             return false;
         }
     }
@@ -129,7 +130,7 @@ public class Config {
             final SQL sql = new SQL();
             final ResultSet rs = sql.select("SELECT name, param FROM config");
             if (rs == null) {
-                LOGGER.warn("Error loading properties from database.");
+                LOGGER.debug("Error loading properties from database.");
                 return false;
             }
             while (rs.next()) {
@@ -140,13 +141,13 @@ public class Config {
             }
             rs.close();
             sql.close();
-            LOGGER.info("Loaded properties from database.");
+            LOGGER.debug("Loaded properties from database.");
             return true;
         } catch (final IOException e) {
-            LOGGER.error("Error loading properties from database.", e);
+            LOGGER.debug("Error loading properties from database.", e);
             return false;
         } catch (final SQLException e) {
-            LOGGER.warn("Error loading properties from database: " + e.getMessage());
+            LOGGER.debug("Error loading properties from database: " + e.getMessage());
             return false;
         }
     }

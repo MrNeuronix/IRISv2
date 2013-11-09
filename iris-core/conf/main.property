@@ -1,6 +1,3 @@
-# General configuration file
-# Attention! Some configuration stored in database!
-
 language=ru
 locale=ru-RU
 systemName=cистема
@@ -15,6 +12,9 @@ microphones=1
 # Microphone name in system (unlimited)
 microphoneDevice2=hw2,0
 microphoneDevice3=hw3,0
+
+startThreshold=70
+stopThreshold=65
 
 #################################
 # REST section

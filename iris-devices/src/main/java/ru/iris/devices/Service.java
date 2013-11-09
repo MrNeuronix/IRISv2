@@ -47,8 +47,7 @@ public class Service {
         DOMConfigurator.configure("conf/etc/log4j.xml");
         I18N i18n = new I18N();
 
-        Config cfg = new Config ();
-        config = cfg.getConfig ();
+        config = new Config().getConfig ();
         sql = new SQL ();
 
         msg = new Messaging ();
