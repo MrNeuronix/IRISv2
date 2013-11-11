@@ -1,6 +1,5 @@
 package ru.iris.record;
 
-import com.darkprograms.speech.microphone.MicrophoneAnalyzer;
 import com.darkprograms.speech.recognizer.GoogleResponse;
 import com.darkprograms.speech.recognizer.Recognizer;
 import org.jetbrains.annotations.NonNls;
@@ -68,118 +67,127 @@ public class RecordService implements Runnable
 
         log.info (i18n.message("record.configured.to.run.0.threads.on.1.microphones", threads, micro));
 
-        Recognizer rec = new Recognizer(Service.config.get("language"));
 
-        boolean shutdown = false;
-        Random randomGenerator = new Random ();
-        @NonNls String strFilename = "infile-" + randomGenerator.nextInt (1000) + ".wav";
-        File filename = new File ("./data/" + strFilename);
-
-        while (!shutdown)
+        for (int m = 1; m <= micro; m++)
         {
-            final MicrophoneAnalyzer mic = new MicrophoneAnalyzer(AudioFileFormat.Type.WAVE);
-            mic.open();
+            final int finalM = m;
 
-            final int startThreshold = Integer.parseInt(Service.config.get("startThreshold"));
-            final int stopThreshold = Integer.parseInt(Service.config.get("stopThreshold"));
-            int avgVolume = 0;
-            boolean speaking = false;
-            long captureStartMillis = System.currentTimeMillis();
-
-            try {
-
-            avgVolume = mic.getAudioVolume();
-
-            for(int i = 0; i<1000||speaking; i++)
+            // Запускам потоки с записью с промежутком в 1с
+            for (int i = 1; i <= threads; i++)
             {
-                int volume = mic.getAudioVolume();
-                avgVolume = (2 * avgVolume + 1 * volume) / 3;
-                System.out.println(volume + " " + avgVolume);
-                if(! speaking && avgVolume > startThreshold) {
-                    try {
-                        mic.captureAudioToFile(filename);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    speaking = true;
-                    System.out.println("speaking");
-                    captureStartMillis = System.currentTimeMillis();
-                }
-                if(System.currentTimeMillis() - captureStartMillis > 1000 && speaking && stopThreshold > avgVolume){
-                    System.out.println("done speaking");
-                    break;
-                }
-                    Thread.sleep(100);
+                log.info (i18n.message("record.start.thread.0.on.microphone.1", i, finalM));
 
-            }
-            mic.close();
-
-            GoogleResponse response = rec.getRecognizedDataForWave(filename);
-            String command = response.getResponse();
-            String confidence = response.getConfidence();
-
-            System.out.println(confidence);
-            System.out.println(command);
-
-            if (command != null && Float.parseFloat(confidence) > 0.6) {
-
-                if(command.contains(Service.config.get("systemName")))
+                final Clip finalClip = clip;
+                new Thread (new Runnable ()
                 {
-                    log.info(i18n.message("record.system.name.detected"));
 
-                        @NonNls ResultSet rs = Service.sql.select("SELECT name, command, param FROM modules WHERE enabled='1' AND language='"+Service.config.get("language")+"'");
+                    @Override
+                    public void run()
+                    {
 
-                        while (rs.next())
+                        while (1 == 1)
                         {
-                            String name = rs.getString("name");
-                            String comm = rs.getString("command");
-                            String param = rs.getString("param");
+                            try {
 
-                            if (command.contains(comm)) {
+                            Random randomGenerator = new Random ();
+                            @NonNls String strFilename = "infile-" + randomGenerator.nextInt (1000) + ".wav";
+                            File outputFile = new File ("./data/" + strFilename);
 
-                                log.info(i18n.message("record.server.found.exec.command"));
+                            @NonNls ProcessBuilder procBuilder = null;
 
-                                if (busy) {
-                                    log.info(i18n.message("command.system.is.busy.skipping"));
-                                    break;
-                                }
-
-                                busy = true;
-
-                                log.info(i18n.message("command.got.0.command", command));
-
-                                @NonNls MapMessage message = Service.session.createMapMessage ();
-
-                                message.setString ("text", command);
-                                message.setDouble ("confidence", Float.parseFloat(confidence) * 100);
-                                message.setStringProperty ("qpid.subject", "event.record.recognized");
-
-                                Service.messageProducer.send (message);
-
-                                try {
-
-                                    Class cl = Class.forName("ru.iris.modules." + name);
-                                    Module execute = (Module) cl.newInstance();
-                                    execute.run(param);
-
-                                    Thread.sleep(1000);
-
-                                    busy = false;
-
-                                } catch (Exception e) {
-                                    log.info(i18n.message("module.error.at.loading.module.0.with.params.11", name, param));
-                                    e.printStackTrace();
-                                }
+                            if(finalM == 1)
+                            {
+                                procBuilder = new ProcessBuilder ("rec", "-q", "-c", "1", "-r", "16000", "./data/" + strFilename, "trim", "0", Service.config.get ("recordDuration"));
+                            } else
+                            {
+                                procBuilder = new ProcessBuilder ("rec", "-q", "-c", "1", "-r", "16000", "-d", Service.config.get ("microphoneDevice" + finalM), "./data/" + strFilename, "trim", "0", Service.config.get ("recordDuration"));
                             }
-                    }
+
+                            procBuilder.redirectErrorStream (true);
+
+                            Process process = procBuilder.start ();
+
+                            InputStream stdout = process.getInputStream ();
+                            InputStreamReader isrStdout = new InputStreamReader (stdout);
+                            BufferedReader brStdout = new BufferedReader (isrStdout);
+
+                            String line = null;
+
+                                while ((line = brStdout.readLine ()) != null)
+                                {
+                                    System.out.println (line);
+                                }
+
+                            process.waitFor ();
+
+                            Recognizer rec = new Recognizer(Service.config.get("language"));
+
+                            GoogleResponse response = rec.getRecognizedDataForWave(outputFile);
+                            String command = response.getResponse();
+                            String confidence = response.getConfidence();
+
+                                    if (command != null && Float.parseFloat(confidence) > 0.6) {
+
+                                        if(command.contains(Service.config.get("systemName")))
+                                        {
+                                            log.info(i18n.message("record.system.name.detected"));
+
+                                                @NonNls ResultSet rs = Service.sql.select("SELECT name, command, param FROM modules WHERE enabled='1' AND language='"+Service.config.get("language")+"'");
+
+                                                while (rs.next())
+                                                {
+                                                    String name = rs.getString("name");
+                                                    String comm = rs.getString("command");
+                                                    String param = rs.getString("param");
+
+                                                    if (command.contains(comm)) {
+
+                                                        log.info(i18n.message("record.server.found.exec.command"));
+
+                                                        if (busy) {
+                                                            log.info(i18n.message("command.system.is.busy.skipping"));
+                                                            break;
+                                                        }
+
+                                                        busy = true;
+
+                                                        log.info(i18n.message("command.got.0.command", command));
+
+                                                        @NonNls MapMessage message = Service.session.createMapMessage ();
+
+                                                        message.setString ("text", command);
+                                                        message.setDouble ("confidence", Float.parseFloat(confidence) * 100);
+                                                        message.setStringProperty ("qpid.subject", "event.record.recognized");
+
+                                                        Service.messageProducer.send (message);
+
+                                                        try {
+
+                                                            Class cl = Class.forName("ru.iris.modules." + name);
+                                                            Module execute = (Module) cl.newInstance();
+                                                            execute.run(param);
+
+                                                            Thread.sleep(1000);
+
+                                                            busy = false;
+
+                                                        } catch (Exception e) {
+                                                            log.info(i18n.message("module.error.at.loading.module.0.with.params.11", name, param));
+                                                            e.printStackTrace();
+                                                        }
+
+                                                    }
+                                                }
+                                        }
+                                    }
+                                }
+                                 catch (Exception e) {
+                                     e.printStackTrace();
+                                 }
+                            }
+                        }
+                    });
                 }
-            }
-
-            filename.delete();
-
-            } catch (Exception e) {
-                e.printStackTrace();
             }
         }
-    }
 }
