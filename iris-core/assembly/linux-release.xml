@@ -14,8 +14,11 @@
     </formats>
     <fileSets>
         <fileSet>
-            <outputDirectory>/bin</outputDirectory>
-            <directory>bin</directory>
+            <outputDirectory>/data</outputDirectory>
+            <directory>data</directory>
+            <excludes>
+                <exclude>*</exclude>
+            </excludes>
         </fileSet>
         <fileSet>
             <outputDirectory>/conf</outputDirectory>
