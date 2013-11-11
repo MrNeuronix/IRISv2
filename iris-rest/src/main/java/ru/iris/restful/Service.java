@@ -11,6 +11,8 @@ package ru.iris.restful;
  */
 
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
+import com.sun.jersey.api.core.PackagesResourceConfig;
+import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.qpid.AMQException;
@@ -52,7 +54,9 @@ public class Service {
         session = msg.getSession();
 
         try {
-            HttpServer server = HttpServerFactory.create("http://" + config.get("httpHost") + ":" + config.get("httpPort") + "/");
+            ResourceConfig rc = new PackagesResourceConfig("ru.iris.restful");
+            rc.getProperties().put("com.sun.jersey.spi.container.ContainerRequestFilters", "ru.iris.restful.AuthFilter");
+            HttpServer server = HttpServerFactory.create("http://" + config.get("httpHost") + ":" + config.get("httpPort") + "/", rc);
             server.start();
         } catch (IllegalArgumentException e) {
             e.printStackTrace();

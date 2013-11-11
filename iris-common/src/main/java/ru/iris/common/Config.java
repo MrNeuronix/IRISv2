@@ -149,9 +149,6 @@ public class Config {
             sql.close();
             LOGGER.debug("Loaded properties from database.");
             return true;
-        } catch (final IOException e) {
-            LOGGER.debug("Error loading properties from database.", e);
-            return false;
         } catch (final SQLException e) {
             LOGGER.debug("Error loading properties from database: " + e.getMessage());
             return false;
