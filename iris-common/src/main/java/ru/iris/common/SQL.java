@@ -26,7 +26,7 @@ public class SQL {
     @NonNls
     private static Logger log = LoggerFactory.getLogger(SQL.class.getName());
 
-    public SQL() throws SQLException, IOException {
+    public SQL() {
 
         // Загружаем класс драйвера
         try {
@@ -41,7 +41,11 @@ public class SQL {
             e.printStackTrace();
         }
 
-        connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/./conf/iris", "sa", "");
+        try {
+            connection = DriverManager.getConnection("jdbc:h2:tcp://localhost/./conf/iris", "sa", "");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public boolean doQuery(@NonNls String sql) {

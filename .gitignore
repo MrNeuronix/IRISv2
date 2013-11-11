@@ -6,3 +6,4 @@ target
 *.log
 work
 *.keystore
+*.zip

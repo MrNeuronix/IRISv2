@@ -40,7 +40,7 @@ public class RESTService {
 
     @GET
     @Path("/device/get/{uuid}")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN + ";charset=utf-8")
     public String device(@PathParam("uuid") String uuid) throws IOException, SQLException {
 
         log.info(i18n.message("rest.get.device.get.0", uuid));
@@ -88,7 +88,7 @@ public class RESTService {
 
     @GET
     @Path("/cmd/{text}")
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.TEXT_PLAIN + ";charset=utf-8")
     public String cmd(@PathParam("text") String text) throws JMSException, SQLException {
 
         log.info(i18n.message("rest.get.cmd.0", text));
@@ -138,7 +138,7 @@ public class RESTService {
 
     @GET
     @Path("/speak/{text}")
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.TEXT_PLAIN + ";charset=utf-8")
     public String speak(@PathParam("text") String text) throws JMSException {
 
         log.info(i18n.message("rest.get.speak.0", text));
@@ -160,7 +160,7 @@ public class RESTService {
 
     @GET
     @Path("/device/{uuid}/enable")
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.TEXT_PLAIN + ";charset=utf-8")
     public String devEnable(@PathParam("uuid") String uuid) throws JMSException {
 
         log.info(i18n.message("rest.enable.0.device", uuid));
@@ -178,7 +178,7 @@ public class RESTService {
 
     @GET
     @Path("/device/{uuid}/disable")
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.TEXT_PLAIN + ";charset=utf-8")
     public String devDisable(@PathParam("uuid") String uuid) throws JMSException {
 
         log.info(i18n.message("rest.disable.0.device", uuid));
@@ -196,7 +196,7 @@ public class RESTService {
 
     @GET
     @Path("/device/{uuid}/level/{level}")
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.TEXT_PLAIN + ";charset=utf-8")
     public String devSetLevel(@PathParam("uuid") String uuid, @PathParam("level") short level) throws JMSException {
 
         log.info(i18n.message("rest.set.level.0.on.1.device", level, uuid));
@@ -215,7 +215,7 @@ public class RESTService {
 
     @GET
     @Path("/device/all/{state}")
-    @Consumes(MediaType.TEXT_PLAIN)
+    @Consumes(MediaType.TEXT_PLAIN + ";charset=utf-8")
     public String devAllState(@PathParam("state") String state) throws JMSException {
         log.info(i18n.message("rest.switch.all.devices.to.0.state", state));
         Service.msg.simpleSendMessage("event.devices.setvalue", "command", "all" + state);
@@ -225,7 +225,7 @@ public class RESTService {
 
     @GET
     @Path("/status/module/{name}")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN + ";charset=utf-8")
     public String status(@PathParam("name") String name) throws IOException, SQLException {
 
         log.info(i18n.message("rest.get.status.module.0", name));
@@ -252,7 +252,7 @@ public class RESTService {
 
     @GET
     @Path("/status/module/all")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN + ";charset=utf-8")
     public String status() throws IOException, SQLException {
 
         log.info(i18n.message("rest.get.status.module.all"));
@@ -288,13 +288,13 @@ public class RESTService {
 
     @GET
     @Path("/scheduler/get/all")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String schedulerGetAll() throws IOException, SQLException {
+    @Produces(MediaType.TEXT_PLAIN + ";charset=utf-8")
+    public String schedulerGetAll() throws IOException, SQLException  {
 
         ArrayList<Task> allTasks = new ArrayList<>();
 
         try {
-            ResultSet rs = Service.sql.select("SELECT id FROM scheduler WHERE enabled='1'");
+            ResultSet rs = Service.sql.select("SELECT id FROM scheduler WHERE enabled='1' AND language='"+Service.config.get("language")+"' ORDER BY ID ASC");
 
             while (rs.next()) {
                 allTasks.add(new Task(rs.getInt("id")));
@@ -307,5 +307,24 @@ public class RESTService {
         }
 
         return gson.toJson(allTasks);
+    }
+
+    @GET
+    @Path("/scheduler/get/{id}")
+    @Produces(MediaType.TEXT_PLAIN + ";charset=utf-8")
+    public String schedulerGet(@PathParam("id") int id) throws IOException {
+
+        Task task;
+
+        try {
+           task = new Task(id);
+        }
+        catch (SQLException e)
+        {
+            return "{ \"error\": \"task "+id+" not found\" }";
+        }
+
+
+        return gson.toJson(task);
     }
 }
