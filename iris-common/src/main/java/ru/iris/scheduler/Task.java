@@ -4,7 +4,9 @@ import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
+import ru.iris.common.SQL;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -34,9 +36,13 @@ public class Task {
     private Date validto;
     private String interval;
     private int enabled;
+    private SQL sql;
 
-    public Task() throws SQLException {
-        ResultSet rs = Service.sql.select("SELECT id FROM scheduler ORDER BY id DESC LIMIT 0,1");
+    public Task() throws SQLException, IOException {
+
+        sql = new SQL();
+
+        ResultSet rs = sql.select("SELECT id FROM scheduler ORDER BY id DESC LIMIT 0,1");
         rs.next();
         int lastid = Integer.valueOf(rs.getInt("id"));
         this.id = lastid++;
@@ -45,21 +51,24 @@ public class Task {
         log.debug(i18n.message("scheduler.create.new.task.instance.with.id.0", id));
     }
 
-    public Task(int id) throws SQLException {
-        log.debug(i18n.message("scheduler.create.task.instance.from.id.0", id));
+    public Task(int id) throws SQLException, IOException {
 
-        @NonNls ResultSet rs = Service.sql.select("SELECT * FROM scheduler WHERE id='" + id + "'");
+        sql = new SQL();
+
+        log.info(i18n.message("scheduler.create.task.instance.from.id.0", id));
+
+        @NonNls ResultSet rs = sql.select("SELECT * FROM scheduler WHERE id='" + id + "'");
 
         rs.next();
 
         this.id = id;
-        date = rs.getTimestamp("date");
-        eclass = rs.getString("class");
-        command = rs.getString("command");
-        type = Integer.valueOf(rs.getInt("type"));
-        validto = rs.getTimestamp("validto");
-        interval = rs.getString("interval");
-        enabled = Integer.valueOf(rs.getInt("enabled"));
+        this.date = rs.getTimestamp("date");
+        this.eclass = rs.getString("class");
+        this.command = rs.getString("command");
+        this.type = Integer.valueOf(rs.getInt("type"));
+        this.validto = rs.getTimestamp("validto");
+        this.interval = rs.getString("interval");
+        this.enabled = Integer.valueOf(rs.getInt("enabled"));
 
         rs.close();
     }
@@ -92,7 +101,7 @@ public class Task {
         return command;
     }
 
-    public void setCommand(String eclass) {
+    public void setCommand(String command) {
         this.command = command;
     }
 
@@ -100,7 +109,7 @@ public class Task {
         return type;
     }
 
-    public void setType(int id) {
+    public void setType(int type) {
         this.type = type;
     }
 
@@ -108,7 +117,7 @@ public class Task {
         return validto;
     }
 
-    public void setValidto(Date date) {
+    public void setValidto(Date validto) {
         this.validto = validto;
     }
 
@@ -131,7 +140,7 @@ public class Task {
     public boolean save() {
         log.info(i18n.message("scheduler.saving.task.0", id));
 
-        if (Service.sql.doQuery("UPDATE scheduler" +
+        if (sql.doQuery("UPDATE scheduler" +
                 "SET id = '" + id + "'," +
                 "date='" + getSQLDate(date) + "'," +
                 "class = '', command = '" + command + "'," +

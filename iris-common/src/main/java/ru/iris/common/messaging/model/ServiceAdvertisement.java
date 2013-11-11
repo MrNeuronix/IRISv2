@@ -20,23 +20,33 @@ import java.util.UUID;
 
 /**
  * Service advertisement providers information about a service.
+ *
  * @author Tommi S.E. Laukkanen
  */
 public class ServiceAdvertisement {
-    /** The service type for example "My custom speak service 1.0" */
+    /**
+     * The service type for example "My custom speak service 1.0"
+     */
     private String type;
-    /** The instance ID. */
+    /**
+     * The instance ID.
+     */
     private UUID instanceId;
-    /** The service status. */
+    /**
+     * The service status.
+     */
     private ServiceStatus status;
-    /** The service capabilities. */
+    /**
+     * The service capabilities.
+     */
     private ServiceCapability[] capabilities;
 
     /**
      * Constructor for initializing value object fields.
-     * @param type the service type
-     * @param instanceId the instance ID
-     * @param status the service status
+     *
+     * @param type         the service type
+     * @param instanceId   the instance ID
+     * @param status       the service status
      * @param capabilities the service capabilities
      */
     public ServiceAdvertisement(String type, UUID instanceId, ServiceStatus status, ServiceCapability[] capabilities) {

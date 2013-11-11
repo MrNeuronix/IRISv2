@@ -42,44 +42,79 @@ import java.util.concurrent.TimeoutException;
  * @author Nikolay A. Viguro, Tommi S.E. Laukkanen
  */
 public class JsonMessaging {
-    /** The logger. */
-    private static Logger LOGGER = LoggerFactory.getLogger (JsonMessaging.class);
-    /** The AMQ connection. */
+    /**
+     * The logger.
+     */
+    private static Logger LOGGER = LoggerFactory.getLogger(JsonMessaging.class);
+    /**
+     * The AMQ connection.
+     */
     private Connection connection;
-    /** The message session. */
+    /**
+     * The message session.
+     */
     private Session session;
-    /** The message destination. */
+    /**
+     * The message destination.
+     */
     private Destination destination;
-    /** The reply queue. */
+    /**
+     * The reply queue.
+     */
     private Queue replyQueue;
-    /** The message producer. */
+    /**
+     * The message producer.
+     */
     private MessageProducer messageProducer;
-    /** The message consumer. */
+    /**
+     * The message consumer.
+     */
     private MessageConsumer messageConsumer;
-    /** The reply producer. */
+    /**
+     * The reply producer.
+     */
     private MessageProducer replyProducer;
-    /** The reply consumer. */
+    /**
+     * The reply consumer.
+     */
     private MessageConsumer replyConsumer;
 
-    /** The instance ID. */
+    /**
+     * The instance ID.
+     */
     private UUID instanceId;
-    /** Boolean flag reflecting whether threads should be close. */
+    /**
+     * Boolean flag reflecting whether threads should be close.
+     */
     private boolean shutdownThreads = false;
-    /** The subjects that has been registered to receive JSON encoded messages. */
+    /**
+     * The subjects that has been registered to receive JSON encoded messages.
+     */
     private Set<String> jsonSubjects = Collections.synchronizedSet(new HashSet<String>());
-    /** The receive queue for JSON objects. */
+    /**
+     * The receive queue for JSON objects.
+     */
     private BlockingQueue<JsonEnvelope> jsonReceiveQueue = new ArrayBlockingQueue<JsonEnvelope>(100);
-    /** The JSON broadcast listen thread. */
+    /**
+     * The JSON broadcast listen thread.
+     */
     private Thread jsonBroadcastListenThread;
-    /** The JSON reply listen thread. */
+    /**
+     * The JSON reply listen thread.
+     */
     private Thread jsonReplyListenThread;
-    /** The replies. */
+    /**
+     * The replies.
+     */
     private Map<String, JsonEnvelope> replies = Collections.synchronizedMap(new HashMap<String, JsonEnvelope>());
-    /** The iris security. */
+    /**
+     * The iris security.
+     */
     private IrisSecurity irisSecurity;
 
     /**
      * Public constructor which setups connectivity and session to AMQP message broker.
+     *
      * @throws JMSException
      * @throws URISyntaxException
      * @throws AMQException
@@ -88,11 +123,11 @@ public class JsonMessaging {
             throws JMSException, URISyntaxException, AMQException {
         this.instanceId = instanceId;
         irisSecurity = new IrisSecurity(instanceId, keystorePath, keystorePassword);
-        connection = new AMQConnection ("amqp://admin:admin@localhost/?brokerlist='tcp://localhost:5672'");
-        connection.start ();
+        connection = new AMQConnection("amqp://admin:admin@localhost/?brokerlist='tcp://localhost:5672'");
+        connection.start();
 
-        session = connection.createSession (false, Session.AUTO_ACKNOWLEDGE);
-        destination = new AMQAnyDestination ("ADDR:iris; {create: always, node: {type: topic}}");
+        session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+        destination = new AMQAnyDestination("ADDR:iris; {create: always, node: {type: topic}}");
         replyQueue = session.createTemporaryQueue();
         messageConsumer = session.createConsumer(destination);
         messageProducer = session.createProducer(destination);
@@ -150,10 +185,10 @@ public class JsonMessaging {
      */
     public void close() {
         try {
-            messageConsumer.close ();
-            messageProducer.close ();
-            session.close ();
-            connection.close ();
+            messageConsumer.close();
+            messageProducer.close();
+            session.close();
+            connection.close();
             shutdownThreads = true;
             if (jsonBroadcastListenThread != null) {
                 jsonBroadcastListenThread.interrupt();
@@ -166,9 +201,10 @@ public class JsonMessaging {
 
     /**
      * Sends object as JSON encoded message with given subject.
+     *
      * @param subject the subject
-     * @param object the object
-     * @param <T> the message class
+     * @param object  the object
+     * @param <T>     the message class
      */
     public <T> void broadcast(final String subject, final Object object) {
         try {
@@ -193,14 +229,15 @@ public class JsonMessaging {
 
     /**
      * Sends request as JSON encoded message with given subject and waits for response.
+     *
      * @param receiverInstanceId receiver instance ID
-     * @param subject the subject
-     * @param object the object
-     * @param timeout the time in millis response is waited for
-     * @param <REQ> the request class
-     * @param <RESP> the response class
+     * @param subject            the subject
+     * @param object             the object
+     * @param timeout            the time in millis response is waited for
+     * @param <REQ>              the request class
+     * @param <RESP>             the response class
      */
-    public <REQ,RESP> RESP request(final UUID receiverInstanceId, final String subject, final REQ object, long timeout)
+    public <REQ, RESP> RESP request(final UUID receiverInstanceId, final String subject, final REQ object, long timeout)
             throws InterruptedException, TimeoutException {
         try {
             final Gson gson = new Gson();
@@ -217,7 +254,7 @@ public class JsonMessaging {
             }
             message.setStringProperty("class", className);
             message.setStringProperty("json", jsonString);
-            message.setStringProperty ("qpid.subject", subject);
+            message.setStringProperty("qpid.subject", subject);
 
             replies.put(jmsCorrelationId, null);
 
@@ -246,9 +283,10 @@ public class JsonMessaging {
     /**
      * Replies object as JSON encoded message to the reply queue and subject contained in
      * received envelope.
+     *
      * @param receivedEnvelope the received envelope
-     * @param replyObject the reply object
-     * @param <T> the message class
+     * @param replyObject      the reply object
+     * @param <T>              the message class
      */
     public <T> void reply(final JsonEnvelope receivedEnvelope, final Object replyObject) {
         try {
@@ -263,7 +301,7 @@ public class JsonMessaging {
             message.setStringProperty("receiver", instanceId.toString());
             message.setStringProperty("class", className);
             message.setStringProperty("json", jsonString);
-            message.setStringProperty ("qpid.subject", receivedEnvelope.getSubject());
+            message.setStringProperty("qpid.subject", receivedEnvelope.getSubject());
 
             secureMessage(message);
             replyProducer.send(receivedEnvelope.getReplyDestination(), message);
@@ -275,6 +313,7 @@ public class JsonMessaging {
 
     /**
      * Blocking receive to listen for JOSN messages arriving to given topic.
+     *
      * @return the JSON message
      */
     public JsonEnvelope receive() throws InterruptedException {
@@ -283,6 +322,7 @@ public class JsonMessaging {
 
     /**
      * Blocking receive to listen for JOSN messages arriving to given topic.
+     *
      * @return the JSON message
      */
     public JsonEnvelope receive(final int timeoutMillis) throws InterruptedException {
@@ -291,6 +331,7 @@ public class JsonMessaging {
 
     /**
      * Gets the JSON message received to subject or null if nothing has been received
+     *
      * @return the JSON message or null
      */
     public JsonEnvelope getJsonObject() {
@@ -304,6 +345,7 @@ public class JsonMessaging {
 
     /**
      * Checks whether JSON message has been received.
+     *
      * @return true if JSON message is available
      */
     public int hasJsonObject() {
@@ -314,6 +356,7 @@ public class JsonMessaging {
 
     /**
      * Method for receiving subscribing to listen JSON objects on a subject.
+     *
      * @param subject the subject
      */
     public void subscribe(final String subject) {
@@ -340,7 +383,7 @@ public class JsonMessaging {
                         final JsonEnvelope envelope = new JsonEnvelope(
                                 UUID.fromString(message.getStringProperty("sender")),
                                 message.getStringProperty("receiver") != null ?
-                                UUID.fromString(message.getStringProperty("receiver")) : null,
+                                        UUID.fromString(message.getStringProperty("receiver")) : null,
                                 message.getJMSCorrelationID(), message.getJMSReplyTo(), subject, object);
 
                         if (verifyMessageSignature(message)) {

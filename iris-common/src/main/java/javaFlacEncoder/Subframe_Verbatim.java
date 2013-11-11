@@ -26,64 +26,70 @@ package javaFlacEncoder;
  * @author Preston Lacey
  */
 public class Subframe_Verbatim extends Subframe {
-  /** For debugging: Higher value equals more output, typically by increments
-   * of 10 */
-  public static int DEBUG_LEV = 0;
-  /** Subframe type supported by this implementation. */
-  public static final EncodingConfiguration.SubframeType type =
-          EncodingConfiguration.SubframeType.VERBATIM;
+    /**
+     * For debugging: Higher value equals more output, typically by increments
+     * of 10
+     */
+    public static int DEBUG_LEV = 0;
+    /**
+     * Subframe type supported by this implementation.
+     */
+    public static final EncodingConfiguration.SubframeType type =
+            EncodingConfiguration.SubframeType.VERBATIM;
 
-  //int sampleSize = 0;
+    //int sampleSize = 0;
 
-  /**
-   * Constructor. Sets StreamConfiguration to use. If the StreamConfiguration
-   * must later be changed, a new Subframe object must be created as well.
-   * @param sc StreamConfiguration to use for encoding.
-   */
-  Subframe_Verbatim(StreamConfiguration sc) {
-    super(sc);
-    //sampleSize = sc.getBitsPerSample();
-  }
-
-  /**
-   * This method is used to set the encoding configuration.
-   * @param ec    encoding configuration to use.
-   * @return      true if configuration was changed, false otherwise
-   */
-  @Override
-  public boolean registerConfiguration(EncodingConfiguration ec) {
-    super.registerConfiguration(ec);
-    return true;
-  }
-
-  public int estimateSize(int count, int bitsPerSample) {
-    int estimatedSize=8+count*bitsPerSample;//header size + unencoded data.
-    return estimatedSize;
-  }
-    
-  public int encodeSamples(int[] samples, int count, int start, int skip,
-    EncodedElement data, int offset, int bitsPerSample ) {
-    if(DEBUG_LEV > 0) {
-      System.err.println("Subframe_Verbatim::encodeSamples(...)");
+    /**
+     * Constructor. Sets StreamConfiguration to use. If the StreamConfiguration
+     * must later be changed, a new Subframe object must be created as well.
+     *
+     * @param sc StreamConfiguration to use for encoding.
+     */
+    Subframe_Verbatim(StreamConfiguration sc) {
+        super(sc);
+        //sampleSize = sc.getBitsPerSample();
     }
-    int encodedSamples = count;
-    int bits = bitsPerSample*count+offset+1*8;
-    int bytesNeeded = bits/8;
-    if(bits%8 != 0)
-      bytesNeeded++;
-    data.clear(bytesNeeded, offset);
-    data.addInt(0, 1);
-    data.addInt(1, 6);
-    data.addInt(0, 1);
-    data.packInt(samples, bitsPerSample, start, skip, count);
-    lastEncodedSize = bits-offset;
 
-    if(DEBUG_LEV > 0)
-      System.err.println("Subframe_Verbatim::encodeSamples(...): End");
-    if(DEBUG_LEV > 10) {
-      System.err.println("--: bitsUsed : "+bits+"  : Bytes : "+bytesNeeded);
+    /**
+     * This method is used to set the encoding configuration.
+     *
+     * @param ec encoding configuration to use.
+     * @return true if configuration was changed, false otherwise
+     */
+    @Override
+    public boolean registerConfiguration(EncodingConfiguration ec) {
+        super.registerConfiguration(ec);
+        return true;
     }
-    return encodedSamples;
-  }
+
+    public int estimateSize(int count, int bitsPerSample) {
+        int estimatedSize = 8 + count * bitsPerSample;//header size + unencoded data.
+        return estimatedSize;
+    }
+
+    public int encodeSamples(int[] samples, int count, int start, int skip,
+                             EncodedElement data, int offset, int bitsPerSample) {
+        if (DEBUG_LEV > 0) {
+            System.err.println("Subframe_Verbatim::encodeSamples(...)");
+        }
+        int encodedSamples = count;
+        int bits = bitsPerSample * count + offset + 1 * 8;
+        int bytesNeeded = bits / 8;
+        if (bits % 8 != 0)
+            bytesNeeded++;
+        data.clear(bytesNeeded, offset);
+        data.addInt(0, 1);
+        data.addInt(1, 6);
+        data.addInt(0, 1);
+        data.packInt(samples, bitsPerSample, start, skip, count);
+        lastEncodedSize = bits - offset;
+
+        if (DEBUG_LEV > 0)
+            System.err.println("Subframe_Verbatim::encodeSamples(...): End");
+        if (DEBUG_LEV > 10) {
+            System.err.println("--: bitsUsed : " + bits + "  : Bytes : " + bytesNeeded);
+        }
+        return encodedSamples;
+    }
 
 }

@@ -26,14 +26,12 @@ import javax.jms.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 
-public class Service
-{
+public class Service {
     public static Map<String, String> config;
     public static SQL sql;
-    private static Logger log = LoggerFactory.getLogger (Service.class);
+    private static Logger log = LoggerFactory.getLogger(Service.class);
     public static MessageConsumer messageConsumer;
     public static MessageProducer messageProducer;
     @NonNls
@@ -41,18 +39,17 @@ public class Service
     public static Session session;
     private static I18N i18n = new I18N();
 
-    public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException
-    {
+    public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException {
         DOMConfigurator.configure("conf/etc/log4j.xml");
 
-        Config cfg = new Config ();
-        config = cfg.getConfig ();
-        sql = new SQL ();
+        Config cfg = new Config();
+        config = cfg.getConfig();
+        sql = new SQL();
 
-        msg = new Messaging ();
-        messageConsumer = msg.getConsumer ();
-        messageProducer = msg.getProducer ();
-        session = msg.getSession ();
+        msg = new Messaging();
+        messageConsumer = msg.getConsumer();
+        messageProducer = msg.getProducer();
+        session = msg.getSession();
 
         try {
             HttpServer server = HttpServerFactory.create("http://" + config.get("httpHost") + ":" + config.get("httpPort") + "/");
@@ -70,15 +67,13 @@ public class Service
 
         msg.simpleSendMessage("status.answer", "alive", "rest");
 
-        while ((mess = Service.messageConsumer.receive (0)) != null)
-        {
+        while ((mess = Service.messageConsumer.receive(0)) != null) {
             m = (MapMessage) mess;
 
-            if(m.getStringProperty("qpid.subject").equals ("status.rest") || m.getStringProperty("qpid.subject").equals ("status.all"))
-            {
-                log.info (i18n.message("rest.got.status.query"));
+            if (m.getStringProperty("qpid.subject").equals("status.rest") || m.getStringProperty("qpid.subject").equals("status.all")) {
+                log.info(i18n.message("rest.got.status.query"));
                 msg.simpleSendMessage("status.answer", "alive", "rest");
             }
         }
-}
+    }
 }

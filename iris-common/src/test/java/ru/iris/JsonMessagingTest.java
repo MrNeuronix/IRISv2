@@ -26,6 +26,7 @@ import java.util.UUID;
 
 /**
  * Simple test to verify JSON serialization and deserialization.
+ *
  * @author Tommi S.E. Laukkanen
  */
 public class JsonMessagingTest {
@@ -85,8 +86,8 @@ public class JsonMessagingTest {
                     Assert.assertEquals(testKeyValueRequest, receivedEnvelope.getObject());
 
                     messaging.reply(receivedEnvelope, testKeyValueResponse);
-                } catch(final Exception e) {
-                        e.printStackTrace();
+                } catch (final Exception e) {
+                    e.printStackTrace();
                 }
             }
         });

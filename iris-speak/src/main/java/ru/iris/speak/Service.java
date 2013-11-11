@@ -9,7 +9,6 @@ import ru.iris.speak.google.GoogleSpeakService;
 import ru.iris.speak.voicerss.VoiceRSSSpeakService;
 
 import javax.jms.*;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,8 +20,7 @@ import java.util.Map;
  * Time: 21:32
  */
 
-public class Service
-{
+public class Service {
     @NonNls
     public static Map<String, String> config;
     public static SQL sql;
@@ -33,39 +31,33 @@ public class Service
     public static Session session;
     private static I18N i18n = new I18N();
 
-    private static Logger log = LoggerFactory.getLogger (Service.class);
+    private static Logger log = LoggerFactory.getLogger(Service.class);
 
-    public static void main(String[] args) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         DOMConfigurator.configure("conf/etc/log4j.xml");
 
-        Config cfg = new Config ();
-        config = cfg.getConfig ();
-        sql = new SQL ();
+        Config cfg = new Config();
+        config = cfg.getConfig();
+        sql = new SQL();
 
         Speak speak = new Speak();
 
-        msg = new Messaging ();
-        messageConsumer = msg.getConsumer ();
-        messageProducer = msg.getProducer ();
-        session = msg.getSession ();
+        msg = new Messaging();
+        messageConsumer = msg.getConsumer();
+        messageProducer = msg.getProducer();
+        session = msg.getSession();
 
-        log.info ("[iris] ----------------------------------");
-        log.info (i18n.message("iris.speak.service.starting"));
-        log.info ("[iris] ----------------------------------");
+        log.info("[iris] ----------------------------------");
+        log.info(i18n.message("iris.speak.service.starting"));
+        log.info("[iris] ----------------------------------");
 
-        if(config.get("ttsEngine").equals("google"))
-        {
+        if (config.get("ttsEngine").equals("google")) {
             new GoogleSpeakService();
             speak.add(i18n.message("syth.voice.launched"));
-        }
-        else if(config.get("ttsEngine").equals("voicerss"))
-        {
+        } else if (config.get("ttsEngine").equals("voicerss")) {
             new VoiceRSSSpeakService();
             speak.add(i18n.message("voice.synth.voicerss.launched"));
-        }
-        else
-        {
+        } else {
             log.info(i18n.message("speak.no.tts.system.specified.in.config.file"));
         }
 
@@ -76,13 +68,11 @@ public class Service
 
         msg.simpleSendMessage("status.answer", "alive", "speak");
 
-        while ((mess = Service.messageConsumer.receive (0)) != null)
-        {
+        while ((mess = Service.messageConsumer.receive(0)) != null) {
             m = (MapMessage) mess;
 
-            if(m.getStringProperty("qpid.subject").equals ("status.speak") || m.getStringProperty("qpid.subject").equals ("status.all"))
-            {
-                log.info (i18n.message("speak.got.status.query"));
+            if (m.getStringProperty("qpid.subject").equals("status.speak") || m.getStringProperty("qpid.subject").equals("status.all")) {
+                log.info(i18n.message("speak.got.status.query"));
                 msg.simpleSendMessage("status.answer", "alive", "speak");
             }
         }

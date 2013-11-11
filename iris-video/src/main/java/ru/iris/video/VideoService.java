@@ -12,12 +12,11 @@ package ru.iris.video;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.iris.common.I18N;
 
 public class VideoService implements Runnable {
 
     private Thread t = null;
-    private static Logger log = LoggerFactory.getLogger (VideoService.class);
+    private static Logger log = LoggerFactory.getLogger(VideoService.class);
     //private static I18N i18n = new I18N();
 
 

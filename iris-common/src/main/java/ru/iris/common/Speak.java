@@ -27,17 +27,17 @@ public class Speak {
     public static void add(String text) throws AMQException, JMSException, URISyntaxException {
 
         I18N i18n = new I18N();
-        Messaging msg = new Messaging ();
+        Messaging msg = new Messaging();
         @NonNls MapMessage message = null;
-        session = msg.getSession ();
-        messageProducer = msg.getProducer ();
+        session = msg.getSession();
+        messageProducer = msg.getProducer();
 
         try {
             message = session.createMapMessage();
 
             message.setStringProperty("text", text);
             message.setDoubleProperty("confidence", 100);
-            message.setStringProperty ("qpid.subject", "event.speak");
+            message.setStringProperty("qpid.subject", "event.speak");
 
             messageProducer.send(message);
         } catch (JMSException e) {

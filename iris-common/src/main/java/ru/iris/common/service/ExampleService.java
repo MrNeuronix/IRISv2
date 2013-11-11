@@ -35,13 +35,18 @@ import java.util.UUID;
  * @author Tommi S.E. Laukkanen
  */
 public class ExampleService {
-    /** The logger. */
+    /**
+     * The logger.
+     */
     private static Logger LOGGER = LoggerFactory.getLogger(JsonMessaging.class);
-    /** If shutdown is ni progress. */
+    /**
+     * If shutdown is ni progress.
+     */
     private static boolean shutdown = false;
 
     /**
      * The main method.
+     *
      * @param args the command line arguments
      */
     public static void main(final String[] args) {
@@ -67,7 +72,7 @@ public class ExampleService {
             }
 
             // Lets load configuration.
-            final Map<String, String > config = new Config().getConfig();
+            final Map<String, String> config = new Config().getConfig();
 
             // Lets instantiate JSON messaging with the selected instance ID for this module using
             // keystore path and password defined in configuration.
@@ -84,7 +89,7 @@ public class ExampleService {
                     new ServiceCapability[]{ServiceCapability.SPEAK}));
 
             long lastStatusBroadcastMillis = System.currentTimeMillis();
-            while(!shutdown) {
+            while (!shutdown) {
 
                 // Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
                 final JsonEnvelope envelope = jsonMessaging.receive(100);
@@ -103,14 +108,14 @@ public class ExampleService {
                         LOGGER.info("Received broadcast "
                                 + " from " + envelope.getSenderInstanceId()
                                 + " to " + envelope.getReceiverInstanceId()
-                                + " at '" +  envelope.getSubject()
+                                + " at '" + envelope.getSubject()
                                 + ": " + envelope.getObject());
                     } else {
                         // We received unknown request message. Lets make generic log entry.
                         LOGGER.info("Received request "
                                 + " from " + envelope.getSenderInstanceId()
                                 + " to " + envelope.getReceiverInstanceId()
-                                + " at '" +  envelope.getSubject()
+                                + " at '" + envelope.getSubject()
                                 + ": " + envelope.getObject());
                     }
                 }

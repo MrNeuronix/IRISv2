@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.sql.*;
 
 public class SQL {
-    /** The logger. */
+    /**
+     * The logger.
+     */
     private static Logger LOGGER = LoggerFactory.getLogger(SQL.class);
 
     private Connection connection = null;

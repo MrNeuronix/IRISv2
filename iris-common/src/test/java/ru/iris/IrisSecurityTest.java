@@ -23,6 +23,7 @@ import java.util.UUID;
 
 /**
  * Test case for testing IRIS security.
+ *
  * @author Tommi S.E. Laukkanen
  */
 public class IrisSecurityTest {

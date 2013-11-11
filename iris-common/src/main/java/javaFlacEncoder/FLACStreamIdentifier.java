@@ -21,29 +21,31 @@ package javaFlacEncoder;
 
 /**
  * Provides the stream identifier used at beginning of flac streams.
+ *
  * @author Preston Lacey
  */
 public class FLACStreamIdentifier {
-  static final byte streamMarkerByte1 = 0x66;
-  static final byte streamMarkerByte2 = 0x4c;
-  static final byte streamMarkerByte3 = 0x61;
-  static final byte streamMarkerByte4 = 0x43;
-  static final byte[] marker = {
-    streamMarkerByte1,
-    streamMarkerByte2,
-    streamMarkerByte3,
-    streamMarkerByte4,
-  };
+    static final byte streamMarkerByte1 = 0x66;
+    static final byte streamMarkerByte2 = 0x4c;
+    static final byte streamMarkerByte3 = 0x61;
+    static final byte streamMarkerByte4 = 0x43;
+    static final byte[] marker = {
+            streamMarkerByte1,
+            streamMarkerByte2,
+            streamMarkerByte3,
+            streamMarkerByte4,
+    };
 
-  /**
-   * Get an EncodedElement containing the marker(which is itself in a byte
-   * array).
-   * @return EncodedElement containing the marker.
-   */
-  public static EncodedElement getIdentifier() {
-    EncodedElement ele = new EncodedElement();
-    ele.setData(marker.clone());
-    ele.setUsableBits(32);
-    return ele;
-  }
+    /**
+     * Get an EncodedElement containing the marker(which is itself in a byte
+     * array).
+     *
+     * @return EncodedElement containing the marker.
+     */
+    public static EncodedElement getIdentifier() {
+        EncodedElement ele = new EncodedElement();
+        ele.setData(marker.clone());
+        ele.setUsableBits(32);
+        return ele;
+    }
 }

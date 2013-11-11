@@ -55,7 +55,7 @@ public class JsonEnvelope {
     }
 
     public JsonEnvelope(UUID senderInstanceId, UUID receiverInstanceId, String correlationId,
-                    Destination replyDestination, String subject, Object object) {
+                        Destination replyDestination, String subject, Object object) {
         this.senderInstanceId = senderInstanceId;
         this.receiverInstanceId = receiverInstanceId;
         this.correlationId = correlationId;

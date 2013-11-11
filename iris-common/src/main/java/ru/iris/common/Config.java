@@ -29,9 +29,13 @@ import java.util.*;
  * Class for loading configuration from properties files and database.
  */
 public class Config {
-    /** The logger. */
+    /**
+     * The logger.
+     */
     private static Logger LOGGER = LoggerFactory.getLogger(Config.class);
-    /** The map of loaded properties. */
+    /**
+     * The map of loaded properties.
+     */
     private static HashMap<String, String> propertyMap = null;
 
     /**
@@ -39,11 +43,10 @@ public class Config {
      */
     public Config() {
         synchronized (Config.class) {
-            // If already loaded in this JVM then exit.
-            // TODO: If enabled, ZWave module will fail to launch with error: java.lang.NoSuchFieldError: config
-            //if (propertyMap != null) {
-            //   return;
-            //}
+
+            if (propertyMap != null) {
+                return;
+            }
             propertyMap = new HashMap<String, String>();
             loadPropertiesFromClassPath("/conf/iris-default.properties");
             if (!loadPropertiesFromClassPath("/conf/iris-extended.properties")) {
@@ -59,7 +62,7 @@ public class Config {
                 if (key.toLowerCase().contains("password")) {
                     LOGGER.debug(key + " = <HIDDEN>");
                 } else {
-                    LOGGER.debug(key + " =" + propertyMap.get(key));
+                    LOGGER.debug(key + " = " + propertyMap.get(key));
                 }
             }
         }
@@ -67,6 +70,7 @@ public class Config {
 
     /**
      * Loads given properties file from class path.
+     *
      * @param propertiesFileName the property file name
      * @return true if file was found and loaded successfully.
      */
@@ -95,6 +99,7 @@ public class Config {
 
     /**
      * Loads given properties file from file system.
+     *
      * @param propertiesFileName the property file name
      * @return true if file was found and loaded successfully.
      */
@@ -123,6 +128,7 @@ public class Config {
 
     /**
      * Loads properties files from database.
+     *
      * @return true if properties were loaded from database successfully.
      */
     private boolean loadPropertiesFromDatabase() {
@@ -154,6 +160,7 @@ public class Config {
 
     /**
      * Returns the configuration properties map containing key value pairs.
+     *
      * @return the configuration properties.
      */
     public Map<String, String> getConfig() {

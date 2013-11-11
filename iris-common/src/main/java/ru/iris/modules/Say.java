@@ -9,6 +9,7 @@ package ru.iris.modules;
  * Time: 18:30
  * License: GPL v3
  */
+
 import org.apache.qpid.AMQException;
 import org.jetbrains.annotations.NonNls;
 import ru.iris.common.Messaging;
@@ -24,8 +25,7 @@ public class Say implements Module {
     public static Messaging msg;
     public static Session session;
 
-    public Say()
-    {
+    public Say() {
         try {
             msg = new Messaging();
         } catch (JMSException e) {
@@ -35,9 +35,9 @@ public class Say implements Module {
         } catch (AMQException e) {
             e.printStackTrace();
         }
-        messageConsumer = msg.getConsumer ();
-        messageProducer = msg.getProducer ();
-        session = msg.getSession ();
+        messageConsumer = msg.getConsumer();
+        messageProducer = msg.getProducer();
+        session = msg.getSession();
     }
 
     public void run(String arg) throws JMSException {
@@ -46,8 +46,8 @@ public class Say implements Module {
 
         message.setStringProperty("text", arg);
         message.setDoubleProperty("confidence", 100);
-        message.setStringProperty ("qpid.subject", "event.speak");
+        message.setStringProperty("qpid.subject", "event.speak");
 
-        messageProducer.send (message);
+        messageProducer.send(message);
     }
 }

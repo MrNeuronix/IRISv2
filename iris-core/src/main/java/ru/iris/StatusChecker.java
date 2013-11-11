@@ -16,19 +16,16 @@ import javax.jms.Message;
  * Time: 13:57
  * License: GPL v3
  */
-public class StatusChecker implements Runnable
-{
-    private static Logger log = LoggerFactory.getLogger (StatusChecker.class.getName ());
+public class StatusChecker implements Runnable {
+    private static Logger log = LoggerFactory.getLogger(StatusChecker.class.getName());
 
-    public StatusChecker()
-    {
-        Thread t = new Thread (this);
-        t.start ();
+    public StatusChecker() {
+        Thread t = new Thread(this);
+        t.start();
     }
 
     @Override
-    public synchronized void run()
-    {
+    public synchronized void run() {
         Message mess;
         @NonNls MapMessage m = null;
 
@@ -36,18 +33,16 @@ public class StatusChecker implements Runnable
 
         try {
 
-            while ((mess = Launcher.messageConsumer.receive (0)) != null)
-            {
+            while ((mess = Launcher.messageConsumer.receive(0)) != null) {
                 m = (MapMessage) mess;
 
-                    if(m.getStringProperty("qpid.subject").equals ("status.answer"))
-                    {
-                        String module = m.getStringProperty("alive");
-                        log.info (i18n.message("status.got.status.answer.from.0", module));
+                if (m.getStringProperty("qpid.subject").equals("status.answer")) {
+                    String module = m.getStringProperty("alive");
+                    log.info(i18n.message("status.got.status.answer.from.0", module));
 
-                        Launcher.sql.doQuery("DELETE FROM MODULESTATUS WHERE NAME='"+module+"'");
-                        Launcher.sql.doQuery("INSERT INTO MODULESTATUS (NAME, LASTSEEN) VALUES ('"+module+"',NOW())");
-                    }
+                    Launcher.sql.doQuery("DELETE FROM MODULESTATUS WHERE NAME='" + module + "'");
+                    Launcher.sql.doQuery("INSERT INTO MODULESTATUS (NAME, LASTSEEN) VALUES ('" + module + "',NOW())");
+                }
             }
 
         } catch (JMSException e) {

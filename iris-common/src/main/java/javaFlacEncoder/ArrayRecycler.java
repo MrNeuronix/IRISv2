@@ -31,30 +31,28 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @author Preston Lacey
  */
 public class ArrayRecycler {
-  LinkedBlockingQueue<int[]> usedIntArrays = null;
+    LinkedBlockingQueue<int[]> usedIntArrays = null;
 
-  ArrayRecycler() {
-    usedIntArrays = new LinkedBlockingQueue<int[]>();
-  }
-
-  public void add(int[] array) {
-    usedIntArrays.add(array);
-  }
-
-  /**
-   *
-   * @param size
-   * @return
-   */
-  public int[] getArray(int size) {
-    int[] result = usedIntArrays.poll();
-    if(result == null) {
-      result = new int[size];
+    ArrayRecycler() {
+        usedIntArrays = new LinkedBlockingQueue<int[]>();
     }
-    else if(result.length < size) {
-      usedIntArrays.offer(result);
-      result = new int[size];
+
+    public void add(int[] array) {
+        usedIntArrays.add(array);
     }
-    return result;
-  }
+
+    /**
+     * @param size
+     * @return
+     */
+    public int[] getArray(int size) {
+        int[] result = usedIntArrays.poll();
+        if (result == null) {
+            result = new int[size];
+        } else if (result.length < size) {
+            usedIntArrays.offer(result);
+            result = new int[size];
+        }
+        return result;
+    }
 }

@@ -2,7 +2,6 @@ package ru.iris;
 
 import org.apache.qpid.server.Broker;
 import org.apache.qpid.server.BrokerOptions;
-import org.apache.qpid.server.Main;
 import org.h2.tools.Server;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
@@ -16,7 +15,6 @@ import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -51,27 +49,24 @@ public class Launcher {
         qpid.startup(brokerOptions);
 
         msg = new Messaging();
-        messageConsumer = msg.getConsumer ();
-        messageProducer = msg.getProducer ();
-        session = msg.getSession ();
+        messageConsumer = msg.getConsumer();
+        messageProducer = msg.getProducer();
+        session = msg.getSession();
 
         // Enable internationalization
         I18N i18n = new I18N();
 
-        log.info ("----------------------------------------");
-        log.info (i18n.message("irisv2.is.starting"));
-        log.info ("----------------------------------------");
+        log.info("----------------------------------------");
+        log.info(i18n.message("irisv2.is.starting"));
+        log.info("----------------------------------------");
 
         // Load configuration
-        Config cfg = new Config ();
-        config = cfg.getConfig ();
+        Config cfg = new Config();
+        config = cfg.getConfig();
         sql = new SQL();
 
         // Modules poll
         new StatusChecker();
-
-        // Lauch REST service
-        runModule("java -jar iris-rest.jar");
 
         // Launch capture sound module
         runModule("java -jar iris-record.jar");
@@ -87,6 +82,9 @@ public class Launcher {
 
         // Launch events module
         runModule("java -jar iris-events.jar");
+
+        // Lauch REST service
+        runModule("java -jar iris-rest.jar");
     }
 
     private static void runModule(@NonNls String cmd) throws IOException {

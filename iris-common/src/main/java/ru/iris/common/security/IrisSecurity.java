@@ -30,10 +30,15 @@ import java.util.UUID;
  * Class for handling security related operations
  */
 public class IrisSecurity {
-    /** The logger. */
+    /**
+     * The logger.
+     */
     private static Logger LOGGER = LoggerFactory.getLogger(IrisSecurity.class);
-    /** The security provider. */
+    /**
+     * The security provider.
+     */
     private final static Provider provider = new BouncyCastleProvider();
+
     static {
         Security.addProvider(provider);
     }
@@ -76,8 +81,8 @@ public class IrisSecurity {
                 final KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA", provider);
                 final KeyPair keyPair = keyGen.generateKeyPair();
                 final X509Certificate certificate = buildCertificate(instanceId.toString(), keyPair);
-                keystore.setKeyEntry(instanceId.toString(), (Key)keyPair.getPrivate(), keystorePassword.toCharArray(),
-                        new X509Certificate[] {certificate});
+                keystore.setKeyEntry(instanceId.toString(), (Key) keyPair.getPrivate(), keystorePassword.toCharArray(),
+                        new X509Certificate[]{certificate});
 
                 keystore.store(keystoreOutputStream, keystorePassword.toCharArray());
                 keystoreLock.release();
@@ -93,6 +98,7 @@ public class IrisSecurity {
 
     /**
      * Calculates signature for message string using certificate identified by instance ID.
+     *
      * @param message the message string
      * @return the signature
      */
@@ -112,8 +118,9 @@ public class IrisSecurity {
 
     /**
      * Verifies that signature has been created by given remote instance ID.
-     * @param message the message
-     * @param signatureString the signature
+     *
+     * @param message          the message
+     * @param signatureString  the signature
      * @param remoteInstanceId
      * @return true if signature is valid
      */
@@ -124,7 +131,7 @@ public class IrisSecurity {
                 LOGGER.warn("Unknown certificate: " + remoteInstanceId);
                 return false;
             }
-            if (!certificate.getSubjectDN().toString().equals("CN="+remoteInstanceId)) {
+            if (!certificate.getSubjectDN().toString().equals("CN=" + remoteInstanceId)) {
                 LOGGER.warn("Invalid certificate DN: '" + certificate.getSubjectDN()
                         + "' for certificate alias: '" + remoteInstanceId + "'");
                 return false;
@@ -147,7 +154,7 @@ public class IrisSecurity {
     /**
      * Encrypt the plain text using public key indicated by the instance ID.
      *
-     * @param plainText plain text
+     * @param plainText  plain text
      * @param instanceId the instance ID
      * @return cipher text
      */
@@ -157,7 +164,7 @@ public class IrisSecurity {
             if (certificate == null) {
                 throw new RuntimeException("Unknown certificate: " + instanceId);
             }
-            if (!certificate.getSubjectDN().toString().equals("CN="+instanceId)) {
+            if (!certificate.getSubjectDN().toString().equals("CN=" + instanceId)) {
                 throw new RuntimeException("Invalid certificate DN: '" + certificate.getSubjectDN()
                         + "' for certificate alias: '" + instanceId + "'");
             }
@@ -173,6 +180,7 @@ public class IrisSecurity {
 
     /**
      * Decrypts cipher text with this instances private key.
+     *
      * @param cipherText the cipher text
      * @return the plain text
      */
@@ -191,8 +199,9 @@ public class IrisSecurity {
 
     /**
      * Build self signed certificate from key pair.
+     *
      * @param commonName the certificate common name
-     * @param keyPair the key pair.
+     * @param keyPair    the key pair.
      * @return the certificate
      * @throws Exception if error occurs in certificate generation process.
      */

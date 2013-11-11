@@ -64,10 +64,31 @@
                             <descriptors>
                                 <descriptor>assembly/linux-release.xml</descriptor>
                             </descriptors>
+                            <finalName>IRISv2</finalName>
+                            <outputDirectory>../</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
+
+
+            <plugin>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>install</phase>
+                        <configuration>
+                            <tasks>
+                                <unzip src="../IRISv2-linux-release.zip" dest="X:\"/>
+                            </tasks>
+                        </configuration>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 

@@ -16,18 +16,18 @@
 
     <!-- Enable info messages for the status-logging hierarchy -->
     <logger additivity="true" name="qpid.message">
-      <level value="off"/>
+        <level value="off"/>
     </logger>
 
     <!-- Subscription state may toggle frequently for clients with low prefetch
     so switch off this operational logging by default-->
     <logger additivity="true" name="qpid.message.subscription.state">
-      <level value="off"/>
+        <level value="off"/>
     </logger>
 
     <!-- Enable log messages for the queue notifications -->
     <logger additivity="true" name="org.apache.qpid.server.queue.NotificationCheck">
-      <level value="off"/>
+        <level value="off"/>
     </logger>
 
     <!-- Set the commons logging that the XML parser uses to WARN, it is very chatty at debug -->
@@ -36,8 +36,8 @@
     </logger>
 
     <root>
-        <priority value ="debug" />
-        <appender-ref ref="STDOUT" />
+        <priority value="info"/>
+        <appender-ref ref="STDOUT"/>
     </root>
 
 </log4j:configuration>

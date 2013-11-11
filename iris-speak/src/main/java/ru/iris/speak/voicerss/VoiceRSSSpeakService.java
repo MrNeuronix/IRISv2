@@ -23,67 +23,56 @@ import javax.jms.MessageConsumer;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class VoiceRSSSpeakService implements Runnable
-{
+public class VoiceRSSSpeakService implements Runnable {
 
     Thread t = null;
-    private static Logger log = LoggerFactory.getLogger (VoiceRSSSpeakService.class.getName ());
+    private static Logger log = LoggerFactory.getLogger(VoiceRSSSpeakService.class.getName());
     private static I18N i18n = new I18N();
 
-    public VoiceRSSSpeakService()
-    {
-        t = new Thread (this);
-        t.start ();
+    public VoiceRSSSpeakService() {
+        t = new Thread(this);
+        t.start();
     }
 
-    public Thread getThread()
-    {
+    public Thread getThread() {
         return t;
     }
 
     @Override
-    public synchronized void run()
-    {
-        log.info (i18n.message("speak.service.started.tts.voicerss"));
+    public synchronized void run() {
+        log.info(i18n.message("speak.service.started.tts.voicerss"));
 
         Message message = null;
         @NonNls MapMessage m = null;
-        ExecutorService exs = Executors.newFixedThreadPool (10);
+        ExecutorService exs = Executors.newFixedThreadPool(10);
 
-        try
-        {
+        try {
             MessageConsumer messageConsumer = new Messaging().getConsumer();
 
-            while ((message = messageConsumer.receive (0)) != null)
-            {
+            while ((message = messageConsumer.receive(0)) != null) {
                 m = (MapMessage) message;
 
-                if(m.getStringProperty("qpid.subject").equals ("event.speak"))
-                {
-                    if(Service.config.get("silence").equals("0"))
-                    {
-                        log.info ("[speak] -----------------------");
-                        log.info (i18n.message("speak.confidence.01", m.getDoubleProperty("confidence")));
-                        log.info (i18n.message("speak.text.01", m.getStringProperty("text")));
-                        log.info ("[speak] -----------------------");
+                if (m.getStringProperty("qpid.subject").equals("event.speak")) {
+                    if (Service.config.get("silence").equals("0")) {
+                        log.info("[speak] -----------------------");
+                        log.info(i18n.message("speak.confidence.01", m.getDoubleProperty("confidence")));
+                        log.info(i18n.message("speak.text.01", m.getStringProperty("text")));
+                        log.info("[speak] -----------------------");
 
                         VoiceRSSSynthesizer Voice = new VoiceRSSSynthesizer(exs);
-                        Voice.setAnswer (m.getStringProperty("text"));
-                        exs.submit (Voice).get ();
-                    }
-                    else
-                    {
+                        Voice.setAnswer(m.getStringProperty("text"));
+                        exs.submit(Voice).get();
+                    } else {
                         log.info(i18n.message("speak.silence.mode.enabled.ignore.speak.request"));
                     }
                 }
             }
 
-            Service.msg.close ();
+            Service.msg.close();
 
-        } catch (Exception e)
-        {
-            e.printStackTrace ();  //To change body of catch statement use File | Settings | File Templates.
-            log.info (i18n.message("speak.get.error.0", m));
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            log.info(i18n.message("speak.get.error.0", m));
         }
     }
 }

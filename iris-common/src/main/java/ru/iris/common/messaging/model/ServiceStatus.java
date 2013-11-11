@@ -17,15 +17,24 @@ package ru.iris.common.messaging.model;
 
 /**
  * Enumeration describing service statuses
+ *
  * @author Tommi S.E. Laukkanen
  */
 public enum ServiceStatus {
-    /** Service has been started. */
+    /**
+     * Service has been started.
+     */
     STARTUP,
-    /** Service is available. */
+    /**
+     * Service is available.
+     */
     AVAILABLE,
-    /** Service has encountered critical errors. */
+    /**
+     * Service has encountered critical errors.
+     */
     ERROR,
-    /** Service has been shutdown. */
+    /**
+     * Service has been shutdown.
+     */
     SHUTDOWN
 }

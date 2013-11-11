@@ -17,15 +17,24 @@ package ru.iris.common.messaging.model;
 
 /**
  * Enumeration describing service capabilities
+ *
  * @author Tommi S.E. Laukkanen
  */
 public enum ServiceCapability {
-    /** Service can speak to user. */
+    /**
+     * Service can speak to user.
+     */
     SPEAK,
-    /** Service can listen to user. */
+    /**
+     * Service can listen to user.
+     */
     LISTEN,
-    /** Service can see environment. */
+    /**
+     * Service can see environment.
+     */
     SEE,
-    /** Service can sense environment variables like temperature, humidity etc...*/
+    /**
+     * Service can sense environment variables like temperature, humidity etc...
+     */
     SENSE
 }

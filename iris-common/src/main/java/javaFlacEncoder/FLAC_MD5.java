@@ -23,68 +23,68 @@ import java.security.MessageDigest;
 
 
 /**
- *
  * @author preston
  */
 public class FLAC_MD5 {
-  private MessageDigest md = null;
-  private byte[] _dataMD5 = null;
-  
-  public FLAC_MD5() throws java.security.NoSuchAlgorithmException {
-    md = MessageDigest.getInstance("md5");
-  }
+    private MessageDigest md = null;
+    private byte[] _dataMD5 = null;
 
-  public MessageDigest getMD() {
-    return md;
-  }
-
-  /**
-   * Add samples to the MD5 hash.
-   * CURRENTLY ONLY MAY WORK FOR: sample sizes which are divisible by 8. Need
-   * to create some audio to test with.
-   * @param samples
-   * @param count
-   * @param channels
-   */
-  public void addSamplesToMD5(int[] samples, int count, int channels,
-      int sampleSize) {
-    int bytesPerSample = sampleSize/8;
-    if(sampleSize%8 != 0)
-      bytesPerSample++;
-    if(_dataMD5 == null || _dataMD5.length < count*bytesPerSample*channels) {
-      _dataMD5 = new byte[count*bytesPerSample*channels];
+    public FLAC_MD5() throws java.security.NoSuchAlgorithmException {
+        md = MessageDigest.getInstance("md5");
     }
-    byte[] dataMD5 = _dataMD5;
-    splitSamplesToBytes(samples, count*channels, bytesPerSample, dataMD5);
-    md.update(dataMD5, 0, count*bytesPerSample*channels);
-  }
 
-  /* Split Samples to bytes(for sending to MD5)
-   * CURRENTLY ONLY MAY WORK FOR: sample sizes which are divisible by 8. Need
-   * to create some audio to test with.*/
-  private static final void splitSamplesToBytes(int[] samples, int totalSamples,
-    int bytesPerSample, byte[] dataMD5) {
-    int destIndexBase = 0;
-    int i = 0;
-    
-    switch(bytesPerSample) {
-      case 3:
-        for(; i < totalSamples; i++) {
-        dataMD5[destIndexBase++] = (byte)(samples[i]);
-        dataMD5[destIndexBase++] = (byte)(samples[i] >> 8);
-        dataMD5[destIndexBase++] = (byte)(samples[i] >> 16);
+    public MessageDigest getMD() {
+        return md;
+    }
+
+    /**
+     * Add samples to the MD5 hash.
+     * CURRENTLY ONLY MAY WORK FOR: sample sizes which are divisible by 8. Need
+     * to create some audio to test with.
+     *
+     * @param samples
+     * @param count
+     * @param channels
+     */
+    public void addSamplesToMD5(int[] samples, int count, int channels,
+                                int sampleSize) {
+        int bytesPerSample = sampleSize / 8;
+        if (sampleSize % 8 != 0)
+            bytesPerSample++;
+        if (_dataMD5 == null || _dataMD5.length < count * bytesPerSample * channels) {
+            _dataMD5 = new byte[count * bytesPerSample * channels];
         }
-        break;
-      case 2:
-        for(; i < totalSamples; i++) {
-        dataMD5[destIndexBase++] = (byte)(samples[i]);
-        dataMD5[destIndexBase++] = (byte)(samples[i] >> 8);
-        }
-        break;
-      case 1:
-        for(; i < totalSamples; i++) {
-        dataMD5[i] = (byte)samples[i];
+        byte[] dataMD5 = _dataMD5;
+        splitSamplesToBytes(samples, count * channels, bytesPerSample, dataMD5);
+        md.update(dataMD5, 0, count * bytesPerSample * channels);
+    }
+
+    /* Split Samples to bytes(for sending to MD5)
+     * CURRENTLY ONLY MAY WORK FOR: sample sizes which are divisible by 8. Need
+     * to create some audio to test with.*/
+    private static final void splitSamplesToBytes(int[] samples, int totalSamples,
+                                                  int bytesPerSample, byte[] dataMD5) {
+        int destIndexBase = 0;
+        int i = 0;
+
+        switch (bytesPerSample) {
+            case 3:
+                for (; i < totalSamples; i++) {
+                    dataMD5[destIndexBase++] = (byte) (samples[i]);
+                    dataMD5[destIndexBase++] = (byte) (samples[i] >> 8);
+                    dataMD5[destIndexBase++] = (byte) (samples[i] >> 16);
+                }
+                break;
+            case 2:
+                for (; i < totalSamples; i++) {
+                    dataMD5[destIndexBase++] = (byte) (samples[i]);
+                    dataMD5[destIndexBase++] = (byte) (samples[i] >> 8);
+                }
+                break;
+            case 1:
+                for (; i < totalSamples; i++) {
+                    dataMD5[i] = (byte) samples[i];
+                }
         }
     }
-  }
 }

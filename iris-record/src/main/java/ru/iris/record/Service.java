@@ -14,7 +14,6 @@ import javax.jms.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -26,8 +25,7 @@ import java.util.Map;
  * Time: 21:32
  */
 
-public class Service
-{
+public class Service {
     @NonNls
     public static Map<String, String> config;
     public static SQL sql;
@@ -38,26 +36,25 @@ public class Service
     public static Session session;
     private static I18N i18n = new I18N();
 
-    private static Logger log = LoggerFactory.getLogger (Service.class);
+    private static Logger log = LoggerFactory.getLogger(Service.class);
 
-    public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException
-    {
+    public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException {
         DOMConfigurator.configure("conf/etc/log4j.xml");
 
-        Config cfg = new Config ();
-        config = cfg.getConfig ();
-        sql = new SQL ();
+        Config cfg = new Config();
+        config = cfg.getConfig();
+        sql = new SQL();
 
-        msg = new Messaging ();
-        messageConsumer = msg.getConsumer ();
-        messageProducer = msg.getProducer ();
-        session = msg.getSession ();
+        msg = new Messaging();
+        messageConsumer = msg.getConsumer();
+        messageProducer = msg.getProducer();
+        session = msg.getSession();
 
-        log.info ("[iris] ----------------------------------");
-        log.info (i18n.message("iris.record.service.starting"));
-        log.info ("[iris] ----------------------------------");
+        log.info("[iris] ----------------------------------");
+        log.info(i18n.message("iris.record.service.starting"));
+        log.info("[iris] ----------------------------------");
 
-        new RecordService ();
+        new RecordService();
 
         // Check module status
 
@@ -66,13 +63,11 @@ public class Service
 
         msg.simpleSendMessage("status.answer", "alive", "record");
 
-        while ((mess = Service.messageConsumer.receive (0)) != null)
-        {
+        while ((mess = Service.messageConsumer.receive(0)) != null) {
             m = (MapMessage) mess;
 
-            if(m.getStringProperty("qpid.subject").equals ("status.record") || m.getStringProperty("qpid.subject").equals ("status.all"))
-            {
-                log.info (i18n.message("record.got.status.query"));
+            if (m.getStringProperty("qpid.subject").equals("status.record") || m.getStringProperty("qpid.subject").equals("status.all")) {
+                log.info(i18n.message("record.got.status.query"));
                 msg.simpleSendMessage("status.answer", "alive", "record");
             }
         }

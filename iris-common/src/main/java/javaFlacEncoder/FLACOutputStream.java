@@ -20,6 +20,7 @@
 package javaFlacEncoder;
 
 import java.io.IOException;
+
 /**
  * This interface defines a location to write the output of the FLAC
  * encoder to. We don't want to require that the entire stream is buffered in the
@@ -43,59 +44,58 @@ import java.io.IOException;
  * the encoder will seek() to a point near the beginning of the stream to fix
  * the stream headers once the stream is closed. <br>
  * </BLOCKQUOTE>
+ *
  * @author Preston Lacey
- *
- *
  */
 public interface FLACOutputStream {
 
-  /**
-   * Attempt to seek to the given position.
-   *
-   * @param pos target position.
-   * @return current position after seek.
-   */
-  public long seek(long pos) throws IOException;
+    /**
+     * Attempt to seek to the given position.
+     *
+     * @param pos target position.
+     * @return current position after seek.
+     */
+    public long seek(long pos) throws IOException;
 
-  /**
-   * Write the given number of bytes from a byte array.
-   *
-   * @param data array containing source bytes to write
-   * @param offset index of source array to begin reading from.
-   * @param count number of bytes to write.
-   * @return number of bytes written.
-   * @throws java.io.IOException IOException raised upon write error.
-   */
-  public int write(byte[] data, int offset, int count) throws IOException;
+    /**
+     * Write the given number of bytes from a byte array.
+     *
+     * @param data   array containing source bytes to write
+     * @param offset index of source array to begin reading from.
+     * @param count  number of bytes to write.
+     * @return number of bytes written.
+     * @throws java.io.IOException IOException raised upon write error.
+     */
+    public int write(byte[] data, int offset, int count) throws IOException;
 
-  /**
-   * Get the number of bytes that have been written in length.
-   * This takes into account seeking to different portions.
-   *
-   * @return total writtne length of stream.
-   */
-  public long size();
+    /**
+     * Get the number of bytes that have been written in length.
+     * This takes into account seeking to different portions.
+     *
+     * @return total writtne length of stream.
+     */
+    public long size();
 
-  /**
-   * Write a single byte to the stream.
-   *
-   * @param data byte to write.
-   * @throws java.io.IOException  IOException raised upon write error.
-   */
-  public void write(byte data) throws IOException;
+    /**
+     * Write a single byte to the stream.
+     *
+     * @param data byte to write.
+     * @throws java.io.IOException IOException raised upon write error.
+     */
+    public void write(byte data) throws IOException;
 
-  /**
-   * Test whether this object allows seeking.
-   *
-   * @return true if seeking is allowed, false otherwise.
-   */
-  public boolean canSeek();
+    /**
+     * Test whether this object allows seeking.
+     *
+     * @return true if seeking is allowed, false otherwise.
+     */
+    public boolean canSeek();
 
-  /**
-   * Get current write position of this stream. If stream cannot seek, then
-   * this will return 0;
-   *
-   * @return current write position.
-   */
-  public long getPos();
+    /**
+     * Get current write position of this stream. If stream cannot seek, then
+     * this will return 0;
+     *
+     * @return current write position.
+     */
+    public long getPos();
 }

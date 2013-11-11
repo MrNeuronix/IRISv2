@@ -14,15 +14,15 @@ import org.apache.log4j.xml.DOMConfigurator;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.iris.common.Config;
-import ru.iris.common.I18N;
 import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
-import javax.jms.*;
+
+import javax.jms.MessageConsumer;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
 import java.util.HashMap;
 
-public class Service
-{
+public class Service {
     public static HashMap<String, String> config;
     public static SQL sql;
     public static MessageConsumer messageConsumer;

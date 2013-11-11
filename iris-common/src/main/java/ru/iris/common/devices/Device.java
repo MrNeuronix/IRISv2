@@ -47,100 +47,98 @@ public class Device {
 
     protected SQL sql;
 
-        public Device() throws IOException, SQLException {
-            sql = new SQL();
+    public Device() throws IOException, SQLException {
+        sql = new SQL();
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public String getSource() {
+        return this.source;
+    }
+
+    public void setNode(short node) {
+        this.node = node;
+    }
+
+    public short getNode() {
+        return this.node;
+    }
+
+    public String getUUID() {
+        return this.uuid;
+    }
+
+    public void setUUID(String uuid) {
+        this.uuid = uuid;
+    }
+
+    public int getZone() {
+        return this.zone;
+    }
+
+    public void setZone(int zone) {
+        this.zone = zone;
+    }
+
+    public String getValue(String label) {
+
+        if (label == null)
+            label = i18n.message("none.set");
+
+        try {
+            return this.LabelsValues.get(label).toString();
+        } catch (NullPointerException e) {
+            return i18n.message("none.set");
         }
 
-        public void setName(String name) {
-            this.name = name;
-        }
+    }
 
-        public String getName() {
-            return this.name;
-        }
+    public Map<String, Object> getLabelsValues() {
+        return this.LabelsValues;
+    }
 
-        public String getSource() {
-            return this.source;
-        }
+    public String getType() {
+        return this.type;
+    }
 
-        public void setNode(short node) {
-            this.node = node;
-        }
+    public void setInternalType(String type) {
+        this.internalType = type;
+    }
 
-        public short getNode() {
-            return this.node;
-        }
+    public String getInternalType() {
+        return this.internalType;
+    }
 
-        public String getUUID() {
-            return this.uuid;
-        }
+    public void setType(String type) {
+        this.type = type;
+    }
 
-        public void setUUID(String uuid) {
-            this.uuid = uuid;
-        }
+    public String getManufName() {
+        return this.manufName;
+    }
 
-        public int getZone() {
-            return this.zone;
-        }
+    public void setManufName(String manufName) {
+        this.manufName = manufName;
+    }
 
-        public void setZone(int zone) {
-            this.zone = zone;
-        }
+    public String getStatus() {
+        return this.status;
+    }
 
-        public String getValue(String label) {
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
-            if (label == null)
-                label = i18n.message("none.set");
-
-            try {
-                return this.LabelsValues.get(label).toString();
-            } catch (NullPointerException e)
-            {
-                return i18n.message("none.set");
-            }
-
-        }
-
-        public Map<String, Object> getLabelsValues() {
-            return this.LabelsValues;
-        }
-
-        public String getType() {
-            return this.type;
-        }
-
-        public void setInternalType(String type) {
-            this.internalType = type;
-        }
-
-        public String getInternalType() {
-            return this.internalType;
-        }
-
-        public void setType(String type) {
-            this.type = type;
-        }
-
-        public String getManufName() {
-            return this.manufName;
-        }
-
-        public void setManufName(String manufName) {
-            this.manufName = manufName;
-        }
-
-        public String getStatus() {
-            return this.status;
-        }
-
-        public void setStatus(String status) {
-            this.status = status;
-        }
-
-        @Override
-        public String toString()
-        {
-            Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().create();
-            return gson.toJson(this);
-        }
+    @Override
+    public String toString() {
+        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().create();
+        return gson.toJson(this);
+    }
 }

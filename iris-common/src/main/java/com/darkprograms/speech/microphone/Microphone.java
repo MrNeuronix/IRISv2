@@ -1,16 +1,17 @@
 package com.darkprograms.speech.microphone;
 
 import javax.sound.sampled.*;
-
 import java.io.File;
 
-/***************************************************************************
+/**
+ * ************************************************************************
  * Microphone class that contains methods to capture audio from microphone
  *
  * @author Luke Kuza, Aaron Gokaslan
- ***************************************************************************/
+ *         *************************************************************************
+ */
 public class Microphone {
-	
+
     /**
      * TargetDataLine variable to receive data from microphone
      */
@@ -81,8 +82,8 @@ public class Microphone {
     public void setTargetDataLine(TargetDataLine targetDataLine) {
         this.targetDataLine = targetDataLine;
     }
-    
-    
+
+
     /**
      * Constructor
      *
@@ -98,15 +99,15 @@ public class Microphone {
     /**
      * Initializes the target data line.
      */
-    private void initTargetDataLine(){
+    private void initTargetDataLine() {
         DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
         try {
-			setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
-		} catch (LineUnavailableException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
+            setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
+        } catch (LineUnavailableException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return;
+        }
 
     }
 
@@ -142,7 +143,7 @@ public class Microphone {
         File file = new File(audioFile);
         setAudioFile(file);
 
-        if(getTargetDataLine()==null){
+        if (getTargetDataLine() == null) {
             DataLine.Info dataLineInfo = new DataLine.Info(TargetDataLine.class, getAudioFormat());
             setTargetDataLine((TargetDataLine) AudioSystem.getLine(dataLineInfo));
         }
@@ -154,7 +155,7 @@ public class Microphone {
 
     }
 
-	
+
     /**
      * The audio format to save in
      *
@@ -178,20 +179,20 @@ public class Microphone {
      * Opens the microphone, starting the targetDataLine.
      * If it's already open, it does nothing.
      */
-    public void open(){
-        if(getTargetDataLine()==null){
-        	initTargetDataLine();
+    public void open() {
+        if (getTargetDataLine() == null) {
+            initTargetDataLine();
         }
-        if(!getTargetDataLine().isOpen() && !getTargetDataLine().isRunning() && !getTargetDataLine().isActive()){
-           	try {
+        if (!getTargetDataLine().isOpen() && !getTargetDataLine().isRunning() && !getTargetDataLine().isActive()) {
+            try {
                 setState(CaptureState.PROCESSING_AUDIO);
-        		getTargetDataLine().open(getAudioFormat());
-            	getTargetDataLine().start();
-			} catch (LineUnavailableException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return;
-			}
+                getTargetDataLine().open(getAudioFormat());
+                getTargetDataLine().start();
+            } catch (LineUnavailableException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return;
+            }
         }
 
     }

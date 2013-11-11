@@ -10,7 +10,6 @@ import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
 
 import javax.jms.*;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -22,8 +21,7 @@ import java.util.Map;
  * Time: 16:32
  */
 
-public class Service
-{
+public class Service {
     public static Map<String, String> config;
     public static SQL sql;
     public static MessageConsumer messageConsumer;
@@ -33,24 +31,24 @@ public class Service
     public static Session session;
     private static I18N i18n = new I18N();
 
-    private static Logger log = LoggerFactory.getLogger (Service.class);
+    private static Logger log = LoggerFactory.getLogger(Service.class);
 
     public static void main(String[] args) throws Exception {
 
         DOMConfigurator.configure("conf/etc/log4j.xml");
 
-        Config cfg = new Config ();
-        config = cfg.getConfig ();
-        sql = new SQL ();
+        Config cfg = new Config();
+        config = cfg.getConfig();
+        sql = new SQL();
 
-        msg = new Messaging ();
-        messageConsumer = msg.getConsumer ();
-        messageProducer = msg.getProducer ();
-        session = msg.getSession ();
+        msg = new Messaging();
+        messageConsumer = msg.getConsumer();
+        messageProducer = msg.getProducer();
+        session = msg.getSession();
 
-        log.info ("[iris] ----------------------------------");
-        log.info (i18n.message("iris.events.engine.starting"));
-        log.info ("[iris] ----------------------------------");
+        log.info("[iris] ----------------------------------");
+        log.info(i18n.message("iris.events.engine.starting"));
+        log.info("[iris] ----------------------------------");
 
 
         // Check module status
@@ -60,13 +58,11 @@ public class Service
 
         msg.simpleSendMessage("status.answer", "alive", "events");
 
-        while ((mess = Service.messageConsumer.receive (0)) != null)
-        {
+        while ((mess = Service.messageConsumer.receive(0)) != null) {
             m = (MapMessage) mess;
 
-            if(m.getStringProperty("qpid.subject").equals ("status.events") || m.getStringProperty("qpid.subject").equals ("status.all"))
-            {
-                log.info (i18n.message("events.got.status.query"));
+            if (m.getStringProperty("qpid.subject").equals("status.events") || m.getStringProperty("qpid.subject").equals("status.all")) {
+                log.info(i18n.message("events.got.status.query"));
                 msg.simpleSendMessage("status.answer", "alive", "events");
             }
         }

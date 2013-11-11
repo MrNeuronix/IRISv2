@@ -18,9 +18,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.util.EntityUtils;
 
-import java.io.*;
-import java.sql.SQLException;
-import java.util.HashMap;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
 import java.util.Map;
 
 /**
@@ -29,64 +30,59 @@ import java.util.Map;
  * Do not create multiple objects for concurrent use.
  */
 
-public class httpPOST
-{
+public class httpPOST {
 
     public static Map<String, String> config;
 
     /**
      * Constructor will setup httpclient, post request method and useragent information as required
      */
-    public httpPOST()
-    {
+    public httpPOST() {
         Config cfg = new Config();
-        config = cfg.getConfig ();
-        httpclient = new DefaultHttpClient ();
-        System.setProperty ("http.agent", "");
-        httppost = new HttpPost ("http://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang="+config.get("locale"));
-        HttpProtocolParams.setUserAgent (httpclient.getParams (), User_Agent);
-        httppost.setHeader (HeaderType, HeaderContent);
+        config = cfg.getConfig();
+        httpclient = new DefaultHttpClient();
+        System.setProperty("http.agent", "");
+        httppost = new HttpPost("http://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang=" + config.get("locale"));
+        HttpProtocolParams.setUserAgent(httpclient.getParams(), User_Agent);
+        httppost.setHeader(HeaderType, HeaderContent);
     }
 
     /**
      * This file will post the flac file to google and store the Json String in jsonResponse data member
      */
-    private void postFLAC()
-    {
-        try
-        {
+    private void postFLAC() {
+        try {
             //long start = System.currentTimeMillis();
 
             // Load the file stream from the given filename
-            File file = new File (FLACFileName);
+            File file = new File(FLACFileName);
 
-            InputStreamEntity reqEntity = new InputStreamEntity (
-                    new FileInputStream (file), -1);
+            InputStreamEntity reqEntity = new InputStreamEntity(
+                    new FileInputStream(file), -1);
 
             // Set the content type of the request entity to binary octet stream.. Taken from the chunked post example HTTPClient
-            reqEntity.setContentType ("binary/octet-stream");
+            reqEntity.setContentType("binary/octet-stream");
             //reqEntity.setChunked(true); // Uncomment this line, but I feel it slows stuff down... Quick Tests show no difference
 
 
             // set the POST request entity...
-            httppost.setEntity (reqEntity);
+            httppost.setEntity(reqEntity);
 
             //System.out.println("executing request " + httppost.getRequestLine());
 
             // Create an httpResponse object and execute the POST
-            HttpResponse response = httpclient.execute (httppost);
+            HttpResponse response = httpclient.execute(httppost);
 
             // Capture the Entity and get content
-            HttpEntity resEntity = response.getEntity ();
+            HttpEntity resEntity = response.getEntity();
 
             //System.out.println(System.currentTimeMillis()-start);
 
             String buffer;
             jsonResponse = "";
 
-            br = new BufferedReader (new InputStreamReader (resEntity.getContent ()));
-            while ((buffer = br.readLine ()) != null)
-            {
+            br = new BufferedReader(new InputStreamReader(resEntity.getContent()));
+            while ((buffer = br.readLine()) != null) {
                 jsonResponse += buffer;
             }
 
@@ -94,34 +90,29 @@ public class httpPOST
             //System.out.println("Content: "+jsonResponse);
 
             // Close Buffered Reader and content stream.
-            EntityUtils.consume (resEntity);
-            br.close ();
-        } catch (Exception ee)
-        {
+            EntityUtils.consume(resEntity);
+            br.close();
+        } catch (Exception ee) {
             // In the event this POST Request FAILED
             //ee.printStackTrace();
             jsonResponse = "_failed_";
-        } finally
-        {
+        } finally {
             // Finally shut down the client
-            httpclient.getConnectionManager ().shutdown ();
+            httpclient.getConnectionManager().shutdown();
         }
     }
 
     /**
      * postFile - Only public facing method of HTTPPOST, requires that you pass to it the filename
      */
-    public String postFile(String fileName)
-    {
+    public String postFile(String fileName) {
 
         // Assuming we have a valid file name we call private postFLAC method
-        if(fileName == null || fileName.equals ("") || !fileName.contains (".flac"))
-        {
+        if (fileName == null || fileName.equals("") || !fileName.contains(".flac")) {
             jsonResponse = "_failed_";
-        } else
-        {
+        } else {
             FLACFileName = fileName;
-            postFLAC ();
+            postFLAC();
         }
         return jsonResponse;
     }
@@ -144,10 +135,9 @@ public class httpPOST
     /**
      * Say function main...
      */
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         // Say the post Request ...
-        httpPOST flacPost = new httpPOST ();
-        flacPost.postFile (System.getProperty ("user.dir") + "/recording.flac");
+        httpPOST flacPost = new httpPOST();
+        flacPost.postFile(System.getProperty("user.dir") + "/recording.flac");
     }
 }

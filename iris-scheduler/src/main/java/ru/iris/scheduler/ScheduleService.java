@@ -20,7 +20,7 @@ import java.util.Date;
 public class ScheduleService implements Runnable {
 
     private Thread t = null;
-    private static Logger log = LoggerFactory.getLogger (ScheduleService.class);
+    private static Logger log = LoggerFactory.getLogger(ScheduleService.class);
     private static I18N i18n = new I18N();
 
     public ScheduleService() {

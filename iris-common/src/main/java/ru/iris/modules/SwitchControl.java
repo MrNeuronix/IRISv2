@@ -9,6 +9,7 @@ package ru.iris.modules;
  * Time: 18:30
  * License: GPL v3
  */
+
 import org.apache.qpid.AMQException;
 import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
@@ -34,8 +35,7 @@ public class SwitchControl implements Module {
 
     private static I18N i18n = new I18N();
 
-    public SwitchControl()
-    {
+    public SwitchControl() {
         try {
             msg = new Messaging();
         } catch (JMSException e) {
@@ -45,9 +45,9 @@ public class SwitchControl implements Module {
         } catch (AMQException e) {
             e.printStackTrace();
         }
-        messageConsumer = msg.getConsumer ();
-        messageProducer = msg.getProducer ();
-        session = msg.getSession ();
+        messageConsumer = msg.getConsumer();
+        messageProducer = msg.getProducer();
+        session = msg.getSession();
     }
 
     public void run(@NonNls String arg) throws JMSException {
@@ -62,9 +62,9 @@ public class SwitchControl implements Module {
         @NonNls MapMessage message = session.createMapMessage();
 
         message.setStringProperty("command", "allon");
-        message.setStringProperty ("qpid.subject", "event.devices.setvalue");
+        message.setStringProperty("qpid.subject", "event.devices.setvalue");
 
-        messageProducer.send (message);
+        messageProducer.send(message);
     }
 
     private void disableSW() throws JMSException {
@@ -74,8 +74,8 @@ public class SwitchControl implements Module {
         @NonNls MapMessage message = session.createMapMessage();
 
         message.setStringProperty("command", "alloff");
-        message.setStringProperty ("qpid.subject", "event.devices.setvalue");
+        message.setStringProperty("qpid.subject", "event.devices.setvalue");
 
-        messageProducer.send (message);
+        messageProducer.send(message);
     }
 }
