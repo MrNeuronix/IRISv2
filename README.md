@@ -20,7 +20,7 @@ In project root directory you will find assembled *IRISv2-linux-release.zip*. Un
 
 ## Configuration
 
-Rename *iris.h2.db.example* to *iris.h2.db.example* in */conf* directory, look to */conf/main.properties*
+Rename *iris.h2.db.example* to *iris.h2.db* in */conf* directory, look to */conf/main.properties*
 
 ## Run
 
