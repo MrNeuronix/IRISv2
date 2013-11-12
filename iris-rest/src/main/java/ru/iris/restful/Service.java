@@ -31,17 +31,18 @@ import java.sql.SQLException;
 import java.util.Map;
 
 public class Service {
+
     public static Map<String, String> config;
     public static SQL sql;
     private static Logger log = LoggerFactory.getLogger(Service.class);
     public static MessageConsumer messageConsumer;
     public static MessageProducer messageProducer;
-    @NonNls
     public static Messaging msg;
     public static Session session;
     private static I18N i18n = new I18N();
 
     public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException {
+
         DOMConfigurator.configure("conf/etc/log4j.xml");
 
         Config cfg = new Config();

@@ -64,7 +64,7 @@ public class Task {
 
     public Task(int id) throws SQLException, IOException {
 
-        log.info(i18n.message("scheduler.create.task.instance.from.id.0", id));
+        log.debug(i18n.message("scheduler.create.task.instance.from.id.0", id));
 
         ResultSet rs = sql.select("SELECT * FROM scheduler WHERE id='" + id + "'");
 
