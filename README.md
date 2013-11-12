@@ -14,14 +14,15 @@ IRISv2 is home automation system with voice control and REST API.
 
 ## Install
 
-*mvn package*
+**mvn package**
 
-In project root directory you will find assembled *IRISv2-linux-release.zip*. Unpack them.
+In project root directory you will find assembled **IRISv2-linux-release.zip**. Unpack them.
+For correct operation of the IRISv2 is needed **rec** from package **sox**
 
 ## Configuration
 
-Rename *iris.h2.db.example* to *iris.h2.db* in */conf* directory, look to */conf/main.properties*
+Rename **iris.h2.db.example** to **iris.h2.db** in **/conf** directory, look to **/conf/main.properties**
 
 ## Run
 
-Type in command line: *java -jar iris-core.jar*
+Type in command line: **java -jar iris-core.jar**
