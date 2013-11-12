@@ -24,7 +24,7 @@ public class AuthFilter implements ContainerRequestFilter {
     private final static WebApplicationException unauthorized =
             new WebApplicationException(
                     Response.status(Response.Status.UNAUTHORIZED)
-                            .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"realm\"")
+                            .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"IRIS Authorization\"")
                             .entity("IRIS Authorization").build());
 
     @Override

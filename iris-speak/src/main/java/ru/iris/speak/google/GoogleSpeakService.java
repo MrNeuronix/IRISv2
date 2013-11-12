@@ -22,6 +22,8 @@ import ru.iris.speak.Service;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
+import javax.sound.sampled.*;
+import java.io.File;
 
 public class GoogleSpeakService implements Runnable {
 
@@ -45,6 +47,28 @@ public class GoogleSpeakService implements Runnable {
         Message message = null;
         @NonNls MapMessage m = null;
 
+        Clip clip = null;
+        AudioInputStream audioIn = null;
+
+        if(Service.config.get("silence").equals("0"))
+        {
+            try {
+                audioIn = AudioSystem.getAudioInputStream(new File("./conf/beep.wav"));
+                AudioFormat format = audioIn.getFormat();
+                DataLine.Info info = new DataLine.Info(Clip.class, format);
+                clip = (Clip)AudioSystem.getLine(info);
+                clip.open(audioIn);
+                clip.start();
+
+                while(clip.isRunning())
+                {
+                    Thread.yield();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         try {
             MessageConsumer messageConsumer = new Messaging().getConsumer();
 
@@ -57,6 +81,13 @@ public class GoogleSpeakService implements Runnable {
                         log.info(i18n.message("speak.confidence.0", m.getDoubleProperty("confidence")));
                         log.info(i18n.message("speak.text.0", m.getStringProperty("text")));
                         log.info("[speak] -----------------------");
+
+                        if(!Service.config.get("silence").equals("1"))
+                        {
+                            clip.setFramePosition(0);
+                            clip.start();
+                            clip.start();
+                        }
 
                         Synthesiser synthesiser = new Synthesiser(Service.config.get("language"));
                         final Player player = new Player(synthesiser.getMP3Data(m.getStringProperty("text")));

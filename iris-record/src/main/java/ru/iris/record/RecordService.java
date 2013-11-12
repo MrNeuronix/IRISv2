@@ -45,27 +45,7 @@ public class RecordService implements Runnable
         int threads = Integer.valueOf (Service.config.get ("recordStreams"));
         int micro = Integer.valueOf (Service.config.get ("microphones"));
 
-        Clip clip = null;
-        AudioInputStream audioIn = null;
 
-        if(Service.config.get("silence").equals("0"))
-        {
-            try {
-                audioIn = AudioSystem.getAudioInputStream(new File("./conf/beep.wav"));
-                AudioFormat format = audioIn.getFormat();
-                DataLine.Info info = new DataLine.Info(Clip.class, format);
-                clip = (Clip)AudioSystem.getLine(info);
-                clip.open(audioIn);
-                clip.start();
-
-                while(clip.isRunning())
-                {
-                    Thread.yield();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
 
         log.info (i18n.message("record.configured.to.run.0.threads.on.1.microphones", threads, micro));
 
@@ -78,7 +58,6 @@ public class RecordService implements Runnable
             {
                 log.info (i18n.message("record.start.thread.0.on.microphone.1", i, finalM));
 
-                final Clip finalClip = clip;
                 new Thread (new Runnable ()
                 {
                     @Override
@@ -172,12 +151,6 @@ public class RecordService implements Runnable
                                                     }
 
                                                     busy = true;
-
-                                                    if(!Service.config.get("silence").equals("1"))
-                                                    {
-                                                        finalClip.setFramePosition(0);
-                                                        finalClip.start();
-                                                    }
 
                                                     log.info(i18n.message("command.got.0.command", command));
 

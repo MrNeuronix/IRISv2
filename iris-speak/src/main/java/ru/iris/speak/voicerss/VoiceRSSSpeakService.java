@@ -20,6 +20,8 @@ import ru.iris.speak.Service;
 import javax.jms.MapMessage;
 import javax.jms.Message;
 import javax.jms.MessageConsumer;
+import javax.sound.sampled.*;
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -46,6 +48,28 @@ public class VoiceRSSSpeakService implements Runnable {
         @NonNls MapMessage m = null;
         ExecutorService exs = Executors.newFixedThreadPool(10);
 
+        Clip clip = null;
+        AudioInputStream audioIn = null;
+
+        if(Service.config.get("silence").equals("0"))
+        {
+            try {
+                audioIn = AudioSystem.getAudioInputStream(new File("./conf/beep.wav"));
+                AudioFormat format = audioIn.getFormat();
+                DataLine.Info info = new DataLine.Info(Clip.class, format);
+                clip = (Clip)AudioSystem.getLine(info);
+                clip.open(audioIn);
+                clip.start();
+
+                while(clip.isRunning())
+                {
+                    Thread.yield();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
         try {
             MessageConsumer messageConsumer = new Messaging().getConsumer();
 
@@ -58,6 +82,13 @@ public class VoiceRSSSpeakService implements Runnable {
                         log.info(i18n.message("speak.confidence.01", m.getDoubleProperty("confidence")));
                         log.info(i18n.message("speak.text.01", m.getStringProperty("text")));
                         log.info("[speak] -----------------------");
+
+                        if(!Service.config.get("silence").equals("1"))
+                        {
+                            clip.setFramePosition(0);
+                            clip.start();
+                            clip.start();
+                        }
 
                         VoiceRSSSynthesizer Voice = new VoiceRSSSynthesizer(exs);
                         Voice.setAnswer(m.getStringProperty("text"));
