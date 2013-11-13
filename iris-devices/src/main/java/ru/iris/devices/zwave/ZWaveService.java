@@ -210,8 +210,6 @@ public class ZWaveService implements Runnable {
                                         notification.getValueId().getIndex(),
                                         notification.getValueId().getInstance())
                                 );
-
-
                         }
 
                         break;
@@ -224,7 +222,7 @@ public class ZWaveService implements Runnable {
                             break;
                         }
 
-                        zrZWaveDevice.removeValue(manager.getValueLabel(notification.getValueId()));
+                        zrZWaveDevice.removeValueID(manager.getValueLabel(notification.getValueId()));
                         log.info(i18n.message("zwave.node.0.value.1.removed", zrZWaveDevice.getNode(), manager.getValueLabel(notification.getValueId())));
 
                         break;
@@ -238,7 +236,7 @@ public class ZWaveService implements Runnable {
                         }
 
                         String oldValue = zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()));
-                        zcZWaveDevice.updateValue(manager.getValueLabel(notification.getValueId()), getValue(notification.getValueId()));
+                        zcZWaveDevice.updateValueID(manager.getValueLabel(notification.getValueId()), notification.getValueId());
                         log.info(i18n.message("zwave.node.0.value.for.label.1.changed.2.3", zcZWaveDevice.getNode(), manager.getValueLabel(notification.getValueId()), oldValue, getValue(notification.getValueId())));
 
                         break;
@@ -320,25 +318,17 @@ public class ZWaveService implements Runnable {
                         }
 
                         node = ZWaveDevice.getNode();
-
-                        // Testing. I have one, periodically change state to dead
-                        //manager.testNetworkNode(homeId, node, 3);
-                        //manager.healNetworkNode(homeId, node, true);
-                        //manager.softReset(homeId);
                     }
 
                     if (cmd.equals("setlevel")) {
                         log.info(i18n.message("zwave.setting.level.0.on.uuid.1.node.2", m.getShortProperty("level"), uuid, node));
-                        manager.setNodeLevel(homeId, node, m.getShortProperty("level"));
-                        ZWaveDevice.updateValue("Level", m.getShortProperty("level"));
+                        setValue(manager, uuid, m.getShortProperty("level"));
                     } else if (cmd.equals("enable")) {
                         log.info(i18n.message("zwave.enabling.uuid.0.node.1", uuid, node));
-                        manager.setNodeOn(homeId, node);
-                        ZWaveDevice.updateValue("Level", 99);
+                        setValue(manager, uuid, 255);
                     } else if (cmd.equals("disable")) {
                         log.info(i18n.message("zwave.disabling.uuid.0.node.1", uuid, node));
-                        manager.setNodeOff(homeId, node);
-                        ZWaveDevice.updateValue("Level", 0);
+                        setValue(manager, uuid, 0);
                     } else if (cmd.equals("allon")) {
                         log.info(i18n.message("zwave.enabling.all"));
                         manager.switchAllOn(homeId);
@@ -348,6 +338,7 @@ public class ZWaveService implements Runnable {
                     } else if (cmd.equals("updateinfo")) {
                         log.info(i18n.message("zwave.update.info.for.node.0", node));
                         manager.refreshNodeInfo(homeId, node);
+                    } else if (cmd.equals("inventory")) {
                     } else {
                         log.info(i18n.message("zwave.unknown.command.0", cmd));
                     }
@@ -355,7 +346,7 @@ public class ZWaveService implements Runnable {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
             log.info(i18n.message("zwave.get.error.0", m));
         }
 
@@ -402,11 +393,34 @@ public class ZWaveService implements Runnable {
         }
     }
 
+    private void setValue(Manager manager, String uuid, int value)
+    {
+        ZWaveDevice device = getZWaveDeviceByUUID(uuid);
+
+        HashMap <String, Object> valueIDs = device.getValueIDs();
+
+        Iterator it = valueIDs.entrySet().iterator();
+        while (it.hasNext()) {
+
+            Map.Entry pairs = (Map.Entry) it.next();
+            ValueId valueId = (ValueId) pairs.getValue();
+
+            if(valueId.getCommandClassId() == 0x25 || valueId.getCommandClassId() == 0x26 || valueId.getCommandClassId() == 0x27)
+            {
+                manager.setValueAsInt(valueId, value);
+            }
+
+            it.remove(); // avoids a ConcurrentModificationException
+        }
+
+    }
+
     private ZWaveDevice hasInstance(String key) {
         HashMap zDv = (HashMap) zDevices.clone();
 
         Iterator it = zDv.entrySet().iterator();
         while (it.hasNext()) {
+
             Map.Entry pairs = (Map.Entry) it.next();
 
             if (key.equals(pairs.getKey())) {
@@ -464,7 +478,7 @@ public class ZWaveService implements Runnable {
                 ZWaveDevice.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
                 ZWaveDevice.setNode(notification.getNodeId());
                 ZWaveDevice.setUUID(uuid);
-                ZWaveDevice.setValue(label, getValue(notification.getValueId()));
+                ZWaveDevice.setValueID(label, notification.getValueId());
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (SQLException e) {
@@ -475,7 +489,7 @@ public class ZWaveService implements Runnable {
             zDevices.put(type + "/" + notification.getNodeId(), ZWaveDevice);
         } else {
             log.info(i18n.message("zwave.add.value.to.device.0.1", label, getValue(notification.getValueId())));
-            ZWaveDevice.setValue(label, getValue(notification.getValueId()));
+            ZWaveDevice.setValueID(label, notification.getValueId());
         }
 
     }

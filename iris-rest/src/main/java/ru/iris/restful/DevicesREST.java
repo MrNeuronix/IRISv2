@@ -57,11 +57,6 @@ public class DevicesREST {
                 zdevice.setUUID(rs.getString("uuid"));
                 zdevice.setZone(rs.getInt("zone"));
 
-                @NonNls ResultSet rsv = Service.sql.select("SELECT * FROM devicelabels WHERE UUID='" + rs.getString("uuid") + "'");
-                while (rsv.next()) {
-                    zdevice.setValue(rsv.getString("label"), rsv.getString("value"));
-                }
-
                 if (rs.getString("uuid").equals(uuid))
                     return gson.toJson(zdevice);
 

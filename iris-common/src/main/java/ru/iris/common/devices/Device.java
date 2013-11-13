@@ -16,11 +16,12 @@ import ru.iris.common.I18N;
 import ru.iris.common.SQL;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Device {
+public class Device implements Serializable {
 
     protected I18N i18n = new I18N();
 
@@ -42,7 +43,6 @@ public class Device {
     protected String status = i18n.message("unknown");
     @Expose
     protected String source = i18n.message("unknown");
-    @Expose
     protected HashMap<String, Object> LabelsValues = new HashMap<String, Object>();
 
     protected SQL sql;
