@@ -235,9 +235,12 @@ public class ZWaveService implements Runnable {
                             break;
                         }
 
-                        String oldValue = zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()));
+                        // break if same value
+                        if(getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))) == getValue(notification.getValueId()))
+                            break;
+
                         zcZWaveDevice.updateValueID(manager.getValueLabel(notification.getValueId()), notification.getValueId());
-                        log.info(i18n.message("zwave.node.0.value.for.label.1.changed.2.3", zcZWaveDevice.getNode(), manager.getValueLabel(notification.getValueId()), oldValue, getValue(notification.getValueId())));
+                        log.info(i18n.message("zwave.node.0.value.for.label.1.changed.2.3", zcZWaveDevice.getNode(), manager.getValueLabel(notification.getValueId()), getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))), getValue(notification.getValueId())));
 
                         break;
                     case VALUE_REFRESHED:
@@ -321,14 +324,14 @@ public class ZWaveService implements Runnable {
                     }
 
                     if (cmd.equals("setlevel")) {
-                        log.info(i18n.message("zwave.setting.level.0.on.uuid.1.node.2", m.getShortProperty("level"), uuid, node));
-                        setValue(manager, uuid, m.getShortProperty("level"));
+                        log.info(i18n.message("zwave.setting.level.0.on.uuid.1.node.2", m.getIntProperty("level"), uuid, node));
+                        setValue(uuid, m.getIntProperty("level"));
                     } else if (cmd.equals("enable")) {
                         log.info(i18n.message("zwave.enabling.uuid.0.node.1", uuid, node));
-                        setValue(manager, uuid, 255);
+                        setValue(uuid, 255);
                     } else if (cmd.equals("disable")) {
                         log.info(i18n.message("zwave.disabling.uuid.0.node.1", uuid, node));
-                        setValue(manager, uuid, 0);
+                        setValue(uuid, 0);
                     } else if (cmd.equals("allon")) {
                         log.info(i18n.message("zwave.enabling.all"));
                         manager.switchAllOn(homeId);
@@ -393,7 +396,7 @@ public class ZWaveService implements Runnable {
         }
     }
 
-    private void setValue(Manager manager, String uuid, int value)
+    private void setValue(String uuid, int value)
     {
         ZWaveDevice device = getZWaveDeviceByUUID(uuid);
 
@@ -407,7 +410,7 @@ public class ZWaveService implements Runnable {
 
             if(valueId.getCommandClassId() == 0x25 || valueId.getCommandClassId() == 0x26 || valueId.getCommandClassId() == 0x27)
             {
-                manager.setValueAsInt(valueId, value);
+                Manager.get().setValueAsShort(valueId, (short) value);
             }
 
             it.remove(); // avoids a ConcurrentModificationException
@@ -452,16 +455,8 @@ public class ZWaveService implements Runnable {
 
     private void addZWaveDeviceOrValue(@NonNls String type, Notification notification, Manager manager) {
 
-        ZWaveDevice ZWaveDevice = null;
+        ZWaveDevice ZWaveDevice;
         String label = manager.getValueLabel(notification.getValueId());
-
-        try {
-            ZWaveDevice = new ZWaveDevice();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
 
         if ((ZWaveDevice = hasInstance(type + "/" + notification.getNodeId())) == null) {
             String uuid = UUID.randomUUID().toString();

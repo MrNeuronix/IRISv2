@@ -87,15 +87,15 @@ public class Device implements Serializable {
         this.zone = zone;
     }
 
-    public String getValue(String label) {
+    public Object getValue(String label) {
 
         if (label == null)
             label = i18n.message("none.set");
 
         try {
-            return this.LabelsValues.get(label).toString();
+            return this.LabelsValues.get(label);
         } catch (NullPointerException e) {
-            return i18n.message("none.set");
+            return null;
         }
 
     }
