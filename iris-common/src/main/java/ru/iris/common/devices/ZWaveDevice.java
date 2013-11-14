@@ -92,7 +92,7 @@ public class ZWaveDevice extends Device implements Serializable {
         if (this.type == null)
             this.type = i18n.message("undefined");
 
-        if (this.manufName == null)
+        if (this.manufName == null || this.manufName.isEmpty())
             this.manufName = i18n.message("undefined");
 
         if (this.status == null)
@@ -102,6 +102,6 @@ public class ZWaveDevice extends Device implements Serializable {
             this.name = i18n.message("not.set");
 
         sql.doQuery("DELETE FROM DEVICES WHERE UUID='" + this.uuid + "'");
-        sql.doQuery("INSERT INTO DEVICES (SOURCE, UUID, internaltype, TYPE, MANUFNAME, NODE, STATUS, NAME, ZONE) VALUES ('zwave','" + uuid + "','" + internalType + "','" + type + "','" + manufName + "','" + node + "','" + status + "','" + name + "','" + zone + "')");
+        sql.doQuery("INSERT INTO DEVICES (SOURCE, UUID, internaltype, TYPE, MANUFNAME, NODE, STATUS, NAME, ZONE, PRODUCTNAME) VALUES ('zwave','" + uuid + "','" + internalType + "','" + type + "','" + manufName + "','" + node + "','" + status + "','" + name + "','" + zone + "','" + productName + "')");
     }
 }

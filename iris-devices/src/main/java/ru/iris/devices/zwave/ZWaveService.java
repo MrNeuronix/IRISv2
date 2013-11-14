@@ -42,7 +42,7 @@ public class ZWaveService implements Runnable {
 
     @Override
     public synchronized void run() {
-        // Сначала вытащим уже имеющиеся устройства из БД
+
         @NonNls ResultSet rs = Service.sql.select("SELECT * FROM DEVICES");
 
         try {
@@ -58,6 +58,7 @@ public class ZWaveService implements Runnable {
                 zDevice.setType(rs.getString("type"));
                 zDevice.setUUID(rs.getString("uuid"));
                 zDevice.setZone(rs.getInt("zone"));
+                zDevice.setProductName(rs.getString("productname"));
 
                 log.info(i18n.message("zwave.load.device.0.1.from.database", zDevice.getInternalType(), zDevice.getNode()));
 
@@ -72,7 +73,6 @@ public class ZWaveService implements Runnable {
             e.printStackTrace();
         }
 
-
         NativeLibraryLoader.loadLibrary(ZWave4j.LIBRARY_NAME, ZWave4j.class);
 
         final Options options = Options.create(Service.config.get("openzwaveCfgPath"), "", "");
@@ -86,9 +86,11 @@ public class ZWaveService implements Runnable {
             @Override
             public void onNotification(Notification notification, Object context) {
 
+                short node = notification.getNodeId();
+
                 switch (notification.getType()) {
                     case DRIVER_READY:
-                        log.info(i18n.message("zwave.driver.ready.home.id.0", notification.getHomeId()));
+                        log.info(i18n.message("zwave.driver.ready.home.id.0", homeId));
                         homeId = notification.getHomeId();
                         break;
                     case DRIVER_FAILED:
@@ -126,8 +128,8 @@ public class ZWaveService implements Runnable {
                     case NODE_QUERIES_COMPLETE:
                         break;
                     case NODE_EVENT:
-                        log.info(i18n.message("zwave.update.info.for.node.0", notification.getNodeId()));
-                        manager.refreshNodeInfo(homeId, notification.getNodeId());
+                        log.info(i18n.message("zwave.update.info.for.node.0", node));
+                        manager.refreshNodeInfo(homeId, node);
                         break;
                     case NODE_NAMING:
                         break;
@@ -136,64 +138,64 @@ public class ZWaveService implements Runnable {
                     case VALUE_ADDED:
 
                         @NonNls
-                        String nodeType = manager.getNodeType(notification.getHomeId(), notification.getNodeId());
+                        String nodeType = manager.getNodeType(homeId, node);
 
                         switch (nodeType) {
                             case "Portable Remote Controller":
 
-                                addZWaveDeviceOrValue("controller", notification, manager);
+                                addZWaveDeviceOrValue("controller", notification);
                                 break;
 
                             //////////////////////////////////
 
                             case "Multilevel Power Switch":
 
-                                addZWaveDeviceOrValue("dimmer", notification, manager);
+                                addZWaveDeviceOrValue("dimmer", notification);
                                 break;
 
                             //////////////////////////////////
 
                             case "Routing Alarm Sensor":
 
-                                addZWaveDeviceOrValue("alarmsensor", notification, manager);
+                                addZWaveDeviceOrValue("alarmsensor", notification);
                                 break;
 
                             case "Binary Power Switch":
 
-                                addZWaveDeviceOrValue("switch", notification, manager);
+                                addZWaveDeviceOrValue("switch", notification);
                                 break;
 
                             case "Routing Binary Sensor":
 
-                                addZWaveDeviceOrValue("binarysensor", notification, manager);
+                                addZWaveDeviceOrValue("binarysensor", notification);
                                 break;
 
                             //////////////////////////////////
 
                             case "Routing Multilevel Sensor":
 
-                                addZWaveDeviceOrValue("multilevelsensor", notification, manager);
+                                addZWaveDeviceOrValue("multilevelsensor", notification);
                                 break;
 
                             //////////////////////////////////
 
                             case "Simple Meter":
 
-                                addZWaveDeviceOrValue("metersensor", notification, manager);
+                                addZWaveDeviceOrValue("metersensor", notification);
                                 break;
 
                             //////////////////////////////////
 
                             case "Simple Window Covering":
 
-                                addZWaveDeviceOrValue("drapes", notification, manager);
+                                addZWaveDeviceOrValue("drapes", notification);
                                 break;
 
                             //////////////////////////////////
 
                             case "Setpoint Thermostat":
 
-                                addZWaveDeviceOrValue("thermostat", notification, manager);
+                                addZWaveDeviceOrValue("thermostat", notification);
                                 break;
 
                             //////////////////////////////////
@@ -201,7 +203,7 @@ public class ZWaveService implements Runnable {
 
                             default:
                                 log.info(i18n.message("zwave.unassigned.value.node.0.type.1.class.2.genre.3.label.4.value.5.index.6.instance.7",
-                                        notification.getNodeId(),
+                                        node,
                                         manager.getNodeType(notification.getHomeId(), notification.getNodeId()),
                                         notification.getValueId().getCommandClassId(),
                                         notification.getValueId().getGenre(),
@@ -215,10 +217,10 @@ public class ZWaveService implements Runnable {
                         break;
                     case VALUE_REMOVED:
 
-                        ZWaveDevice zrZWaveDevice = getZWaveDeviceByNode(notification.getNodeId());
+                        ZWaveDevice zrZWaveDevice = getZWaveDeviceByNode(node);
 
                         if (zrZWaveDevice == null) {
-                            log.info(i18n.message("zwave.error.while.save.value.remove.cannot.find.device.with.node.id.0", notification.getNodeId()));
+                            log.info(i18n.message("zwave.error.while.save.value.remove.cannot.find.device.with.node.id.0", node));
                             break;
                         }
 
@@ -228,10 +230,10 @@ public class ZWaveService implements Runnable {
                         break;
                     case VALUE_CHANGED:
 
-                        ZWaveDevice zcZWaveDevice = getZWaveDeviceByNode(notification.getNodeId());
+                        ZWaveDevice zcZWaveDevice = getZWaveDeviceByNode(node);
 
                         if (zcZWaveDevice == null) {
-                            log.info(i18n.message("zwave.error.while.save.value.change.cannot.find.device.with.node.id.0", notification.getNodeId()));
+                            log.info(i18n.message("zwave.error.while.save.value.change.cannot.find.device.with.node.id.0", node));
                             break;
                         }
 
@@ -251,7 +253,7 @@ public class ZWaveService implements Runnable {
                         break;
                     case VALUE_REFRESHED:
                         log.info(i18n.message("value.refreshed.node.id.0.command.class.1.instance.2.index.3.value.4",
-                                notification.getNodeId(),
+                                node,
                                 notification.getValueId().getCommandClassId(),
                                 notification.getValueId().getInstance(),
                                 notification.getValueId().getIndex(),
@@ -272,7 +274,7 @@ public class ZWaveService implements Runnable {
                     case NOTIFICATION:
                         break;
                     default:
-                        System.out.println(notification.getType().name());
+                        log.info(notification.getType().name());
                         break;
                 }
             }
@@ -506,28 +508,33 @@ public class ZWaveService implements Runnable {
         return null;
     }
 
-    private void addZWaveDeviceOrValue(@NonNls String type, Notification notification, Manager manager) {
+    private void addZWaveDeviceOrValue(@NonNls String type, Notification notification) {
 
         ZWaveDevice ZWaveDevice;
-        String label = manager.getValueLabel(notification.getValueId());
+        String label = Manager.get().getValueLabel(notification.getValueId());
+        String state = i18n.message("not.responding");
+        String productName = Manager.get().getNodeProductName(notification.getHomeId(), notification.getNodeId());
+        String manufName = Manager.get().getNodeManufacturerName(notification.getHomeId(), notification.getNodeId());
+
+        if (Manager.get().requestNodeState(homeId, notification.getNodeId()))
+            state = i18n.message("listening");
 
         if ((ZWaveDevice = hasInstance(type + "/" + notification.getNodeId())) == null) {
-            String uuid = UUID.randomUUID().toString();
-            String state = i18n.message("not.responding");
 
-            if (manager.requestNodeState(homeId, notification.getNodeId()))
-                state = i18n.message("listening");
+            String uuid = UUID.randomUUID().toString();
 
             try {
                 ZWaveDevice = new ZWaveDevice();
-                ZWaveDevice.setManufName(manager.getNodeManufacturerName(notification.getHomeId(), notification.getNodeId()));
-                ZWaveDevice.setProductName(manager.getNodeProductName(notification.getHomeId(), notification.getNodeId()));
+
                 ZWaveDevice.setInternalType(type);
-                ZWaveDevice.setStatus(state);
-                ZWaveDevice.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
+                ZWaveDevice.setType(Manager.get().getNodeType(notification.getHomeId(), notification.getNodeId()));
                 ZWaveDevice.setNode(notification.getNodeId());
                 ZWaveDevice.setUUID(uuid);
+                ZWaveDevice.setManufName(manufName);
+                ZWaveDevice.setProductName(productName);
+                ZWaveDevice.setStatus(state);
                 ZWaveDevice.setValueID(label, notification.getValueId());
+
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (SQLException e) {
@@ -537,6 +544,11 @@ public class ZWaveService implements Runnable {
             log.info(i18n.message("zwave.add.device.to.array.0.1", type, notification.getNodeId()));
             zDevices.put(type + "/" + notification.getNodeId(), ZWaveDevice);
         } else {
+
+            ZWaveDevice.setManufName(manufName);
+            ZWaveDevice.setProductName(productName);
+            ZWaveDevice.setStatus(state);
+
             log.info(i18n.message("zwave.add.value.to.device.0.1", label, getValue(notification.getValueId())));
             ZWaveDevice.setValueID(label, notification.getValueId());
         }

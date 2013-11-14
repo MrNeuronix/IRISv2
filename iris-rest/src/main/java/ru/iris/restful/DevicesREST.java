@@ -49,6 +49,7 @@ public class DevicesREST {
                 ZWaveDevice zdevice = new ZWaveDevice();
 
                 zdevice.setManufName(rs.getString("manufname"));
+                zdevice.setProductName(rs.getString("productname"));
                 zdevice.setName(rs.getString("name"));
                 zdevice.setNode((short) rs.getInt("node"));
                 zdevice.setStatus(rs.getString("status"));

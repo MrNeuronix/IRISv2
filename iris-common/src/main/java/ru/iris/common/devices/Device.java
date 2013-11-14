@@ -62,7 +62,7 @@ public class Device implements Serializable {
     }
 
     public void setProductName(String productName) {
-        this.productName = productName;
+            this.productName = productName;
     }
 
     public String getProductName() {

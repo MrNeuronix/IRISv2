@@ -5,6 +5,7 @@ target
 .directory
 *.log
 work
+main.property
 *.keystore
 *.zip
-main.property
+
