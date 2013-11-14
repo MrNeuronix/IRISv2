@@ -34,6 +34,7 @@ public class ZWaveService implements Runnable {
     private static boolean ready = false;
     private static HashMap<String, ZWaveDevice> zDevices = new HashMap<String, ZWaveDevice>();
     private static final I18N i18n = new I18N();
+    private boolean initComplete = false;
 
     public ZWaveService() {
         Thread t = new Thread(this);
@@ -300,6 +301,7 @@ public class ZWaveService implements Runnable {
         for (ZWaveDevice ZWaveDevice : zDevices.values()) {
             try {
                 ZWaveDevice.save();
+                initComplete = true;
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -349,7 +351,7 @@ public class ZWaveService implements Runnable {
                     } else if (cmd.equals("updateinfo")) {
                         log.info(i18n.message("zwave.update.info.for.node.0", node));
                         manager.refreshNodeInfo(homeId, node);
-                    } else if (cmd.equals("inventory")) {
+                    } else if (cmd.equals("association")) {
                     } else {
                         log.info(i18n.message("zwave.unknown.command.0", cmd));
                     }
@@ -535,9 +537,7 @@ public class ZWaveService implements Runnable {
                 ZWaveDevice.setStatus(state);
                 ZWaveDevice.setValueID(label, notification.getValueId());
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (SQLException e) {
+            } catch (IOException | SQLException e) {
                 e.printStackTrace();
             }
 
@@ -549,8 +549,16 @@ public class ZWaveService implements Runnable {
             ZWaveDevice.setProductName(productName);
             ZWaveDevice.setStatus(state);
 
-            log.info(i18n.message("zwave.add.value.to.device.0.1", label, getValue(notification.getValueId())));
+            log.info(i18n.message("zwave.node.0.add.value.to.device.1.2", ZWaveDevice.getNode(), label, getValue(notification.getValueId())));
             ZWaveDevice.setValueID(label, notification.getValueId());
+        }
+
+        // catch and save into database value changes after init complete
+        try {
+            if(initComplete)
+                ZWaveDevice.save();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
