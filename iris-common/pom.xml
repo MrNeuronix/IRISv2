@@ -119,7 +119,8 @@
         <dependency>
             <groupId>org.zwave4j</groupId>
             <artifactId>zwave4j</artifactId>
-            <version>0.2</version>
+            <version>0.2-rc1</version>
+            <classifier>ozw-rev-686</classifier>
         </dependency>
         <dependency>
             <groupId>com.intellij</groupId>

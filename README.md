@@ -21,7 +21,9 @@ For correct operation of the IRISv2 is needed **rec** from package **sox**
 
 ## Configuration
 
-Rename **iris.h2.db.example** to **iris.h2.db** in **/conf** directory, look to **/conf/main.properties**
+* Rename **iris.h2.db.example** to **iris.h2.db** in **/conf** directory, look to **/conf/main.properties**
+* Rename **main.property.example** to **main.property** in **/conf** directory
+* Change what you need in **main.property**
 
 ## Run
 

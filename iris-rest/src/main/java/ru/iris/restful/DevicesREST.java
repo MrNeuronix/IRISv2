@@ -118,7 +118,7 @@ public class DevicesREST {
         @NonNls MapMessage message = Service.session.createMapMessage();
 
         message.setStringProperty("command", "setlevel");
-        message.setShortProperty("level", level);
+        message.setStringProperty("level", String.valueOf(level));
         message.setStringProperty("uuid", uuid);
         message.setStringProperty("qpid.subject", "event.devices.setvalue");
 

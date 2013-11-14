@@ -17,23 +17,23 @@ microphoneDevice3=hw3,0
 # REST section
 #################################
 
-httpPort=16101
-httpHost=192.168.10.150
+httpPort=8085
+httpHost=localhost
 httpUser=admin
-httpPassword=secaccess
+httpPassword=changeme
 
 #################################
 # Voice synth section
 #################################
 
 # Silence mode
-silence=1
+silence=0
 
 # Voice engine (google, voicerss)
 ttsEngine=google
 
 # VoiceRSS API (can be obtain for free)
-voicerssAPI=a07e6a0dd3884deb978d02d2f1d7ee76
+voicerssAPI=
 
 #################################
 # Zwave section

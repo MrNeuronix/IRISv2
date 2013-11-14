@@ -38,6 +38,8 @@ public class Device implements Serializable {
     @Expose
     protected String manufName = i18n.message("unknown");
     @Expose
+    protected String productName = i18n.message("unknown");
+    @Expose
     protected String uuid = i18n.message("unknown");
     @Expose
     protected String status = i18n.message("unknown");
@@ -57,6 +59,14 @@ public class Device implements Serializable {
 
     public String getName() {
         return this.name;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public String getProductName() {
+        return this.productName;
     }
 
     public String getSource() {

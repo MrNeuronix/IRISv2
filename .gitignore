@@ -7,3 +7,4 @@ target
 work
 *.keystore
 *.zip
+main.property

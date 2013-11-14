@@ -236,8 +236,14 @@ public class ZWaveService implements Runnable {
                         }
 
                         // break if same value
-                        if(getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))) == getValue(notification.getValueId()))
+                        try {
+                            if(getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))) == getValue(notification.getValueId()))
+                                break;
+                        }
+                        catch (NullPointerException e)
+                        {
                             break;
+                        }
 
                         zcZWaveDevice.updateValueID(manager.getValueLabel(notification.getValueId()), notification.getValueId());
                         log.info(i18n.message("zwave.node.0.value.for.label.1.changed.2.3", zcZWaveDevice.getNode(), manager.getValueLabel(notification.getValueId()), getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))), getValue(notification.getValueId())));
@@ -324,8 +330,8 @@ public class ZWaveService implements Runnable {
                     }
 
                     if (cmd.equals("setlevel")) {
-                        log.info(i18n.message("zwave.setting.level.0.on.uuid.1.node.2", m.getIntProperty("level"), uuid, node));
-                        setValue(uuid, m.getIntProperty("level"));
+                        log.info(i18n.message("zwave.setting.level.0.on.uuid.1.node.2", m.getStringProperty("level"), uuid, node));
+                        setValue(uuid, m.getStringProperty("level"));
                     } else if (cmd.equals("enable")) {
                         log.info(i18n.message("zwave.enabling.uuid.0.node.1", uuid, node));
                         setValue(uuid, 255);
@@ -396,10 +402,55 @@ public class ZWaveService implements Runnable {
         }
     }
 
-    private void setValue(String uuid, int value)
+    private void setTypedValue(ValueId valueId, String value) {
+
+        log.debug("Set type "+valueId.getType()+" to label "+Manager.get().getValueLabel(valueId));
+
+        switch (valueId.getType()) {
+            case BOOL:
+                log.debug("Set value type BOOL to "+value);
+                Manager.get().setValueAsBool(valueId, Boolean.valueOf(value));
+                break;
+            case BYTE:
+                log.debug("Set value type BYTE to "+value);
+                Manager.get().setValueAsByte(valueId, Short.valueOf(value));
+                break;
+            case DECIMAL:
+                log.debug("Set value type FLOAT to "+value);
+                Manager.get().setValueAsFloat(valueId, Float.valueOf(value));
+                break;
+            case INT:
+                log.debug("Set value type INT to "+value);
+                Manager.get().setValueAsInt(valueId, Integer.valueOf(value));
+                break;
+            case LIST:
+                log.debug("Set value type LIST to "+value);
+                break;
+            case SCHEDULE:
+                log.debug("Set value type SCHEDULE to "+value);
+                break;
+            case SHORT:
+                log.debug("Set value type SHORT to "+value);
+                Manager.get().setValueAsShort(valueId, Short.valueOf(value));
+                break;
+            case STRING:
+                log.debug("Set value type STRING to "+value);
+                Manager.get().setValueAsString(valueId, value);
+                break;
+            case BUTTON:
+                log.debug("Set value type BUTTON to "+value);
+                break;
+            case RAW:
+                log.debug("Set value RAW to "+value);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void setValue(String uuid, Object value)
     {
         ZWaveDevice device = getZWaveDeviceByUUID(uuid);
-
         HashMap <String, Object> valueIDs = device.getValueIDs();
 
         Iterator it = valueIDs.entrySet().iterator();
@@ -408,14 +459,16 @@ public class ZWaveService implements Runnable {
             Map.Entry pairs = (Map.Entry) it.next();
             ValueId valueId = (ValueId) pairs.getValue();
 
+            // for testing now
+            // TODO need to know, what we should do to enable/disable/level on different devices
             if(valueId.getCommandClassId() == 0x25 || valueId.getCommandClassId() == 0x26 || valueId.getCommandClassId() == 0x27)
             {
-                Manager.get().setValueAsShort(valueId, (short) value);
+                if(Manager.get().getValueLabel(valueId).equals("Level"))
+                {
+                    setTypedValue(valueId, String.valueOf(value));
+                }
             }
-
-            it.remove(); // avoids a ConcurrentModificationException
         }
-
     }
 
     private ZWaveDevice hasInstance(String key) {
@@ -468,6 +521,7 @@ public class ZWaveService implements Runnable {
             try {
                 ZWaveDevice = new ZWaveDevice();
                 ZWaveDevice.setManufName(manager.getNodeManufacturerName(notification.getHomeId(), notification.getNodeId()));
+                ZWaveDevice.setProductName(manager.getNodeProductName(notification.getHomeId(), notification.getNodeId()));
                 ZWaveDevice.setInternalType(type);
                 ZWaveDevice.setStatus(state);
                 ZWaveDevice.setType(manager.getNodeType(notification.getHomeId(), notification.getNodeId()));
