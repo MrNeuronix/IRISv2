@@ -35,11 +35,18 @@ public class Service {
     public static Messaging msg;
     public static Session session;
     private static I18N i18n = new I18N();
+    public static ServiceChecker ServiceState;
+    public static UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6007");
 
     private static Logger log = LoggerFactory.getLogger(Service.class);
 
     public static void main(String[] args) throws Exception {
+
         DOMConfigurator.configure("conf/etc/log4j.xml");
+
+        ServiceState = new ServiceChecker(serviceId, new ServiceAdvertisement(
+                "Speak", serviceId, ServiceStatus.STARTUP,
+                new ServiceCapability[]{ServiceCapability.SPEAK}));
 
         Config cfg = new Config();
         config = cfg.getConfig();
@@ -65,10 +72,5 @@ public class Service {
         } else {
             log.info(i18n.message("speak.no.tts.system.specified.in.config.file"));
         }
-
-        // Check module status
-        new ServiceChecker().start(UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6007"), new ServiceAdvertisement(
-                "Speak", UUID.randomUUID(), ServiceStatus.AVAILABLE,
-                new ServiceCapability[]{ServiceCapability.SPEAK}));
     }
 }

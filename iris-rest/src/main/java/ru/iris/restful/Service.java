@@ -45,10 +45,16 @@ public class Service {
     public static Messaging msg;
     public static Session session;
     private static I18N i18n = new I18N();
+    private static ServiceChecker ServiceState;
+    public static UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6005");
 
     public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException {
 
         DOMConfigurator.configure("conf/etc/log4j.xml");
+
+        ServiceState = new ServiceChecker(serviceId, new ServiceAdvertisement(
+                "Rest", serviceId, ServiceStatus.STARTUP,
+                new ServiceCapability[]{ServiceCapability.CONTROL}));
 
         Config cfg = new Config();
         config = cfg.getConfig();
@@ -64,15 +70,15 @@ public class Service {
             rc.getProperties().put("com.sun.jersey.spi.container.ContainerRequestFilters", "ru.iris.restful.AuthFilter");
             HttpServer server = HttpServerFactory.create("http://" + config.get("httpHost") + ":" + config.get("httpPort") + "/", rc);
             server.start();
+
+            ServiceState.setAdvertisment(new ServiceAdvertisement(
+                    "Rest", serviceId, ServiceStatus.AVAILABLE,
+                    new ServiceCapability[]{ServiceCapability.CONTROL}));
+
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // Check module status
-        new ServiceChecker().start(UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6005"), new ServiceAdvertisement(
-                "Rest", UUID.randomUUID(), ServiceStatus.AVAILABLE,
-                new ServiceCapability[]{ServiceCapability.CONTROL}));
     }
 }

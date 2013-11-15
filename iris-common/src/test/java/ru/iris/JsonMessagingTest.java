@@ -50,7 +50,7 @@ public class JsonMessagingTest {
     public void testJsonBroadcast() throws Exception {
         final UUID testInstanceId = UUID.randomUUID();
         final String keystorePath = "target/" + testInstanceId + ".jks";
-        final JsonMessaging messaging = new JsonMessaging(testInstanceId, keystorePath, "changeit");
+        final JsonMessaging messaging = new JsonMessaging(testInstanceId);
 
         final TestKeyValue testKeyValueOriginal = new TestKeyValue("test-key", "test-value");
 
@@ -69,7 +69,7 @@ public class JsonMessagingTest {
     public void testJsonRequestResponse() throws Exception {
         final UUID testInstanceId = UUID.randomUUID();
         final String keystorePath = "target/" + testInstanceId + ".jks";
-        final JsonMessaging messaging = new JsonMessaging(testInstanceId, keystorePath, "changeit");
+        final JsonMessaging messaging = new JsonMessaging(testInstanceId);
 
         messaging.start();
         messaging.subscribe("test");

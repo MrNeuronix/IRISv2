@@ -86,7 +86,7 @@ public class StatusChecker implements Runnable {
                                 );
 
                                 Launcher.sql.doQuery("DELETE FROM MODULESTATUS WHERE NAME='" + serviceAdvertisement.getName() + "'");
-                                Launcher.sql.doQuery("INSERT INTO MODULESTATUS (NAME, LASTSEEN) VALUES ('" + serviceAdvertisement.getName() + "',NOW())");
+                                Launcher.sql.doQuery("INSERT INTO MODULESTATUS (NAME, LASTSEEN, STATE) VALUES ('" + serviceAdvertisement.getName() + "',NOW(),'"+serviceAdvertisement.getStatus()+"')");
 
                             } else if (envelope.getReceiverInstanceId() == null) {
                                 // We received unknown broadcast message. Lets make generic log entry.

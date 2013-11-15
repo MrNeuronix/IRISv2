@@ -7,6 +7,9 @@ import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
 import ru.iris.common.Module;
 import ru.iris.common.httpPOST;
+import ru.iris.common.messaging.model.ServiceAdvertisement;
+import ru.iris.common.messaging.model.ServiceCapability;
+import ru.iris.common.messaging.model.ServiceStatus;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
@@ -39,15 +42,14 @@ public class RecordService implements Runnable
     @Override
     public synchronized void run()
     {
-
-        log.info (i18n.message("record.service.started"));
-
         int threads = Integer.valueOf (Service.config.get ("recordStreams"));
         int micro = Integer.valueOf (Service.config.get ("microphones"));
 
-
-
         log.info (i18n.message("record.configured.to.run.0.threads.on.1.microphones", threads, micro));
+
+        Service.ServiceState.setAdvertisment(new ServiceAdvertisement(
+                "Record", Service.serviceId, ServiceStatus.AVAILABLE,
+                new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
 
         for (int m = 1; m <= micro; m++)
         {

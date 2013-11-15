@@ -33,52 +33,81 @@ import java.util.UUID;
  * limitations under the License.
  */
 
-public class ServiceChecker {
+public class ServiceChecker implements Runnable {
 
     private static Logger log = LoggerFactory.getLogger(ServiceChecker.class.getName());
     private static boolean shutdown = false;
+    private UUID instanceId = UUID.randomUUID();
+    private Object advertisment;
+    private boolean reinitialize = false;
 
-    public static void start(final UUID instanceId, final Object ServiceAdv) {
+    public ServiceChecker(UUID instanceId, Object advertisment)
+    {
+        this.instanceId = instanceId;
+        this.advertisment = advertisment;
 
-        try {
-            // Make sure we exit the wait loop if we receive shutdown signal.
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    shutdown = true;
+        Thread t = new Thread(this);
+        t.start();
+    }
+
+    public void setUUID(UUID instanceId)
+    {
+        this.instanceId = instanceId;
+    }
+
+    public UUID getUUID()
+    {
+        return instanceId;
+    }
+
+    public void setAdvertisment(Object advertisment)
+    {
+        this.advertisment = advertisment;
+        this.reinitialize = true;
+    }
+
+    @Override
+    public void run() {
+
+            try {
+                // Make sure we exit the wait loop if we receive shutdown signal.
+                Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        shutdown = true;
+                    }
+                }));
+
+                final JsonMessaging jsonMessaging = new JsonMessaging(instanceId);
+                // Lets subscribe to listen service.status subject.
+                jsonMessaging.subscribe("service.status");
+                // Lets start JSON processing to be able to exchange messages.
+                jsonMessaging.start();
+
+                jsonMessaging.broadcast("service.status", advertisment);
+
+                long lastStatusBroadcastMillis = System.currentTimeMillis();
+                while (!shutdown) {
+
+                    // If there is more than 60 seconds from last availability broadcasts then lets redo this.
+                    if (60000L < System.currentTimeMillis() - lastStatusBroadcastMillis || reinitialize) {
+                        jsonMessaging.broadcast("service.status", advertisment);
+                        lastStatusBroadcastMillis = System.currentTimeMillis();
+                        if(reinitialize)
+                            reinitialize = false;
+                    }
                 }
-            }));
 
-            final JsonMessaging jsonMessaging = new JsonMessaging(instanceId);
-            // Lets subscribe to listen service.status subject.
-            jsonMessaging.subscribe("service.status");
-            // Lets start JSON processing to be able to exchange messages.
-            jsonMessaging.start();
+                // Broadcast that this service is shutdown.
+                jsonMessaging.broadcast("service.status", advertisment);
 
-            // Broadcast that this service has started up.
-            jsonMessaging.broadcast("service.status", ServiceAdv);
+                // Close JSON messaging.
+                jsonMessaging.close();
 
-            long lastStatusBroadcastMillis = System.currentTimeMillis();
-            while (!shutdown) {
-
-                // If there is more than 60 seconds from last availability broadcasts then lets redo this.
-                if (60000L < System.currentTimeMillis() - lastStatusBroadcastMillis) {
-                    jsonMessaging.broadcast("service.status", ServiceAdv);
-                    lastStatusBroadcastMillis = System.currentTimeMillis();
-                }
-
+            } catch (final Throwable t) {
+                t.printStackTrace();
+                log.error("Unexpected exception in Status Checker", t);
             }
-
-            // Broadcast that this service is shutdown.
-            jsonMessaging.broadcast("service.status", ServiceAdv);
-
-            // Close JSON messaging.
-            jsonMessaging.close();
-
-        } catch (final Throwable t) {
-            t.printStackTrace();
-            log.error("Unexpected exception in Status Checker", t);
-        }
-
     }
 }
+

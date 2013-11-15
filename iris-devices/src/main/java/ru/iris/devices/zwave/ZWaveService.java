@@ -7,6 +7,9 @@ import org.zwave4j.*;
 import ru.iris.common.I18N;
 import ru.iris.common.Messaging;
 import ru.iris.common.devices.ZWaveDevice;
+import ru.iris.common.messaging.model.ServiceAdvertisement;
+import ru.iris.common.messaging.model.ServiceCapability;
+import ru.iris.common.messaging.model.ServiceStatus;
 import ru.iris.devices.Service;
 
 import javax.jms.MapMessage;
@@ -297,6 +300,10 @@ public class ZWaveService implements Runnable {
         }
 
         log.info(i18n.message("zwave.initialization.complete.found.0.device.s", zDevices.size()));
+
+        Service.ServiceState.setAdvertisment(new ServiceAdvertisement(
+                "Devices", Service.serviceId, ServiceStatus.AVAILABLE,
+                new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
 
         for (ZWaveDevice ZWaveDevice : zDevices.values()) {
             try {

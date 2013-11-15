@@ -32,23 +32,20 @@ public class Service {
     public static SQL sql;
     public static MessageConsumer messageConsumer;
     public static MessageProducer messageProducer;
-    @NonNls
     public static Messaging msg;
     public static Session session;
-
     private static Logger log = LoggerFactory.getLogger(Service.class);
+    public static ServiceChecker ServiceState;
+    public static UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6008");
 
     public static void main(String[] args) throws Exception {
 
         DOMConfigurator.configure("conf/etc/log4j.xml");
 
-        new VideoService();
-
-        // Check module status
-        new ServiceChecker().start(UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6008"), new ServiceAdvertisement(
-                "Video", UUID.randomUUID(), ServiceStatus.AVAILABLE,
+        ServiceState = new ServiceChecker(serviceId, new ServiceAdvertisement(
+                "Video", serviceId, ServiceStatus.STARTUP,
                 new ServiceCapability[]{ServiceCapability.SEE}));
 
-
+        new VideoService();
     }
 }

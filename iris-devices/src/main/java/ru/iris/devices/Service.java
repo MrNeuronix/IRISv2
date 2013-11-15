@@ -39,12 +39,18 @@ public class Service {
     public static MessageProducer messageProducer;
     public static Messaging msg;
     public static Session session;
+    public static ServiceChecker ServiceState;
+    public static UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6002");
 
     private static Logger log = LoggerFactory.getLogger(Service.class);
 
     public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException {
         DOMConfigurator.configure("conf/etc/log4j.xml");
         I18N i18n = new I18N();
+
+        ServiceState = new ServiceChecker(serviceId, new ServiceAdvertisement(
+                "Devices", serviceId, ServiceStatus.STARTUP,
+                new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
 
         config = new Config().getConfig();
         sql = new SQL();
@@ -65,10 +71,5 @@ public class Service {
         if (config.get("onewireEnabled").equals("1")) {
             log.info(i18n.message("1.wire.1.wire.support.is.enabled.starting"));
         }
-
-        // Check module status
-        new ServiceChecker().start(UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6002"), new ServiceAdvertisement(
-                "Devices", UUID.randomUUID(), ServiceStatus.AVAILABLE,
-                new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
     }
 }

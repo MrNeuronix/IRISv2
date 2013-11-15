@@ -15,6 +15,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
 import ru.iris.common.Messaging;
+import ru.iris.common.messaging.model.ServiceAdvertisement;
+import ru.iris.common.messaging.model.ServiceCapability;
+import ru.iris.common.messaging.model.ServiceStatus;
 import ru.iris.speak.Service;
 
 import javax.jms.MapMessage;
@@ -50,6 +53,10 @@ public class VoiceRSSSpeakService implements Runnable {
 
         Clip clip = null;
         AudioInputStream audioIn = null;
+
+        Service.ServiceState.setAdvertisment(new ServiceAdvertisement(
+                "Speak", Service.serviceId, ServiceStatus.AVAILABLE,
+                new ServiceCapability[]{ServiceCapability.SPEAK}));
 
         if(Service.config.get("silence").equals("0"))
         {
