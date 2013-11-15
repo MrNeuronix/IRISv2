@@ -107,10 +107,6 @@ public class JsonMessaging {
      * The replies.
      */
     private Map<String, JsonEnvelope> replies = Collections.synchronizedMap(new HashMap<String, JsonEnvelope>());
-    /**
-     * The iris security.
-     */
-    private IrisSecurity irisSecurity;
 
     /**
      * Public constructor which setups connectivity and session to AMQP message broker.
@@ -119,10 +115,9 @@ public class JsonMessaging {
      * @throws URISyntaxException
      * @throws AMQException
      */
-    public JsonMessaging(final UUID instanceId, final String keystorePath, final String keystorePassword)
+    public JsonMessaging(final UUID instanceId)
             throws JMSException, URISyntaxException, AMQException {
         this.instanceId = instanceId;
-        irisSecurity = new IrisSecurity(instanceId, keystorePath, keystorePassword);
         connection = new AMQConnection("amqp://admin:admin@localhost/?brokerlist='tcp://localhost:5672'");
         connection.start();
 
@@ -271,10 +266,10 @@ public class JsonMessaging {
             }
 
             if (replyEnvelope.getObject() instanceof Throwable) {
-                throw new RuntimeException("Exception in remote component:" + (Throwable) replyEnvelope.getObject());
+                throw new RuntimeException("Exception in remote component:" + replyEnvelope.getObject());
             }
 
-            return (RESP) replyEnvelope.getObject();
+            return replyEnvelope.getObject();
         } catch (JMSException e) {
             throw new RuntimeException("Error sending JSON request: " + object + " to subject: " + subject, e);
         }
@@ -317,7 +312,7 @@ public class JsonMessaging {
      * @return the JSON message
      */
     public JsonEnvelope receive() throws InterruptedException {
-        return (JsonEnvelope) jsonReceiveQueue.take();
+        return jsonReceiveQueue.take();
     }
 
     /**
@@ -326,7 +321,7 @@ public class JsonMessaging {
      * @return the JSON message
      */
     public JsonEnvelope receive(final int timeoutMillis) throws InterruptedException {
-        return (JsonEnvelope) jsonReceiveQueue.poll(timeoutMillis, TimeUnit.MILLISECONDS);
+        return jsonReceiveQueue.poll(timeoutMillis, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -386,7 +381,6 @@ public class JsonMessaging {
                                         UUID.fromString(message.getStringProperty("receiver")) : null,
                                 message.getJMSCorrelationID(), message.getJMSReplyTo(), subject, object);
 
-                        if (verifyMessageSignature(message)) {
                             LOGGER.debug("Received message with ID: " + message.getJMSMessageID()
                                     + " with correlation ID: " + message.getJMSCorrelationID()
                                     + " sender: " + envelope.getSenderInstanceId()
@@ -394,20 +388,10 @@ public class JsonMessaging {
                                     + " to subject: "
                                     + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
                             jsonReceiveQueue.put(envelope);
-                        } else {
-                            LOGGER.warn("Received invalid signature in message. ID: " + message.getJMSMessageID()
-                                    + " correlation ID: " + message.getJMSCorrelationID()
-                                    + " sender: " + envelope.getSenderInstanceId()
-                                    + " receiver: " + envelope.getReceiverInstanceId()
-                                    + " to subject: " + envelope.getSubject()
-                                    + " class: " + envelope.getObject().getClass().getSimpleName());
-                        }
                     }
                 } catch (final JMSException e) {
                     LOGGER.error("Error receiving JSON message.", e);
                 } catch (final ClassNotFoundException e) {
-                    LOGGER.error("Error deserializing JSON message.", e);
-                } catch (final ParseException e) {
                     LOGGER.error("Error deserializing JSON message.", e);
                 }
             }
@@ -450,14 +434,8 @@ public class JsonMessaging {
                                 jmsCorrelationId = jmsCorrelationCandidateId;
                             }
                         }
-                        if (verifyMessageSignature(message)) {
-
                             final String plainJsonString;
-                            if (message.getStringProperty("receiver") != null) {
-                                plainJsonString = irisSecurity.decrypt(jsonString);
-                            } else {
-                                plainJsonString = jsonString;
-                            }
+                            plainJsonString = jsonString;
 
                             final Object object = gson.fromJson(plainJsonString, clazz);
                             final JsonEnvelope envelope = new JsonEnvelope(
@@ -474,13 +452,7 @@ public class JsonMessaging {
                                     + " receiver: " + envelope.getReceiverInstanceId()
                                     + " subject: " + envelope.getSubject()
                                     + " class: " + envelope.getObject().getClass().getSimpleName());
-                        } else {
-                            synchronized (jmsCorrelationId) {
-                                jmsCorrelationId.notify();
-                            }
-                            LOGGER.warn("Received invalid signature in response with ID: " + message.getJMSMessageID()
-                                    + " with correlation ID: " + message.getJMSCorrelationID());
-                        }
+
                     } else {
                         LOGGER.warn("Received response to unknown request ID:"
                                 + message.getJMSCorrelationID());
@@ -490,8 +462,6 @@ public class JsonMessaging {
                 LOGGER.error("Error receiving JSON message.", e);
             } catch (final ClassNotFoundException e) {
                 LOGGER.error("Error deserializing JSON message.", e);
-            } catch (final ParseException e) {
-                LOGGER.error("Error deserializing JSON message.", e);
             }
 
         }
@@ -499,30 +469,9 @@ public class JsonMessaging {
 
     private void secureMessage(final MapMessage message) throws JMSException {
         if (message.getStringProperty("receiver") != null) {
-            final UUID receiverInstanceId = UUID.fromString(message.getStringProperty("receiver"));
-            message.setStringProperty("json", irisSecurity.encrypt(message.getStringProperty("json"),
-                    receiverInstanceId));
+            message.setStringProperty("json", message.getStringProperty("json"));
         }
         message.setStringProperty("signed", DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(new Date()));
-        final String signatureContent = buildSignatureContent(message);
-        message.setStringProperty("signature", irisSecurity.calculateSignature(signatureContent));
-    }
-
-    private boolean verifyMessageSignature(final MapMessage message) throws JMSException, ParseException {
-        final String signedDateTimeString = message.getStringProperty("signed");
-        final Date signedDate = DateUtils.parseDate(signedDateTimeString,
-                new String[]{DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.getPattern()});
-
-        if (System.currentTimeMillis() - signedDate.getTime() > 10000) {
-            LOGGER.warn("Rejected over 10 seconds old signature.");
-            return false;
-        }
-
-        final String signatureContent = buildSignatureContent(message);
-        final String signture = message.getStringProperty("signature");
-        final UUID senderInstanceId = UUID.fromString(message.getStringProperty("sender"));
-
-        return irisSecurity.verifySignature(signatureContent, signture, senderInstanceId);
     }
 
     private String buildSignatureContent(final MapMessage message) throws JMSException {

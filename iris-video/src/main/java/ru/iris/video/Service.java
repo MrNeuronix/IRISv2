@@ -16,11 +16,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
+import ru.iris.common.messaging.ServiceChecker;
+import ru.iris.common.messaging.model.ServiceAdvertisement;
+import ru.iris.common.messaging.model.ServiceCapability;
+import ru.iris.common.messaging.model.ServiceStatus;
 
 import javax.jms.MessageConsumer;
 import javax.jms.MessageProducer;
 import javax.jms.Session;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class Service {
     public static HashMap<String, String> config;
@@ -30,7 +35,6 @@ public class Service {
     @NonNls
     public static Messaging msg;
     public static Session session;
-    //private static I18N i18n = new I18N();
 
     private static Logger log = LoggerFactory.getLogger(Service.class);
 
@@ -40,36 +44,10 @@ public class Service {
 
         new VideoService();
 
-/*        Config cfg = new Config ();
-        config = cfg.getConfig ();
-        sql = new SQL ();
-
-        msg = new Messaging ();
-        messageConsumer = msg.getConsumer ();
-        messageProducer = msg.getProducer ();
-        session = msg.getSession ();
-
-        log.info ("[iris] ----------------------------------");
-        log.info (i18n.message("iris.video.module.started"));
-        log.info ("[iris] ----------------------------------");
-
         // Check module status
-
-        Message mess;
-        @NonNls MapMessage m = null;
-
-        msg.simpleSendMessage("status.answer", "alive", "video");
-
-        while ((mess = Service.messageConsumer.receive (0)) != null)
-        {
-            m = (MapMessage) mess;
-
-            if(m.getStringProperty("qpid.subject").equals ("status.video") || m.getStringProperty("qpid.subject").equals ("status.all"))
-            {
-                log.info (i18n.message("events.got.status.query"));
-                msg.simpleSendMessage("status.answer", "alive", "video");
-            }
-        }*/
+        new ServiceChecker().start(UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6008"), new ServiceAdvertisement(
+                "Video", UUID.randomUUID(), ServiceStatus.AVAILABLE,
+                new ServiceCapability[]{ServiceCapability.SEE}));
 
 
     }

@@ -25,9 +25,9 @@ import java.util.UUID;
  */
 public class ServiceAdvertisement {
     /**
-     * The service type for example "My custom speak service 1.0"
+     * The service name for example "My custom speak service 1.0"
      */
-    private String type;
+    private String name;
     /**
      * The instance ID.
      */
@@ -44,13 +44,13 @@ public class ServiceAdvertisement {
     /**
      * Constructor for initializing value object fields.
      *
-     * @param type         the service type
+     * @param name         the service type
      * @param instanceId   the instance ID
      * @param status       the service status
      * @param capabilities the service capabilities
      */
-    public ServiceAdvertisement(String type, UUID instanceId, ServiceStatus status, ServiceCapability[] capabilities) {
-        this.type = type;
+    public ServiceAdvertisement(String name, UUID instanceId, ServiceStatus status, ServiceCapability[] capabilities) {
+        this.name = name;
         this.instanceId = instanceId;
         this.status = status;
         this.capabilities = capabilities;
@@ -62,12 +62,12 @@ public class ServiceAdvertisement {
     public ServiceAdvertisement() {
     }
 
-    public String getType() {
-        return type;
+    public String getName() {
+        return name;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public UUID getInstanceId() {
@@ -114,7 +114,7 @@ public class ServiceAdvertisement {
     @Override
     public String toString() {
         return "ServiceAdvertisement{" +
-                "type='" + type + '\'' +
+                "type='" + name + '\'' +
                 ", instanceId=" + instanceId +
                 ", status=" + status +
                 ", capabilities=" + Arrays.toString(capabilities) +

@@ -5,11 +5,16 @@ import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.*;
+import ru.iris.common.messaging.ServiceChecker;
+import ru.iris.common.messaging.model.ServiceAdvertisement;
+import ru.iris.common.messaging.model.ServiceCapability;
+import ru.iris.common.messaging.model.ServiceStatus;
 import ru.iris.speak.google.GoogleSpeakService;
 import ru.iris.speak.voicerss.VoiceRSSSpeakService;
 
 import javax.jms.*;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * IRISv2 Project
@@ -62,20 +67,8 @@ public class Service {
         }
 
         // Check module status
-
-        Message mess;
-        @NonNls MapMessage m = null;
-
-        msg.simpleSendMessage("status.answer", "alive", "speak");
-
-        while ((mess = Service.messageConsumer.receive(0)) != null) {
-            m = (MapMessage) mess;
-
-            if (m.getStringProperty("qpid.subject").equals("status.speak") || m.getStringProperty("qpid.subject").equals("status.all")) {
-                log.info(i18n.message("speak.got.status.query"));
-                msg.simpleSendMessage("status.answer", "alive", "speak");
-            }
-        }
-
+        new ServiceChecker().start(UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6007"), new ServiceAdvertisement(
+                "Speak", UUID.randomUUID(), ServiceStatus.AVAILABLE,
+                new ServiceCapability[]{ServiceCapability.SPEAK}));
     }
 }

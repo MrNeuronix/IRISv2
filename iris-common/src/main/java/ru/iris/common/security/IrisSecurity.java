@@ -45,7 +45,7 @@ public class IrisSecurity {
 
     private final UUID instanceId;
     private final String keystorePassword;
-    private final String keystorePath;
+    private String keystorePath;
     private final KeyStore keystore;
 
     public IrisSecurity(final UUID instanceId, final String keystorePath, final String keystorePassword) {
@@ -67,6 +67,7 @@ public class IrisSecurity {
             final FileInputStream keystoreInputStream = new FileInputStream(keystoreFile);
             keystore = KeyStore.getInstance("JKS");
             keystore.load(keystoreInputStream, keystorePassword.toCharArray());
+            keystoreInputStream.close();
 
             // If own certificate is missing from the keystore then generate certificate.
             if (!keystore.containsAlias(instanceId.toString())) {
@@ -88,8 +89,6 @@ public class IrisSecurity {
                 keystoreLock.release();
                 keystoreOutputStream.close();
             }
-
-            keystoreInputStream.close();
 
         } catch (final Exception e) {
             throw new RuntimeException("Error initializing security.", e);

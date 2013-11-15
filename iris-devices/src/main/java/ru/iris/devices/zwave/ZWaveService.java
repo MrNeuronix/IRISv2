@@ -560,6 +560,5 @@ public class ZWaveService implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 }

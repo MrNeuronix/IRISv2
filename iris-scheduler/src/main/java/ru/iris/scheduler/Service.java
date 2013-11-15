@@ -8,9 +8,14 @@ import ru.iris.common.Config;
 import ru.iris.common.I18N;
 import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
+import ru.iris.common.messaging.ServiceChecker;
+import ru.iris.common.messaging.model.ServiceAdvertisement;
+import ru.iris.common.messaging.model.ServiceCapability;
+import ru.iris.common.messaging.model.ServiceStatus;
 
 import javax.jms.*;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * IRISv2 Project
@@ -51,21 +56,9 @@ public class Service {
 
         new ScheduleService();
 
-
         // Check module status
-
-        Message mess;
-        @NonNls MapMessage m = null;
-
-        msg.simpleSendMessage("status.answer", "alive", "scheduler");
-
-        while ((mess = Service.messageConsumer.receive(0)) != null) {
-            m = (MapMessage) mess;
-
-            if (m.getStringProperty("qpid.subject").equals("status.scheduler") || m.getStringProperty("qpid.subject").equals("status.all")) {
-                log.info(i18n.message("scheduler.got.status.query"));
-                msg.simpleSendMessage("status.answer", "alive", "scheduler");
-            }
-        }
+        new ServiceChecker().start(UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6006"), new ServiceAdvertisement(
+                "Scheduler", UUID.randomUUID(), ServiceStatus.AVAILABLE,
+                new ServiceCapability[]{ServiceCapability.CONTROL}));
     }
 }

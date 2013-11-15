@@ -34,7 +34,15 @@ public enum ServiceCapability {
      */
     SEE,
     /**
-     * Service can sense environment variables like temperature, humidity etc...
+     * Service can sense environment variables like temperature, humidity, etc...
      */
-    SENSE
+    SENSE,
+    /**
+     * Service can control environment variables like light level, temperature, etc...
+     */
+    CONTROL,
+    /**
+     * System service
+     */
+    SYSTEM
 }

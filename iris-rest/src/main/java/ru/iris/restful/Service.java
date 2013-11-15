@@ -23,12 +23,17 @@ import ru.iris.common.Config;
 import ru.iris.common.I18N;
 import ru.iris.common.Messaging;
 import ru.iris.common.SQL;
+import ru.iris.common.messaging.ServiceChecker;
+import ru.iris.common.messaging.model.ServiceAdvertisement;
+import ru.iris.common.messaging.model.ServiceCapability;
+import ru.iris.common.messaging.model.ServiceStatus;
 
 import javax.jms.*;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.UUID;
 
 public class Service {
 
@@ -66,19 +71,8 @@ public class Service {
         }
 
         // Check module status
-
-        Message mess;
-        @NonNls MapMessage m = null;
-
-        msg.simpleSendMessage("status.answer", "alive", "rest");
-
-        while ((mess = Service.messageConsumer.receive(0)) != null) {
-            m = (MapMessage) mess;
-
-            if (m.getStringProperty("qpid.subject").equals("status.rest") || m.getStringProperty("qpid.subject").equals("status.all")) {
-                log.info(i18n.message("rest.got.status.query"));
-                msg.simpleSendMessage("status.answer", "alive", "rest");
-            }
-        }
+        new ServiceChecker().start(UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6005"), new ServiceAdvertisement(
+                "Rest", UUID.randomUUID(), ServiceStatus.AVAILABLE,
+                new ServiceCapability[]{ServiceCapability.CONTROL}));
     }
 }

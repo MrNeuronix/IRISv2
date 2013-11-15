@@ -29,10 +29,7 @@ import java.util.*;
  * Class for loading configuration from properties files and database.
  */
 public class Config {
-    /**
-     * The logger.
-     */
-    private static Logger LOGGER = LoggerFactory.getLogger(Config.class);
+
     /**
      * The map of loaded properties.
      */
@@ -55,16 +52,6 @@ public class Config {
                 }
             }
             loadPropertiesFromDatabase();
-            LOGGER.debug("Loaded configuration: ");
-            final List<String> keys = new ArrayList<String>(propertyMap.keySet());
-            Collections.sort(keys);
-            for (final String key : keys) {
-                if (key.toLowerCase().contains("password")) {
-                    LOGGER.debug(key + " = <HIDDEN>");
-                } else {
-                    LOGGER.debug(key + " = " + propertyMap.get(key));
-                }
-            }
         }
     }
 
@@ -77,7 +64,6 @@ public class Config {
     private boolean loadPropertiesFromClassPath(final String propertiesFileName) {
         final InputStream inputStream = Config.class.getResourceAsStream(propertiesFileName);
         if (inputStream == null) {
-            LOGGER.debug("Properties not found from classpath: " + propertiesFileName);
             return false;
         }
         try {
@@ -89,11 +75,9 @@ public class Config {
                 propertyMap.put(key, (String) properties.get(key));
             }
         } catch (final IOException e) {
-            LOGGER.debug("Error loading properties from classpath: " + propertiesFileName, e);
             return false;
         }
 
-        LOGGER.debug("Loaded properties from classpath: " + propertiesFileName);
         return true;
     }
 
@@ -118,10 +102,8 @@ public class Config {
                 propertyMap.put(key, (String) properties.get(key));
             }
 
-            LOGGER.debug("Loaded properties from file system: " + propertiesFileName);
             return true;
         } catch (final IOException e) {
-            LOGGER.debug("Error loading properties from file system: " + propertiesFileName + " : " + e.getMessage());
             return false;
         }
     }
@@ -136,7 +118,6 @@ public class Config {
             final SQL sql = new SQL();
             final ResultSet rs = sql.select("SELECT name, param FROM config");
             if (rs == null) {
-                LOGGER.debug("Error loading properties from database.");
                 return false;
             }
             while (rs.next()) {
@@ -147,10 +128,8 @@ public class Config {
             }
             rs.close();
             sql.close();
-            LOGGER.debug("Loaded properties from database.");
             return true;
         } catch (final SQLException e) {
-            LOGGER.debug("Error loading properties from database: " + e.getMessage());
             return false;
         }
     }
