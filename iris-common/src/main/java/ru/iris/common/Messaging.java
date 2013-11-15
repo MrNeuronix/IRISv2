@@ -21,10 +21,10 @@ import javax.jms.*;
 import java.net.URISyntaxException;
 
 public class Messaging {
-    @NonNls
+
     private Connection connection;
     private Session session;
-    @NonNls
+
     private Destination destination;
     private MessageConsumer messageConsumer;
     private MessageProducer messageProducer;
@@ -69,7 +69,7 @@ public class Messaging {
 
     public void simpleSendMessage(String topic, String key, String value) {
         try {
-            @NonNls MapMessage message = session.createMapMessage();
+             MapMessage message = session.createMapMessage();
             message.setStringProperty(key, value);
             message.setStringProperty("qpid.subject", topic);
             messageProducer.send(message);

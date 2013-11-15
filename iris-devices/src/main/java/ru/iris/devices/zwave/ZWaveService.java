@@ -47,7 +47,7 @@ public class ZWaveService implements Runnable {
     @Override
     public synchronized void run() {
 
-        @NonNls ResultSet rs = Service.sql.select("SELECT * FROM DEVICES");
+         ResultSet rs = Service.sql.select("SELECT * FROM DEVICES");
 
         try {
             while (rs.next()) {
@@ -141,7 +141,7 @@ public class ZWaveService implements Runnable {
                         break;
                     case VALUE_ADDED:
 
-                        @NonNls
+
                         String nodeType = manager.getNodeType(homeId, node);
 
                         switch (nodeType) {
@@ -315,18 +315,18 @@ public class ZWaveService implements Runnable {
         }
 
         Message message = null;
-        @NonNls MapMessage m = null;
+         MapMessage m = null;
 
         try {
             MessageConsumer messageConsumer = new Messaging().getConsumer();
 
             while ((message = messageConsumer.receive(0)) != null) {
                 m = (MapMessage) message;
-                @NonNls ZWaveDevice ZWaveDevice = null;
+                 ZWaveDevice ZWaveDevice;
 
                 if (m.getStringProperty("qpid.subject").contains("event.devices.setvalue")) {
                     String uuid = m.getStringProperty("uuid");
-                    @NonNls String cmd = m.getStringProperty("command");
+                     String cmd = m.getStringProperty("command");
                     short node = 0;
 
                     if (!cmd.equals("allon") && !cmd.equals("alloff")) {
@@ -517,7 +517,7 @@ public class ZWaveService implements Runnable {
         return null;
     }
 
-    private void addZWaveDeviceOrValue(@NonNls String type, Notification notification) {
+    private void addZWaveDeviceOrValue( String type, Notification notification) {
 
         ZWaveDevice ZWaveDevice;
         String label = Manager.get().getValueLabel(notification.getValueId());

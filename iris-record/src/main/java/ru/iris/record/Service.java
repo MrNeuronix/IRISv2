@@ -31,12 +31,12 @@ import java.util.UUID;
  */
 
 public class Service {
-    @NonNls
+
     public static Map<String, String> config;
     public static SQL sql;
     public static MessageConsumer messageConsumer;
     public static MessageProducer messageProducer;
-    @NonNls
+
     public static Messaging msg;
     public static Session session;
     private static I18N i18n = new I18N();

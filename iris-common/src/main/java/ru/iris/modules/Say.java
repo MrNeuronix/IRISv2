@@ -42,7 +42,7 @@ public class Say implements Module {
 
     public void run(String arg) throws JMSException {
 
-        @NonNls MapMessage message = session.createMapMessage();
+        MapMessage message = session.createMapMessage();
 
         message.setStringProperty("text", arg);
         message.setDoubleProperty("confidence", 100);

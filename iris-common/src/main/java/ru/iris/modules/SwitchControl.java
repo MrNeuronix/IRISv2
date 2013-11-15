@@ -50,7 +50,7 @@ public class SwitchControl implements Module {
         session = msg.getSession();
     }
 
-    public void run(@NonNls String arg) throws JMSException {
+    public void run( String arg) throws JMSException {
         if (arg.equals("enable")) enableSW();
         if (arg.equals("disable")) disableSW();
     }
@@ -59,7 +59,7 @@ public class SwitchControl implements Module {
 
         log.info(i18n.message("switchcontol.switch.all.devices.to.on.state"));
 
-        @NonNls MapMessage message = session.createMapMessage();
+         MapMessage message = session.createMapMessage();
 
         message.setStringProperty("command", "allon");
         message.setStringProperty("qpid.subject", "event.devices.setvalue");
@@ -71,7 +71,7 @@ public class SwitchControl implements Module {
 
         log.info(i18n.message("switchcontol.switch.all.devices.to.off.state"));
 
-        @NonNls MapMessage message = session.createMapMessage();
+         MapMessage message = session.createMapMessage();
 
         message.setStringProperty("command", "alloff");
         message.setStringProperty("qpid.subject", "event.devices.setvalue");

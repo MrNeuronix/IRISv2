@@ -68,10 +68,10 @@ public class RecordService implements Runnable
                         while (true)
                         {
                             Random randomGenerator = new Random ();
-                            @NonNls String strFilename = "infile-" + randomGenerator.nextInt (1000) + ".wav";
+                             String strFilename = "infile-" + randomGenerator.nextInt (1000) + ".wav";
                             File outputFile = new File ("./data/" + strFilename);
 
-                            @NonNls ProcessBuilder procBuilder = null;
+                             ProcessBuilder procBuilder = null;
 
                             if(finalM == 1)
                             {
@@ -81,7 +81,7 @@ public class RecordService implements Runnable
                                 procBuilder = new ProcessBuilder ("rec", "-q", "-c", "1", "-r", "16000", "-d", Service.config.get ("microphoneDevice" + finalM), "./data/" + strFilename, "trim", "0", Service.config.get ("recordDuration"));
                             }
 
-                            @NonNls httpPOST SendFile = new httpPOST ();
+                             httpPOST SendFile = new httpPOST ();
 
                             Process process = null;
                             try
@@ -106,7 +106,7 @@ public class RecordService implements Runnable
                             encoder1.useThreads (true);
                             encoder1.encode (infile, outfile);
 
-                            @NonNls String googleSpeechAPIResponse = SendFile.postFile (System.getProperty ("user.dir") + "/data/" + strFilename + ".flac");
+                             String googleSpeechAPIResponse = SendFile.postFile (System.getProperty ("user.dir") + "/data/" + strFilename + ".flac");
 
                             // debug
                             if(!googleSpeechAPIResponse.contains ("\"utterance\":"))
@@ -135,7 +135,7 @@ public class RecordService implements Runnable
 
                                         try
                                         {
-                                            @NonNls ResultSet rs = Service.sql.select("SELECT name, command, param FROM modules WHERE enabled='1' AND language='"+Service.config.get("language")+"'");
+                                             ResultSet rs = Service.sql.select("SELECT name, command, param FROM modules WHERE enabled='1' AND language='"+Service.config.get("language")+"'");
 
                                             while (rs.next())
                                             {
@@ -156,7 +156,7 @@ public class RecordService implements Runnable
 
                                                     log.info(i18n.message("command.got.0.command", command));
 
-                                                    @NonNls MapMessage message = Service.session.createMapMessage ();
+                                                     MapMessage message = Service.session.createMapMessage ();
 
                                                     message.setString ("text", command);
                                                     message.setDouble ("confidence", confidence * 100);

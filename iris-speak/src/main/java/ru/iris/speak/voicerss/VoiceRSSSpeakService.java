@@ -48,7 +48,7 @@ public class VoiceRSSSpeakService implements Runnable {
         log.info(i18n.message("speak.service.started.tts.voicerss"));
 
         Message message = null;
-        @NonNls MapMessage m = null;
+         MapMessage m = null;
         ExecutorService exs = Executors.newFixedThreadPool(10);
 
         Clip clip = null;

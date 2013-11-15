@@ -39,15 +39,16 @@ public class StatusREST {
 
         log.info(i18n.message("rest.get.status.module.all"));
 
-        @NonNls ResultSet rs = Service.sql.select("SELECT * FROM MODULESTATUS");
+         ResultSet rs = Service.sql.select("SELECT * FROM MODULESTATUS");
 
-        @NonNls HashMap<String, Object> obj = new HashMap<>();
+         HashMap<String, Object> obj = new HashMap<>();
         ArrayList result = new ArrayList();
 
         try {
             while (rs.next()) {
                 obj.put("id", rs.getInt("id"));
                 obj.put("name", rs.getString("name"));
+                obj.put("state", rs.getString("state"));
                 obj.put("lastseen", rs.getString("lastseen"));
 
                 result.add(obj.clone());
@@ -70,14 +71,15 @@ public class StatusREST {
 
         log.info(i18n.message("rest.get.status.module.0", name));
 
-        @NonNls ResultSet rs = Service.sql.select("SELECT * FROM MODULESTATUS WHERE name='" + name + "'");
+         ResultSet rs = Service.sql.select("SELECT * FROM MODULESTATUS WHERE name='" + name + "'");
 
-        @NonNls HashMap<String, Object> result = new HashMap<>();
+         HashMap<String, Object> result = new HashMap<>();
 
         try {
             while (rs.next()) {
                 result.put("id", rs.getInt("id"));
                 result.put("name", rs.getString("name"));
+                result.put("state", rs.getString("state"));
                 result.put("lastseen", rs.getString("lastseen"));
             }
 

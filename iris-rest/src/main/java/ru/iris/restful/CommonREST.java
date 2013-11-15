@@ -49,7 +49,7 @@ public class CommonREST {
         Service.msg.simpleSendMessage("event.command", "cmd", text);
 
         Message mess;
-        @NonNls MapMessage m = null;
+         MapMessage m = null;
 
         while ((mess = Service.messageConsumer.receive(0)) != null) {
             m = (MapMessage) mess;
@@ -57,7 +57,7 @@ public class CommonREST {
             if (m.getStringProperty("qpid.subject").equals("event.command")) {
                 log.info(i18n.message("rest.got.0.command", m.getStringProperty("cmd")));
 
-                @NonNls ResultSet rs = Service.sql.select("SELECT name, command, param FROM modules");
+                 ResultSet rs = Service.sql.select("SELECT name, command, param FROM modules");
 
                 while (rs.next()) {
                     String name = rs.getString("name");
@@ -92,7 +92,7 @@ public class CommonREST {
 
         log.info(i18n.message("rest.get.speak.0", text));
 
-        @NonNls MapMessage message = Service.session.createMapMessage();
+         MapMessage message = Service.session.createMapMessage();
 
         message.setStringProperty("text", text);
         message.setDoubleProperty("confidence", 100);

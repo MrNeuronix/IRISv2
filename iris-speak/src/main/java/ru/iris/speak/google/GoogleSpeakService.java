@@ -48,7 +48,7 @@ public class GoogleSpeakService implements Runnable {
         log.info(i18n.message("speak.service.started.tts.google"));
 
         Message message = null;
-        @NonNls MapMessage m = null;
+         MapMessage m = null;
 
         Clip clip = null;
         AudioInputStream audioIn = null;

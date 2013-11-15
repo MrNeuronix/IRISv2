@@ -28,7 +28,7 @@ public class Speak {
 
         I18N i18n = new I18N();
         Messaging msg = new Messaging();
-        @NonNls MapMessage message = null;
+         MapMessage message = null;
         session = msg.getSession();
         messageProducer = msg.getProducer();
 

@@ -40,7 +40,7 @@ public class DevicesREST {
 
         log.info(i18n.message("rest.get.device.get.0", uuid));
 
-        @NonNls ResultSet rs = Service.sql.select("SELECT * FROM DEVICES");
+         ResultSet rs = Service.sql.select("SELECT * FROM DEVICES");
         ArrayList<ZWaveDevice> zDevices = new ArrayList<ZWaveDevice>();
 
         try {
@@ -80,7 +80,7 @@ public class DevicesREST {
 
         log.info(i18n.message("rest.enable.0.device", uuid));
 
-        @NonNls MapMessage message = Service.session.createMapMessage();
+         MapMessage message = Service.session.createMapMessage();
 
         message.setStringProperty("command", "enable");
         message.setStringProperty("uuid", uuid);
@@ -98,7 +98,7 @@ public class DevicesREST {
 
         log.info(i18n.message("rest.disable.0.device", uuid));
 
-        @NonNls MapMessage message = Service.session.createMapMessage();
+         MapMessage message = Service.session.createMapMessage();
 
         message.setStringProperty("command", "disable");
         message.setStringProperty("uuid", uuid);
@@ -116,7 +116,7 @@ public class DevicesREST {
 
         log.info(i18n.message("rest.set.level.0.on.1.device", level, uuid));
 
-        @NonNls MapMessage message = Service.session.createMapMessage();
+         MapMessage message = Service.session.createMapMessage();
 
         message.setStringProperty("command", "setlevel");
         message.setStringProperty("level", String.valueOf(level));

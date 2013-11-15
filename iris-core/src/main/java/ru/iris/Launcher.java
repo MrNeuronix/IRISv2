@@ -87,7 +87,7 @@ public class Launcher {
         runModule("java -jar iris-rest.jar");
     }
 
-    private static void runModule(@NonNls String cmd) throws IOException {
+    private static void runModule( String cmd) throws IOException {
 
         ProcessBuilder builder = new ProcessBuilder(cmd.split("\\s+")).redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectErrorStream(true);
         builder.start();

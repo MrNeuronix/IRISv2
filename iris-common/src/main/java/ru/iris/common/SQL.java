@@ -23,7 +23,7 @@ public class SQL {
     private static Logger LOGGER = LoggerFactory.getLogger(SQL.class);
 
     private Connection connection = null;
-    @NonNls
+
     private static Logger log = LoggerFactory.getLogger(SQL.class.getName());
 
     public SQL() {
@@ -48,7 +48,7 @@ public class SQL {
         }
     }
 
-    public boolean doQuery(@NonNls String sql) {
+    public boolean doQuery( String sql) {
         try {
             Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             try {
@@ -63,7 +63,7 @@ public class SQL {
         return true;
     }
 
-    public ResultSet select(@NonNls String sql) {
+    public ResultSet select( String sql) {
         ResultSet resultSet = null;
 
         try {
