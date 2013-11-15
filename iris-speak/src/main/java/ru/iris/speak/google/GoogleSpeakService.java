@@ -12,7 +12,7 @@ package ru.iris.speak.google;
 
 import com.darkprograms.speech.synthesiser.Synthesiser;
 import javazoom.jl.player.Player;
-import org.jetbrains.annotations.NonNls;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;

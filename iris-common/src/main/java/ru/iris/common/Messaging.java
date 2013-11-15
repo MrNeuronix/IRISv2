@@ -13,7 +13,6 @@ package ru.iris.common;
 import org.apache.qpid.AMQException;
 import org.apache.qpid.client.AMQAnyDestination;
 import org.apache.qpid.client.AMQConnection;
-import org.jetbrains.annotations.NonNls;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,7 +1,7 @@
 package ru.iris.record;
 
 import javaFlacEncoder.FLAC_FileEncoder;
-import org.jetbrains.annotations.NonNls;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;

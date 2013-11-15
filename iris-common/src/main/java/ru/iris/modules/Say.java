@@ -11,7 +11,7 @@ package ru.iris.modules;
  */
 
 import org.apache.qpid.AMQException;
-import org.jetbrains.annotations.NonNls;
+
 import ru.iris.common.Messaging;
 import ru.iris.common.Module;
 

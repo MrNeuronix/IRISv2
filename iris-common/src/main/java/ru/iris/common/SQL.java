@@ -9,7 +9,7 @@ package ru.iris.common;
  * Time: 13:27
  */
 
-import org.jetbrains.annotations.NonNls;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

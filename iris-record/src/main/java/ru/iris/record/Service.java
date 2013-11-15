@@ -2,7 +2,7 @@ package ru.iris.record;
 
 import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.qpid.AMQException;
-import org.jetbrains.annotations.NonNls;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.Config;

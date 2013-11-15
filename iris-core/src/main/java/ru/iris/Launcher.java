@@ -3,7 +3,7 @@ package ru.iris;
 import org.apache.qpid.server.Broker;
 import org.apache.qpid.server.BrokerOptions;
 import org.h2.tools.Server;
-import org.jetbrains.annotations.NonNls;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.Config;

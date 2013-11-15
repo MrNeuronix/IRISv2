@@ -473,25 +473,4 @@ public class JsonMessaging {
         }
         message.setStringProperty("signed", DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(new Date()));
     }
-
-    private String buildSignatureContent(final MapMessage message) throws JMSException {
-        final StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(message.getJMSCorrelationID().replaceAll("-", "--"));
-        stringBuilder.append('-');
-        stringBuilder.append(message.getStringProperty("sender").replaceAll("-", "--"));
-        stringBuilder.append('-');
-        if (message.getStringProperty("receiver") != null) {
-            stringBuilder.append(message.getStringProperty("receiver").replaceAll("-", "--"));
-            stringBuilder.append('-');
-        }
-        stringBuilder.append(message.getStringProperty("qpid.subject").replaceAll("-", "--"));
-        stringBuilder.append('-');
-        stringBuilder.append(message.getStringProperty("class").replaceAll("-", "--"));
-        stringBuilder.append('-');
-        stringBuilder.append(message.getStringProperty("json").replaceAll("-", "--"));
-        stringBuilder.append('-');
-        stringBuilder.append(message.getStringProperty("signed").replaceAll("-", "--"));
-        return stringBuilder.toString();
-    }
-
 }
