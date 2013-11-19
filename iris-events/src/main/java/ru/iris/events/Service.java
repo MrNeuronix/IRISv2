@@ -59,5 +59,7 @@ public class Service {
         log.info("[iris] ----------------------------------");
         log.info(i18n.message("iris.events.engine.starting"));
         log.info("[iris] ----------------------------------");
+
+        new EventsService();
     }
 }

@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
 import ru.iris.common.devices.ZWaveDevice;
+import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.model.SetDeviceLevelAdvertisement;
 
 import javax.jms.JMSException;
 import javax.jms.MapMessage;
@@ -16,6 +18,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * IRISv2 Project
@@ -29,6 +32,7 @@ import java.util.ArrayList;
 
 @Path("/device")
 public class DevicesREST {
+
     private static Logger log = LoggerFactory.getLogger(CommonREST.class.getName());
     private static I18N i18n = new I18N();
     private static Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
@@ -74,67 +78,28 @@ public class DevicesREST {
     }
 
     @GET
-    @Path("/{uuid}/enable")
+    @Path("/{uuid}/{label}/{level}")
     @Consumes(MediaType.TEXT_PLAIN + ";charset=utf-8")
-    public String devEnable(@PathParam("uuid") String uuid) throws JMSException {
-
-        log.info(i18n.message("rest.enable.0.device", uuid));
-
-         MapMessage message = Service.session.createMapMessage();
-
-        message.setStringProperty("command", "enable");
-        message.setStringProperty("uuid", uuid);
-        message.setStringProperty("qpid.subject", "event.devices.setvalue");
-
-        Service.messageProducer.send(message);
-
-        return "{ status: " + i18n.message("done") + " }";
-    }
-
-    @GET
-    @Path("/{uuid}/disable")
-    @Consumes(MediaType.TEXT_PLAIN + ";charset=utf-8")
-    public String devDisable(@PathParam("uuid") String uuid) throws JMSException {
-
-        log.info(i18n.message("rest.disable.0.device", uuid));
-
-         MapMessage message = Service.session.createMapMessage();
-
-        message.setStringProperty("command", "disable");
-        message.setStringProperty("uuid", uuid);
-        message.setStringProperty("qpid.subject", "event.devices.setvalue");
-
-        Service.messageProducer.send(message);
-
-        return "{ status: " + i18n.message("done") + " }";
-    }
-
-    @GET
-    @Path("/{uuid}/level/{level}")
-    @Consumes(MediaType.TEXT_PLAIN + ";charset=utf-8")
-    public String devSetLevel(@PathParam("uuid") String uuid, @PathParam("level") short level) throws JMSException {
-
+    public String devSetLevel(@PathParam("uuid") String uuid, @PathParam("uuid") String label, @PathParam("level") String level)
+    {
         log.info(i18n.message("rest.set.level.0.on.1.device", level, uuid));
-
-         MapMessage message = Service.session.createMapMessage();
-
-        message.setStringProperty("command", "setlevel");
-        message.setStringProperty("level", String.valueOf(level));
-        message.setStringProperty("uuid", uuid);
-        message.setStringProperty("qpid.subject", "event.devices.setvalue");
-
-        Service.messageProducer.send(message);
-
-        return "{ status: " + i18n.message("done") + " }";
+        return "{ status: " + sendMessage(uuid, label, level) + " }";
     }
 
-    @GET
-    @Path("/all/{state}")
-    @Consumes(MediaType.TEXT_PLAIN + ";charset=utf-8")
-    public String devAllState(@PathParam("state") String state) throws JMSException {
-        log.info(i18n.message("rest.switch.all.devices.to.0.state", state));
-        Service.msg.simpleSendMessage("event.devices.setvalue", "command", "all" + state);
+    private String sendMessage(String uuid, String label, String value)
+    {
+        try {
 
-        return "{ status: " + i18n.message("done") + " }";
+            final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
+            jsonMessaging.broadcast("event.devices.setvalue", new SetDeviceLevelAdvertisement(uuid, label, value));
+            jsonMessaging.close();
+
+            return i18n.message("done");
+
+        } catch (final Throwable t) {
+            log.error("Unexpected exception in DevicesREST", t);
+            return "Something goes wrong: "+t.toString();
+        }
     }
+
 }
