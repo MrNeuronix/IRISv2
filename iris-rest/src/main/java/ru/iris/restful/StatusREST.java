@@ -33,7 +33,7 @@ public class StatusREST {
     private static Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
     @GET
-    @Path("/module/all")
+    @Path("/all")
     @Produces(MediaType.TEXT_PLAIN + ";charset=utf-8")
     public String status() throws IOException, SQLException {
 
@@ -46,7 +46,6 @@ public class StatusREST {
 
         try {
             while (rs.next()) {
-                obj.put("id", rs.getInt("id"));
                 obj.put("name", rs.getString("name"));
                 obj.put("state", rs.getString("state"));
                 obj.put("lastseen", rs.getString("lastseen"));
@@ -65,7 +64,7 @@ public class StatusREST {
     }
 
     @GET
-    @Path("/module/{name}")
+    @Path("/{name}")
     @Produces(MediaType.TEXT_PLAIN + ";charset=utf-8")
     public String status(@PathParam("name") String name) throws IOException, SQLException {
 

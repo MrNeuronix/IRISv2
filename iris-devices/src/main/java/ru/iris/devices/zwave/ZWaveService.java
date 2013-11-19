@@ -10,10 +10,7 @@ import ru.iris.common.Messaging;
 import ru.iris.common.devices.ZWaveDevice;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.ServiceAdvertisement;
-import ru.iris.common.messaging.model.ServiceCapability;
-import ru.iris.common.messaging.model.ServiceStatus;
-import ru.iris.common.messaging.model.SetDeviceLevelAdvertisement;
+import ru.iris.common.messaging.model.*;
 import ru.iris.devices.Service;
 
 import javax.jms.MapMessage;
@@ -338,6 +335,7 @@ public class ZWaveService implements Runnable {
         final JsonMessaging jsonMessaging = new JsonMessaging(Service.serviceId);
         // Lets subscribe to listen service.status subject.
         jsonMessaging.subscribe("event.devices.setvalue");
+        jsonMessaging.subscribe("event.devices.getinventory");
         // Lets start JSON processing to be able to exchange messages.
         jsonMessaging.start();
 
@@ -372,6 +370,19 @@ public class ZWaveService implements Runnable {
                             log.info("Node: "+node+" Cant set empty value or node dead");
                         }
 
+                } else if (envelope.getObject() instanceof GetInventoryAdvertisement) {
+
+                    final GetInventoryAdvertisement advertisement = envelope.getObject();
+
+                    if(advertisement.getDeviceUUID().equals("all"))
+                    {
+                        jsonMessaging.reply(envelope, zDevices);
+                    }
+                    else
+                    {
+                        jsonMessaging.reply(envelope, getZWaveDeviceByUUID(advertisement.getDeviceUUID()));
+                    }
+
                 } else if (envelope.getReceiverInstanceId() == null) {
                     // We received unknown broadcast message. Lets make generic log entry.
                     log.info("Received broadcast "
@@ -400,7 +411,7 @@ public class ZWaveService implements Runnable {
 
         } catch (final Throwable t) {
             t.printStackTrace();
-            log.error("Unexpected exception in Events", t);
+            log.error("Unexpected exception in ZWave Devices", t);
         }
     }
 

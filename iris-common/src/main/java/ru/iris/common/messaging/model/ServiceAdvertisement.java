@@ -15,6 +15,8 @@
  */
 package ru.iris.common.messaging.model;
 
+import com.google.gson.annotations.Expose;
+
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -27,18 +29,22 @@ public class ServiceAdvertisement {
     /**
      * The service name for example "My custom speak service 1.0"
      */
+    @Expose
     private String name;
     /**
      * The instance ID.
      */
+    @Expose
     private UUID instanceId;
     /**
      * The service status.
      */
+    @Expose
     private ServiceStatus status;
     /**
      * The service capabilities.
      */
+    @Expose
     private ServiceCapability[] capabilities;
 
     /**

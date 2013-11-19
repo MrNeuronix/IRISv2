@@ -15,34 +15,43 @@
  */
 package ru.iris.common.messaging.model;
 
+import com.google.gson.annotations.Expose;
+
 /**
  * Enumeration describing service capabilities
  *
  * @author Tommi S.E. Laukkanen
  */
+
 public enum ServiceCapability {
     /**
      * Service can speak to user.
      */
+    @Expose
     SPEAK,
     /**
      * Service can listen to user.
      */
+    @Expose
     LISTEN,
     /**
      * Service can see environment.
      */
+    @Expose
     SEE,
     /**
      * Service can sense environment variables like temperature, humidity, etc...
      */
+    @Expose
     SENSE,
     /**
      * Service can control environment variables like light level, temperature, etc...
      */
+    @Expose
     CONTROL,
     /**
      * System service
      */
+    @Expose
     SYSTEM
 }

@@ -1,5 +1,7 @@
 package ru.iris.common.messaging.model;
 
+import com.google.gson.annotations.Expose;
+
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -16,14 +18,17 @@ public class SetDeviceLevelAdvertisement extends Advertisement {
     /**
      * Device UUID
      */
+    @Expose
     private String deviceUUID;
     /**
      * Label, what value we want change.
      */
+    @Expose
     private String label;
     /**
      * Label value.
      */
+    @Expose
     private String value;
 
     public SetDeviceLevelAdvertisement(String deviceUUID, String label, String value)

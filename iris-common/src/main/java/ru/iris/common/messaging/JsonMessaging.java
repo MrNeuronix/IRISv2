@@ -16,6 +16,7 @@
 package ru.iris.common.messaging;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.commons.lang.time.DateUtils;
@@ -203,7 +204,7 @@ public class JsonMessaging {
      */
     public <T> void broadcast(final String subject, final Object object) {
         try {
-            final Gson gson = new Gson();
+            final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
             final String className = object.getClass().getName();
             final String jsonString = gson.toJson(object);
 
@@ -235,7 +236,7 @@ public class JsonMessaging {
     public <REQ, RESP> RESP request(final UUID receiverInstanceId, final String subject, final REQ object, long timeout)
             throws InterruptedException, TimeoutException {
         try {
-            final Gson gson = new Gson();
+            final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
             final String className = object.getClass().getName();
             final String jsonString = gson.toJson(object);
             final String jmsCorrelationId = "ID:" + UUID.randomUUID().toString();
@@ -285,7 +286,7 @@ public class JsonMessaging {
      */
     public <T> void reply(final JsonEnvelope receivedEnvelope, final Object replyObject) {
         try {
-            final Gson gson = new Gson();
+            final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
             final String className = replyObject.getClass().getName();
             final String jsonString = gson.toJson(replyObject);
 
@@ -359,7 +360,7 @@ public class JsonMessaging {
     }
 
     private void listenBroadcasts() {
-        final Gson gson = new Gson();
+        final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         try {
             while (!shutdownThreads) {
                 try {
@@ -402,7 +403,7 @@ public class JsonMessaging {
 
 
     private void listenReplies() {
-        final Gson gson = new Gson();
+        final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
         while (!shutdownThreads) {
             try {
                 final MapMessage message = ((MapMessage) replyConsumer.receive());

@@ -1,5 +1,7 @@
 package ru.iris.common.messaging.model;
 
+import com.google.gson.annotations.Expose;
+
 /**
  * IRISv2 Project
  * Author: Nikolay A. Viguro
@@ -13,6 +15,7 @@ public class Advertisement {
     /**
      * Internal device identificator (i.e. dimmer/1)
      */
+    @Expose
     private String deviceInternal;
 
     /**
