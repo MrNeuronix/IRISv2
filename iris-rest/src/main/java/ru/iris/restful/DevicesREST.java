@@ -80,7 +80,7 @@ public class DevicesREST {
     @GET
     @Path("/{uuid}/{label}/{level}")
     @Consumes(MediaType.TEXT_PLAIN + ";charset=utf-8")
-    public String devSetLevel(@PathParam("uuid") String uuid, @PathParam("uuid") String label, @PathParam("level") String level)
+    public String devSetLevel(@PathParam("uuid") String uuid, @PathParam("label") String label, @PathParam("level") String level)
     {
         log.info(i18n.message("rest.set.level.0.on.1.device", level, uuid));
         return "{ status: " + sendMessage(uuid, label, level) + " }";

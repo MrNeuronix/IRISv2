@@ -45,7 +45,7 @@ public class ScheduleService implements Runnable {
             ResultSet rsActualize = Service.sql.select("SELECT id FROM scheduler WHERE enabled='1' AND date < NOW()");
 
             while (rsActualize.next()) {
-                Task task = new Task(Integer.valueOf(rsActualize.getInt("id")));
+                Task task = new Task(rsActualize.getInt("id"));
 
                 if (task.getType() == 1) {
                     log.info(i18n.message("scheduler.actualize.task.time.next.run.at.0", task.nextRunAsString()));
@@ -82,7 +82,7 @@ public class ScheduleService implements Runnable {
                 Date now = new Date();
 
                 while (rs.next()) {
-                    Task task = new Task(Integer.valueOf(rs.getInt("id")));
+                    Task task = new Task(rs.getInt("id"));
 
                     if (task.getDateAsString(now).equals(task.getDateAsString(task.getDate()))) {
                         log.info(i18n.message("scheduler.executing.task.0.1.2", task.getId(), task.getEclass(), task.getCommand()));

@@ -313,28 +313,13 @@ public class ZWaveService implements Runnable {
                 // Check for dead nodes
                 if(manager.isNodeFailed(homeId, ZWaveDevice.getNode()))
                 {
-                    log.info("Dead node found. Try to heal.");
-
-                    //try to heal
-                    manager.healNetworkNode(homeId, ZWaveDevice.getNode(), true);
-                    manager.healNetwork(homeId, true);
-
-                    // wait some time
-                    Thread.sleep(5000);
-
-                    //check again
-                    if(manager.isNodeFailed(homeId, ZWaveDevice.getNode()))
-                    {
-                        log.info("Setting node "+ZWaveDevice.getNode()+" to DEAD state");
-                        ZWaveDevice.setStatus("Dead");
-                    }
+                   log.info("Setting node "+ZWaveDevice.getNode()+" to DEAD state");
+                   ZWaveDevice.setStatus("Dead");
                 }
 
                 ZWaveDevice.save();
                 initComplete = true;
             } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -379,7 +364,7 @@ public class ZWaveService implements Runnable {
                     int node = ZWaveDevice.getNode();
 
                         if (!label.isEmpty() && !level.isEmpty() && !ZWaveDevice.getStatus().equals("Dead")) {
-                            log.info(i18n.message("zwave.setting.level.0.on.uuid.1.node.2", level, uuid, node));
+                            log.info("Setting value: "+level+" to label \""+label+"\" on node "+node+" (UUID: "+uuid+")");
                             setValue(uuid, label, level);
                         }
                         else
@@ -512,6 +497,9 @@ public class ZWaveService implements Runnable {
         HashMap <String, Object> valueIDs = device.getValueIDs();
 
         Iterator it = valueIDs.entrySet().iterator();
+
+        if(!it.hasNext())
+            log.info("ValueID set is empty!");
 
         while (it.hasNext()) {
 
