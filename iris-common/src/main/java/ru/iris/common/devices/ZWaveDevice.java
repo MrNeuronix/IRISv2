@@ -10,8 +10,8 @@ package ru.iris.common.devices;
  */
 
 import com.google.gson.annotations.Expose;
-import org.zwave4j.Manager;
 import org.zwave4j.ValueId;
+import ru.iris.common.Utils;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -19,12 +19,11 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ZWaveDevice extends Device implements Serializable {
 
     @Expose
-    private HashMap<String, Object> valueIDs = new HashMap<String, Object>();
+    private HashMap<String, Object> valueIDs = new HashMap<>();
 
     public ZWaveDevice() throws IOException, SQLException {
         super();
@@ -41,7 +40,7 @@ public class ZWaveDevice extends Device implements Serializable {
             label = i18n.message("none.set");
 
         this.LabelsValues.put(label, value);
-        this.valueIDs.put(label, getValue((ValueId) value));
+        this.valueIDs.put(label, Utils.getValue((ValueId) value));
     }
 
     public void updateValueID(String label, Object value) {
@@ -76,7 +75,7 @@ public class ZWaveDevice extends Device implements Serializable {
             if (label.equals(olabel)) {
                 zDvDigits.put(label, value);
             } else {
-                zDvDigits.put(olabel, getValue(ovalue));
+                zDvDigits.put(olabel, Utils.getValue(ovalue));
             }
         }
 
@@ -118,7 +117,7 @@ public class ZWaveDevice extends Device implements Serializable {
             if (label.equals(olabel)) {
                 continue;
             } else {
-                zDvDigits.put(olabel, getValue(ovalue));
+                zDvDigits.put(olabel, Utils.getValue(ovalue));
             }
         }
 
@@ -142,46 +141,4 @@ public class ZWaveDevice extends Device implements Serializable {
         sql.doQuery("DELETE FROM DEVICES WHERE UUID='" + this.uuid + "'");
         sql.doQuery("INSERT INTO DEVICES (SOURCE, UUID, internaltype, TYPE, MANUFNAME, NODE, STATUS, NAME, ZONE, PRODUCTNAME) VALUES ('zwave','" + uuid + "','" + internalType + "','" + type + "','" + manufName + "','" + node + "','" + status + "','" + name + "','" + zone + "','" + productName + "')");
     }
-
-    private static Object getValue(ValueId valueId) {
-        switch (valueId.getType()) {
-            case BOOL:
-                AtomicReference<Boolean> b = new AtomicReference<>();
-                Manager.get().getValueAsBool(valueId, b);
-                return b.get();
-            case BYTE:
-                AtomicReference<Short> bb = new AtomicReference<>();
-                Manager.get().getValueAsByte(valueId, bb);
-                return bb.get();
-            case DECIMAL:
-                AtomicReference<Float> f = new AtomicReference<>();
-                Manager.get().getValueAsFloat(valueId, f);
-                return f.get();
-            case INT:
-                AtomicReference<Integer> i = new AtomicReference<>();
-                Manager.get().getValueAsInt(valueId, i);
-                return i.get();
-            case LIST:
-                return null;
-            case SCHEDULE:
-                return null;
-            case SHORT:
-                AtomicReference<Short> s = new AtomicReference<>();
-                Manager.get().getValueAsShort(valueId, s);
-                return s.get();
-            case STRING:
-                AtomicReference<String> ss = new AtomicReference<>();
-                Manager.get().getValueAsString(valueId, ss);
-                return ss.get();
-            case BUTTON:
-                return null;
-            case RAW:
-                AtomicReference<short[]> sss = new AtomicReference<>();
-                Manager.get().getValueAsRaw(valueId, sss);
-                return sss.get();
-            default:
-                return null;
-        }
-    }
-
 }

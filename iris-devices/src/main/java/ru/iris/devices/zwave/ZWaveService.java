@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zwave4j.*;
 import ru.iris.common.I18N;
+import ru.iris.common.Utils;
 import ru.iris.common.devices.ZWaveDevice;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
@@ -19,7 +20,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created with IntelliJ IDEA.
@@ -211,7 +211,7 @@ public class ZWaveService implements Runnable {
                                         notification.getValueId().getCommandClassId(),
                                         notification.getValueId().getGenre(),
                                         manager.getValueLabel(notification.getValueId()),
-                                        getValue(notification.getValueId()),
+                                        Utils.getValue(notification.getValueId()),
                                         notification.getValueId().getIndex(),
                                         notification.getValueId().getInstance())
                                 );
@@ -242,14 +242,14 @@ public class ZWaveService implements Runnable {
 
                         // break if same value
                         try {
-                            if (getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))) == getValue(notification.getValueId()))
+                            if (Utils.getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))) == Utils.getValue(notification.getValueId()))
                                 break;
                         } catch (NullPointerException e) {
                             break;
                         }
 
                         zcZWaveDevice.updateValueID(manager.getValueLabel(notification.getValueId()), notification.getValueId());
-                        log.info(i18n.message("zwave.node.0.value.for.label.1.changed.2.3", zcZWaveDevice.getNode(), manager.getValueLabel(notification.getValueId()), getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))), getValue(notification.getValueId())));
+                        log.info(i18n.message("zwave.node.0.value.for.label.1.changed.2.3", zcZWaveDevice.getNode(), manager.getValueLabel(notification.getValueId()), Utils.getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))), Utils.getValue(notification.getValueId())));
 
                         break;
                     case VALUE_REFRESHED:
@@ -258,7 +258,7 @@ public class ZWaveService implements Runnable {
                                 notification.getValueId().getCommandClassId(),
                                 notification.getValueId().getInstance(),
                                 notification.getValueId().getIndex(),
-                                getValue(notification.getValueId())));
+                                Utils.getValue(notification.getValueId())));
                         break;
                     case GROUP:
                         break;
@@ -413,47 +413,6 @@ public class ZWaveService implements Runnable {
         }
     }
 
-    private static Object getValue(ValueId valueId) {
-        switch (valueId.getType()) {
-            case BOOL:
-                AtomicReference<Boolean> b = new AtomicReference<>();
-                Manager.get().getValueAsBool(valueId, b);
-                return b.get();
-            case BYTE:
-                AtomicReference<Short> bb = new AtomicReference<>();
-                Manager.get().getValueAsByte(valueId, bb);
-                return bb.get();
-            case DECIMAL:
-                AtomicReference<Float> f = new AtomicReference<>();
-                Manager.get().getValueAsFloat(valueId, f);
-                return f.get();
-            case INT:
-                AtomicReference<Integer> i = new AtomicReference<>();
-                Manager.get().getValueAsInt(valueId, i);
-                return i.get();
-            case LIST:
-                return null;
-            case SCHEDULE:
-                return null;
-            case SHORT:
-                AtomicReference<Short> s = new AtomicReference<>();
-                Manager.get().getValueAsShort(valueId, s);
-                return s.get();
-            case STRING:
-                AtomicReference<String> ss = new AtomicReference<>();
-                Manager.get().getValueAsString(valueId, ss);
-                return ss.get();
-            case BUTTON:
-                return null;
-            case RAW:
-                AtomicReference<short[]> sss = new AtomicReference<>();
-                Manager.get().getValueAsRaw(valueId, sss);
-                return sss.get();
-            default:
-                return null;
-        }
-    }
-
     private void setTypedValue(ValueId valueId, String value) {
 
         log.debug("Set type " + valueId.getType() + " to label " + Manager.get().getValueLabel(valueId));
@@ -598,7 +557,7 @@ public class ZWaveService implements Runnable {
             ZWaveDevice.setProductName(productName);
             ZWaveDevice.setStatus(state);
 
-            log.info(i18n.message("zwave.node.0.add.value.to.device.1.2", ZWaveDevice.getNode(), label, getValue(notification.getValueId())));
+            log.info(i18n.message("zwave.node.0.add.value.to.device.1.2", ZWaveDevice.getNode(), label, Utils.getValue(notification.getValueId())));
             ZWaveDevice.setValueID(label, notification.getValueId());
         }
 
