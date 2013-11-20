@@ -85,6 +85,7 @@ public class DevicesREST {
                     return gson.toJson(envelope.getObject());
                 } else {
                     log.info("Unknown response! " + envelope.getObject());
+                    return "{ \"error\": \"Unknown response! " + envelope.getObject() + "\" }";
                 }
             }
 
@@ -92,8 +93,6 @@ public class DevicesREST {
         } catch (final Throwable t) {
             log.error("Unexpected exception in DevicesREST", t);
             return "{ \"error\": \"" + t.toString() + "\" }";
-        } finally {
-            messaging.close();
         }
 
         return "{ \"error\": \"no answer\" }";

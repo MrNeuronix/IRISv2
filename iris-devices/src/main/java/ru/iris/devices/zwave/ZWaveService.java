@@ -377,7 +377,7 @@ public class ZWaveService implements Runnable {
                             jsonMessaging.broadcast("event.devices.responseinventory", zDevices);
                         } else {
                             ZWaveDevice zdv = getZWaveDeviceByUUID(advertisement.getDeviceUUID());
-                            if (zdv == null)
+                            if (zdv != null)
                                 jsonMessaging.broadcast("event.devices.responseinventory", zdv);
                         }
 
