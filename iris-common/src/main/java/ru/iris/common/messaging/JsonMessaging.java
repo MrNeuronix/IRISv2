@@ -19,18 +19,15 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.qpid.AMQException;
 import org.apache.qpid.client.AMQAnyDestination;
 import org.apache.qpid.client.AMQConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.iris.common.security.IrisSecurity;
 
 import javax.jms.*;
 import javax.jms.Queue;
 import java.net.URISyntaxException;
-import java.text.ParseException;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -382,13 +379,13 @@ public class JsonMessaging {
                                         UUID.fromString(message.getStringProperty("receiver")) : null,
                                 message.getJMSCorrelationID(), message.getJMSReplyTo(), subject, object);
 
-                            LOGGER.debug("Received message with ID: " + message.getJMSMessageID()
-                                    + " with correlation ID: " + message.getJMSCorrelationID()
-                                    + " sender: " + envelope.getSenderInstanceId()
-                                    + " receiver: " + envelope.getReceiverInstanceId()
-                                    + " to subject: "
-                                    + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
-                            jsonReceiveQueue.put(envelope);
+                        LOGGER.debug("Received message with ID: " + message.getJMSMessageID()
+                                + " with correlation ID: " + message.getJMSCorrelationID()
+                                + " sender: " + envelope.getSenderInstanceId()
+                                + " receiver: " + envelope.getReceiverInstanceId()
+                                + " to subject: "
+                                + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
+                        jsonReceiveQueue.put(envelope);
                     }
                 } catch (final JMSException e) {
                     LOGGER.error("Error receiving JSON message.", e);
@@ -413,6 +410,7 @@ public class JsonMessaging {
                 final String subject = message.getStringProperty("qpid.subject");
                 final String jsonString = message.getStringProperty("json");
                 final String className = message.getStringProperty("class");
+
                 if (jsonSubjects.contains(subject)
                         && !StringUtils.isEmpty(className)
                         && !StringUtils.isEmpty(jsonString)) {
@@ -421,7 +419,7 @@ public class JsonMessaging {
                         if (message.getStringProperty("receiver") != null) {
                             final UUID receiverInstanceId = UUID.fromString(message.getStringProperty("receiver"));
                             if (!instanceId.equals(receiverInstanceId)) {
-                                LOGGER.warn("Rejected message not intended to this insance.");
+                                LOGGER.warn("Rejected message not intended to this instance.");
                                 continue;
                             }
                         } else {
@@ -435,34 +433,36 @@ public class JsonMessaging {
                                 jmsCorrelationId = jmsCorrelationCandidateId;
                             }
                         }
-                            final String plainJsonString;
-                            plainJsonString = jsonString;
+                        final String plainJsonString;
+                        plainJsonString = jsonString;
 
-                            final Object object = gson.fromJson(plainJsonString, clazz);
-                            final JsonEnvelope envelope = new JsonEnvelope(
-                                    UUID.fromString(message.getStringProperty("sender")),
-                                    UUID.fromString(message.getStringProperty("receiver")),
-                                    message.getJMSMessageID(), message.getJMSReplyTo(), subject, object);
-                            replies.put(jmsCorrelationId, envelope);
-                            synchronized (jmsCorrelationId) {
-                                jmsCorrelationId.notify();
-                            }
-                            LOGGER.debug("Received response. ID: " + message.getJMSMessageID()
-                                    + " correlation ID: " + message.getJMSCorrelationID()
-                                    + " sender: " + envelope.getSenderInstanceId()
-                                    + " receiver: " + envelope.getReceiverInstanceId()
-                                    + " subject: " + envelope.getSubject()
-                                    + " class: " + envelope.getObject().getClass().getSimpleName());
+                        final Object object = gson.fromJson(plainJsonString, clazz);
+
+                        final JsonEnvelope envelope = new JsonEnvelope(
+                                UUID.fromString(message.getStringProperty("sender")),
+                                UUID.fromString(message.getStringProperty("receiver")),
+                                message.getJMSMessageID(), message.getJMSReplyTo(), subject, object);
+                        replies.put(jmsCorrelationId, envelope);
+
+                        synchronized (jmsCorrelationId) {
+                            jmsCorrelationId.notify();
+                        }
+                        LOGGER.debug("Received response. ID: " + message.getJMSMessageID()
+                                + " correlation ID: " + message.getJMSCorrelationID()
+                                + " sender: " + envelope.getSenderInstanceId()
+                                + " receiver: " + envelope.getReceiverInstanceId()
+                                + " subject: " + envelope.getSubject()
+                                + " class: " + envelope.getObject().getClass().getSimpleName());
 
                     } else {
-                        LOGGER.warn("Received response to unknown request ID:"
+                        LOGGER.info("Received response to unknown request ID:"
                                 + message.getJMSCorrelationID());
                     }
                 }
             } catch (final JMSException e) {
-                LOGGER.error("Error receiving JSON message.", e);
+                LOGGER.info("Error receiving JSON message.", e);
             } catch (final ClassNotFoundException e) {
-                LOGGER.error("Error deserializing JSON message.", e);
+                LOGGER.info("Error deserializing JSON message.", e);
             }
 
         }

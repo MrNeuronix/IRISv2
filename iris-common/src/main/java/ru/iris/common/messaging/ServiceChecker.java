@@ -12,20 +12,18 @@ package ru.iris.common.messaging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.iris.common.Config;
 
-import java.util.Map;
 import java.util.UUID;
 
 /**
  * Copyright 2013 Tommi S.E. Laukkanen, Nikolay A. Viguro
- *
+ * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p/>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p/>
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,8 +39,7 @@ public class ServiceChecker implements Runnable {
     private Object advertisment;
     private boolean reinitialize = false;
 
-    public ServiceChecker(UUID instanceId, Object advertisment)
-    {
+    public ServiceChecker(UUID instanceId, Object advertisment) {
         this.instanceId = instanceId;
         this.advertisment = advertisment;
 
@@ -50,18 +47,15 @@ public class ServiceChecker implements Runnable {
         t.start();
     }
 
-    public void setUUID(UUID instanceId)
-    {
+    public void setUUID(UUID instanceId) {
         this.instanceId = instanceId;
     }
 
-    public UUID getUUID()
-    {
+    public UUID getUUID() {
         return instanceId;
     }
 
-    public void setAdvertisment(Object advertisment)
-    {
+    public void setAdvertisment(Object advertisment) {
         this.advertisment = advertisment;
         this.reinitialize = true;
     }
@@ -69,45 +63,41 @@ public class ServiceChecker implements Runnable {
     @Override
     public void run() {
 
-            try {
-                // Make sure we exit the wait loop if we receive shutdown signal.
-                Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        shutdown = true;
-                    }
-                }));
-
-                final JsonMessaging jsonMessaging = new JsonMessaging(instanceId);
-                // Lets subscribe to listen service.status subject.
-                jsonMessaging.subscribe("service.status");
-                // Lets start JSON processing to be able to exchange messages.
-                jsonMessaging.start();
-
-                jsonMessaging.broadcast("service.status", advertisment);
-
-                long lastStatusBroadcastMillis = System.currentTimeMillis();
-                while (!shutdown) {
-
-                    // If there is more than 60 seconds from last availability broadcasts then lets redo this.
-                    if (60000L < System.currentTimeMillis() - lastStatusBroadcastMillis || reinitialize) {
-                        jsonMessaging.broadcast("service.status", advertisment);
-                        lastStatusBroadcastMillis = System.currentTimeMillis();
-                        if(reinitialize)
-                            reinitialize = false;
-                    }
+        try {
+            // Make sure we exit the wait loop if we receive shutdown signal.
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    shutdown = true;
                 }
+            }));
 
-                // Broadcast that this service is shutdown.
-                jsonMessaging.broadcast("service.status", advertisment);
+            JsonMessaging jsonMessaging = new JsonMessaging(instanceId);
 
-                // Close JSON messaging.
-                jsonMessaging.close();
+            jsonMessaging.broadcast("service.status", advertisment);
 
-            } catch (final Throwable t) {
-                t.printStackTrace();
-                log.error("Unexpected exception in Status Checker", t);
+            long lastStatusBroadcastMillis = System.currentTimeMillis();
+            while (!shutdown) {
+
+                // If there is more than 60 seconds from last availability broadcasts then lets redo this.
+                if (60000L < System.currentTimeMillis() - lastStatusBroadcastMillis || reinitialize) {
+                    jsonMessaging.broadcast("service.status", advertisment);
+                    lastStatusBroadcastMillis = System.currentTimeMillis();
+                    if (reinitialize)
+                        reinitialize = false;
+                }
             }
+
+            // Broadcast that this service is shutdown.
+            jsonMessaging.broadcast("service.status", advertisment);
+
+            // Close JSON messaging.
+            jsonMessaging.close();
+
+        } catch (final Throwable t) {
+            t.printStackTrace();
+            log.error("Unexpected exception in Status Checker", t);
+        }
     }
 }
 

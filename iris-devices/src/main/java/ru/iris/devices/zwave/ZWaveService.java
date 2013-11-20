@@ -1,25 +1,24 @@
 package ru.iris.devices.zwave;
 
 
+import com.google.gson.annotations.Expose;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zwave4j.*;
-import ru.iris.common.Config;
 import ru.iris.common.I18N;
-import ru.iris.common.Messaging;
 import ru.iris.common.devices.ZWaveDevice;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.*;
 import ru.iris.devices.Service;
 
-import javax.jms.MapMessage;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -33,7 +32,8 @@ public class ZWaveService implements Runnable {
     private static Logger log = LoggerFactory.getLogger(ZWaveService.class.getName());
     private static long homeId;
     private static boolean ready = false;
-    private static HashMap<String, ZWaveDevice> zDevices = new HashMap<String, ZWaveDevice>();
+    @Expose
+    private static HashMap<String, ZWaveDevice> zDevices = new HashMap<>();
     private static final I18N i18n = new I18N();
     private boolean initComplete = false;
     private boolean shutdown = false;
@@ -46,7 +46,7 @@ public class ZWaveService implements Runnable {
     @Override
     public synchronized void run() {
 
-         ResultSet rs = Service.sql.select("SELECT * FROM DEVICES");
+        ResultSet rs = Service.sql.select("SELECT * FROM DEVICES");
 
         try {
             while (rs.next()) {
@@ -242,11 +242,9 @@ public class ZWaveService implements Runnable {
 
                         // break if same value
                         try {
-                            if(getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))) == getValue(notification.getValueId()))
+                            if (getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))) == getValue(notification.getValueId()))
                                 break;
-                        }
-                        catch (NullPointerException e)
-                        {
+                        } catch (NullPointerException e) {
                             break;
                         }
 
@@ -308,10 +306,15 @@ public class ZWaveService implements Runnable {
             try {
 
                 // Check for dead nodes
-                if(manager.isNodeFailed(homeId, ZWaveDevice.getNode()))
-                {
-                   log.info("Setting node "+ZWaveDevice.getNode()+" to DEAD state");
-                   ZWaveDevice.setStatus("Dead");
+                if (manager.isNodeFailed(homeId, ZWaveDevice.getNode())) {
+                    log.info("Setting node " + ZWaveDevice.getNode() + " to DEAD state");
+                    ZWaveDevice.setStatus("Dead");
+                }
+
+                // Check for sleeping nodes
+                if (!manager.isNodeAwake(homeId, ZWaveDevice.getNode())) {
+                    log.info("Setting node " + ZWaveDevice.getNode() + " to SLEEP state");
+                    ZWaveDevice.setStatus("Sleeping");
                 }
 
                 ZWaveDevice.save();
@@ -330,84 +333,79 @@ public class ZWaveService implements Runnable {
                 }
             }));
 
-        // Lets instantiate JSON messaging with the selected instance ID for this module using
-        // keystore path and password defined in configuration.
-        final JsonMessaging jsonMessaging = new JsonMessaging(Service.serviceId);
-        // Lets subscribe to listen service.status subject.
-        jsonMessaging.subscribe("event.devices.setvalue");
-        jsonMessaging.subscribe("event.devices.getinventory");
-        // Lets start JSON processing to be able to exchange messages.
-        jsonMessaging.start();
+            JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
 
-        while (!shutdown) {
+            jsonMessaging.subscribe("event.devices.setvalue");
+            jsonMessaging.subscribe("event.devices.getinventory");
 
-            // Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
-            final JsonEnvelope envelope = jsonMessaging.receive(100);
-            if (envelope != null) {
-                if (envelope.getObject() instanceof SetDeviceLevelAdvertisement) {
-                    // We know of service advertisement
-                    final SetDeviceLevelAdvertisement advertisement = envelope.getObject();
+            jsonMessaging.start();
 
-                    String uuid = advertisement.getDeviceUUID();
-                    String label = advertisement.getLabel();
-                    String level = advertisement.getValue();
+            while (!shutdown) {
 
-                    ZWaveDevice ZWaveDevice = getZWaveDeviceByUUID(uuid);
+                // Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
+                final JsonEnvelope envelope = jsonMessaging.receive(100);
+                if (envelope != null) {
+                    if (envelope.getObject() instanceof SetDeviceLevelAdvertisement) {
+                        // We know of service advertisement
+                        final SetDeviceLevelAdvertisement advertisement = envelope.getObject();
 
-                    if (ZWaveDevice == null) {
-                        log.info(i18n.message("zwave.cannot.find.device.with.uuid.0", uuid));
-                        continue;
-                    }
+                        String uuid = advertisement.getDeviceUUID();
+                        String label = advertisement.getLabel();
+                        String level = advertisement.getValue();
 
-                    int node = ZWaveDevice.getNode();
+                        ZWaveDevice ZWaveDevice = getZWaveDeviceByUUID(uuid);
+
+                        if (ZWaveDevice == null) {
+                            log.info(i18n.message("zwave.cannot.find.device.with.uuid.0", uuid));
+                            continue;
+                        }
+
+                        int node = ZWaveDevice.getNode();
 
                         if (!label.isEmpty() && !level.isEmpty() && !ZWaveDevice.getStatus().equals("Dead")) {
-                            log.info("Setting value: "+level+" to label \""+label+"\" on node "+node+" (UUID: "+uuid+")");
+                            log.info("Setting value: " + level + " to label \"" + label + "\" on node " + node + " (UUID: " + uuid + ")");
                             setValue(uuid, label, level);
-                        }
-                        else
-                        {
-                            log.info("Node: "+node+" Cant set empty value or node dead");
+                        } else {
+                            log.info("Node: " + node + " Cant set empty value or node dead");
                         }
 
-                } else if (envelope.getObject() instanceof GetInventoryAdvertisement) {
+                    } else if (envelope.getObject() instanceof GetInventoryAdvertisement) {
 
-                    final GetInventoryAdvertisement advertisement = envelope.getObject();
+                        final GetInventoryAdvertisement advertisement = envelope.getObject();
 
-                    if(advertisement.getDeviceUUID().equals("all"))
-                    {
-                        jsonMessaging.reply(envelope, zDevices);
+                        if (advertisement.getDeviceUUID().equals("all")) {
+                            jsonMessaging.broadcast("event.devices.responseinventory", zDevices);
+                        } else {
+                            ZWaveDevice zdv = getZWaveDeviceByUUID(advertisement.getDeviceUUID());
+                            if (zdv == null)
+                                jsonMessaging.broadcast("event.devices.responseinventory", zdv);
+                        }
+
+                    } else if (envelope.getReceiverInstanceId() == null) {
+                        // We received unknown broadcast message. Lets make generic log entry.
+                        log.info("Received broadcast "
+                                + " from " + envelope.getSenderInstanceId()
+                                + " to " + envelope.getReceiverInstanceId()
+                                + " at '" + envelope.getSubject()
+                                + ": " + envelope.getObject());
+                    } else {
+                        // We received unknown request message. Lets make generic log entry.
+                        log.info("Received request "
+                                + " from " + envelope.getSenderInstanceId()
+                                + " to " + envelope.getReceiverInstanceId()
+                                + " at '" + envelope.getSubject()
+                                + ": " + envelope.getObject());
                     }
-                    else
-                    {
-                        jsonMessaging.reply(envelope, getZWaveDeviceByUUID(advertisement.getDeviceUUID()));
-                    }
-
-                } else if (envelope.getReceiverInstanceId() == null) {
-                    // We received unknown broadcast message. Lets make generic log entry.
-                    log.info("Received broadcast "
-                            + " from " + envelope.getSenderInstanceId()
-                            + " to " + envelope.getReceiverInstanceId()
-                            + " at '" + envelope.getSubject()
-                            + ": " + envelope.getObject());
-                } else {
-                    // We received unknown request message. Lets make generic log entry.
-                    log.info("Received request "
-                            + " from " + envelope.getSenderInstanceId()
-                            + " to " + envelope.getReceiverInstanceId()
-                            + " at '" + envelope.getSubject()
-                            + ": " + envelope.getObject());
                 }
             }
-        }
 
-        // Broadcast that this service is shutdown.
-        jsonMessaging.broadcast("service.status", new ServiceAdvertisement(
-                "Devices", Service.serviceId, ServiceStatus.SHUTDOWN,
-                new ServiceCapability[]{ServiceCapability.SYSTEM}));
+            // Broadcast that this service is shutdown.
+            jsonMessaging.broadcast("service.status", new ServiceAdvertisement(
+                    "Devices", Service.serviceId, ServiceStatus.SHUTDOWN,
+                    new ServiceCapability[]{ServiceCapability.SYSTEM}));
 
-        // Close JSON messaging.
-        jsonMessaging.close();
+            // Close JSON messaging.
+            jsonMessaging.close();
 
         } catch (final Throwable t) {
             t.printStackTrace();
@@ -458,58 +456,57 @@ public class ZWaveService implements Runnable {
 
     private void setTypedValue(ValueId valueId, String value) {
 
-        log.debug("Set type "+valueId.getType()+" to label "+Manager.get().getValueLabel(valueId));
+        log.debug("Set type " + valueId.getType() + " to label " + Manager.get().getValueLabel(valueId));
 
         switch (valueId.getType()) {
             case BOOL:
-                log.debug("Set value type BOOL to "+value);
+                log.debug("Set value type BOOL to " + value);
                 Manager.get().setValueAsBool(valueId, Boolean.valueOf(value));
                 break;
             case BYTE:
-                log.debug("Set value type BYTE to "+value);
+                log.debug("Set value type BYTE to " + value);
                 Manager.get().setValueAsByte(valueId, Short.valueOf(value));
                 break;
             case DECIMAL:
-                log.debug("Set value type FLOAT to "+value);
+                log.debug("Set value type FLOAT to " + value);
                 Manager.get().setValueAsFloat(valueId, Float.valueOf(value));
                 break;
             case INT:
-                log.debug("Set value type INT to "+value);
+                log.debug("Set value type INT to " + value);
                 Manager.get().setValueAsInt(valueId, Integer.valueOf(value));
                 break;
             case LIST:
-                log.debug("Set value type LIST to "+value);
+                log.debug("Set value type LIST to " + value);
                 break;
             case SCHEDULE:
-                log.debug("Set value type SCHEDULE to "+value);
+                log.debug("Set value type SCHEDULE to " + value);
                 break;
             case SHORT:
-                log.debug("Set value type SHORT to "+value);
+                log.debug("Set value type SHORT to " + value);
                 Manager.get().setValueAsShort(valueId, Short.valueOf(value));
                 break;
             case STRING:
-                log.debug("Set value type STRING to "+value);
+                log.debug("Set value type STRING to " + value);
                 Manager.get().setValueAsString(valueId, value);
                 break;
             case BUTTON:
-                log.debug("Set value type BUTTON to "+value);
+                log.debug("Set value type BUTTON to " + value);
                 break;
             case RAW:
-                log.debug("Set value RAW to "+value);
+                log.debug("Set value RAW to " + value);
                 break;
             default:
                 break;
         }
     }
 
-    private void setValue(String uuid, String label, String value)
-    {
+    private void setValue(String uuid, String label, String value) {
         ZWaveDevice device = getZWaveDeviceByUUID(uuid);
-        HashMap <String, Object> valueIDs = device.getValueIDs();
+        HashMap<String, Object> valueIDs = device.getValueIDs();
 
         Iterator it = valueIDs.entrySet().iterator();
 
-        if(!it.hasNext())
+        if (!it.hasNext())
             log.info("ValueID set is empty!");
 
         while (it.hasNext()) {
@@ -517,15 +514,11 @@ public class ZWaveService implements Runnable {
             Map.Entry pairs = (Map.Entry) it.next();
             ValueId valueId = (ValueId) pairs.getValue();
 
-            if(Manager.get().getValueLabel(valueId).equals(label))
-            {
-                if(!Manager.get().isValueReadOnly(valueId))
-                {
+            if (Manager.get().getValueLabel(valueId).equals(label)) {
+                if (!Manager.get().isValueReadOnly(valueId)) {
                     setTypedValue(valueId, String.valueOf(value));
-                }
-                else
-                {
-                    log.info("Value \""+label+"\" is read-only! Skip.");
+                } else {
+                    log.info("Value \"" + label + "\" is read-only! Skip.");
                 }
             }
         }
@@ -566,7 +559,7 @@ public class ZWaveService implements Runnable {
         return null;
     }
 
-    private void addZWaveDeviceOrValue( String type, Notification notification) {
+    private void addZWaveDeviceOrValue(String type, Notification notification) {
 
         ZWaveDevice ZWaveDevice;
         String label = Manager.get().getValueLabel(notification.getValueId());
@@ -611,7 +604,7 @@ public class ZWaveService implements Runnable {
 
         // catch and save into database value changes after init complete
         try {
-            if(initComplete)
+            if (initComplete)
                 ZWaveDevice.save();
         } catch (Exception e) {
             e.printStackTrace();
