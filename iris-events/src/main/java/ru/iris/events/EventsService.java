@@ -42,7 +42,14 @@ public class EventsService implements Runnable {
             }));
 
             final JsonMessaging jsonMessaging = new JsonMessaging(Service.serviceId);
-            jsonMessaging.subscribe("event.*");
+
+            jsonMessaging.subscribe("event.status");
+            jsonMessaging.subscribe("event.devices.setvalue");
+            jsonMessaging.subscribe("event.devices.getinventory");
+            jsonMessaging.subscribe("event.devices.responseinventory");
+            jsonMessaging.subscribe("event.speak");
+            jsonMessaging.subscribe("event.speak.recognized");
+
             jsonMessaging.start();
 
             Service.serviceChecker.setAdvertisment(new ServiceAdvertisement(

@@ -17,7 +17,6 @@ import ru.iris.common.messaging.model.*;
 import ru.iris.devices.Service;
 
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -29,6 +28,7 @@ import java.util.*;
  * License: GPL v3
  */
 public class ZWaveService implements Runnable {
+
     private static Logger log = LoggerFactory.getLogger(ZWaveService.class.getName());
     private static long homeId;
     private static boolean ready = false;
@@ -45,36 +45,6 @@ public class ZWaveService implements Runnable {
 
     @Override
     public synchronized void run() {
-
-        ResultSet rs = Service.sql.select("SELECT * FROM DEVICES");
-
-        try {
-            while (rs.next()) {
-
-                ZWaveDevice zDevice = new ZWaveDevice();
-
-                zDevice.setManufName(rs.getString("manufname"));
-                zDevice.setName(rs.getString("name"));
-                zDevice.setNode((short) rs.getInt("node"));
-                zDevice.setStatus(rs.getString("status"));
-                zDevice.setInternalType(rs.getString("internaltype"));
-                zDevice.setType(rs.getString("type"));
-                zDevice.setUUID(rs.getString("uuid"));
-                zDevice.setZone(rs.getInt("zone"));
-                zDevice.setProductName(rs.getString("productname"));
-
-                log.info(i18n.message("zwave.load.device.0.1.from.database", zDevice.getInternalType(), zDevice.getNode()));
-
-                zDevices.put(zDevice.getInternalType() + "/" + zDevice.getNode(), zDevice);
-            }
-
-            rs.close();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         NativeLibraryLoader.loadLibrary(ZWave4j.LIBRARY_NAME, ZWave4j.class);
 
@@ -227,13 +197,10 @@ public class ZWaveService implements Runnable {
                             break;
                         }
 
-                        // check empty
-                        if (manager.getValueLabel(notification.getValueId()).isEmpty()) {
-                            break;
-                        }
-
                         zrZWaveDevice.removeValueID(manager.getValueLabel(notification.getValueId()));
-                        log.info(i18n.message("zwave.node.0.value.1.removed", zrZWaveDevice.getNode(), manager.getValueLabel(notification.getValueId())));
+
+                        if(!manager.getValueLabel(notification.getValueId()).isEmpty())
+                            log.info(i18n.message("zwave.node.0.value.1.removed", zrZWaveDevice.getNode(), manager.getValueLabel(notification.getValueId())));
 
                         break;
                     case VALUE_CHANGED:
@@ -413,7 +380,7 @@ public class ZWaveService implements Runnable {
                                 inventory.add(gson.toJson(jsonElement));
                             }
 
-                            jsonMessaging.broadcast("event.devices.responseinventory", inventory);
+                            jsonMessaging.broadcast("event.devices.responseinventory", new ResponseZWaveDeviceArrayInventoryAdvertisement(inventory));
 
                         } else {
                             ZWaveDevice zdv = getZWaveDeviceByUUID(advertisement.getDeviceUUID());
@@ -434,7 +401,7 @@ public class ZWaveService implements Runnable {
 
                                 jsonElement.getAsJsonObject().add("values", jsValues);
 
-                                jsonMessaging.broadcast("event.devices.responseinventory", jsonElement);
+                                jsonMessaging.broadcast("event.devices.responseinventory", new ResponseZWaveDeviceInventoryAdvertisement(jsonElement));
                             }
                         }
 

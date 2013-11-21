@@ -7,6 +7,8 @@ import ru.iris.common.I18N;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.GetInventoryAdvertisement;
+import ru.iris.common.messaging.model.ResponseZWaveDeviceArrayInventoryAdvertisement;
+import ru.iris.common.messaging.model.ResponseZWaveDeviceInventoryAdvertisement;
 import ru.iris.common.messaging.model.SetDeviceLevelAdvertisement;
 
 import javax.ws.rs.*;
@@ -66,16 +68,20 @@ public class DevicesREST {
 
         try {
             JsonMessaging messaging = new JsonMessaging(InstanceId);
+
             messaging.subscribe("event.devices.responseinventory");
             messaging.start();
 
             messaging.broadcast("event.devices.getinventory", new GetInventoryAdvertisement(uuid));
 
-            // Lets wait for 5000 ms on json messages and if nothing comes then proceed to carry out other tasks.
             final JsonEnvelope envelope = messaging.receive(5000);
             if (envelope != null) {
-                if (envelope.getObject() instanceof ArrayList || envelope.getObject() instanceof JsonElement) {
-                    return envelope.getObject().toString();
+                if (envelope.getObject() instanceof ResponseZWaveDeviceArrayInventoryAdvertisement)
+                {
+                    return ((ResponseZWaveDeviceArrayInventoryAdvertisement) envelope.getObject()).getDevices().toString();
+                } else if (envelope.getObject() instanceof ResponseZWaveDeviceInventoryAdvertisement)
+                {
+                    return ((ResponseZWaveDeviceInventoryAdvertisement) envelope.getObject()).getDevice().toString();
                 } else {
                     log.info("Unknown response! " + envelope.getObject());
                     return "{ \"error\": \"Unknown response! Class: " + envelope.getObject().getClass() + " Response: " + envelope.getObject() + "\" }";

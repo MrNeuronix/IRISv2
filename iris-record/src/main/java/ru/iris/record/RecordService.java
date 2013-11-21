@@ -7,15 +7,18 @@ import ru.iris.common.I18N;
 import ru.iris.common.Module;
 import ru.iris.common.Speak;
 import ru.iris.common.httpPOST;
+import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
 import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
+import ru.iris.common.messaging.model.SpeakRecognizedAdvertisement;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -98,31 +101,21 @@ public class RecordService implements Runnable {
                                 // Include -> System.out.println(wGetResponse); // to view the Raw output
                                 int startIndex = googleSpeechAPIResponse.indexOf("\"utterance\":") + 13; //Account for term "utterance":"<TARGET>","confidence"
                                 int stopIndex = googleSpeechAPIResponse.indexOf(",\"confidence\":") - 1; //End position
-                                String command = googleSpeechAPIResponse.substring(startIndex, stopIndex);
+                                String text = googleSpeechAPIResponse.substring(startIndex, stopIndex);
 
                                 // Determine Confidence
                                 startIndex = stopIndex + 15;
                                 stopIndex = googleSpeechAPIResponse.indexOf("}]}") - 1;
                                 double confidence = Double.parseDouble(googleSpeechAPIResponse.substring(startIndex, stopIndex));
 
-                                log.info(i18n.message("data.utterance.0", command.toUpperCase()));
+                                log.info(i18n.message("data.utterance.0", text.toUpperCase()));
                                 log.info(i18n.message("data.confidence.level.0", confidence * 100));
 
-                                if (confidence * 100 > 65) {
-                                    if (command.contains(Service.config.get("systemName"))) {
+                                if (confidence * 100 > 65)
+                                {
+                                    if (text.contains(Service.config.get("systemName")))
+                                    {
                                         log.info(i18n.message("record.system.name.detected"));
-
-                                        try {
-                                            ResultSet rs = Service.sql.select("SELECT name, command, param FROM modules WHERE enabled='1' AND language='" + Service.config.get("language") + "'");
-
-                                            while (rs.next()) {
-                                                String name = rs.getString("name");
-                                                String comm = rs.getString("command");
-                                                String param = rs.getString("param");
-
-                                                if (command.contains(comm)) {
-
-                                                    log.info(i18n.message("record.server.found.exec.command"));
 
                                                     if (busy) {
                                                         log.info(i18n.message("command.system.is.busy.skipping"));
@@ -131,33 +124,16 @@ public class RecordService implements Runnable {
 
                                                     busy = true;
 
-                                                    log.info(i18n.message("command.got.0.command", command));
-
+                                                    log.info(i18n.message("command.got.0.command", text));
 
                                                     try {
-
-                                                        new Speak().add(command);
-
-                                                        Class cl = Class.forName("ru.iris.modules." + name);
-                                                        Module execute = (Module) cl.newInstance();
-                                                        execute.run(param);
-
+                                                        new JsonMessaging(UUID.randomUUID()).broadcast("event.speak.recognized", new SpeakRecognizedAdvertisement(text, confidence));
                                                         Thread.sleep(1000);
-
                                                         busy = false;
-
                                                     } catch (Exception e) {
-                                                        log.info(i18n.message("module.error.at.loading.module.0.with.params.11", name, param));
+                                                        log.info("Failed to send recognized event");
                                                         e.printStackTrace();
                                                     }
-                                                }
-                                            }
-
-                                            rs.close();
-
-                                        } catch (SQLException e) {
-                                            e.printStackTrace();
-                                        }
                                     }
                                 }
                             }
@@ -168,8 +144,6 @@ public class RecordService implements Runnable {
                                 infile.delete();
                             } catch (Exception ignored) {
                             }
-
-                            /////////////////////////////////
                         }
                     }
                 }).start();
