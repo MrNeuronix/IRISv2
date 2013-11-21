@@ -56,6 +56,9 @@ public class Launcher {
         // Modules poll
         new StatusChecker();
 
+        // Launch events module
+        runModule("java -jar iris-events.jar");
+
         // Launch capture sound module
         runModule("java -jar iris-record.jar");
 
@@ -67,9 +70,6 @@ public class Launcher {
 
         // Launch schedule module
         runModule("java -jar iris-scheduler.jar");
-
-        // Launch events module
-        runModule("java -jar iris-events.jar");
 
         // Lauch REST service
         runModule("java -jar iris-rest.jar");

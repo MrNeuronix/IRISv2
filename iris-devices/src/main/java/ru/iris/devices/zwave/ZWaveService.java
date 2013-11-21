@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zwave4j.*;
@@ -14,9 +15,12 @@ import ru.iris.common.devices.ZWaveDevice;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.*;
+import ru.iris.common.messaging.model.zwave.*;
 import ru.iris.devices.Service;
 
+import javax.jms.JMSException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -36,6 +40,7 @@ public class ZWaveService implements Runnable {
     private static final I18N i18n = new I18N();
     private boolean initComplete = false;
     private boolean shutdown = false;
+    private static JsonMessaging messaging;
     private static Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
     public ZWaveService() {
@@ -45,6 +50,12 @@ public class ZWaveService implements Runnable {
 
     @Override
     public synchronized void run() {
+
+        try {
+            messaging = new JsonMessaging(UUID.randomUUID());
+        } catch (JMSException | URISyntaxException | AMQException e) {
+            e.printStackTrace();
+        }
 
         NativeLibraryLoader.loadLibrary(ZWave4j.LIBRARY_NAME, ZWave4j.class);
 
@@ -65,110 +76,171 @@ public class ZWaveService implements Runnable {
                     case DRIVER_READY:
                         log.info(i18n.message("zwave.driver.ready.home.id.0", homeId));
                         homeId = notification.getHomeId();
+                        messaging.broadcast("event.devices.zwave.driver.ready", new ZWaveDriverReady(homeId));
                         break;
                     case DRIVER_FAILED:
                         log.info(i18n.message("zwave.driver.failed"));
+                        messaging.broadcast("event.devices.zwave.driver.failed", new ZWaveDriverFailed());
                         break;
                     case DRIVER_RESET:
                         log.info(i18n.message("zwave.driver.reset"));
+                        messaging.broadcast("event.devices.zwave.driver.reset", new ZWaveDriverReset());
                         break;
                     case AWAKE_NODES_QUERIED:
                         log.info(i18n.message("zwave.awake.nodes.queried"));
                         ready = true;
+                        messaging.broadcast("event.devices.zwave.awakenodesqueried", new ZWaveAwakeNodesQueried());
                         break;
                     case ALL_NODES_QUERIED:
                         log.info(i18n.message("zwave.all.nodes.queried"));
                         manager.writeConfig(homeId);
                         ready = true;
+                        messaging.broadcast("event.devices.zwave.allnodesqueried", new ZWaveAllNodesQueried());
                         break;
                     case ALL_NODES_QUERIED_SOME_DEAD:
                         log.info(i18n.message("zwave.all.nodes.queried.some.dead"));
+                        messaging.broadcast("event.devices.zwave.allnodesqueriedsomedead", new ZWaveAllNodesQueriedSomeDead());
                         break;
                     case POLLING_ENABLED:
                         log.info(i18n.message("zwave.polling.enabled"));
+                        messaging.broadcast("event.devices.zwave.polling.disabled", new ZWavePolling(getZWaveDeviceByNode(notification.getNodeId()), true));
                         break;
                     case POLLING_DISABLED:
                         log.info(i18n.message("zwave.polling.disabled"));
+                        messaging.broadcast("event.devices.zwave.polling.enabled", new ZWavePolling(getZWaveDeviceByNode(notification.getNodeId()), false));
                         break;
                     case NODE_NEW:
+                        messaging.broadcast("event.devices.zwave.node.new", new ZWaveNodeNew(getZWaveDeviceByNode(notification.getNodeId())));
                         break;
                     case NODE_ADDED:
+                        messaging.broadcast("event.devices.zwave.node.added", new ZWaveNodeAdded(getZWaveDeviceByNode(notification.getNodeId())));
                         break;
                     case NODE_REMOVED:
+                        messaging.broadcast("event.devices.zwave.node.removed", new ZWaveNodeRemoved(getZWaveDeviceByNode(notification.getNodeId())));
                         break;
                     case ESSENTIAL_NODE_QUERIES_COMPLETE:
+                        messaging.broadcast("event.devices.zwave.essentialnodequeriscomplete", new ZWaveEssentialNodeQueriesComplete());
                         break;
                     case NODE_QUERIES_COMPLETE:
+                        messaging.broadcast("event.devices.zwave.node.queriescomplete", new ZWaveNodeQueriesComplete());
                         break;
                     case NODE_EVENT:
                         log.info(i18n.message("zwave.update.info.for.node.0", node));
                         manager.refreshNodeInfo(homeId, node);
+                        messaging.broadcast("event.devices.zwave.node.event", new ZWaveNodeEvent(getZWaveDeviceByNode(notification.getNodeId())));
                         break;
                     case NODE_NAMING:
+                        messaging.broadcast("event.devices.zwave.node.naming", new ZWaveNodeNaming(getZWaveDeviceByNode(notification.getNodeId())));
                         break;
                     case NODE_PROTOCOL_INFO:
+                        messaging.broadcast("event.devices.zwave.node.protocolinfo", new ZWaveNodeProtocolInfo(getZWaveDeviceByNode(notification.getNodeId())));
                         break;
                     case VALUE_ADDED:
 
-
                         String nodeType = manager.getNodeType(homeId, node);
+                        ZWaveDevice zw;
 
                         switch (nodeType) {
                             case "Portable Remote Controller":
 
-                                addZWaveDeviceOrValue("controller", notification);
+                                zw = addZWaveDeviceOrValue("controller", notification);
+                                messaging.broadcast("event.devices.value.added",
+                                        new ZWaveDeviceValueAdded(
+                                                zw,
+                                                Manager.get().getValueLabel(notification.getValueId()),
+                                                String.valueOf(Utils.getValue(notification.getValueId()))));
                                 break;
 
                             //////////////////////////////////
 
                             case "Multilevel Power Switch":
 
-                                addZWaveDeviceOrValue("dimmer", notification);
+                                zw = addZWaveDeviceOrValue("dimmer", notification);
+                                messaging.broadcast("event.devices.value.added",
+                                        new ZWaveDeviceValueAdded(
+                                                zw,
+                                                Manager.get().getValueLabel(notification.getValueId()),
+                                                String.valueOf(Utils.getValue(notification.getValueId()))));
                                 break;
 
                             //////////////////////////////////
 
                             case "Routing Alarm Sensor":
 
-                                addZWaveDeviceOrValue("alarmsensor", notification);
+                                zw = addZWaveDeviceOrValue("alarmsensor", notification);
+                                messaging.broadcast("event.devices.value.added",
+                                        new ZWaveDeviceValueAdded(
+                                                zw,
+                                                Manager.get().getValueLabel(notification.getValueId()),
+                                                String.valueOf(Utils.getValue(notification.getValueId()))));
                                 break;
 
                             case "Binary Power Switch":
 
-                                addZWaveDeviceOrValue("switch", notification);
+                                zw = addZWaveDeviceOrValue("switch", notification);
+                                messaging.broadcast("event.devices.value.added",
+                                        new ZWaveDeviceValueAdded(
+                                                zw,
+                                                Manager.get().getValueLabel(notification.getValueId()),
+                                                String.valueOf(Utils.getValue(notification.getValueId()))));
                                 break;
 
                             case "Routing Binary Sensor":
 
-                                addZWaveDeviceOrValue("binarysensor", notification);
+                                zw = addZWaveDeviceOrValue("binarysensor", notification);
+                                messaging.broadcast("event.devices.value.added",
+                                        new ZWaveDeviceValueAdded(
+                                                zw,
+                                                Manager.get().getValueLabel(notification.getValueId()),
+                                                String.valueOf(Utils.getValue(notification.getValueId()))));
                                 break;
 
                             //////////////////////////////////
 
                             case "Routing Multilevel Sensor":
 
-                                addZWaveDeviceOrValue("multilevelsensor", notification);
+                                zw = addZWaveDeviceOrValue("multilevelsensor", notification);
+                                messaging.broadcast("event.devices.value.added",
+                                        new ZWaveDeviceValueAdded(
+                                                zw,
+                                                Manager.get().getValueLabel(notification.getValueId()),
+                                                String.valueOf(Utils.getValue(notification.getValueId()))));
                                 break;
 
                             //////////////////////////////////
 
                             case "Simple Meter":
 
-                                addZWaveDeviceOrValue("metersensor", notification);
+                                zw = addZWaveDeviceOrValue("metersensor", notification);
+                                messaging.broadcast("event.devices.value.added",
+                                        new ZWaveDeviceValueAdded(
+                                                zw,
+                                                Manager.get().getValueLabel(notification.getValueId()),
+                                                String.valueOf(Utils.getValue(notification.getValueId()))));
                                 break;
 
                             //////////////////////////////////
 
                             case "Simple Window Covering":
 
-                                addZWaveDeviceOrValue("drapes", notification);
+                                zw = addZWaveDeviceOrValue("drapes", notification);
+                                messaging.broadcast("event.devices.value.added",
+                                        new ZWaveDeviceValueAdded(
+                                                zw,
+                                                Manager.get().getValueLabel(notification.getValueId()),
+                                                String.valueOf(Utils.getValue(notification.getValueId()))));
                                 break;
 
                             //////////////////////////////////
 
                             case "Setpoint Thermostat":
 
-                                addZWaveDeviceOrValue("thermostat", notification);
+                                zw = addZWaveDeviceOrValue("thermostat", notification);
+                                messaging.broadcast("event.devices.value.added",
+                                        new ZWaveDeviceValueAdded(
+                                                zw,
+                                                Manager.get().getValueLabel(notification.getValueId()),
+                                                String.valueOf(Utils.getValue(notification.getValueId()))));
                                 break;
 
                             //////////////////////////////////
@@ -199,6 +271,12 @@ public class ZWaveService implements Runnable {
 
                         zrZWaveDevice.removeValueID(manager.getValueLabel(notification.getValueId()));
 
+                        messaging.broadcast("event.devices.value.removed",
+                                new ZWaveDeviceValueRemoved(
+                                        zrZWaveDevice,
+                                        Manager.get().getValueLabel(notification.getValueId()),
+                                        String.valueOf(Utils.getValue(notification.getValueId()))));
+
                         if(!manager.getValueLabel(notification.getValueId()).isEmpty())
                             log.info(i18n.message("zwave.node.0.value.1.removed", zrZWaveDevice.getNode(), manager.getValueLabel(notification.getValueId())));
 
@@ -227,6 +305,12 @@ public class ZWaveService implements Runnable {
                                 Utils.getValue(notification.getValueId())));
 
                         zcZWaveDevice.updateValueID(manager.getValueLabel(notification.getValueId()), notification.getValueId());
+
+                        messaging.broadcast("event.devices.value.changed",
+                                new ZWaveDeviceValueChanged(
+                                        zcZWaveDevice,
+                                        Manager.get().getValueLabel(notification.getValueId()),
+                                        String.valueOf(Utils.getValue(notification.getValueId()))));
 
                         break;
                     case VALUE_REFRESHED:
@@ -542,7 +626,7 @@ public class ZWaveService implements Runnable {
         return null;
     }
 
-    private void addZWaveDeviceOrValue(String type, Notification notification) {
+    private ZWaveDevice addZWaveDeviceOrValue(String type, Notification notification) {
 
         ZWaveDevice ZWaveDevice;
         String label = Manager.get().getValueLabel(notification.getValueId());
@@ -553,7 +637,7 @@ public class ZWaveService implements Runnable {
         if (Manager.get().requestNodeState(homeId, notification.getNodeId()))
             state = i18n.message("listening");
 
-        if ((ZWaveDevice = hasInstance(type + "/" + notification.getNodeId())) == null) {
+        if ((ZWaveDevice = hasInstance("zwave/" + type + "/" + notification.getNodeId())) == null) {
 
             String uuid = UUID.randomUUID().toString();
 
@@ -561,6 +645,7 @@ public class ZWaveService implements Runnable {
                 ZWaveDevice = new ZWaveDevice();
 
                 ZWaveDevice.setInternalType(type);
+                ZWaveDevice.setInternalName("zwave/" + type + "/" + notification.getNodeId());
                 ZWaveDevice.setType(Manager.get().getNodeType(notification.getHomeId(), notification.getNodeId()));
                 ZWaveDevice.setNode(notification.getNodeId());
                 ZWaveDevice.setUUID(uuid);
@@ -574,7 +659,7 @@ public class ZWaveService implements Runnable {
             }
 
             log.info(i18n.message("zwave.add.device.to.array.0.1", type, notification.getNodeId()));
-            zDevices.put(type + "/" + notification.getNodeId(), ZWaveDevice);
+            zDevices.put("zwave/" + type + "/" + notification.getNodeId(), ZWaveDevice);
         } else {
 
             ZWaveDevice.setManufName(manufName);
@@ -592,5 +677,7 @@ public class ZWaveService implements Runnable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        return ZWaveDevice;
     }
 }

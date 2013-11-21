@@ -1,19 +1,17 @@
 package ru.iris.restful;
 
-import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.GetInventoryAdvertisement;
-import ru.iris.common.messaging.model.ResponseZWaveDeviceArrayInventoryAdvertisement;
-import ru.iris.common.messaging.model.ResponseZWaveDeviceInventoryAdvertisement;
+import ru.iris.common.messaging.model.zwave.ResponseZWaveDeviceArrayInventoryAdvertisement;
+import ru.iris.common.messaging.model.zwave.ResponseZWaveDeviceInventoryAdvertisement;
 import ru.iris.common.messaging.model.SetDeviceLevelAdvertisement;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
 import java.util.UUID;
 
 /**

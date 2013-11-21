@@ -1,7 +1,8 @@
-package ru.iris.common.messaging.model;
+package ru.iris.common.messaging.model.zwave;
 
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.Expose;
+import ru.iris.common.messaging.model.Advertisement;
 
 /**
  * IRISv2 Project

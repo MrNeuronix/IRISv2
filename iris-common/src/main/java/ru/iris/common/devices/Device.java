@@ -45,6 +45,9 @@ public class Device implements Serializable {
     protected String status = i18n.message("unknown");
     @Expose
     protected String source = i18n.message("unknown");
+    @Expose
+    protected String internalName = i18n.message("unknown");
+
     protected HashMap<String, Object> LabelsValues = new HashMap<String, Object>();
 
     protected SQL sql;
@@ -120,6 +123,14 @@ public class Device implements Serializable {
 
     public void setInternalType(String type) {
         this.internalType = type;
+    }
+
+    public String getInternalName() {
+        return internalName;
+    }
+
+    public void setInternalName(String internalName) {
+        this.internalName = internalName;
     }
 
     public String getInternalType() {
