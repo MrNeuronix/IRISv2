@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zwave4j.*;
@@ -17,9 +16,7 @@ import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.*;
 import ru.iris.devices.Service;
 
-import javax.jms.JMSException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -301,13 +298,10 @@ public class ZWaveService implements Runnable {
 
         log.info(i18n.message("zwave.initialization.complete.found.0.device.s", zDevices.size()));
 
-        try {
-            new JsonMessaging(Service.serviceId).broadcast("event.status",
-                    new ServiceAdvertisement("Devices", Service.serviceId, ServiceStatus.AVAILABLE,
-                            new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
-        } catch (JMSException | AMQException | URISyntaxException e) {
-            e.printStackTrace();
-        }
+
+        Service.serviceChecker.setAdvertisment(new ServiceAdvertisement("Devices", Service.serviceId, ServiceStatus.AVAILABLE,
+                new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
+
 
         for (ZWaveDevice ZWaveDevice : zDevices.values()) {
             try {
@@ -453,7 +447,7 @@ public class ZWaveService implements Runnable {
             }
 
             // Broadcast that this service is shutdown.
-            jsonMessaging.broadcast("service.status", new ServiceAdvertisement(
+            Service.serviceChecker.setAdvertisment(new ServiceAdvertisement(
                     "Devices", Service.serviceId, ServiceStatus.SHUTDOWN,
                     new ServiceCapability[]{ServiceCapability.SYSTEM}));
 

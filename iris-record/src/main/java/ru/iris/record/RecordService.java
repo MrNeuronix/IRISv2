@@ -1,22 +1,18 @@
 package ru.iris.record;
 
 import javaFlacEncoder.FLAC_FileEncoder;
-import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
 import ru.iris.common.Module;
 import ru.iris.common.Speak;
 import ru.iris.common.httpPOST;
-import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
 import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
 
-import javax.jms.JMSException;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Random;
@@ -46,13 +42,8 @@ public class RecordService implements Runnable {
 
         log.info(i18n.message("record.configured.to.run.0.threads.on.1.microphones", threads, micro));
 
-        try {
-            new JsonMessaging(Service.serviceId).broadcast("event.status",
-                    new ServiceAdvertisement("Record", Service.serviceId, ServiceStatus.AVAILABLE,
-                            new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
-        } catch (JMSException | AMQException | URISyntaxException e) {
-            e.printStackTrace();
-        }
+        Service.serviceChecker.setAdvertisment(new ServiceAdvertisement("Record", Service.serviceId, ServiceStatus.AVAILABLE,
+                new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
 
         for (int m = 1; m <= micro; m++) {
             final int finalM = m;

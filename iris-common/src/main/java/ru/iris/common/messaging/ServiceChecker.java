@@ -37,6 +37,7 @@ public class ServiceChecker implements Runnable {
     private static boolean shutdown = false;
     private UUID instanceId = UUID.randomUUID();
     private Object advertisment;
+    private boolean reinitialize = false;
 
     public ServiceChecker(UUID instanceId, Object advertisment) {
         this.instanceId = instanceId;
@@ -44,6 +45,19 @@ public class ServiceChecker implements Runnable {
 
         Thread t = new Thread(this);
         t.start();
+    }
+
+    public void setUUID(UUID instanceId) {
+        this.instanceId = instanceId;
+    }
+
+    public UUID getUUID() {
+        return instanceId;
+    }
+
+    public void setAdvertisment(Object advertisment) {
+        this.advertisment = advertisment;
+        this.reinitialize = true;
     }
 
     @Override
@@ -63,16 +77,19 @@ public class ServiceChecker implements Runnable {
             jsonMessaging.broadcast("service.status", advertisment);
 
             long lastStatusBroadcastMillis = System.currentTimeMillis();
+
             while (!shutdown) {
 
-                // If there is more than 60 seconds from last availability broadcasts then lets redo this.
-                if (60000L < System.currentTimeMillis() - lastStatusBroadcastMillis) {
+                // If there is more than 30 seconds from last availability broadcasts then lets redo this.
+                if (30000L < System.currentTimeMillis() - lastStatusBroadcastMillis || reinitialize) {
                     jsonMessaging.broadcast("service.status", advertisment);
                     lastStatusBroadcastMillis = System.currentTimeMillis();
+                    if (reinitialize)
+                        reinitialize = false;
                 }
 
                 // avoids high cpu load
-                Thread.sleep(1000);
+                Thread.sleep(5000L);
             }
 
             // Broadcast that this service is shutdown.

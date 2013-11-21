@@ -45,7 +45,7 @@ public class EventsService implements Runnable {
             jsonMessaging.subscribe("event.*");
             jsonMessaging.start();
 
-            jsonMessaging.broadcast("service.status", new ServiceAdvertisement(
+            Service.serviceChecker.setAdvertisment(new ServiceAdvertisement(
                     "Events", Service.serviceId, ServiceStatus.AVAILABLE,
                     new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
 
@@ -83,7 +83,7 @@ public class EventsService implements Runnable {
             }
 
             // Broadcast that this service is shutdown.
-            jsonMessaging.broadcast("service.status", new ServiceAdvertisement(
+            Service.serviceChecker.setAdvertisment(new ServiceAdvertisement(
                     "Events", Service.serviceId, ServiceStatus.SHUTDOWN,
                     new ServiceCapability[]{ServiceCapability.SYSTEM}));
 

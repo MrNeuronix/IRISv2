@@ -26,13 +26,14 @@ public class Service {
     public static HashMap<String, String> config;
     public static SQL sql;
     private static Logger log = LoggerFactory.getLogger(Service.class);
+    private static ServiceChecker serviceChecker;
     public static UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6008");
 
     public static void main(String[] args) throws Exception {
 
         DOMConfigurator.configure("conf/etc/log4j.xml");
 
-        new ServiceChecker(serviceId, new ServiceAdvertisement(
+        serviceChecker = new ServiceChecker(serviceId, new ServiceAdvertisement(
                 "Video", serviceId, ServiceStatus.STARTUP,
                 new ServiceCapability[]{ServiceCapability.SEE}));
 

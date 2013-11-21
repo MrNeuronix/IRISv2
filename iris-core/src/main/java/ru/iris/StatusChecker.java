@@ -69,6 +69,7 @@ public class StatusChecker implements Runnable {
                     if (envelope.getObject() instanceof ServiceAdvertisement) {
                         // We know of service advertisement. Lets log it properly.
                         final ServiceAdvertisement serviceAdvertisement = envelope.getObject();
+
                         log.debug("Service '" + serviceAdvertisement.getName()
                                 + "' status: '" + serviceAdvertisement.getStatus()
                                 + "' capabilities: " + Arrays.asList(serviceAdvertisement.getCapabilities())
@@ -96,8 +97,8 @@ public class StatusChecker implements Runnable {
                     }
                 }
 
-                // If there is more than 60 seconds from last availability broadcasts then lets redo this.
-                if (60000L < System.currentTimeMillis() - lastStatusBroadcastMillis) {
+                // If there is more than 30 seconds from last availability broadcasts then lets redo this.
+                if (30000L < System.currentTimeMillis() - lastStatusBroadcastMillis) {
                     jsonMessagingStatus.broadcast("service.status", new ServiceAdvertisement(
                             "Status Checker", instanceId, ServiceStatus.AVAILABLE,
                             new ServiceCapability[]{ServiceCapability.SYSTEM}));

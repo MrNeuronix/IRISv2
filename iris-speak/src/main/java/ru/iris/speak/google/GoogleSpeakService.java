@@ -12,7 +12,6 @@ package ru.iris.speak.google;
 
 import com.darkprograms.speech.synthesiser.Synthesiser;
 import javazoom.jl.player.Player;
-import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
@@ -24,10 +23,8 @@ import ru.iris.common.messaging.model.ServiceStatus;
 import ru.iris.common.messaging.model.SpeakAdvertisement;
 import ru.iris.speak.Service;
 
-import javax.jms.JMSException;
 import javax.sound.sampled.*;
 import java.io.File;
-import java.net.URISyntaxException;
 import java.util.UUID;
 
 public class GoogleSpeakService implements Runnable {
@@ -53,13 +50,9 @@ public class GoogleSpeakService implements Runnable {
         Clip clip = null;
         AudioInputStream audioIn;
 
-        try {
-            new JsonMessaging(Service.serviceId).broadcast("event.status",
-                    new ServiceAdvertisement("Speak", Service.serviceId, ServiceStatus.AVAILABLE,
-                            new ServiceCapability[]{ServiceCapability.SPEAK}));
-        } catch (JMSException | URISyntaxException | AMQException e) {
-            e.printStackTrace();
-        }
+        Service.serviceChecker.setAdvertisment(
+                new ServiceAdvertisement("Speak", Service.serviceId, ServiceStatus.AVAILABLE,
+                        new ServiceCapability[]{ServiceCapability.SPEAK}));
 
         if (Service.config.get("silence").equals("0")) {
             try {
@@ -129,20 +122,21 @@ public class GoogleSpeakService implements Runnable {
                 }
             }
 
-            try {
-                new JsonMessaging(Service.serviceId).broadcast("event.status",
-                        new ServiceAdvertisement("Speak", Service.serviceId, ServiceStatus.SHUTDOWN,
-                                new ServiceCapability[]{ServiceCapability.SPEAK}));
-            } catch (JMSException | URISyntaxException | AMQException e) {
-                e.printStackTrace();
-            }
+            Service.serviceChecker.setAdvertisment(
+                    new ServiceAdvertisement("Speak", Service.serviceId, ServiceStatus.SHUTDOWN,
+                            new ServiceCapability[]{ServiceCapability.SPEAK}));
 
             // Close JSON messaging.
             jsonMessaging.close();
 
         } catch (final Throwable t) {
-            t.printStackTrace();
+
             log.error("Unexpected exception in Speak", t);
+
+            Service.serviceChecker.setAdvertisment(
+                    new ServiceAdvertisement("Speak", Service.serviceId, ServiceStatus.SHUTDOWN,
+                            new ServiceCapability[]{ServiceCapability.SPEAK}));
+            t.printStackTrace();
         }
     }
 }

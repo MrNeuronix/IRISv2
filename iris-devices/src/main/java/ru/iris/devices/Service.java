@@ -34,6 +34,7 @@ public class Service {
 
     public static Map<String, String> config;
     public static SQL sql;
+    public static ServiceChecker serviceChecker;
     public static UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6002");
 
     private static Logger log = LoggerFactory.getLogger(Service.class);
@@ -42,7 +43,7 @@ public class Service {
         DOMConfigurator.configure("conf/etc/log4j.xml");
         I18N i18n = new I18N();
 
-        new ServiceChecker(serviceId, new ServiceAdvertisement(
+        serviceChecker = new ServiceChecker(serviceId, new ServiceAdvertisement(
                 "Devices", serviceId, ServiceStatus.STARTUP,
                 new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
 
