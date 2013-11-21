@@ -227,6 +227,11 @@ public class ZWaveService implements Runnable {
                             break;
                         }
 
+                        // check empty
+                        if (manager.getValueLabel(notification.getValueId()).isEmpty()) {
+                            break;
+                        }
+
                         zrZWaveDevice.removeValueID(manager.getValueLabel(notification.getValueId()));
                         log.info(i18n.message("zwave.node.0.value.1.removed", zrZWaveDevice.getNode(), manager.getValueLabel(notification.getValueId())));
 
@@ -248,7 +253,12 @@ public class ZWaveService implements Runnable {
                             break;
                         }
 
-                        log.info(i18n.message("zwave.node.0.value.for.label.1.changed.2.3", zcZWaveDevice.getNode(), manager.getValueLabel(notification.getValueId()), Utils.getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))), Utils.getValue(notification.getValueId())));
+                        log.info(i18n.message("zwave.node.0.value.for.label.1.changed.2.3",
+                                zcZWaveDevice.getNode(),
+                                manager.getValueLabel(notification.getValueId()),
+                                Utils.getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))),
+                                Utils.getValue(notification.getValueId())));
+
                         zcZWaveDevice.updateValueID(manager.getValueLabel(notification.getValueId()), notification.getValueId());
 
                         break;
