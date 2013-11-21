@@ -9,9 +9,7 @@ package ru.iris.common.devices;
  * Time: 16:01
  */
 
-import com.google.gson.annotations.Expose;
 import org.zwave4j.ValueId;
-import ru.iris.common.Utils;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -21,9 +19,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class ZWaveDevice extends Device implements Serializable {
-
-    @Expose
-    private HashMap<String, Object> valueIDs = new HashMap<>();
 
     public ZWaveDevice() throws IOException, SQLException {
         super();
@@ -40,7 +35,6 @@ public class ZWaveDevice extends Device implements Serializable {
             label = i18n.message("none.set");
 
         this.LabelsValues.put(label, value);
-        this.valueIDs.put(label, Utils.getValue((ValueId) value));
     }
 
     public void updateValueID(String label, Object value) {
@@ -62,24 +56,6 @@ public class ZWaveDevice extends Device implements Serializable {
         }
 
         LabelsValues = zDv;
-
-        HashMap<String, Object> zDvDigits = new HashMap<>();
-
-        Iterator itDigits = LabelsValues.entrySet().iterator();
-        while (itDigits.hasNext()) {
-            Map.Entry pairs = (Map.Entry) itDigits.next();
-
-            String olabel = String.valueOf(pairs.getKey());
-            ValueId ovalue = (ValueId) pairs.getValue();
-
-            if (label.equals(olabel)) {
-                zDvDigits.put(label, value);
-            } else {
-                zDvDigits.put(olabel, Utils.getValue(ovalue));
-            }
-        }
-
-        valueIDs = zDvDigits;
     }
 
     public void removeValueID(String label) {
@@ -104,24 +80,6 @@ public class ZWaveDevice extends Device implements Serializable {
         }
 
         LabelsValues = zDv;
-
-        HashMap<String, Object> zDvDigits = new HashMap<>();
-
-        Iterator itDigits = LabelsValues.entrySet().iterator();
-        while (itDigits.hasNext()) {
-            Map.Entry pairs = (Map.Entry) itDigits.next();
-
-            String olabel = String.valueOf(pairs.getKey());
-            ValueId ovalue = (ValueId) pairs.getValue();
-
-            if (label.equals(olabel)) {
-                continue;
-            } else {
-                zDvDigits.put(olabel, Utils.getValue(ovalue));
-            }
-        }
-
-        valueIDs = zDvDigits;
     }
 
     public void save() throws SQLException {

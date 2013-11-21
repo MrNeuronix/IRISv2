@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
-import ru.iris.common.devices.ZWaveDevice;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.GetInventoryAdvertisement;
@@ -13,7 +12,7 @@ import ru.iris.common.messaging.model.SetDeviceLevelAdvertisement;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -66,11 +65,9 @@ public class DevicesREST {
 
     private String getDevices(String uuid) {
         final UUID InstanceId = UUID.randomUUID();
-        JsonMessaging messaging = null;
 
         try {
-
-            messaging = new JsonMessaging(InstanceId);
+            JsonMessaging messaging = new JsonMessaging(InstanceId);
             messaging.subscribe("event.devices.responseinventory");
             messaging.start();
 
@@ -79,17 +76,13 @@ public class DevicesREST {
             // Lets wait for 5000 ms on json messages and if nothing comes then proceed to carry out other tasks.
             final JsonEnvelope envelope = messaging.receive(5000);
             if (envelope != null) {
-                if (envelope.getObject() instanceof ZWaveDevice) {
-                    return gson.toJson(envelope.getObject());
-                } else if (envelope.getObject() instanceof HashMap) {
-                    return gson.toJson(envelope.getObject());
+                if (envelope.getObject() instanceof ArrayList || envelope.getObject() instanceof JsonEnvelope) {
+                    return envelope.getObject().toString();
                 } else {
                     log.info("Unknown response! " + envelope.getObject());
-                    return "{ \"error\": \"Unknown response! " + envelope.getObject() + "\" }";
+                    return "{ \"error\": \"Unknown response! Class: " + envelope.getClass() + " Response: " + envelope.getObject() + "\" }";
                 }
             }
-
-
         } catch (final Throwable t) {
             log.error("Unexpected exception in DevicesREST", t);
             return "{ \"error\": \"" + t.toString() + "\" }";

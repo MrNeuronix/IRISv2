@@ -1,7 +1,10 @@
 package ru.iris.devices.zwave;
 
 
-import com.google.gson.annotations.Expose;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zwave4j.*;
@@ -16,10 +19,7 @@ import ru.iris.devices.Service;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -32,11 +32,11 @@ public class ZWaveService implements Runnable {
     private static Logger log = LoggerFactory.getLogger(ZWaveService.class.getName());
     private static long homeId;
     private static boolean ready = false;
-    @Expose
     private static HashMap<String, ZWaveDevice> zDevices = new HashMap<>();
     private static final I18N i18n = new I18N();
     private boolean initComplete = false;
     private boolean shutdown = false;
+    private static Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
     public ZWaveService() {
         Thread t = new Thread(this);
@@ -373,12 +373,58 @@ public class ZWaveService implements Runnable {
 
                         final GetInventoryAdvertisement advertisement = envelope.getObject();
 
+                        ArrayList<String> inventory = new ArrayList<>();
+
                         if (advertisement.getDeviceUUID().equals("all")) {
-                            jsonMessaging.broadcast("event.devices.responseinventory", zDevices);
+
+                            Iterator it = zDevices.entrySet().iterator();
+                            while (it.hasNext()) {
+
+                                Map.Entry pairs = (Map.Entry) it.next();
+
+                                ZWaveDevice zwd = (ZWaveDevice) pairs.getValue();
+                                JsonElement jsonElement = gson.toJsonTree(zwd);
+                                JsonObject jsValues = new JsonObject();
+
+                                Iterator itDigits = zwd.getValueIDs().entrySet().iterator();
+                                while (itDigits.hasNext()) {
+
+                                    Map.Entry pair = (Map.Entry) itDigits.next();
+
+                                    String olabel = String.valueOf(pair.getKey());
+                                    ValueId ovalue = (ValueId) pair.getValue();
+
+                                    jsValues.addProperty(olabel, String.valueOf(Utils.getValue(ovalue)));
+                                }
+
+                                jsonElement.getAsJsonObject().add("values", jsValues);
+
+                                inventory.add(gson.toJson(jsonElement));
+                            }
+
+                            jsonMessaging.broadcast("event.devices.responseinventory", inventory);
+
                         } else {
                             ZWaveDevice zdv = getZWaveDeviceByUUID(advertisement.getDeviceUUID());
-                            if (zdv != null)
+                            if (zdv != null) {
+                                JsonElement jsonElement = gson.toJsonTree(zdv);
+                                JsonObject jsValues = new JsonObject();
+
+                                Iterator itDigits = zdv.getValueIDs().entrySet().iterator();
+                                while (itDigits.hasNext()) {
+
+                                    Map.Entry pair = (Map.Entry) itDigits.next();
+
+                                    String olabel = String.valueOf(pair.getKey());
+                                    ValueId ovalue = (ValueId) pair.getValue();
+
+                                    jsValues.addProperty(olabel, String.valueOf(Utils.getValue(ovalue)));
+                                }
+
+                                jsonElement.getAsJsonObject().add("values", jsValues);
+
                                 jsonMessaging.broadcast("event.devices.responseinventory", zdv);
+                            }
                         }
 
                     } else if (envelope.getReceiverInstanceId() == null) {
