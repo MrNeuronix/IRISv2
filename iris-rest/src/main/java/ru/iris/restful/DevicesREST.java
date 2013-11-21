@@ -1,7 +1,5 @@
 package ru.iris.restful;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +29,6 @@ public class DevicesREST {
 
     private static Logger log = LoggerFactory.getLogger(DevicesREST.class.getName());
     private static I18N i18n = new I18N();
-    private static Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
     @GET
     @Path("/{uuid}")

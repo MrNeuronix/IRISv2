@@ -10,21 +10,23 @@ package ru.iris.speak.voicerss;
  * License: GPL v3
  */
 
-
+import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
-import ru.iris.common.Messaging;
+import ru.iris.common.messaging.JsonEnvelope;
+import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
 import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
+import ru.iris.common.messaging.model.SpeakAdvertisement;
 import ru.iris.speak.Service;
 
-import javax.jms.MapMessage;
-import javax.jms.Message;
-import javax.jms.MessageConsumer;
+import javax.jms.JMSException;
 import javax.sound.sampled.*;
 import java.io.File;
+import java.net.URISyntaxException;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,6 +35,7 @@ public class VoiceRSSSpeakService implements Runnable {
     Thread t = null;
     private static Logger log = LoggerFactory.getLogger(VoiceRSSSpeakService.class.getName());
     private static I18N i18n = new I18N();
+    private boolean shutdown = false;
 
     public VoiceRSSSpeakService() {
         t = new Thread(this);
@@ -47,29 +50,29 @@ public class VoiceRSSSpeakService implements Runnable {
     public synchronized void run() {
         log.info(i18n.message("speak.service.started.tts.voicerss"));
 
-        Message message = null;
-         MapMessage m = null;
         ExecutorService exs = Executors.newFixedThreadPool(10);
 
         Clip clip = null;
         AudioInputStream audioIn = null;
 
-        Service.ServiceState.setAdvertisment(new ServiceAdvertisement(
-                "Speak", Service.serviceId, ServiceStatus.AVAILABLE,
-                new ServiceCapability[]{ServiceCapability.SPEAK}));
+        try {
+            new JsonMessaging(Service.serviceId).broadcast("event.status",
+                    new ServiceAdvertisement("Speak", Service.serviceId, ServiceStatus.AVAILABLE,
+                            new ServiceCapability[]{ServiceCapability.SPEAK}));
+        } catch (JMSException | URISyntaxException | AMQException e) {
+            e.printStackTrace();
+        }
 
-        if(Service.config.get("silence").equals("0"))
-        {
+        if (Service.config.get("silence").equals("0")) {
             try {
                 audioIn = AudioSystem.getAudioInputStream(new File("./conf/beep.wav"));
                 AudioFormat format = audioIn.getFormat();
                 DataLine.Info info = new DataLine.Info(Clip.class, format);
-                clip = (Clip)AudioSystem.getLine(info);
+                clip = (Clip) AudioSystem.getLine(info);
                 clip.open(audioIn);
                 clip.start();
 
-                while(clip.isRunning())
-                {
+                while (clip.isRunning()) {
                     Thread.yield();
                 }
             } catch (Exception e) {
@@ -78,39 +81,70 @@ public class VoiceRSSSpeakService implements Runnable {
         }
 
         try {
-            MessageConsumer messageConsumer = new Messaging().getConsumer();
+            // Make sure we exit the wait loop if we receive shutdown signal.
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    shutdown = true;
+                }
+            }));
 
-            while ((message = messageConsumer.receive(0)) != null) {
-                m = (MapMessage) message;
+            JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
+            jsonMessaging.subscribe("event.speak");
+            jsonMessaging.start();
 
-                if (m.getStringProperty("qpid.subject").equals("event.speak")) {
-                    if (Service.config.get("silence").equals("0")) {
-                        log.info("[speak] -----------------------");
-                        log.info(i18n.message("speak.confidence.01", m.getDoubleProperty("confidence")));
-                        log.info(i18n.message("speak.text.01", m.getStringProperty("text")));
-                        log.info("[speak] -----------------------");
+            while (!shutdown) {
 
-                        if(!Service.config.get("silence").equals("1"))
-                        {
-                            clip.setFramePosition(0);
-                            clip.start();
-                            clip.start();
+                // Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
+                final JsonEnvelope envelope = jsonMessaging.receive(100);
+                if (envelope != null) {
+                    if (envelope.getObject() instanceof SpeakAdvertisement) {
+
+                        SpeakAdvertisement advertisement = envelope.getObject();
+
+                        if (Service.config.get("silence").equals("0")) {
+                            log.info(i18n.message("speak.confidence.0", advertisement.getConfidence()));
+                            log.info(i18n.message("speak.text.0", advertisement.getText()));
+
+                            if (!Service.config.get("silence").equals("1")) {
+                                clip.setFramePosition(0);
+                                clip.start();
+                                clip.start();
+                            }
+
+                            VoiceRSSSynthesizer Voice = new VoiceRSSSynthesizer(exs);
+                            Voice.setAnswer(advertisement.getText());
+                            exs.submit(Voice).get();
+
+                        } else {
+                            log.info(i18n.message("speak.silence.mode.enabled.ignore.speak.request"));
                         }
 
-                        VoiceRSSSynthesizer Voice = new VoiceRSSSynthesizer(exs);
-                        Voice.setAnswer(m.getStringProperty("text"));
-                        exs.submit(Voice).get();
                     } else {
-                        log.info(i18n.message("speak.silence.mode.enabled.ignore.speak.request"));
+                        // We received unknown request message. Lets make generic log entry.
+                        log.info("Received request "
+                                + " from " + envelope.getSenderInstanceId()
+                                + " to " + envelope.getReceiverInstanceId()
+                                + " at '" + envelope.getSubject()
+                                + ": " + envelope.getObject());
                     }
                 }
             }
 
-            Service.msg.close();
+            try {
+                new JsonMessaging(Service.serviceId).broadcast("event.status",
+                        new ServiceAdvertisement("Speak", Service.serviceId, ServiceStatus.SHUTDOWN,
+                                new ServiceCapability[]{ServiceCapability.SPEAK}));
+            } catch (JMSException | URISyntaxException | AMQException e) {
+                e.printStackTrace();
+            }
 
-        } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-            log.info(i18n.message("speak.get.error.0", m));
+            // Close JSON messaging.
+            jsonMessaging.close();
+
+        } catch (final Throwable t) {
+            t.printStackTrace();
+            log.error("Unexpected exception in Speak", t);
         }
     }
 }

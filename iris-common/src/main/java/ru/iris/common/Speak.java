@@ -1,15 +1,14 @@
 package ru.iris.common;
 
 import org.apache.qpid.AMQException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.model.SpeakAdvertisement;
 
 import javax.jms.JMSException;
-import javax.jms.MapMessage;
-import javax.jms.MessageProducer;
-import javax.jms.Session;
 import java.net.URISyntaxException;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,28 +19,16 @@ import java.net.URISyntaxException;
  */
 public class Speak {
 
-    private static MessageProducer messageProducer;
-    private static Session session;
     private static Logger log = LoggerFactory.getLogger(Speak.class);
 
-    public static void add(String text) throws AMQException, JMSException, URISyntaxException {
+    public void add(String text) throws AMQException, JMSException, URISyntaxException {
 
         I18N i18n = new I18N();
-        Messaging msg = new Messaging();
-         MapMessage message = null;
-        session = msg.getSession();
-        messageProducer = msg.getProducer();
 
         try {
-            message = session.createMapMessage();
-
-            message.setStringProperty("text", text);
-            message.setDoubleProperty("confidence", 100);
-            message.setStringProperty("qpid.subject", "event.speak");
-
-            messageProducer.send(message);
+            new JsonMessaging(UUID.randomUUID()).broadcast("event.speak", new SpeakAdvertisement(text, 100.0));
         } catch (JMSException e) {
-            log.info(i18n.message("error.failed.speak.0", message));  //To change body of catch statement use File | Settings | File Templates.
+            log.info(i18n.message("error.failed.speak.0", text));
         }
     }
 }

@@ -1,10 +1,12 @@
 package ru.iris.speak;
 
 import org.apache.log4j.xml.DOMConfigurator;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.iris.common.*;
+import ru.iris.common.Config;
+import ru.iris.common.I18N;
+import ru.iris.common.SQL;
+import ru.iris.common.Speak;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
 import ru.iris.common.messaging.model.ServiceCapability;
@@ -12,7 +14,6 @@ import ru.iris.common.messaging.model.ServiceStatus;
 import ru.iris.speak.google.GoogleSpeakService;
 import ru.iris.speak.voicerss.VoiceRSSSpeakService;
 
-import javax.jms.*;
 import java.util.Map;
 import java.util.UUID;
 
@@ -29,13 +30,7 @@ public class Service {
 
     public static Map<String, String> config;
     public static SQL sql;
-    public static MessageConsumer messageConsumer;
-    public static MessageProducer messageProducer;
-
-    public static Messaging msg;
-    public static Session session;
     private static I18N i18n = new I18N();
-    public static ServiceChecker ServiceState;
     public static UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6007");
 
     private static Logger log = LoggerFactory.getLogger(Service.class);
@@ -44,7 +39,7 @@ public class Service {
 
         DOMConfigurator.configure("conf/etc/log4j.xml");
 
-        ServiceState = new ServiceChecker(serviceId, new ServiceAdvertisement(
+        new ServiceChecker(serviceId, new ServiceAdvertisement(
                 "Speak", serviceId, ServiceStatus.STARTUP,
                 new ServiceCapability[]{ServiceCapability.SPEAK}));
 
@@ -54,14 +49,7 @@ public class Service {
 
         Speak speak = new Speak();
 
-        msg = new Messaging();
-        messageConsumer = msg.getConsumer();
-        messageProducer = msg.getProducer();
-        session = msg.getSession();
-
-        log.info("[iris] ----------------------------------");
         log.info(i18n.message("iris.speak.service.starting"));
-        log.info("[iris] ----------------------------------");
 
         if (config.get("ttsEngine").equals("google")) {
             new GoogleSpeakService();

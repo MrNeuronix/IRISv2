@@ -11,43 +11,26 @@ package ru.iris.modules;
  */
 
 import org.apache.qpid.AMQException;
-
-import ru.iris.common.Messaging;
 import ru.iris.common.Module;
+import ru.iris.common.Speak;
 
-import javax.jms.*;
+import javax.jms.JMSException;
 import java.net.URISyntaxException;
 
 public class Say implements Module {
 
-    public static MessageConsumer messageConsumer;
-    public static MessageProducer messageProducer;
-    public static Messaging msg;
-    public static Session session;
-
     public Say() {
-        try {
-            msg = new Messaging();
-        } catch (JMSException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        } catch (AMQException e) {
-            e.printStackTrace();
-        }
-        messageConsumer = msg.getConsumer();
-        messageProducer = msg.getProducer();
-        session = msg.getSession();
     }
 
     public void run(String arg) throws JMSException {
 
-        MapMessage message = session.createMapMessage();
-
-        message.setStringProperty("text", arg);
-        message.setDoubleProperty("confidence", 100);
-        message.setStringProperty("qpid.subject", "event.speak");
-
-        messageProducer.send(message);
+        Speak speak = new Speak();
+        try {
+            speak.add(arg);
+        } catch (AMQException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 }

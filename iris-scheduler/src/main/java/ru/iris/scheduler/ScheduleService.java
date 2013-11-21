@@ -9,14 +9,18 @@ package ru.iris.scheduler;
  * Time: 13:26
  */
 
+import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
 import ru.iris.common.Module;
+import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
 import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
 
+import javax.jms.JMSException;
+import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.util.Date;
 
@@ -72,9 +76,13 @@ public class ScheduleService implements Runnable {
 
         // Запускаем выполнение тасков
 
-        Service.ServiceState.setAdvertisment(new ServiceAdvertisement(
-                "Scheduler", Service.serviceId, ServiceStatus.AVAILABLE,
-                new ServiceCapability[]{ServiceCapability.CONTROL}));
+        try {
+            new JsonMessaging(Service.serviceId).broadcast("event.status",
+                    new ServiceAdvertisement("Scheduler", Service.serviceId, ServiceStatus.AVAILABLE,
+                            new ServiceCapability[]{ServiceCapability.CONTROL}));
+        } catch (JMSException | URISyntaxException | AMQException e) {
+            e.printStackTrace();
+        }
 
         while (true) {
             try {

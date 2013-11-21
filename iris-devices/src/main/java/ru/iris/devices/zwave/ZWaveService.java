@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zwave4j.*;
@@ -16,7 +17,9 @@ import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.*;
 import ru.iris.devices.Service;
 
+import javax.jms.JMSException;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -248,8 +251,8 @@ public class ZWaveService implements Runnable {
                             break;
                         }
 
-                        zcZWaveDevice.updateValueID(manager.getValueLabel(notification.getValueId()), notification.getValueId());
                         log.info(i18n.message("zwave.node.0.value.for.label.1.changed.2.3", zcZWaveDevice.getNode(), manager.getValueLabel(notification.getValueId()), Utils.getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))), Utils.getValue(notification.getValueId())));
+                        zcZWaveDevice.updateValueID(manager.getValueLabel(notification.getValueId()), notification.getValueId());
 
                         break;
                     case VALUE_REFRESHED:
@@ -298,9 +301,13 @@ public class ZWaveService implements Runnable {
 
         log.info(i18n.message("zwave.initialization.complete.found.0.device.s", zDevices.size()));
 
-        Service.ServiceState.setAdvertisment(new ServiceAdvertisement(
-                "Devices", Service.serviceId, ServiceStatus.AVAILABLE,
-                new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
+        try {
+            new JsonMessaging(Service.serviceId).broadcast("event.status",
+                    new ServiceAdvertisement("Devices", Service.serviceId, ServiceStatus.AVAILABLE,
+                            new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
+        } catch (JMSException | AMQException | URISyntaxException e) {
+            e.printStackTrace();
+        }
 
         for (ZWaveDevice ZWaveDevice : zDevices.values()) {
             try {
