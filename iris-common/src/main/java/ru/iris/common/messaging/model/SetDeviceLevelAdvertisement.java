@@ -61,4 +61,9 @@ public class SetDeviceLevelAdvertisement extends Advertisement {
     public void setDeviceUUID(String deviceUUID) {
         this.deviceUUID = deviceUUID;
     }
+
+    @Override
+    public String toString() {
+        return "SetDeviceLevelAdvertisement { UUID: " + deviceUUID + ", label: " + label + ", value: " + value + " }";
+    }
 }

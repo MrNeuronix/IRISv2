@@ -30,4 +30,9 @@ public class GetInventoryAdvertisement extends Advertisement {
     public void setDeviceUUID(String deviceUUID) {
         this.deviceUUID = deviceUUID;
     }
+
+    @Override
+    public String toString() {
+        return "GetInventoryAdvertisement { UUID: " + deviceUUID + " }";
+    }
 }

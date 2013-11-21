@@ -44,4 +44,9 @@ public class SpeakAdvertisement extends Advertisement {
     public void setConfidence(double confidence) {
         this.confidence = confidence;
     }
+
+    @Override
+    public String toString() {
+        return "SpeakAdvertisement { text: " + text + ", confidence: " + confidence + " }";
+    }
 }

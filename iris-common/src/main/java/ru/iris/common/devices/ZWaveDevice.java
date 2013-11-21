@@ -72,11 +72,8 @@ public class ZWaveDevice extends Device implements Serializable {
             String olabel = String.valueOf(pairs.getKey());
             ValueId ovalue = (ValueId) pairs.getValue();
 
-            if (label.equals(olabel)) {
-                continue;
-            } else {
+            if (!label.equals(olabel))
                 zDv.put(olabel, ovalue);
-            }
         }
 
         LabelsValues = zDv;
@@ -97,6 +94,6 @@ public class ZWaveDevice extends Device implements Serializable {
             this.name = i18n.message("not.set");
 
         sql.doQuery("DELETE FROM DEVICES WHERE UUID='" + this.uuid + "'");
-        sql.doQuery("INSERT INTO DEVICES (SOURCE, UUID, internaltype, TYPE, MANUFNAME, NODE, STATUS, NAME, ZONE, PRODUCTNAME) VALUES ('zwave','" + uuid + "','" + internalType + "','" + type + "','" + manufName + "','" + node + "','" + status + "','" + name + "','" + zone + "','" + productName + "')");
+        sql.doQuery("INSERT INTO DEVICES (SOURCE, UUID, internaltype, TYPE, MANUFNAME, NODE, STATUS, NAME, ZONE, PRODUCTNAME, internalname) VALUES ('zwave','" + uuid + "','" + internalType + "','" + type + "','" + manufName + "','" + node + "','" + status + "','" + name + "','" + zone + "','" + productName + "','" + internalName + "')");
     }
 }
