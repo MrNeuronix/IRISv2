@@ -423,7 +423,7 @@ public class ZWaveService implements Runnable {
 
                                 jsonElement.getAsJsonObject().add("values", jsValues);
 
-                                jsonMessaging.broadcast("event.devices.responseinventory", zdv);
+                                jsonMessaging.broadcast("event.devices.responseinventory", jsonElement);
                             }
                         }
 

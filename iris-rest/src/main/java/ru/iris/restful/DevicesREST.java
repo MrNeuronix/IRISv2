@@ -2,6 +2,7 @@ package ru.iris.restful;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
@@ -76,11 +77,11 @@ public class DevicesREST {
             // Lets wait for 5000 ms on json messages and if nothing comes then proceed to carry out other tasks.
             final JsonEnvelope envelope = messaging.receive(5000);
             if (envelope != null) {
-                if (envelope.getObject() instanceof ArrayList || envelope.getObject() instanceof JsonEnvelope) {
+                if (envelope.getObject() instanceof ArrayList || envelope.getObject() instanceof JsonElement) {
                     return envelope.getObject().toString();
                 } else {
                     log.info("Unknown response! " + envelope.getObject());
-                    return "{ \"error\": \"Unknown response! Class: " + envelope.getClass() + " Response: " + envelope.getObject() + "\" }";
+                    return "{ \"error\": \"Unknown response! Class: " + envelope.getObject().getClass() + " Response: " + envelope.getObject() + "\" }";
                 }
             }
         } catch (final Throwable t) {
