@@ -33,8 +33,8 @@ import java.util.UUID;
 
 public class ServiceChecker implements Runnable {
 
-    private static Logger log = LoggerFactory.getLogger(ServiceChecker.class.getName());
-    private static boolean shutdown = false;
+    private Logger log = LoggerFactory.getLogger(ServiceChecker.class.getName());
+    private boolean shutdown = false;
     private UUID instanceId = UUID.randomUUID();
     private Object advertisment;
     private boolean reinitialize = false;

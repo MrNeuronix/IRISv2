@@ -29,6 +29,7 @@ public class DevicesREST {
 
     private Logger log = LoggerFactory.getLogger(DevicesREST.class.getName());
     private I18N i18n = new I18N();
+    private final UUID InstanceId = UUID.randomUUID();
 
     @GET
     @Path("/{uuid}")
@@ -49,7 +50,7 @@ public class DevicesREST {
     private String sendLevelMessage(String uuid, String label, String value) {
         try {
 
-            final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
+            final JsonMessaging jsonMessaging = new JsonMessaging(InstanceId);
             jsonMessaging.broadcast("event.devices.setvalue", new SetDeviceLevelAdvertisement(uuid, label, value));
             jsonMessaging.close();
 
@@ -62,7 +63,6 @@ public class DevicesREST {
     }
 
     private String getDevices(String uuid) {
-        final UUID InstanceId = UUID.randomUUID();
 
         try {
             JsonMessaging messaging = new JsonMessaging(InstanceId);
@@ -75,15 +75,17 @@ public class DevicesREST {
             final JsonEnvelope envelope = messaging.receive(5000);
             if (envelope != null) {
                 if (envelope.getObject() instanceof ResponseZWaveDeviceArrayInventoryAdvertisement) {
+                    messaging.close();
                     return ((ResponseZWaveDeviceArrayInventoryAdvertisement) envelope.getObject()).getDevices().toString();
                 } else if (envelope.getObject() instanceof ResponseZWaveDeviceInventoryAdvertisement) {
+                    messaging.close();
                     return ((ResponseZWaveDeviceInventoryAdvertisement) envelope.getObject()).getDevice().toString();
                 } else {
                     log.info("Unknown response! " + envelope.getObject());
+                    messaging.close();
                     return "{ \"error\": \"Unknown response! Class: " + envelope.getObject().getClass() + " Response: " + envelope.getObject() + "\" }";
                 }
             }
-            messaging.close();
 
         } catch (final Throwable t) {
             log.error("Unexpected exception in DevicesREST", t);
