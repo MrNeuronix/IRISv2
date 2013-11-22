@@ -20,8 +20,7 @@ public class ResponseZWaveDeviceInventoryAdvertisement extends Advertisement {
     @Expose
     private JsonElement device;
 
-    public ResponseZWaveDeviceInventoryAdvertisement(JsonElement device)
-    {
+    public ResponseZWaveDeviceInventoryAdvertisement(JsonElement device) {
         this.device = device;
     }
 
@@ -31,5 +30,12 @@ public class ResponseZWaveDeviceInventoryAdvertisement extends Advertisement {
 
     public void setDevice(JsonElement device) {
         this.device = device;
+    }
+
+    @Override
+    public String toString() {
+        return "ResponseZWaveDeviceInventoryAdvertisement {" +
+                "zwaveDevice=" + device +
+                '}';
     }
 }

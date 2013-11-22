@@ -54,10 +54,10 @@ public class Service {
 
         if (config.get("ttsEngine").equals("google")) {
             new GoogleSpeakService();
-            speak.add(i18n.message("syth.voice.launched"));
+            speak.say(i18n.message("syth.voice.launched"));
         } else if (config.get("ttsEngine").equals("voicerss")) {
             new VoiceRSSSpeakService();
-            speak.add(i18n.message("voice.synth.voicerss.launched"));
+            speak.say(i18n.message("voice.synth.voicerss.launched"));
         } else {
             log.info(i18n.message("speak.no.tts.system.specified.in.config.file"));
         }

@@ -684,7 +684,7 @@ public class ZWaveService implements Runnable {
                 e.printStackTrace();
             }
 
-            log.info(i18n.message("zwave.add.device.to.array.0.1", type, notification.getNodeId()));
+            log.info(i18n.message("zwave.say.device.to.array.0.1", type, notification.getNodeId()));
             zDevices.put("zwave/" + type + "/" + notification.getNodeId(), ZWaveDevice);
         } else {
 
@@ -692,7 +692,7 @@ public class ZWaveService implements Runnable {
             ZWaveDevice.setProductName(productName);
             ZWaveDevice.setStatus(state);
 
-            log.info(i18n.message("zwave.node.0.add.value.to.device.1.2", ZWaveDevice.getNode(), label, Utils.getValue(notification.getValueId())));
+            log.info(i18n.message("zwave.node.0.say.value.to.device.1.2", ZWaveDevice.getNode(), label, Utils.getValue(notification.getValueId())));
             ZWaveDevice.setValueID(label, notification.getValueId());
         }
 

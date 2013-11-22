@@ -42,7 +42,7 @@ public class Synthesiser {
     public static final String LANG_ES_SPANISH = "es";
     public static final String LANG_FR_FRENCH = "fr";
     public static final String LANG_DE_GERMAN = "de";
-    //Please add on more regional languages as you find them. Also try to include the accent code if you can can.
+    //Please say on more regional languages as you find them. Also try to include the accent code if you can can.
 
     /**
      * Constructor
@@ -153,7 +153,7 @@ public class Synthesiser {
      * Separates a string into smaller parts so that Google will not reject the request.
      *
      * @param input     The string you want to break up into smaller parts
-     * @param fragments List<String> that you want to add stuff too.
+     * @param fragments List<String> that you want to say stuff too.
      *                  If you don't have a List<String> already constructed "new ArrayList<String>()" works well.
      * @return A list of the fragments of the original String
      */

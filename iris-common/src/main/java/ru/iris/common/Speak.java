@@ -21,12 +21,14 @@ public class Speak {
 
     private static Logger log = LoggerFactory.getLogger(Speak.class);
 
-    public void add(String text) throws AMQException, JMSException, URISyntaxException {
+    public void say(String text) throws AMQException, JMSException, URISyntaxException {
 
         I18N i18n = new I18N();
 
         try {
-            new JsonMessaging(UUID.randomUUID()).broadcast("event.speak", new SpeakAdvertisement(text, 100.0));
+            JsonMessaging messaging = new JsonMessaging(UUID.randomUUID());
+            messaging.broadcast("event.speak", new SpeakAdvertisement(text, 100.0));
+            messaging.close();
         } catch (JMSException e) {
             log.info(i18n.message("error.failed.speak.0", text));
         }
