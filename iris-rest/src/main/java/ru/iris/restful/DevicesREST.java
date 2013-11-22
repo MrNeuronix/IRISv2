@@ -75,14 +75,14 @@ public class DevicesREST {
             final JsonEnvelope envelope = messaging.receive(5000);
             if (envelope != null) {
                 if (envelope.getObject() instanceof ResponseZWaveDeviceArrayInventoryAdvertisement) {
-                    messaging.close();
+                    //messaging.close();
                     return ((ResponseZWaveDeviceArrayInventoryAdvertisement) envelope.getObject()).getDevices().toString();
                 } else if (envelope.getObject() instanceof ResponseZWaveDeviceInventoryAdvertisement) {
                     messaging.close();
                     return ((ResponseZWaveDeviceInventoryAdvertisement) envelope.getObject()).getDevice().toString();
                 } else {
                     log.info("Unknown response! " + envelope.getObject());
-                    messaging.close();
+                    //messaging.close();
                     return "{ \"error\": \"Unknown response! Class: " + envelope.getObject().getClass() + " Response: " + envelope.getObject() + "\" }";
                 }
             }

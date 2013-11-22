@@ -18,7 +18,6 @@ package ru.iris.common.messaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.qpid.AMQException;
 import org.apache.qpid.client.AMQAnyDestination;
 import org.apache.qpid.client.AMQConnection;
@@ -26,13 +25,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jms.*;
-import javax.jms.Queue;
 import java.net.URISyntaxException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Prototype for JSON message broadcasting.
@@ -57,10 +57,6 @@ public class JsonMessaging {
      */
     private Destination destination;
     /**
-     * The reply queue.
-     */
-    private Queue replyQueue;
-    /**
      * The message producer.
      */
     private MessageProducer messageProducer;
@@ -68,14 +64,6 @@ public class JsonMessaging {
      * The message consumer.
      */
     private MessageConsumer messageConsumer;
-    /**
-     * The reply producer.
-     */
-    private MessageProducer replyProducer;
-    /**
-     * The reply consumer.
-     */
-    private MessageConsumer replyConsumer;
 
     /**
      * The instance ID.
@@ -97,14 +85,6 @@ public class JsonMessaging {
      * The JSON broadcast listen thread.
      */
     private Thread jsonBroadcastListenThread;
-    /**
-     * The JSON reply listen thread.
-     */
-    private Thread jsonReplyListenThread;
-    /**
-     * The replies.
-     */
-    private Map<String, JsonEnvelope> replies = Collections.synchronizedMap(new HashMap<String, JsonEnvelope>());
 
     /**
      * Public constructor which setups connectivity and session to AMQP message broker.
@@ -121,11 +101,8 @@ public class JsonMessaging {
 
         session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
         destination = new AMQAnyDestination("ADDR:iris; {create: always, node: {type: topic}}");
-        replyQueue = session.createTemporaryQueue();
         messageConsumer = session.createConsumer(destination);
         messageProducer = session.createProducer(destination);
-        replyConsumer = session.createConsumer(replyQueue);
-        replyProducer = session.createProducer(null);
     }
 
 
@@ -142,15 +119,6 @@ public class JsonMessaging {
         }, "json-broascast-listen");
         jsonBroadcastListenThread.start();
 
-        // Startup listen thread.
-        jsonReplyListenThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                listenReplies();
-            }
-        }, "json-reply-listen");
-        jsonReplyListenThread.start();
-
         // Add close hook to close the listen thread when JVM exits.
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
@@ -158,12 +126,6 @@ public class JsonMessaging {
                 jsonBroadcastListenThread.interrupt();
                 try {
                     jsonBroadcastListenThread.join();
-                } catch (final InterruptedException e) {
-                    LOGGER.debug(e.toString());
-                }
-                jsonReplyListenThread.interrupt();
-                try {
-                    jsonReplyListenThread.join();
                 } catch (final InterruptedException e) {
                     LOGGER.debug(e.toString());
                 }
@@ -207,100 +169,14 @@ public class JsonMessaging {
 
             final MapMessage message = session.createMapMessage();
             message.setJMSCorrelationID("ID:" + UUID.randomUUID().toString());
-            message.setJMSReplyTo(replyQueue);
             message.setStringProperty("sender", instanceId.toString());
             message.setStringProperty("class", className);
             message.setStringProperty("json", jsonString);
             message.setStringProperty("qpid.subject", subject);
 
-            secureMessage(message);
             messageProducer.send(message);
         } catch (JMSException e) {
             throw new RuntimeException("Error sending JSON message: " + object + " to subject: " + object, e);
-        }
-    }
-
-    /**
-     * Sends request as JSON encoded message with given subject and waits for response.
-     *
-     * @param receiverInstanceId receiver instance ID
-     * @param subject            the subject
-     * @param object             the object
-     * @param timeout            the time in millis response is waited for
-     * @param <REQ>              the request class
-     * @param <RESP>             the response class
-     */
-    public <REQ, RESP> RESP request(final UUID receiverInstanceId, final String subject, final REQ object, long timeout)
-            throws InterruptedException, TimeoutException {
-        try {
-            final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-            final String className = object.getClass().getName();
-            final String jsonString = gson.toJson(object);
-            final String jmsCorrelationId = "ID:" + UUID.randomUUID().toString();
-
-            final MapMessage message = session.createMapMessage();
-            message.setJMSCorrelationID(jmsCorrelationId);
-            message.setJMSReplyTo(replyQueue);
-            message.setStringProperty("sender", instanceId.toString());
-            if (receiverInstanceId != null) {
-                message.setStringProperty("receiver", receiverInstanceId.toString());
-            }
-            message.setStringProperty("class", className);
-            message.setStringProperty("json", jsonString);
-            message.setStringProperty("qpid.subject", subject);
-
-            replies.put(jmsCorrelationId, null);
-
-            secureMessage(message);
-            messageProducer.send(message);
-
-            synchronized (jmsCorrelationId) {
-                jmsCorrelationId.wait(timeout);
-            }
-
-            final JsonEnvelope replyEnvelope = replies.remove(jmsCorrelationId);
-            if (replyEnvelope == null) {
-                throw new TimeoutException();
-            }
-
-            if (replyEnvelope.getObject() instanceof Throwable) {
-                throw new RuntimeException("Exception in remote component:" + replyEnvelope.getObject());
-            }
-
-            return replyEnvelope.getObject();
-        } catch (JMSException e) {
-            throw new RuntimeException("Error sending JSON request: " + object + " to subject: " + subject, e);
-        }
-    }
-
-    /**
-     * Replies object as JSON encoded message to the reply queue and subject contained in
-     * received envelope.
-     *
-     * @param receivedEnvelope the received envelope
-     * @param replyObject      the reply object
-     * @param <T>              the message class
-     */
-    public <T> void reply(final JsonEnvelope receivedEnvelope, final Object replyObject) {
-        try {
-            final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-            final String className = replyObject.getClass().getName();
-            final String jsonString = gson.toJson(replyObject);
-
-            final MapMessage message = session.createMapMessage();
-            message.setJMSCorrelationID(receivedEnvelope.getCorrelationId());
-            message.setJMSReplyTo(replyQueue);
-            message.setStringProperty("sender", receivedEnvelope.getSenderInstanceId().toString());
-            message.setStringProperty("receiver", instanceId.toString());
-            message.setStringProperty("class", className);
-            message.setStringProperty("json", jsonString);
-            message.setStringProperty("qpid.subject", receivedEnvelope.getSubject());
-
-            secureMessage(message);
-            replyProducer.send(receivedEnvelope.getReplyDestination(), message);
-        } catch (JMSException e) {
-            LOGGER.error(
-                    "Error replying to JSON message: " + replyObject + " to received envelope: " + receivedEnvelope, e);
         }
     }
 
@@ -361,7 +237,7 @@ public class JsonMessaging {
         try {
             while (!shutdownThreads) {
                 try {
-                    final MapMessage message = (MapMessage) messageConsumer.receive();
+                    final MapMessage message = (MapMessage) messageConsumer.receive(100);
                     if (message == null) {
                         continue;
                     }
@@ -393,85 +269,8 @@ public class JsonMessaging {
                     LOGGER.error("Error deserializing JSON message.", e);
                 }
             }
-        } catch (InterruptedException e) {
-            LOGGER.debug(e.toString());
+        } catch (Exception e) {
+            LOGGER.error(e.toString());
         }
-    }
-
-
-    private void listenReplies() {
-        final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-        while (!shutdownThreads) {
-            try {
-                final MapMessage message = ((MapMessage) replyConsumer.receive());
-                if (message == null) {
-                    continue;
-                }
-                final String subject = message.getStringProperty("qpid.subject");
-                final String jsonString = message.getStringProperty("json");
-                final String className = message.getStringProperty("class");
-
-                if (jsonSubjects.contains(subject)
-                        && !StringUtils.isEmpty(className)
-                        && !StringUtils.isEmpty(jsonString)) {
-                    final Class clazz = Class.forName(className);
-                    if (replies.containsKey(message.getJMSCorrelationID())) {
-                        if (message.getStringProperty("receiver") != null) {
-                            final UUID receiverInstanceId = UUID.fromString(message.getStringProperty("receiver"));
-                            if (!instanceId.equals(receiverInstanceId)) {
-                                LOGGER.warn("Rejected message not intended to this instance.");
-                                continue;
-                            }
-                        } else {
-                            LOGGER.warn("Rejected message sent to reply queue without received ID defined.");
-                            continue;
-                        }
-
-                        String jmsCorrelationId = null;
-                        for (final String jmsCorrelationCandidateId : replies.keySet()) {
-                            if (jmsCorrelationCandidateId.equals(message.getJMSCorrelationID())) {
-                                jmsCorrelationId = jmsCorrelationCandidateId;
-                            }
-                        }
-                        final String plainJsonString;
-                        plainJsonString = jsonString;
-
-                        final Object object = gson.fromJson(plainJsonString, clazz);
-
-                        final JsonEnvelope envelope = new JsonEnvelope(
-                                UUID.fromString(message.getStringProperty("sender")),
-                                UUID.fromString(message.getStringProperty("receiver")),
-                                message.getJMSMessageID(), message.getJMSReplyTo(), subject, object);
-                        replies.put(jmsCorrelationId, envelope);
-
-                        synchronized (jmsCorrelationId) {
-                            jmsCorrelationId.notify();
-                        }
-                        LOGGER.debug("Received response. ID: " + message.getJMSMessageID()
-                                + " correlation ID: " + message.getJMSCorrelationID()
-                                + " sender: " + envelope.getSenderInstanceId()
-                                + " receiver: " + envelope.getReceiverInstanceId()
-                                + " subject: " + envelope.getSubject()
-                                + " class: " + envelope.getObject().getClass().getSimpleName());
-
-                    } else {
-                        LOGGER.info("Received response to unknown request ID:"
-                                + message.getJMSCorrelationID());
-                    }
-                }
-            } catch (final JMSException e) {
-                LOGGER.info("Error receiving JSON message.", e);
-            } catch (final ClassNotFoundException e) {
-                LOGGER.info("Error deserializing JSON message.", e);
-            }
-
-        }
-    }
-
-    private void secureMessage(final MapMessage message) throws JMSException {
-        if (message.getStringProperty("receiver") != null) {
-            message.setStringProperty("json", message.getStringProperty("json"));
-        }
-        message.setStringProperty("signed", DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.format(new Date()));
     }
 }
