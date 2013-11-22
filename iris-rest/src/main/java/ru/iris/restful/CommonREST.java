@@ -35,6 +35,7 @@ public class CommonREST {
 
     private static Logger log = LoggerFactory.getLogger(DevicesREST.class.getName());
     private static I18N i18n = new I18N();
+    private static JsonMessaging messaging;
 
     @GET
     @Path("/cmd/{text}")
@@ -43,7 +44,9 @@ public class CommonREST {
 
         log.info(i18n.message("rest.get.cmd.0", text));
 
-        new JsonMessaging(UUID.randomUUID()).broadcast("event.command", text);
+        messaging = new JsonMessaging(UUID.randomUUID());
+        messaging.broadcast("event.command", text);
+        messaging.close();
 
         ResultSet rs = Service.sql.select("SELECT name, command, param FROM modules");
 

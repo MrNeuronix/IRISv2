@@ -6,9 +6,9 @@ import ru.iris.common.I18N;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.GetInventoryAdvertisement;
+import ru.iris.common.messaging.model.SetDeviceLevelAdvertisement;
 import ru.iris.common.messaging.model.zwave.ResponseZWaveDeviceArrayInventoryAdvertisement;
 import ru.iris.common.messaging.model.zwave.ResponseZWaveDeviceInventoryAdvertisement;
-import ru.iris.common.messaging.model.SetDeviceLevelAdvertisement;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -74,17 +74,17 @@ public class DevicesREST {
 
             final JsonEnvelope envelope = messaging.receive(5000);
             if (envelope != null) {
-                if (envelope.getObject() instanceof ResponseZWaveDeviceArrayInventoryAdvertisement)
-                {
+                if (envelope.getObject() instanceof ResponseZWaveDeviceArrayInventoryAdvertisement) {
                     return ((ResponseZWaveDeviceArrayInventoryAdvertisement) envelope.getObject()).getDevices().toString();
-                } else if (envelope.getObject() instanceof ResponseZWaveDeviceInventoryAdvertisement)
-                {
+                } else if (envelope.getObject() instanceof ResponseZWaveDeviceInventoryAdvertisement) {
                     return ((ResponseZWaveDeviceInventoryAdvertisement) envelope.getObject()).getDevice().toString();
                 } else {
                     log.info("Unknown response! " + envelope.getObject());
                     return "{ \"error\": \"Unknown response! Class: " + envelope.getObject().getClass() + " Response: " + envelope.getObject() + "\" }";
                 }
             }
+            messaging.close();
+
         } catch (final Throwable t) {
             log.error("Unexpected exception in DevicesREST", t);
             return "{ \"error\": \"" + t.toString() + "\" }";

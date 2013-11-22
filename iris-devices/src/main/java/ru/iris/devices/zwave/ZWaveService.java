@@ -61,6 +61,7 @@ public class ZWaveService implements Runnable {
 
         final Options options = Options.create(Service.config.get("openzwaveCfgPath"), "", "");
         options.addOptionBool("ConsoleOutput", Boolean.parseBoolean(Service.config.get("zwaveDebug")));
+        options.addOptionString("UserPath", "conf/", true);
         options.lock();
 
         final Manager manager = Manager.create();
@@ -89,6 +90,7 @@ public class ZWaveService implements Runnable {
                     case AWAKE_NODES_QUERIED:
                         log.info(i18n.message("zwave.awake.nodes.queried"));
                         ready = true;
+                        manager.writeConfig(homeId);
                         messaging.broadcast("event.devices.zwave.awakenodesqueried", new ZWaveAwakeNodesQueried());
                         break;
                     case ALL_NODES_QUERIED:
@@ -99,6 +101,7 @@ public class ZWaveService implements Runnable {
                         break;
                     case ALL_NODES_QUERIED_SOME_DEAD:
                         log.info(i18n.message("zwave.all.nodes.queried.some.dead"));
+                        manager.writeConfig(homeId);
                         messaging.broadcast("event.devices.zwave.allnodesqueriedsomedead", new ZWaveAllNodesQueriedSomeDead());
                         break;
                     case POLLING_ENABLED:
@@ -277,13 +280,35 @@ public class ZWaveService implements Runnable {
                                         Manager.get().getValueLabel(notification.getValueId()),
                                         String.valueOf(Utils.getValue(notification.getValueId()))));
 
-                        if(!manager.getValueLabel(notification.getValueId()).isEmpty())
+                        if (!manager.getValueLabel(notification.getValueId()).isEmpty())
                             log.info(i18n.message("zwave.node.0.value.1.removed", zrZWaveDevice.getNode(), manager.getValueLabel(notification.getValueId())));
 
                         break;
                     case VALUE_CHANGED:
 
                         ZWaveDevice zcZWaveDevice = getZWaveDeviceByNode(node);
+
+                        // Check for awaked after sleeping nodes
+                        if (manager.isNodeAwake(homeId, zcZWaveDevice.getNode()) && zcZWaveDevice.getStatus().equals("Sleeping")) {
+                            log.info("Setting node " + zcZWaveDevice.getNode() + " to LISTEN state");
+                            zcZWaveDevice.setStatus("Listening");
+                            try {
+                                zcZWaveDevice.save();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        // Check for sleeping after awake nodes
+                        if (!manager.isNodeAwake(homeId, zcZWaveDevice.getNode()) && zcZWaveDevice.getStatus().equals("Listening")) {
+                            log.info("Setting node " + zcZWaveDevice.getNode() + " to SLEEP state");
+                            zcZWaveDevice.setStatus("Sleeping");
+                            try {
+                                zcZWaveDevice.save();
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }
 
                         if (zcZWaveDevice == null) {
                             log.info(i18n.message("zwave.error.while.save.value.change.cannot.find.device.with.node.id.0", node));
@@ -514,6 +539,7 @@ public class ZWaveService implements Runnable {
 
             // Close JSON messaging.
             jsonMessaging.close();
+            messaging.close();
 
         } catch (final Throwable t) {
             t.printStackTrace();

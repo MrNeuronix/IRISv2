@@ -1,11 +1,10 @@
 package ru.iris.record;
 
 import javaFlacEncoder.FLAC_FileEncoder;
+import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
-import ru.iris.common.Module;
-import ru.iris.common.Speak;
 import ru.iris.common.httpPOST;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
@@ -13,10 +12,10 @@ import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
 import ru.iris.common.messaging.model.SpeakRecognizedAdvertisement;
 
+import javax.jms.JMSException;
 import java.io.File;
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.net.URISyntaxException;
 import java.util.Random;
 import java.util.UUID;
 
@@ -32,6 +31,7 @@ public class RecordService implements Runnable {
     private static Logger log = LoggerFactory.getLogger(RecordService.class.getName());
     private static boolean busy = false;
     private static I18N i18n = new I18N();
+    private static JsonMessaging messaging;
 
     public RecordService() {
         Thread t = new Thread(this);
@@ -40,8 +40,15 @@ public class RecordService implements Runnable {
 
     @Override
     public synchronized void run() {
+
         int threads = Integer.valueOf(Service.config.get("recordStreams"));
         int micro = Integer.valueOf(Service.config.get("microphones"));
+
+        try {
+            messaging = new JsonMessaging(UUID.randomUUID());
+        } catch (JMSException | URISyntaxException | AMQException e) {
+            e.printStackTrace();
+        }
 
         log.info(i18n.message("record.configured.to.run.0.threads.on.1.microphones", threads, micro));
 
@@ -111,29 +118,27 @@ public class RecordService implements Runnable {
                                 log.info(i18n.message("data.utterance.0", text.toUpperCase()));
                                 log.info(i18n.message("data.confidence.level.0", confidence * 100));
 
-                                if (confidence * 100 > 65)
-                                {
-                                    if (text.contains(Service.config.get("systemName")))
-                                    {
+                                if (confidence * 100 > 65) {
+                                    if (text.contains(Service.config.get("systemName"))) {
                                         log.info(i18n.message("record.system.name.detected"));
 
-                                                    if (busy) {
-                                                        log.info(i18n.message("command.system.is.busy.skipping"));
-                                                        break;
-                                                    }
+                                        if (busy) {
+                                            log.info(i18n.message("command.system.is.busy.skipping"));
+                                            break;
+                                        }
 
-                                                    busy = true;
+                                        busy = true;
 
-                                                    log.info(i18n.message("command.got.0.command", text));
+                                        log.info(i18n.message("command.got.0.command", text));
 
-                                                    try {
-                                                        new JsonMessaging(UUID.randomUUID()).broadcast("event.speak.recognized", new SpeakRecognizedAdvertisement(text, confidence));
-                                                        Thread.sleep(1000);
-                                                        busy = false;
-                                                    } catch (Exception e) {
-                                                        log.info("Failed to send recognized event");
-                                                        e.printStackTrace();
-                                                    }
+                                        try {
+                                            messaging.broadcast("event.speak.recognized", new SpeakRecognizedAdvertisement(text, confidence));
+                                            Thread.sleep(1000);
+                                            busy = false;
+                                        } catch (Exception e) {
+                                            log.info("Failed to send recognized event");
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }
                             }
