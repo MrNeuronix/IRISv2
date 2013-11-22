@@ -9,7 +9,9 @@ import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zwave4j.*;
+import ru.iris.common.Config;
 import ru.iris.common.I18N;
+import ru.iris.common.SQL;
 import ru.iris.common.Utils;
 import ru.iris.common.devices.ZWaveDevice;
 import ru.iris.common.messaging.JsonEnvelope;
@@ -21,6 +23,7 @@ import ru.iris.devices.Service;
 import javax.jms.JMSException;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -33,15 +36,17 @@ import java.util.*;
  */
 public class ZWaveService implements Runnable {
 
-    private static Logger log = LoggerFactory.getLogger(ZWaveService.class.getName());
-    private static long homeId;
-    private static boolean ready = false;
-    private static HashMap<String, ZWaveDevice> zDevices = new HashMap<>();
-    private static final I18N i18n = new I18N();
+    private Logger log = LoggerFactory.getLogger(ZWaveService.class.getName());
+    private long homeId;
+    private boolean ready = false;
+    private HashMap<String, ZWaveDevice> zDevices = new HashMap<>();
+    private final I18N i18n = new I18N();
     private boolean initComplete = false;
     private boolean shutdown = false;
-    private static JsonMessaging messaging;
-    private static Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
+    private JsonMessaging messaging;
+    private Map<String, String> config;
+    private SQL sql = new SQL();
+    private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
     public ZWaveService() {
         Thread t = new Thread(this);
@@ -53,14 +58,45 @@ public class ZWaveService implements Runnable {
 
         try {
             messaging = new JsonMessaging(UUID.randomUUID());
+            config = new Config().getConfig();
+
         } catch (JMSException | URISyntaxException | AMQException e) {
+            e.printStackTrace();
+        }
+
+        ResultSet rs = sql.select("SELECT * FROM DEVICES");
+
+        try {
+            while (rs.next()) {
+
+                ZWaveDevice zDevice = new ZWaveDevice();
+
+                zDevice.setManufName(rs.getString("manufname"));
+                zDevice.setName(rs.getString("name"));
+                zDevice.setNode(rs.getShort("node"));
+                zDevice.setStatus(rs.getString("status"));
+                zDevice.setInternalType(rs.getString("internaltype"));
+                zDevice.setType(rs.getString("type"));
+                zDevice.setUUID(rs.getString("uuid"));
+                zDevice.setZone(rs.getInt("zone"));
+                zDevice.setProductName(rs.getString("productname"));
+                zDevice.setInternalName(rs.getString("internalname"));
+
+                log.info(i18n.message("zwave.load.device.0.1.from.database", zDevice.getInternalType(), zDevice.getNode()));
+
+                zDevices.put("zwave/" + zDevice.getInternalType() + "/" + zDevice.getNode(), zDevice);
+            }
+
+            rs.close();
+
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
 
         NativeLibraryLoader.loadLibrary(ZWave4j.LIBRARY_NAME, ZWave4j.class);
 
-        final Options options = Options.create(Service.config.get("openzwaveCfgPath"), "", "");
-        options.addOptionBool("ConsoleOutput", Boolean.parseBoolean(Service.config.get("zwaveDebug")));
+        final Options options = Options.create(config.get("openzwaveCfgPath"), "", "");
+        options.addOptionBool("ConsoleOutput", Boolean.parseBoolean(config.get("zwaveDebug")));
         options.addOptionString("UserPath", "conf/", true);
         options.lock();
 
@@ -368,7 +404,7 @@ public class ZWaveService implements Runnable {
         };
 
         manager.addWatcher(watcher, null);
-        manager.addDriver(Service.config.get("zwavePort"));
+        manager.addDriver(config.get("zwavePort"));
 
         log.info(i18n.message("zwave.waiting.ready.state.from.zwave"));
 
@@ -684,7 +720,7 @@ public class ZWaveService implements Runnable {
                 e.printStackTrace();
             }
 
-            log.info(i18n.message("zwave.say.device.to.array.0.1", type, notification.getNodeId()));
+            log.info(i18n.message("zwave.add.device.to.array.0.1", type, notification.getNodeId()));
             zDevices.put("zwave/" + type + "/" + notification.getNodeId(), ZWaveDevice);
         } else {
 
@@ -692,7 +728,7 @@ public class ZWaveService implements Runnable {
             ZWaveDevice.setProductName(productName);
             ZWaveDevice.setStatus(state);
 
-            log.info(i18n.message("zwave.node.0.say.value.to.device.1.2", ZWaveDevice.getNode(), label, Utils.getValue(notification.getValueId())));
+            log.info(i18n.message("zwave.node.0.add.value.to.device.1.2", ZWaveDevice.getNode(), label, Utils.getValue(notification.getValueId())));
             ZWaveDevice.setValueID(label, notification.getValueId());
         }
 

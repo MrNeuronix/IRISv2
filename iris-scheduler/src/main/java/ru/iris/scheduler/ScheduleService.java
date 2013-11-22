@@ -12,19 +12,24 @@ package ru.iris.scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
-import ru.iris.common.Module;
+import ru.iris.common.SQL;
+import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.model.CommandAdvertisement;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
 import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
 
 import java.sql.ResultSet;
 import java.util.Date;
+import java.util.UUID;
 
 public class ScheduleService implements Runnable {
 
     private Thread t = null;
-    private static Logger log = LoggerFactory.getLogger(ScheduleService.class);
-    private static I18N i18n = new I18N();
+    private Logger log = LoggerFactory.getLogger(ScheduleService.class);
+    private I18N i18n = new I18N();
+    private SQL sql = new SQL();
+    private JsonMessaging messaging;
 
     public ScheduleService() {
         this.t = new Thread(this);
@@ -42,21 +47,22 @@ public class ScheduleService implements Runnable {
 
         try {
 
-            ResultSet rsActualize = Service.sql.select("SELECT id FROM scheduler WHERE enabled='1' AND date < NOW()");
+            ResultSet rsActualize = sql.select("SELECT id FROM scheduler WHERE enabled='1' AND date < NOW()");
+            messaging = new JsonMessaging(UUID.randomUUID());
 
             while (rsActualize.next()) {
                 Task task = new Task(rsActualize.getInt("id"));
 
                 if (task.getType() == 1) {
                     log.info(i18n.message("scheduler.actualize.task.time.next.run.at.0", task.nextRunAsString()));
-                    Service.sql.doQuery("UPDATE scheduler SET date='" + task.nextRunAsString() + "' WHERE id='" + task.getId() + "'");
+                    sql.doQuery("UPDATE scheduler SET date='" + task.nextRunAsString() + "' WHERE id='" + task.getId() + "'");
                 } else if (task.getType() == 3) {
                     if (task.getValidto().before(task.nextRunAsDate())) {
                         log.info(i18n.message("scheduler.actualize.task.time.set.task.to.disable"));
-                        Service.sql.doQuery("UPDATE scheduler SET enabled='0' WHERE id='" + task.getId() + "'");
+                        sql.doQuery("UPDATE scheduler SET enabled='0' WHERE id='" + task.getId() + "'");
                     } else {
                         log.info(i18n.message("scheduler.actualize.task.time.next.run.at.01", task.nextRunAsString()));
-                        Service.sql.doQuery("UPDATE scheduler SET date='" + task.nextRunAsString() + "' WHERE id='" + task.getId() + "'");
+                        sql.doQuery("UPDATE scheduler SET date='" + task.nextRunAsString() + "' WHERE id='" + task.getId() + "'");
                     }
                 } else {
                     log.info(i18n.message("scheduler.actualize.task.time.skip.task"));
@@ -78,7 +84,7 @@ public class ScheduleService implements Runnable {
 
         while (true) {
             try {
-                ResultSet rs = Service.sql.select("SELECT id FROM scheduler WHERE enabled='1'");
+                ResultSet rs = sql.select("SELECT id FROM scheduler WHERE enabled='1'");
                 Date now = new Date();
 
                 while (rs.next()) {
@@ -87,23 +93,21 @@ public class ScheduleService implements Runnable {
                     if (task.getDateAsString(now).equals(task.getDateAsString(task.getDate()))) {
                         log.info(i18n.message("scheduler.executing.task.0.1.2", task.getId(), task.getEclass(), task.getCommand()));
 
-                        Class cl = Class.forName("ru.iris.modules." + task.getEclass());
-                        Module execute = (Module) cl.newInstance();
-                        execute.run(task.getCommand());
+                        messaging.broadcast("event.command", new CommandAdvertisement(task.getCommand()));
 
                         if (task.getType() == 1) {
                             log.info(i18n.message("scheduler.next.run.at.0", task.nextRunAsString()));
-                            Service.sql.doQuery("UPDATE scheduler SET date='" + task.nextRunAsString() + "' WHERE id='" + task.getId() + "'");
+                            sql.doQuery("UPDATE scheduler SET date='" + task.nextRunAsString() + "' WHERE id='" + task.getId() + "'");
                         } else if (task.getType() == 2) {
                             log.info(i18n.message("scheduler.set.task.to.disable"));
-                            Service.sql.doQuery("UPDATE scheduler SET enabled='0' WHERE id='" + task.getId() + "'");
+                            sql.doQuery("UPDATE scheduler SET enabled='0' WHERE id='" + task.getId() + "'");
                         } else {
                             if (task.getValidto().before(task.nextRunAsDate())) {
                                 log.info(i18n.message("scheduler.set.task.to.disable"));
-                                Service.sql.doQuery("UPDATE scheduler SET enabled='0' WHERE id='" + task.getId() + "'");
+                                sql.doQuery("UPDATE scheduler SET enabled='0' WHERE id='" + task.getId() + "'");
                             } else {
                                 log.info(i18n.message("scheduler.next.run.at.0", task.nextRunAsString()));
-                                Service.sql.doQuery("UPDATE scheduler SET date='" + task.nextRunAsString() + "' WHERE id='" + task.getId() + "'");
+                                sql.doQuery("UPDATE scheduler SET date='" + task.nextRunAsString() + "' WHERE id='" + task.getId() + "'");
                             }
                         }
                     }

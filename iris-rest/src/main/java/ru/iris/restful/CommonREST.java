@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
 import ru.iris.common.Speak;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.model.CommandAdvertisement;
 
 import javax.jms.JMSException;
 import javax.ws.rs.Consumes;
@@ -30,9 +31,9 @@ import java.util.UUID;
 @Path("/")
 public class CommonREST {
 
-    private static Logger log = LoggerFactory.getLogger(DevicesREST.class.getName());
-    private static I18N i18n = new I18N();
-    private static JsonMessaging messaging;
+    private Logger log = LoggerFactory.getLogger(DevicesREST.class.getName());
+    private I18N i18n = new I18N();
+    private JsonMessaging messaging;
 
     @GET
     @Path("/cmd/{text}")
@@ -42,7 +43,7 @@ public class CommonREST {
         log.info(i18n.message("rest.get.cmd.0", text));
 
         messaging = new JsonMessaging(UUID.randomUUID());
-        messaging.broadcast("event.command", text);
+        messaging.broadcast("event.command", new CommandAdvertisement(text));
         messaging.close();
 
         return "{ status: " + i18n.message("done") + " }";

@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.Config;
 import ru.iris.common.I18N;
-import ru.iris.common.SQL;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
 import ru.iris.common.messaging.model.ServiceCapability;
@@ -32,10 +31,8 @@ import java.util.UUID;
 
 public class Service {
 
-    public static Map<String, String> config;
-    public static SQL sql;
     public static ServiceChecker serviceChecker;
-    public static UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6002");
+    public static final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6002");
 
     private static Logger log = LoggerFactory.getLogger(Service.class);
 
@@ -47,8 +44,8 @@ public class Service {
                 "Devices", serviceId, ServiceStatus.STARTUP,
                 new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
 
-        config = new Config().getConfig();
-        sql = new SQL();
+        Map<String, String> config = new Config().getConfig();
+
 
         log.info(i18n.message("iris.devices.service.starting"));
 

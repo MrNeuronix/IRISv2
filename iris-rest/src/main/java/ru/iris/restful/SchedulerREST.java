@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.Config;
 import ru.iris.common.I18N;
+import ru.iris.common.SQL;
 import ru.iris.scheduler.Task;
 
 import javax.ws.rs.GET;
@@ -30,9 +32,11 @@ import java.util.ArrayList;
 @Path("/scheduler")
 public class SchedulerREST {
 
-    private static Logger log = LoggerFactory.getLogger(StatusREST.class.getName());
-    private static I18N i18n = new I18N();
-    private static Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
+    private Logger log = LoggerFactory.getLogger(StatusREST.class.getName());
+    private I18N i18n = new I18N();
+    private Config config = new Config();
+    private SQL sql = new SQL();
+    private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
     @GET
     @Path("/get/all")
@@ -42,7 +46,7 @@ public class SchedulerREST {
         ArrayList<Task> allTasks = new ArrayList<>();
 
         try {
-            ResultSet rs = Service.sql.select("SELECT id FROM scheduler WHERE enabled='1' AND language='"+Service.config.get("language")+"' ORDER BY ID ASC");
+            ResultSet rs = sql.select("SELECT id FROM scheduler WHERE enabled='1' AND language='" + config.getConfig().get("language") + "' ORDER BY ID ASC");
 
             while (rs.next()) {
                 allTasks.add(new Task(rs.getInt("id")));
@@ -66,10 +70,8 @@ public class SchedulerREST {
 
         try {
             task = new Task(id);
-        }
-        catch (SQLException e)
-        {
-            return "{ \"error\": \"task "+id+" not found\" }";
+        } catch (SQLException e) {
+            return "{ \"error\": \"task " + id + " not found\" }";
         }
 
         return gson.toJson(task);

@@ -14,6 +14,7 @@ import com.darkprograms.speech.synthesiser.Synthesiser;
 import javazoom.jl.player.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.Config;
 import ru.iris.common.I18N;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
@@ -29,10 +30,11 @@ import java.util.UUID;
 
 public class GoogleSpeakService implements Runnable {
 
-    Thread t = null;
-    private static Logger log = LoggerFactory.getLogger(GoogleSpeakService.class.getName());
-    private static I18N i18n = new I18N();
+    private Thread t = null;
+    private Logger log = LoggerFactory.getLogger(GoogleSpeakService.class.getName());
+    private I18N i18n = new I18N();
     private boolean shutdown = false;
+    private Config config = new Config();
 
     public GoogleSpeakService() {
         t = new Thread(this);
@@ -50,11 +52,12 @@ public class GoogleSpeakService implements Runnable {
         Clip clip = null;
         AudioInputStream audioIn;
 
+
         Service.serviceChecker.setAdvertisment(
                 new ServiceAdvertisement("Speak", Service.serviceId, ServiceStatus.AVAILABLE,
                         new ServiceCapability[]{ServiceCapability.SPEAK}));
 
-        if (Service.config.get("silence").equals("0")) {
+        if (config.getConfig().get("silence").equals("0")) {
             try {
                 audioIn = AudioSystem.getAudioInputStream(new File("./conf/beep.wav"));
                 AudioFormat format = audioIn.getFormat();
@@ -93,17 +96,17 @@ public class GoogleSpeakService implements Runnable {
 
                         SpeakAdvertisement advertisement = envelope.getObject();
 
-                        if (Service.config.get("silence").equals("0")) {
+                        if (config.getConfig().get("silence").equals("0")) {
                             log.info(i18n.message("speak.confidence.0", advertisement.getConfidence()));
                             log.info(i18n.message("speak.text.0", advertisement.getText()));
 
-                            if (!Service.config.get("silence").equals("1")) {
+                            if (!config.getConfig().get("silence").equals("1")) {
                                 clip.setFramePosition(0);
                                 clip.start();
                                 clip.start();
                             }
 
-                            Synthesiser synthesiser = new Synthesiser(Service.config.get("language"));
+                            Synthesiser synthesiser = new Synthesiser(config.getConfig().get("language"));
                             final Player player = new Player(synthesiser.getMP3Data(advertisement.getText()));
                             player.play();
                             player.close();

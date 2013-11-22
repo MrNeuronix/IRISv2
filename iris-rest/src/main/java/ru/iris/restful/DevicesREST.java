@@ -27,8 +27,8 @@ import java.util.UUID;
 @Path("/device")
 public class DevicesREST {
 
-    private static Logger log = LoggerFactory.getLogger(DevicesREST.class.getName());
-    private static I18N i18n = new I18N();
+    private Logger log = LoggerFactory.getLogger(DevicesREST.class.getName());
+    private I18N i18n = new I18N();
 
     @GET
     @Path("/{uuid}")

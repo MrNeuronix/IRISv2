@@ -3,6 +3,7 @@ package ru.iris.restful;
 import com.sun.jersey.core.util.Base64;
 import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
+import ru.iris.common.Config;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
@@ -19,6 +20,8 @@ import javax.ws.rs.core.Response;
  */
 
 public class AuthFilter implements ContainerRequestFilter {
+
+    private Config config = new Config();
 
     // Exception thrown if user is unauthorized.
     private final static WebApplicationException unauthorized =
@@ -45,7 +48,7 @@ public class AuthFilter implements ContainerRequestFilter {
         auth = auth.replaceFirst("[Bb]asic ", "");
         String userColonPass = Base64.base64Decode(auth);
 
-        if (!userColonPass.equals(Service.config.get("httpUser")+":"+Service.config.get("httpPassword")))
+        if (!userColonPass.equals(config.getConfig().get("httpUser") + ":" + config.getConfig().get("httpPassword")))
             throw unauthorized;
 
         return containerRequest;

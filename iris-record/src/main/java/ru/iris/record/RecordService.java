@@ -4,6 +4,7 @@ import javaFlacEncoder.FLAC_FileEncoder;
 import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.Config;
 import ru.iris.common.I18N;
 import ru.iris.common.httpPOST;
 import ru.iris.common.messaging.JsonMessaging;
@@ -28,10 +29,11 @@ import java.util.UUID;
  */
 public class RecordService implements Runnable {
 
-    private static Logger log = LoggerFactory.getLogger(RecordService.class.getName());
-    private static boolean busy = false;
-    private static I18N i18n = new I18N();
-    private static JsonMessaging messaging;
+    private Logger log = LoggerFactory.getLogger(RecordService.class.getName());
+    private boolean busy = false;
+    private I18N i18n = new I18N();
+    private JsonMessaging messaging;
+    private Config config = new Config();
 
     public RecordService() {
         Thread t = new Thread(this);
@@ -41,8 +43,8 @@ public class RecordService implements Runnable {
     @Override
     public synchronized void run() {
 
-        int threads = Integer.valueOf(Service.config.get("recordStreams"));
-        int micro = Integer.valueOf(Service.config.get("microphones"));
+        int threads = Integer.valueOf(config.getConfig().get("recordStreams"));
+        int micro = Integer.valueOf(config.getConfig().get("microphones"));
 
         try {
             messaging = new JsonMessaging(UUID.randomUUID());
@@ -73,9 +75,9 @@ public class RecordService implements Runnable {
                             ProcessBuilder procBuilder = null;
 
                             if (finalM == 1) {
-                                procBuilder = new ProcessBuilder("rec", "-q", "-c", "1", "-r", "16000", "./data/" + strFilename, "trim", "0", Service.config.get("recordDuration"));
+                                procBuilder = new ProcessBuilder("rec", "-q", "-c", "1", "-r", "16000", "./data/" + strFilename, "trim", "0", config.getConfig().get("recordDuration"));
                             } else {
-                                procBuilder = new ProcessBuilder("rec", "-q", "-c", "1", "-r", "16000", "-d", Service.config.get("microphoneDevice" + finalM), "./data/" + strFilename, "trim", "0", Service.config.get("recordDuration"));
+                                procBuilder = new ProcessBuilder("rec", "-q", "-c", "1", "-r", "16000", "-d", config.getConfig().get("microphoneDevice" + finalM), "./data/" + strFilename, "trim", "0", config.getConfig().get("recordDuration"));
                             }
 
                             httpPOST SendFile = new httpPOST();
@@ -119,7 +121,7 @@ public class RecordService implements Runnable {
                                 log.info(i18n.message("data.confidence.level.0", confidence * 100));
 
                                 if (confidence * 100 > 65) {
-                                    if (text.contains(Service.config.get("systemName"))) {
+                                    if (text.contains(config.getConfig().get("systemName"))) {
                                         log.info(i18n.message("record.system.name.detected"));
 
                                         if (busy) {

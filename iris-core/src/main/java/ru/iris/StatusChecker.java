@@ -2,6 +2,7 @@ package ru.iris;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
@@ -31,6 +32,7 @@ public class StatusChecker implements Runnable {
 
     private static Logger log = LoggerFactory.getLogger(StatusChecker.class.getName());
     private static boolean shutdown = false;
+    private SQL sql;
 
     public StatusChecker() {
         Thread t = new Thread(this);
@@ -48,6 +50,8 @@ public class StatusChecker implements Runnable {
                     shutdown = true;
                 }
             }));
+
+            sql = new SQL();
 
             final UUID instanceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6501");
             final JsonMessaging jsonMessagingStatus = new JsonMessaging(instanceId);
@@ -77,8 +81,8 @@ public class StatusChecker implements Runnable {
                                 + "'"
                         );
 
-                        Launcher.sql.doQuery("DELETE FROM MODULESTATUS WHERE NAME='" + serviceAdvertisement.getName() + "'");
-                        Launcher.sql.doQuery("INSERT INTO MODULESTATUS (NAME, LASTSEEN, STATE) VALUES ('" + serviceAdvertisement.getName() + "',NOW(),'" + serviceAdvertisement.getStatus() + "')");
+                        sql.doQuery("DELETE FROM MODULESTATUS WHERE NAME='" + serviceAdvertisement.getName() + "'");
+                        sql.doQuery("INSERT INTO MODULESTATUS (NAME, LASTSEEN, STATE) VALUES ('" + serviceAdvertisement.getName() + "',NOW(),'" + serviceAdvertisement.getStatus() + "')");
 
                     } else if (envelope.getReceiverInstanceId() == null) {
                         // We received unknown broadcast message. Lets make generic log entry.

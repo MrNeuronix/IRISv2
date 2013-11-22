@@ -5,13 +5,9 @@ import org.apache.qpid.server.BrokerOptions;
 import org.h2.tools.Server;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.iris.common.Config;
 import ru.iris.common.I18N;
-import ru.iris.common.SQL;
 
-import javax.jms.Session;
 import java.io.IOException;
-import java.util.Map;
 
 /**
  * IRISv2 Project
@@ -24,10 +20,7 @@ import java.util.Map;
  */
 public class Launcher {
 
-    public static Map<String, String> config;
     private static Logger log = LoggerFactory.getLogger(Launcher.class);
-    public static SQL sql;
-    public static Session session;
 
     public static void main(String[] args) throws Exception {
 
@@ -35,7 +28,6 @@ public class Launcher {
         Server.createTcpServer().start();
 
         // Launch Apache Qpid broker
-
         BrokerOptions brokerOptions = new BrokerOptions();
         brokerOptions.setConfigProperty("qpid.home_dir", "conf/");
         Broker qpid = new Broker();
@@ -47,11 +39,6 @@ public class Launcher {
         log.info("----------------------------------------");
         log.info(i18n.message("irisv2.is.starting"));
         log.info("----------------------------------------");
-
-        // Load configuration
-        Config cfg = new Config();
-        config = cfg.getConfig();
-        sql = new SQL();
 
         // Modules poll
         new StatusChecker();

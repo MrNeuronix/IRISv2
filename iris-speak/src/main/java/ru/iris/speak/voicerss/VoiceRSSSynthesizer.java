@@ -14,9 +14,9 @@ import javazoom.jl.player.FactoryRegistry;
 import javazoom.jl.player.Player;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.iris.common.Config;
 import ru.iris.common.I18N;
 import ru.iris.common.httpGET;
-import ru.iris.speak.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -60,7 +60,8 @@ public class VoiceRSSSynthesizer implements Runnable {
     private AudioDevice AudioLine;
 
     private final ExecutorService exs;
-    private final String SPEAK_URL = "http://api.voicerss.org/?key=" + Service.config.get("voicerssAPI") + "&hl=" + Service.config.get("language") + "-" + Service.config.get("language") + "&f=48khz_16bit_stereo&c=mp3&src=";
+    private Config config = new Config();
+    private String SPEAK_URL;
     private final Future<AudioDevice> futureAudioLine;
     private static Logger log = LoggerFactory.getLogger(VoiceRSSSynthesizer.class.getName());
 
@@ -70,6 +71,8 @@ public class VoiceRSSSynthesizer implements Runnable {
      * Constructor for Synthesizer Object*
      */
     public VoiceRSSSynthesizer(ExecutorService executor) {
+
+        SPEAK_URL = "http://api.voicerss.org/?key=" + config.getConfig().get("voicerssAPI") + "&hl=" + config.getConfig().get("language") + "-" + config.getConfig().get("language") + "&f=48khz_16bit_stereo&c=mp3&src=";
         //Assign executor
         this.exs = executor;
         this.IsUnassigned = true;

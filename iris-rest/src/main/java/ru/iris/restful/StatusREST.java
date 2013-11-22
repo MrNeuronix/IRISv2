@@ -2,12 +2,15 @@ package ru.iris.restful;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
+import ru.iris.common.SQL;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -28,9 +31,10 @@ import java.util.HashMap;
 @Path("/status")
 public class StatusREST {
 
-    private static Logger log = LoggerFactory.getLogger(StatusREST.class.getName());
-    private static I18N i18n = new I18N();
-    private static Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
+    private Logger log = LoggerFactory.getLogger(StatusREST.class.getName());
+    private I18N i18n = new I18N();
+    private SQL sql = new SQL();
+    private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
     @GET
     @Path("/all")
@@ -39,9 +43,9 @@ public class StatusREST {
 
         log.info(i18n.message("rest.get.status.module.all"));
 
-         ResultSet rs = Service.sql.select("SELECT * FROM MODULESTATUS");
+        ResultSet rs = sql.select("SELECT * FROM MODULESTATUS");
 
-         HashMap<String, Object> obj = new HashMap<>();
+        HashMap<String, Object> obj = new HashMap<>();
         ArrayList result = new ArrayList();
 
         try {
@@ -70,9 +74,9 @@ public class StatusREST {
 
         log.info(i18n.message("rest.get.status.module.0", name));
 
-         ResultSet rs = Service.sql.select("SELECT * FROM MODULESTATUS WHERE name='" + name + "'");
+        ResultSet rs = sql.select("SELECT * FROM MODULESTATUS WHERE name='" + name + "'");
 
-         HashMap<String, Object> result = new HashMap<>();
+        HashMap<String, Object> result = new HashMap<>();
 
         try {
             while (rs.next()) {

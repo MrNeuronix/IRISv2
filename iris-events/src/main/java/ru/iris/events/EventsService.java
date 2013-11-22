@@ -20,8 +20,9 @@ import java.util.Arrays;
  */
 
 public class EventsService implements Runnable {
-    private static Logger log = LoggerFactory.getLogger(EventsService.class.getName());
-    private static final I18N i18n = new I18N();
+
+    private Logger log = LoggerFactory.getLogger(EventsService.class.getName());
+    private final I18N i18n = new I18N();
     private boolean shutdown = false;
 
     public EventsService() {
