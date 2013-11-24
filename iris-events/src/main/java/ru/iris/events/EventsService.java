@@ -53,9 +53,8 @@ public class EventsService implements Runnable {
 
             jsonMessaging.start();
 
-            Service.serviceChecker.setAdvertisment(new ServiceAdvertisement(
-                    "Events", Service.serviceId, ServiceStatus.AVAILABLE,
-                    new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
+            Service.serviceChecker.setAdvertisment(Service.advertisement.set(
+                    "Events", Service.serviceId, ServiceStatus.AVAILABLE));
 
             while (!shutdown) {
 
@@ -67,23 +66,22 @@ public class EventsService implements Runnable {
                         final ServiceAdvertisement serviceAdvertisement = envelope.getObject();
                         log.info("Service '" + serviceAdvertisement.getName()
                                 + "' status: '" + serviceAdvertisement.getStatus()
-                                + "' capabilities: " + Arrays.asList(serviceAdvertisement.getCapabilities())
                                 + " instance: '" + serviceAdvertisement.getInstanceId()
                                 + "'"
                         );
 
-                    } else if (envelope.getReceiverInstanceId() == null) {
+                    } else if (envelope.getReceiverInstance() == null) {
                         // We received unknown broadcast message. Lets make generic log entry.
                         log.info("Received broadcast "
-                                + " from " + envelope.getSenderInstanceId()
-                                + " to " + envelope.getReceiverInstanceId()
+                                + " from " + envelope.getSenderInstance()
+                                + " to " + envelope.getReceiverInstance()
                                 + " at '" + envelope.getSubject()
                                 + ": " + envelope.getObject());
                     } else {
                         // We received unknown request message. Lets make generic log entry.
                         log.info("Received request "
-                                + " from " + envelope.getSenderInstanceId()
-                                + " to " + envelope.getReceiverInstanceId()
+                                + " from " + envelope.getSenderInstance()
+                                + " to " + envelope.getReceiverInstance()
                                 + " at '" + envelope.getSubject()
                                 + ": " + envelope.getObject());
                     }
@@ -91,9 +89,8 @@ public class EventsService implements Runnable {
             }
 
             // Broadcast that this service is shutdown.
-            Service.serviceChecker.setAdvertisment(new ServiceAdvertisement(
-                    "Events", Service.serviceId, ServiceStatus.SHUTDOWN,
-                    new ServiceCapability[]{ServiceCapability.SYSTEM}));
+            Service.serviceChecker.setAdvertisment(Service.advertisement.set(
+                    "Events", Service.serviceId, ServiceStatus.SHUTDOWN));
 
             // Close JSON messaging.
             jsonMessaging.close();

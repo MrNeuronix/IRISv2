@@ -30,6 +30,9 @@ public class DevicesREST {
     private Logger log = LoggerFactory.getLogger(DevicesREST.class.getName());
     private I18N i18n = new I18N();
     private final UUID InstanceId = UUID.randomUUID();
+    private JsonMessaging messaging;
+    private SetDeviceLevelAdvertisement setDeviceLevelAdvertisement = new SetDeviceLevelAdvertisement();
+    private GetInventoryAdvertisement getInventoryAdvertisement = new GetInventoryAdvertisement();
 
     @GET
     @Path("/{uuid}")
@@ -50,14 +53,15 @@ public class DevicesREST {
     private String sendLevelMessage(String uuid, String label, String value) {
         try {
 
-            final JsonMessaging jsonMessaging = new JsonMessaging(InstanceId);
-            jsonMessaging.broadcast("event.devices.setvalue", new SetDeviceLevelAdvertisement(uuid, label, value));
-            jsonMessaging.close();
+            messaging = new JsonMessaging(InstanceId);
+            messaging.broadcast("event.devices.setvalue", setDeviceLevelAdvertisement.set(uuid, label, value));
+            messaging.close();
 
             return i18n.message("done");
 
         } catch (final Throwable t) {
             log.error("Unexpected exception in DevicesREST", t);
+            messaging.close();
             return "{ \"error\": \"Something goes wrong: " + t.toString() + "\" }";
         }
     }
@@ -65,33 +69,35 @@ public class DevicesREST {
     private String getDevices(String uuid) {
 
         try {
-            JsonMessaging messaging = new JsonMessaging(InstanceId);
+            messaging = new JsonMessaging(InstanceId);
 
             messaging.subscribe("event.devices.responseinventory");
             messaging.start();
 
-            messaging.broadcast("event.devices.getinventory", new GetInventoryAdvertisement(uuid));
+            messaging.broadcast("event.devices.getinventory", getInventoryAdvertisement.set(uuid));
 
             final JsonEnvelope envelope = messaging.receive(5000);
             if (envelope != null) {
                 if (envelope.getObject() instanceof ResponseZWaveDeviceArrayInventoryAdvertisement) {
-                    //messaging.close();
+                    messaging.close();
                     return ((ResponseZWaveDeviceArrayInventoryAdvertisement) envelope.getObject()).getDevices().toString();
                 } else if (envelope.getObject() instanceof ResponseZWaveDeviceInventoryAdvertisement) {
                     messaging.close();
                     return ((ResponseZWaveDeviceInventoryAdvertisement) envelope.getObject()).getDevice().toString();
                 } else {
                     log.info("Unknown response! " + envelope.getObject());
-                    //messaging.close();
+                    messaging.close();
                     return "{ \"error\": \"Unknown response! Class: " + envelope.getObject().getClass() + " Response: " + envelope.getObject() + "\" }";
                 }
             }
 
         } catch (final Throwable t) {
             log.error("Unexpected exception in DevicesREST", t);
+            messaging.close();
             return "{ \"error\": \"" + t.toString() + "\" }";
         }
 
+        messaging.close();
         return "{ \"error\": \"no answer\" }";
     }
 }

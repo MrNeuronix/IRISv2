@@ -13,8 +13,9 @@ import ru.iris.common.devices.ZWaveDevice;
  */
 public class ZWaveNodeProtocolInfo extends ZWaveNode {
 
-    public ZWaveNodeProtocolInfo(ZWaveDevice device) {
-        super(device);
+    public ZWaveNodeProtocolInfo set(ZWaveDevice device) {
+        super.device = device;
+        return this;
     }
 
     @Override

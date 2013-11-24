@@ -13,8 +13,9 @@ import ru.iris.common.devices.ZWaveDevice;
  */
 public class ZWaveNodeNaming extends ZWaveNode {
 
-    public ZWaveNodeNaming(ZWaveDevice device) {
-        super(device);
+    public ZWaveNodeNaming set(ZWaveDevice device) {
+        super.device = device;
+        return this;
     }
 
     @Override

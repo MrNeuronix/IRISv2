@@ -1,8 +1,6 @@
 package ru.iris;
 
-import org.apache.qpid.server.Broker;
-import org.apache.qpid.server.BrokerOptions;
-import org.h2.tools.Server;
+import org.apache.log4j.xml.DOMConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
@@ -24,14 +22,7 @@ public class Launcher {
 
     public static void main(String[] args) throws Exception {
 
-        // Launch H2 TCP server
-        Server.createTcpServer().start();
-
-        // Launch Apache Qpid broker
-        BrokerOptions brokerOptions = new BrokerOptions();
-        brokerOptions.setConfigProperty("qpid.home_dir", "conf/");
-        Broker qpid = new Broker();
-        qpid.startup(brokerOptions);
+        DOMConfigurator.configure("conf/etc/log4j.xml");
 
         // Enable internationalization
         I18N i18n = new I18N();

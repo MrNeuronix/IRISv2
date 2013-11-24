@@ -30,6 +30,7 @@ public class ScheduleService implements Runnable {
     private I18N i18n = new I18N();
     private SQL sql = new SQL();
     private JsonMessaging messaging;
+    private static CommandAdvertisement commandAdvertisement = new CommandAdvertisement();
 
     public ScheduleService() {
         this.t = new Thread(this);
@@ -79,8 +80,7 @@ public class ScheduleService implements Runnable {
         // Запускаем выполнение тасков
 
         Service.serviceChecker.setAdvertisment(
-                new ServiceAdvertisement("Scheduler", Service.serviceId, ServiceStatus.AVAILABLE,
-                        new ServiceCapability[]{ServiceCapability.CONTROL}));
+                Service.advertisement.set("Scheduler", Service.serviceId, ServiceStatus.AVAILABLE));
 
         while (true) {
             try {
@@ -93,7 +93,7 @@ public class ScheduleService implements Runnable {
                     if (task.getDateAsString(now).equals(task.getDateAsString(task.getDate()))) {
                         log.info(i18n.message("scheduler.executing.task.0.1.2", task.getId(), task.getEclass(), task.getCommand()));
 
-                        messaging.broadcast("event.command", new CommandAdvertisement(task.getCommand()));
+                        messaging.broadcast("event.command", commandAdvertisement.set(task.getCommand()));
 
                         if (task.getType() == 1) {
                             log.info(i18n.message("scheduler.next.run.at.0", task.nextRunAsString()));
@@ -124,8 +124,7 @@ public class ScheduleService implements Runnable {
                 Thread.sleep(1000L);
             } catch (InterruptedException e) {
                 Service.serviceChecker.setAdvertisment(
-                        new ServiceAdvertisement("Scheduler", Service.serviceId, ServiceStatus.SHUTDOWN,
-                                new ServiceCapability[]{ServiceCapability.CONTROL}));
+                        Service.advertisement.set("Scheduler", Service.serviceId, ServiceStatus.SHUTDOWN));
             }
         }
     }

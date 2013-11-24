@@ -21,9 +21,10 @@ public class ResponseZWaveDeviceArrayInventoryAdvertisement extends Advertisemen
     @Expose
     private ArrayList devices;
 
-    public ResponseZWaveDeviceArrayInventoryAdvertisement(ArrayList devices)
+    public ResponseZWaveDeviceArrayInventoryAdvertisement set(ArrayList devices)
     {
         this.devices = devices;
+        return this;
     }
 
     public ArrayList getDevices() {

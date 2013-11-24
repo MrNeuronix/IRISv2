@@ -2,12 +2,17 @@ language=ru
 locale=ru-RU
 systemName=cистема
 
-keystore-path=conf/keystore.db
-keystore-password=changeme
+dbHost=localhost
+dbName=iris
+dbUsername=root
+dbPassword=root
 
 #################################
 # Audio section
 #################################
+
+recordStreams=3
+recordDuration=5
 
 # Total of connected microphones
 microphones=1
@@ -42,6 +47,8 @@ voicerssAPI=
 # Zwave section
 #################################
 
+zwaveEnabled=1
+
 # Controller port
 zwavePort=/dev/ttyUSB0
 
@@ -50,4 +57,10 @@ zwaveDebug=false
 
 # Path for open-zwave "conf" directory
 openzwaveCfgPath=./conf/zwave-conf
+
+#################################
+# 1-wire section
+#################################
+
+onewireEnabled=0
 

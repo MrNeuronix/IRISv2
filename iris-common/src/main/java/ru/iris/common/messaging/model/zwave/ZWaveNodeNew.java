@@ -14,8 +14,9 @@ import ru.iris.common.devices.ZWaveDevice;
  */
 public class ZWaveNodeNew extends ZWaveNode {
 
-    public ZWaveNodeNew(ZWaveDevice device) {
-        super(device);
+    public ZWaveNodeNew set(ZWaveDevice device) {
+        super.device = device;
+        return this;
     }
 
     @Override

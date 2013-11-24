@@ -18,9 +18,10 @@ public class GetInventoryAdvertisement extends Advertisement {
     @Expose
     private String deviceUUID;
 
-    public GetInventoryAdvertisement(String deviceUUID)
+    public GetInventoryAdvertisement set(String deviceUUID)
     {
         this.deviceUUID = deviceUUID;
+        return this;
     }
 
     public String getDeviceUUID() {

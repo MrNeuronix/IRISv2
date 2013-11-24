@@ -27,19 +27,11 @@ public class JsonEnvelope {
     /**
      * The sender instance ID.
      */
-    private UUID senderInstanceId;
+    private String senderInstance;
     /**
      * The receiver instance ID.
      */
-    private UUID receiverInstanceId;
-    /**
-     * The correlation ID.
-     */
-    private String correlationId;
-    /**
-     * The reply destination.
-     */
-    private Destination replyDestination;
+    private String receiverInstance;
     /**
      * The subject.
      */
@@ -54,22 +46,11 @@ public class JsonEnvelope {
         this.object = object;
     }
 
-    public JsonEnvelope(UUID senderInstanceId, UUID receiverInstanceId, String correlationId,
-                        Destination replyDestination, String subject, Object object) {
-        this.senderInstanceId = senderInstanceId;
-        this.receiverInstanceId = receiverInstanceId;
-        this.correlationId = correlationId;
-        this.replyDestination = replyDestination;
+    public JsonEnvelope(String senderInstance, String receiverInstance, String subject, Object object) {
+        this.senderInstance = senderInstance;
+        this.receiverInstance = receiverInstance;
         this.subject = subject;
         this.object = object;
-    }
-
-    public String getCorrelationId() {
-        return correlationId;
-    }
-
-    public Destination getReplyDestination() {
-        return replyDestination;
     }
 
     public String getSubject() {
@@ -80,21 +61,19 @@ public class JsonEnvelope {
         return (T) object;
     }
 
-    public UUID getSenderInstanceId() {
-        return senderInstanceId;
+    public String getSenderInstance() {
+        return senderInstance;
     }
 
-    public UUID getReceiverInstanceId() {
-        return receiverInstanceId;
+    public String getReceiverInstance() {
+        return receiverInstance;
     }
 
     @Override
     public String toString() {
         return "Envelope{" +
-                "senderInstanceId=" + senderInstanceId +
-                ", receiverInstanceId=" + receiverInstanceId +
-                ", correlationId='" + correlationId + '\'' +
-                ", replyDestination=" + replyDestination +
+                "senderInstance=" + senderInstance +
+                ", receiverInstance=" + receiverInstance +
                 ", subject='" + subject + '\'' +
                 ", object=" + object +
                 '}';

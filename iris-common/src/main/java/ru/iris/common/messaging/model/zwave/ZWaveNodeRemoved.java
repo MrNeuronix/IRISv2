@@ -13,8 +13,9 @@ import ru.iris.common.devices.ZWaveDevice;
  */
 public class ZWaveNodeRemoved extends ZWaveNode {
 
-    public ZWaveNodeRemoved(ZWaveDevice device) {
-        super(device);
+    public ZWaveNodeRemoved set(ZWaveDevice device) {
+        super.device = device;
+        return this;
     }
 
     @Override

@@ -23,8 +23,9 @@ public class Advertisement {
      *
      * @param deviceInternal         the device internal name
      */
-    public Advertisement(String deviceInternal) {
-        this.deviceInternal = deviceInternal;;
+    public Advertisement set(String deviceInternal) {
+        this.deviceInternal = deviceInternal;
+        return this;
     }
 
     /**

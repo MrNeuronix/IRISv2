@@ -1,6 +1,5 @@
 package ru.iris.common;
 
-import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.messaging.JsonMessaging;
@@ -20,16 +19,17 @@ import java.util.UUID;
 public class Speak {
 
     private static Logger log = LoggerFactory.getLogger(Speak.class);
+    private static SpeakAdvertisement advertisement = new SpeakAdvertisement();
 
-    public void say(String text) throws AMQException, JMSException, URISyntaxException {
+    public void say(String text) throws JMSException, URISyntaxException {
 
         I18N i18n = new I18N();
 
         try {
             JsonMessaging messaging = new JsonMessaging(UUID.randomUUID());
-            messaging.broadcast("event.speak", new SpeakAdvertisement(text, 100.0));
+            messaging.broadcast("event.speak", advertisement.set(text, 100.0));
             messaging.close();
-        } catch (JMSException e) {
+        } catch (Exception e) {
             log.info(i18n.message("error.failed.speak.0", text));
         }
     }

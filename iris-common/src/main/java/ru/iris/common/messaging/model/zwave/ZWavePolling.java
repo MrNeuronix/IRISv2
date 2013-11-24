@@ -20,9 +20,10 @@ public class ZWavePolling extends ZWaveNode {
     /**
      * Default constructor for de-serialisation.
      */
-    public ZWavePolling(ZWaveDevice device, boolean state) {
-        super(device);
+    public ZWavePolling set(ZWaveDevice device, boolean state) {
+        super.device = device;
         this.state = state;
+        return this;
     }
 
     public boolean getState() {

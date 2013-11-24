@@ -15,14 +15,11 @@ import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.net.httpserver.HttpServer;
 import org.apache.log4j.xml.DOMConfigurator;
-import org.apache.qpid.AMQException;
 import ru.iris.common.Config;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
-import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
 
-import javax.jms.JMSException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
@@ -33,15 +30,15 @@ public class Service {
 
     private static Map<String, String> config;
     public static ServiceChecker serviceChecker;
+    public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
     public static final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6005");
 
-    public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException {
+    public static void main(String[] args) throws IOException, SQLException, URISyntaxException {
 
         DOMConfigurator.configure("conf/etc/log4j.xml");
 
-        serviceChecker = new ServiceChecker(serviceId, new ServiceAdvertisement(
-                "Rest", serviceId, ServiceStatus.STARTUP,
-                new ServiceCapability[]{ServiceCapability.CONTROL}));
+        serviceChecker = new ServiceChecker(serviceId, advertisement.set(
+                "Rest", serviceId, ServiceStatus.STARTUP));
 
         Config cfg = new Config();
         config = cfg.getConfig();
@@ -52,13 +49,9 @@ public class Service {
             HttpServer server = HttpServerFactory.create("http://" + config.get("httpHost") + ":" + config.get("httpPort") + "/", rc);
             server.start();
 
-            serviceChecker.setAdvertisment(
-                    new ServiceAdvertisement("Rest", serviceId, ServiceStatus.AVAILABLE,
-                            new ServiceCapability[]{ServiceCapability.CONTROL}));
+            serviceChecker.setAdvertisment(advertisement.set("Rest", serviceId, ServiceStatus.AVAILABLE));
 
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (IllegalArgumentException | IOException e) {
             e.printStackTrace();
         }
     }

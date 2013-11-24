@@ -26,10 +26,11 @@ public class ZWaveDeviceValueAdded {
     @Expose
     private String value;
 
-    public ZWaveDeviceValueAdded(ZWaveDevice device, String label, String value) {
+    public ZWaveDeviceValueAdded set(ZWaveDevice device, String label, String value) {
         this.device = device;
         this.label = label;
         this.value = value;
+        return this;
     }
 
     /**

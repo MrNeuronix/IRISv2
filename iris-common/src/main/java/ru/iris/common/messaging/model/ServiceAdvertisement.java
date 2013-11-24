@@ -41,25 +41,13 @@ public class ServiceAdvertisement {
      */
     @Expose
     private ServiceStatus status;
-    /**
-     * The service capabilities.
-     */
-    @Expose
-    private ServiceCapability[] capabilities;
 
-    /**
-     * Constructor for initializing value object fields.
-     *
-     * @param name         the service type
-     * @param instanceId   the instance ID
-     * @param status       the service status
-     * @param capabilities the service capabilities
-     */
-    public ServiceAdvertisement(String name, UUID instanceId, ServiceStatus status, ServiceCapability[] capabilities) {
+    public ServiceAdvertisement set(String name, UUID instanceId, ServiceStatus status) {
         this.name = name;
         this.instanceId = instanceId;
         this.status = status;
-        this.capabilities = capabilities;
+
+        return this;
     }
 
     /**
@@ -92,14 +80,6 @@ public class ServiceAdvertisement {
         this.status = status;
     }
 
-    public ServiceCapability[] getCapabilities() {
-        return capabilities;
-    }
-
-    public void setCapabilities(ServiceCapability[] capabilities) {
-        this.capabilities = capabilities;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -123,7 +103,6 @@ public class ServiceAdvertisement {
                 "type='" + name + '\'' +
                 ", instanceId=" + instanceId +
                 ", status=" + status +
-                ", capabilities=" + Arrays.toString(capabilities) +
                 '}';
     }
 }

@@ -11,20 +11,16 @@ package ru.iris.devices;
  */
 
 import org.apache.log4j.xml.DOMConfigurator;
-import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.Config;
 import ru.iris.common.I18N;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
-import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
 import ru.iris.devices.zwave.ZWaveService;
 
-import javax.jms.JMSException;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
@@ -33,16 +29,17 @@ public class Service {
 
     public static ServiceChecker serviceChecker;
     public static final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6002");
+    public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
 
     private static Logger log = LoggerFactory.getLogger(Service.class);
 
-    public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException {
+    public static void main(String[] args) throws IOException, SQLException {
+
         DOMConfigurator.configure("conf/etc/log4j.xml");
         I18N i18n = new I18N();
 
-        serviceChecker = new ServiceChecker(serviceId, new ServiceAdvertisement(
-                "Devices", serviceId, ServiceStatus.STARTUP,
-                new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
+        serviceChecker = new ServiceChecker(serviceId, advertisement.set(
+                "Devices", serviceId, ServiceStatus.STARTUP));
 
         Map<String, String> config = new Config().getConfig();
 

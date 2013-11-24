@@ -1,7 +1,6 @@
 package ru.iris.record;
 
 import org.apache.log4j.xml.DOMConfigurator;
-import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
@@ -29,17 +28,17 @@ public class Service {
 
     private static I18N i18n = new I18N();
     public static ServiceChecker serviceChecker;
+    public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
     public static UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6004");
 
     private static Logger log = LoggerFactory.getLogger(Service.class);
 
-    public static void main(String[] args) throws IOException, SQLException, AMQException, JMSException, URISyntaxException {
+    public static void main(String[] args) throws IOException, SQLException, JMSException, URISyntaxException {
 
         DOMConfigurator.configure("conf/etc/log4j.xml");
 
-        serviceChecker = new ServiceChecker(serviceId, new ServiceAdvertisement(
-                "Record", serviceId, ServiceStatus.STARTUP,
-                new ServiceCapability[]{ServiceCapability.LISTEN}));
+        serviceChecker = new ServiceChecker(serviceId, advertisement.set(
+                "Record", serviceId, ServiceStatus.STARTUP));
 
         log.info(i18n.message("iris.record.service.starting"));
 

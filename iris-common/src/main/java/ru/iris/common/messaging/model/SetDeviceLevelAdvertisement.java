@@ -31,11 +31,12 @@ public class SetDeviceLevelAdvertisement extends Advertisement {
     @Expose
     private String value;
 
-    public SetDeviceLevelAdvertisement(String deviceUUID, String label, String value)
+    public SetDeviceLevelAdvertisement set(String deviceUUID, String label, String value)
     {
         this.label = label;
         this.value = value;
         this.deviceUUID = deviceUUID;
+        return this;
     }
 
     public String getLabel() {

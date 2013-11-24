@@ -15,14 +15,9 @@
  */
 package ru.iris.common;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -51,7 +46,6 @@ public class Config {
                     loadPropertiesFromFileSystem("./conf/main.property");
                 }
             }
-            loadPropertiesFromDatabase();
         }
     }
 
@@ -104,32 +98,6 @@ public class Config {
 
             return true;
         } catch (final IOException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Loads properties files from database.
-     *
-     * @return true if properties were loaded from database successfully.
-     */
-    private boolean loadPropertiesFromDatabase() {
-        try {
-            final SQL sql = new SQL();
-            final ResultSet rs = sql.select("SELECT name, param FROM config");
-            if (rs == null) {
-                return false;
-            }
-            while (rs.next()) {
-                String name = rs.getString("name");
-                String val = rs.getString("param");
-
-                propertyMap.put(name, val);
-            }
-            rs.close();
-            sql.close();
-            return true;
-        } catch (final SQLException e) {
             return false;
         }
     }

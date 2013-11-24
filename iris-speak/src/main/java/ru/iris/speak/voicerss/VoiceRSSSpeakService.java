@@ -55,8 +55,7 @@ public class VoiceRSSSpeakService implements Runnable {
         AudioInputStream audioIn = null;
 
         Service.serviceChecker.setAdvertisment(
-                new ServiceAdvertisement("Speak", Service.serviceId, ServiceStatus.AVAILABLE,
-                        new ServiceCapability[]{ServiceCapability.SPEAK}));
+                Service.advertisement.set("Speak", Service.serviceId, ServiceStatus.AVAILABLE));
 
         if (config.getConfig().get("silence").equals("0")) {
             try {
@@ -118,8 +117,8 @@ public class VoiceRSSSpeakService implements Runnable {
                     } else {
                         // We received unknown request message. Lets make generic log entry.
                         log.info("Received request "
-                                + " from " + envelope.getSenderInstanceId()
-                                + " to " + envelope.getReceiverInstanceId()
+                                + " from " + envelope.getSenderInstance()
+                                + " to " + envelope.getReceiverInstance()
                                 + " at '" + envelope.getSubject()
                                 + ": " + envelope.getObject());
                     }
@@ -127,8 +126,7 @@ public class VoiceRSSSpeakService implements Runnable {
             }
 
             Service.serviceChecker.setAdvertisment(
-                    new ServiceAdvertisement("Speak", Service.serviceId, ServiceStatus.SHUTDOWN,
-                            new ServiceCapability[]{ServiceCapability.SPEAK}));
+                    Service.advertisement.set("Speak", Service.serviceId, ServiceStatus.SHUTDOWN));
 
             // Close JSON messaging.
             jsonMessaging.close();
@@ -138,8 +136,7 @@ public class VoiceRSSSpeakService implements Runnable {
             log.error("Unexpected exception in Speak", t);
 
             Service.serviceChecker.setAdvertisment(
-                    new ServiceAdvertisement("Speak", Service.serviceId, ServiceStatus.SHUTDOWN,
-                            new ServiceCapability[]{ServiceCapability.SPEAK}));
+                    Service.advertisement.set("Speak", Service.serviceId, ServiceStatus.SHUTDOWN));
 
             t.printStackTrace();
         }

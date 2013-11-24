@@ -20,8 +20,9 @@ public class ResponseZWaveDeviceInventoryAdvertisement extends Advertisement {
     @Expose
     private JsonElement device;
 
-    public ResponseZWaveDeviceInventoryAdvertisement(JsonElement device) {
+    public ResponseZWaveDeviceInventoryAdvertisement set(JsonElement device) {
         this.device = device;
+        return this;
     }
 
     public JsonElement getDevice() {

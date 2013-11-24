@@ -18,8 +18,9 @@ public class CommandAdvertisement extends Advertisement {
     @Expose
     private String command;
 
-    public CommandAdvertisement(String command) {
+    public CommandAdvertisement set(String command) {
         this.command = command;
+        return this;
     }
 
     public String getCommand() {

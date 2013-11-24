@@ -93,7 +93,7 @@ public class ZWaveDevice extends Device implements Serializable {
         if (name == null)
             name = i18n.message("not.set");
 
-        sql.doQuery("DELETE FROM DEVICES WHERE UUID='" + uuid + "'");
-        sql.doQuery("INSERT INTO DEVICES (SOURCE, UUID, internaltype, TYPE, MANUFNAME, NODE, STATUS, NAME, ZONE, PRODUCTNAME, internalname) VALUES ('zwave','" + uuid + "','" + internalType + "','" + type + "','" + manufName + "','" + node + "','" + status + "','" + name + "','" + zone + "','" + productName + "','" + internalName + "')");
+        sql.doQuery("DELETE FROM devices WHERE uuid='" + uuid + "'");
+        sql.doQuery("INSERT INTO devices (source, uuid, internaltype, type, manufname, node, status, name, zone, productname, internalname) VALUES ('zwave','" + uuid + "','" + internalType + "','" + type + "','" + manufName + "','" + node + "','" + status + "','" + name + "','" + zone + "','" + productName + "','" + internalName + "')");
     }
 }

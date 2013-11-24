@@ -28,6 +28,7 @@ public class Service {
 
     private static I18N i18n = new I18N();
     public static ServiceChecker serviceChecker;
+    public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
     public static final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6007");
 
     private static Logger log = LoggerFactory.getLogger(Service.class);
@@ -36,9 +37,8 @@ public class Service {
 
         DOMConfigurator.configure("conf/etc/log4j.xml");
 
-        serviceChecker = new ServiceChecker(serviceId, new ServiceAdvertisement(
-                "Speak", serviceId, ServiceStatus.STARTUP,
-                new ServiceCapability[]{ServiceCapability.SPEAK}));
+        serviceChecker = new ServiceChecker(serviceId, advertisement.set(
+                "Speak", serviceId, ServiceStatus.STARTUP));
 
         Config cfg = new Config();
 

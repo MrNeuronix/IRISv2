@@ -1,15 +1,12 @@
 package ru.iris.record;
 
 import javaFlacEncoder.FLAC_FileEncoder;
-import org.apache.qpid.AMQException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.Config;
 import ru.iris.common.I18N;
 import ru.iris.common.httpPOST;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.ServiceAdvertisement;
-import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
 import ru.iris.common.messaging.model.SpeakRecognizedAdvertisement;
 
@@ -34,6 +31,7 @@ public class RecordService implements Runnable {
     private I18N i18n = new I18N();
     private JsonMessaging messaging;
     private Config config = new Config();
+    private static SpeakRecognizedAdvertisement advertisement = new SpeakRecognizedAdvertisement();
 
     public RecordService() {
         Thread t = new Thread(this);
@@ -46,16 +44,11 @@ public class RecordService implements Runnable {
         int threads = Integer.valueOf(config.getConfig().get("recordStreams"));
         int micro = Integer.valueOf(config.getConfig().get("microphones"));
 
-        try {
             messaging = new JsonMessaging(UUID.randomUUID());
-        } catch (JMSException | URISyntaxException | AMQException e) {
-            e.printStackTrace();
-        }
 
         log.info(i18n.message("record.configured.to.run.0.threads.on.1.microphones", threads, micro));
 
-        Service.serviceChecker.setAdvertisment(new ServiceAdvertisement("Record", Service.serviceId, ServiceStatus.AVAILABLE,
-                new ServiceCapability[]{ServiceCapability.CONTROL, ServiceCapability.SENSE}));
+        Service.serviceChecker.setAdvertisment(Service.advertisement.set("Record", Service.serviceId, ServiceStatus.AVAILABLE));
 
         for (int m = 1; m <= micro; m++) {
             final int finalM = m;
@@ -134,7 +127,7 @@ public class RecordService implements Runnable {
                                         log.info(i18n.message("command.got.0.command", text));
 
                                         try {
-                                            messaging.broadcast("event.speak.recognized", new SpeakRecognizedAdvertisement(text, confidence));
+                                            messaging.broadcast("event.speak.recognized", advertisement.set(text, confidence));
                                             Thread.sleep(1000);
                                             busy = false;
                                         } catch (Exception e) {

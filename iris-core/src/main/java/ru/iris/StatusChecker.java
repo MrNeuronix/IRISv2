@@ -33,6 +33,7 @@ public class StatusChecker implements Runnable {
     private static Logger log = LoggerFactory.getLogger(StatusChecker.class.getName());
     private static boolean shutdown = false;
     private SQL sql;
+    private static ServiceAdvertisement advertisement = new ServiceAdvertisement();
 
     public StatusChecker() {
         Thread t = new Thread(this);
@@ -60,9 +61,8 @@ public class StatusChecker implements Runnable {
             jsonMessagingStatus.start();
 
             // Broadcast that this service has started up.
-            jsonMessagingStatus.broadcast("service.status", new ServiceAdvertisement(
-                    "Status Checker", instanceId, ServiceStatus.STARTUP,
-                    new ServiceCapability[]{ServiceCapability.SYSTEM}));
+            jsonMessagingStatus.broadcast("service.status", advertisement.set(
+                    "Status Checker", instanceId, ServiceStatus.STARTUP));
 
             long lastStatusBroadcastMillis = System.currentTimeMillis();
             while (!shutdown) {
@@ -76,26 +76,25 @@ public class StatusChecker implements Runnable {
 
                         log.debug("Service '" + serviceAdvertisement.getName()
                                 + "' status: '" + serviceAdvertisement.getStatus()
-                                + "' capabilities: " + Arrays.asList(serviceAdvertisement.getCapabilities())
                                 + " instance: '" + serviceAdvertisement.getInstanceId()
                                 + "'"
                         );
 
-                        sql.doQuery("DELETE FROM MODULESTATUS WHERE NAME='" + serviceAdvertisement.getName() + "'");
-                        sql.doQuery("INSERT INTO MODULESTATUS (NAME, LASTSEEN, STATE) VALUES ('" + serviceAdvertisement.getName() + "',NOW(),'" + serviceAdvertisement.getStatus() + "')");
+                        sql.doQuery("DELETE FROM modulestatus WHERE name='" + serviceAdvertisement.getName() + "'");
+                        sql.doQuery("INSERT INTO modulestatus (name, lastseen, state) VALUES ('" + serviceAdvertisement.getName() + "',NOW(),'" + serviceAdvertisement.getStatus() + "')");
 
-                    } else if (envelope.getReceiverInstanceId() == null) {
+                    } else if (envelope.getReceiverInstance() == null) {
                         // We received unknown broadcast message. Lets make generic log entry.
                         log.debug("Received broadcast "
-                                + " from " + envelope.getSenderInstanceId()
-                                + " to " + envelope.getReceiverInstanceId()
+                                + " from " + envelope.getSenderInstance()
+                                + " to " + envelope.getReceiverInstance()
                                 + " at '" + envelope.getSubject()
                                 + ": " + envelope.getObject());
                     } else {
                         // We received unknown request message. Lets make generic log entry.
                         log.debug("Received request "
-                                + " from " + envelope.getSenderInstanceId()
-                                + " to " + envelope.getReceiverInstanceId()
+                                + " from " + envelope.getSenderInstance()
+                                + " to " + envelope.getReceiverInstance()
                                 + " at '" + envelope.getSubject()
                                 + ": " + envelope.getObject());
                     }
@@ -103,18 +102,16 @@ public class StatusChecker implements Runnable {
 
                 // If there is more than 30 seconds from last availability broadcasts then lets redo this.
                 if (30000L < System.currentTimeMillis() - lastStatusBroadcastMillis) {
-                    jsonMessagingStatus.broadcast("service.status", new ServiceAdvertisement(
-                            "Status Checker", instanceId, ServiceStatus.AVAILABLE,
-                            new ServiceCapability[]{ServiceCapability.SYSTEM}));
+                    jsonMessagingStatus.broadcast("service.status", advertisement.set(
+                            "Status Checker", instanceId, ServiceStatus.AVAILABLE));
                     lastStatusBroadcastMillis = System.currentTimeMillis();
                 }
 
             }
 
             // Broadcast that this service is shutdown.
-            jsonMessagingStatus.broadcast("service.status", new ServiceAdvertisement(
-                    "Status Checker", instanceId, ServiceStatus.SHUTDOWN,
-                    new ServiceCapability[]{ServiceCapability.SYSTEM}));
+            jsonMessagingStatus.broadcast("service.status", advertisement.set(
+                    "Status Checker", instanceId, ServiceStatus.SHUTDOWN));
 
             // Close JSON messaging.
             jsonMessagingStatus.close();

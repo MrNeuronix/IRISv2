@@ -17,8 +17,9 @@ public class ZWaveNode {
     @Expose
     protected ZWaveDevice device;
 
-    public ZWaveNode(ZWaveDevice device) {
+    public ZWaveNode set(ZWaveDevice device) {
         this.device = device;
+        return this;
     }
 
     public ZWaveDevice getDevice() {

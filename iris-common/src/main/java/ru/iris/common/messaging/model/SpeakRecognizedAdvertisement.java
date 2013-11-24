@@ -24,9 +24,10 @@ public class SpeakRecognizedAdvertisement extends Advertisement {
     @Expose
     private double confidence;
 
-    public SpeakRecognizedAdvertisement(String text, double confidence) {
+    public SpeakRecognizedAdvertisement set(String text, double confidence) {
         this.text = text;
         this.confidence = confidence;
+        return this;
     }
 
     public String getText() {

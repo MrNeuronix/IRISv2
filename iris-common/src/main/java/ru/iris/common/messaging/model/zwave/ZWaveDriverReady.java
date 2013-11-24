@@ -19,8 +19,9 @@ public class ZWaveDriverReady {
     /**
      * Default constructor for de-serialisation.
      */
-    public ZWaveDriverReady(long homeId) {
+    public ZWaveDriverReady set(long homeId) {
         this.homeId = homeId;
+        return this;
     }
 
     public long getHomeId() {
