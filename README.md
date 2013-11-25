@@ -1,6 +1,6 @@
 # IRISv2
 
-A new version of IRIS-X with strong modular system, AMPQ communication protocol and RESTful service.
+A new version of IRIS-X with strong modular system and RESTful service.
 IRISv2 is home automation system with voice control and REST API.
 
 [![Build Status](https://travis-ci.org/Neuronix2/IRISv2.png?branch=master)](https://travis-ci.org/Neuronix2/IRISv2)
@@ -8,7 +8,7 @@ IRISv2 is home automation system with voice control and REST API.
 ## Features
 
 * Strong modular system
-* AMPQ protocol used for communication between modules
+* Own message protocol based on SQL used for communication between modules
 * RESTful service for data requests
 * More other stuff :)
 
@@ -17,11 +17,11 @@ IRISv2 is home automation system with voice control and REST API.
 **mvn package**
 
 In project root directory you will find assembled **IRISv2-linux-release.zip**. Unpack them.
+Create database for IRISv2 (**conf/iris-db.sql**).
 For correct operation of the IRISv2 is needed **rec** from package **sox**
 
 ## Configuration
 
-* Rename **iris.h2.db.example** to **iris.h2.db** in **/conf** directory, look to **/conf/main.properties**
 * Rename **main.property.example** to **main.property** in **/conf** directory
 * Change what you need in **main.property**
 
