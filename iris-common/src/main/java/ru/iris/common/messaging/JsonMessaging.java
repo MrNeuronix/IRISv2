@@ -21,11 +21,6 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.SQL;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -38,6 +33,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Nikolay A. Viguro
  */
+
 public class JsonMessaging {
 
     private static Logger LOGGER = LoggerFactory.getLogger(JsonMessaging.class);
@@ -47,7 +43,6 @@ public class JsonMessaging {
     private Thread jsonBroadcastListenThread;
     private BlockingQueue<JsonEnvelope> jsonReceiveQueue = new ArrayBlockingQueue<JsonEnvelope>(50);
     private int myLastID = 0;
-    private Date myLastDate;
     private SQL sql = new SQL();
     private final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
@@ -157,11 +152,11 @@ public class JsonMessaging {
                             String jsonString = rs.getString("json");
                             String className = rs.getString("class");
                             int id = rs.getInt("id");
-                            Date date = rs.getDate("time");
 
                             if (jsonSubjects.contains(subject)
                                     && !StringUtils.isEmpty(className)
-                                    && !StringUtils.isEmpty(jsonString)) {
+                                    && !StringUtils.isEmpty(jsonString)
+                                    && id != myLastID) {
 
                                 LOGGER.info("JSON: "+jsonString);
 
@@ -175,7 +170,6 @@ public class JsonMessaging {
                                         + " to subject: "
                                         + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
                                 myLastID = id;
-                                myLastDate = date;
                                 jsonReceiveQueue.put(envelope);
                             }
                         }
