@@ -10,9 +10,11 @@ package ru.iris.common;
  */
 
 
+import com.sun.rowset.CachedRowSetImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.sql.rowset.CachedRowSet;
 import java.sql.*;
 
 public class SQL {
@@ -21,6 +23,9 @@ public class SQL {
      */
     private static Logger LOGGER = LoggerFactory.getLogger(SQL.class);
     private Connection connection;
+    private String connectionURL;
+    private String username;
+    private String password;
 
     public SQL() {
 
@@ -35,33 +40,45 @@ public class SQL {
             Config config = new Config();
             String serverName = config.getConfig().get("dbHost");
             String mydatabase = config.getConfig().get("dbName")+"?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8";
-            String url = "jdbc:mysql://" + serverName + "/" + mydatabase;
-            String username = config.getConfig().get("dbUsername");
-            String password = config.getConfig().get("dbPassword");
+            connectionURL = "jdbc:mysql://" + serverName + "/" + mydatabase;
+            username = config.getConfig().get("dbUsername");
+            password = config.getConfig().get("dbPassword");
 
-            connection = DriverManager.getConnection(url, username, password);
-            LOGGER.info("Connection to database established: " + connection);
-
-        } catch (ClassNotFoundException | SQLException e) {
-            LOGGER.info("[sql] Error load driver");
-            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            LOGGER.error("[sql] Error load driver");
             System.exit(1);
         }
     }
 
     public boolean doQuery(String sql) {
+
+        Statement statement = null;
+
         try {
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            connection = DriverManager.getConnection(connectionURL, username, password);
+            statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             try {
                 statement.executeUpdate(sql);
             } catch (Exception e) {
-                LOGGER.info("SQL error: "+e);
+                LOGGER.error("SQL error: "+e);
                 e.printStackTrace();
             }
-            statement.close();
         } catch (Exception e1) {
-            LOGGER.info("SQL error: "+e1);
+            LOGGER.error("SQL error: "+e1);
             return false;
+        }
+        finally {
+            //closing the resources in this transaction
+            //similar logic than the used in the last close block code
+            try {
+                if (statement != null) {
+                    statement.close();
+                }
+                //at the last of all the operations, close the connection
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException sqle) {}
         }
         return true;
     }
@@ -69,27 +86,39 @@ public class SQL {
     public ResultSet select( String sql) {
 
         ResultSet resultSet = null;
+        Statement statement = null;
+        CachedRowSetImpl crs = null;
 
         try {
-            //TODO Need to close statement!
-            Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            crs = new CachedRowSetImpl();
+            connection = DriverManager.getConnection(connectionURL, username, password);
+            statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
             try {
                 resultSet = statement.executeQuery(sql);
+                crs.populate(resultSet);
             } catch (SQLException e) {
-                LOGGER.warn("Error executing: " + sql + ": " + e.getMessage());
+                LOGGER.error("Error executing: " + sql + ": " + e.getMessage());
             }
         } catch (SQLException e1) {
             e1.printStackTrace();
         }
+            finally {
+                //closing the resources in this transaction
+                //similar logic than the used in the last close block code
+                try {
+                    if (resultSet != null) {
+                        resultSet.close();
+                    }
+                    if (statement != null) {
+                        statement.close();
+                    }
+                    //at the last of all the operations, close the connection
+                    if (connection != null) {
+                        connection.close();
+                    }
+                } catch (SQLException ignored) {}
+            }
 
-        return resultSet;
-    }
-
-    public void close() throws SQLException {
-        try {
-            connection.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        return crs;
     }
 }

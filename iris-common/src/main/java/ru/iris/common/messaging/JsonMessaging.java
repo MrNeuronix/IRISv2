@@ -21,6 +21,11 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.SQL;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -158,11 +163,13 @@ public class JsonMessaging {
                                     && !StringUtils.isEmpty(className)
                                     && !StringUtils.isEmpty(jsonString)) {
 
+                                LOGGER.info("JSON: "+jsonString);
+
                                 final Class clazz = Class.forName(className);
                                 Object object = gson.fromJson(jsonString, clazz);
                                 JsonEnvelope envelope = new JsonEnvelope(rs.getString("sender"), null, subject, object);
 
-                                LOGGER.info("Received message: "
+                                LOGGER.debug("Received message: "
                                         + " sender: " + envelope.getSenderInstance()
                                         + " receiver: " + envelope.getReceiverInstance()
                                         + " to subject: "
@@ -178,10 +185,14 @@ public class JsonMessaging {
                     Thread.sleep(1000L);
 
                 } catch (final SQLException e) {
-                    LOGGER.debug("Error receiving JSON message.", e);
+                    LOGGER.debug("Error receiving JSON message ", e);
                 } catch (final ClassNotFoundException e) {
-                    LOGGER.error("Error deserializing JSON message.", e);
+                    LOGGER.error("Error deserializing JSON message ", e);
+                } catch (final InterruptedException e)
+                {
+                    LOGGER.error("Interrupt erro in JSOM message ", e);
                 }
+
             }
         } catch (Exception e) {
             LOGGER.error("Error JsonMessaging: "+e.toString());
