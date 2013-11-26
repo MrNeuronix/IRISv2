@@ -25,6 +25,10 @@
             <directory>conf</directory>
         </fileSet>
         <fileSet>
+            <outputDirectory>/scripts</outputDirectory>
+            <directory>scripts</directory>
+        </fileSet>
+        <fileSet>
             <outputDirectory>/</outputDirectory>
             <includes>
                 <include>*.jar</include>

@@ -1,11 +1,22 @@
 package ru.iris.events;
 
+import org.apache.commons.io.FileUtils;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.tools.shell.Global;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.model.CommandAdvertisement;
+import ru.iris.common.messaging.model.CommandResult;
 import ru.iris.common.messaging.model.ServiceStatus;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -20,6 +31,7 @@ public class EventsService implements Runnable {
     private Logger log = LoggerFactory.getLogger(EventsService.class.getName());
     private final I18N i18n = new I18N();
     private boolean shutdown = false;
+    private final CommandResult commandResult = new CommandResult();
 
     public EventsService() {
         Thread t = new Thread(this);
@@ -40,6 +52,16 @@ public class EventsService implements Runnable {
 
             final JsonMessaging jsonMessaging = new JsonMessaging(Service.serviceId);
 
+            // Initialize rhino engine
+            Global global = new Global();
+            Context cx = ContextFactory.getGlobal().enterContext();
+            global.init(cx);
+            Scriptable scope = cx.initStandardObjects(global);
+
+            // Pass jsonmessaging instance to js engine
+            ScriptableObject.putProperty(scope, "jsonMessaging", Context.javaToJS(jsonMessaging, scope));
+            ScriptableObject.putProperty(scope, "out", Context.javaToJS(System.out, scope));
+
             // subscribe to anything
             jsonMessaging.subscribe("*");
             jsonMessaging.start();
@@ -52,8 +74,23 @@ public class EventsService implements Runnable {
                 final JsonEnvelope envelope = jsonMessaging.receive(100);
                 if (envelope != null) {
 
-                    log.info("EVENT DETECTED! " + envelope.getObject());
+                    // Check command and launch script
+                    if (envelope.getObject() instanceof CommandAdvertisement) {
+                        CommandAdvertisement advertisement = envelope.getObject();
+                        log.info("Launch script: " + advertisement.getCommand());
 
+                        File jsFile = new File("./scripts/" + advertisement.getCommand() + ".js");
+
+                        try {
+                            Object result = cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
+                            jsonMessaging.broadcast("event.command.result", commandResult.set(advertisement.getCommand(), result));
+                        } catch (FileNotFoundException e) {
+                            log.error("Script file scripts/" + advertisement.getCommand() + ".js not found!");
+                        } catch (Exception e) {
+                            log.error("Error in script scripts/" + advertisement.getCommand() + ".js: " + e.toString());
+                            e.printStackTrace();
+                        }
+                    }
                 }
             }
 
