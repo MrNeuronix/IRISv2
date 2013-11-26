@@ -49,7 +49,6 @@ public class ZWaveService implements Runnable {
     private ZWaveDriverReady zWaveDriverReady = new ZWaveDriverReady();
     private ZWaveDriverFailed zWaveDriverFailed = new ZWaveDriverFailed();
     private ZWaveDriverReset zWaveDriverReset = new ZWaveDriverReset();
-    private ZWaveNode zWaveNode = new ZWaveNode();
     private ZWaveNodeNaming zWaveNodeNaming = new ZWaveNodeNaming();
     private ZWaveNodeAdded zWaveNodeAdded = new ZWaveNodeAdded();
     private ZWaveNodeEvent zWaveNodeEvent = new ZWaveNodeEvent();
@@ -148,7 +147,7 @@ public class ZWaveService implements Runnable {
                         log.info(i18n.message("zwave.all.nodes.queried"));
                         manager.writeConfig(homeId);
                         ready = true;
-                        messaging.broadcast("event.devices.zwave.allnodesqueried", new ZWaveAllNodesQueried());
+                        messaging.broadcast("event.devices.zwave.allnodesqueried", zWaveAllNodesQueried);
                         break;
                     case ALL_NODES_QUERIED_SOME_DEAD:
                         log.info(i18n.message("zwave.all.nodes.queried.some.dead"));
@@ -192,6 +191,17 @@ public class ZWaveService implements Runnable {
 
                         String nodeType = manager.getNodeType(homeId, node);
                         ZWaveDevice zw;
+
+                        ZWaveDevice zcZWaveDevice = getZWaveDeviceByNode(node);
+
+                        if(zcZWaveDevice != null)
+                        {
+                            // Check for awaked after sleeping nodes
+                            if (manager.isNodeAwake(homeId, zcZWaveDevice.getNode()) && zcZWaveDevice.getStatus().equals("Sleeping")) {
+                                log.info("Setting node " + zcZWaveDevice.getNode() + " to LISTEN state");
+                                zcZWaveDevice.setStatus("Listening");
+                            }
+                        }
 
                         switch (nodeType) {
                             case "Portable Remote Controller":
@@ -336,54 +346,43 @@ public class ZWaveService implements Runnable {
                         break;
                     case VALUE_CHANGED:
 
-                        ZWaveDevice zcZWaveDevice = getZWaveDeviceByNode(node);
+                        ZWaveDevice ZWaveDevice = getZWaveDeviceByNode(node);
 
                         // Check for awaked after sleeping nodes
-                        if (manager.isNodeAwake(homeId, zcZWaveDevice.getNode()) && zcZWaveDevice.getStatus().equals("Sleeping")) {
-                            log.info("Setting node " + zcZWaveDevice.getNode() + " to LISTEN state");
-                            zcZWaveDevice.setStatus("Listening");
+                        if (manager.isNodeAwake(homeId, ZWaveDevice.getNode()) && ZWaveDevice.getStatus().equals("Sleeping")) {
+                            log.info("Setting node " + ZWaveDevice.getNode() + " to LISTEN state");
+                            ZWaveDevice.setStatus("Listening");
                             try {
-                                zcZWaveDevice.save();
+                                ZWaveDevice.save();
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
                         }
 
-                        // Check for sleeping after awake nodes
-                        if (!manager.isNodeAwake(homeId, zcZWaveDevice.getNode()) && zcZWaveDevice.getStatus().equals("Listening")) {
-                            log.info("Setting node " + zcZWaveDevice.getNode() + " to SLEEP state");
-                            zcZWaveDevice.setStatus("Sleeping");
-                            try {
-                                zcZWaveDevice.save();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                        if (zcZWaveDevice == null) {
+                        if (ZWaveDevice == null) {
                             log.info(i18n.message("zwave.error.while.save.value.change.cannot.find.device.with.node.id.0", node));
                             break;
                         }
 
                         // break if same value
                         try {
-                            if (Utils.getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))) == Utils.getValue(notification.getValueId()))
+                            if (Utils.getValue((ValueId) ZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))) == Utils.getValue(notification.getValueId()))
                                 break;
                         } catch (NullPointerException e) {
                             break;
                         }
 
                         log.info(i18n.message("zwave.node.0.value.for.label.1.changed.2.3",
-                                zcZWaveDevice.getNode(),
+                                ZWaveDevice.getNode(),
                                 manager.getValueLabel(notification.getValueId()),
-                                Utils.getValue((ValueId) zcZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))),
+                                Utils.getValue((ValueId) ZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))),
                                 Utils.getValue(notification.getValueId())));
 
-                        zcZWaveDevice.updateValueID(manager.getValueLabel(notification.getValueId()), notification.getValueId());
+                        ZWaveDevice.updateValueID(manager.getValueLabel(notification.getValueId()), notification.getValueId());
 
                         messaging.broadcast("event.devices.value.changed",
                                 zWaveDeviceValueChanged.set(
-                                        zcZWaveDevice,
+                                        ZWaveDevice,
                                         Manager.get().getValueLabel(notification.getValueId()),
                                         String.valueOf(Utils.getValue(notification.getValueId()))));
 

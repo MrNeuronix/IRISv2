@@ -5,6 +5,8 @@ IRISv2 is home automation system with voice control and REST API.
 
 [![Build Status](https://travis-ci.org/Neuronix2/IRISv2.png?branch=master)](https://travis-ci.org/Neuronix2/IRISv2)
 
+Please remember that this project is in deep alpha and now is mostly for developers than for users.
+
 ## Features
 
 * Strong modular system
