@@ -108,7 +108,8 @@ public class JsonMessaging {
         final String className = object.getClass().getName();
         final String jsonString = gson.toJson(object);
 
-        sql.doQuery("INSERT INTO messages (time, subject, sender, class, json) VALUES (CURRENT_TIMESTAMP(), '" + subject + "', '" + sender + "', '" + className + "', '" + jsonString + "')");
+        sql.doQuery("INSERT INTO messages (time, subject, sender, class, json) " +
+                "VALUES (CURRENT_TIMESTAMP(), '" + subject + "', '" + sender + "', '" + className + "', '" + jsonString + "')");
     }
 
     /**
@@ -186,7 +187,7 @@ public class JsonMessaging {
                 } catch (final ClassNotFoundException e) {
                     LOGGER.error("Error deserializing JSON message ", e);
                 } catch (final InterruptedException e) {
-                    //LOGGER.error("Interrupt erro in JSOM message ", e);
+                    //LOGGER.error("Interrupt error in JSON message ", e);
                 }
 
             }

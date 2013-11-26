@@ -40,7 +40,8 @@ public class EventsService implements Runnable {
 
             final JsonMessaging jsonMessaging = new JsonMessaging(Service.serviceId);
 
-            jsonMessaging.subscribe("event.*");
+            // subscribe to anything
+            jsonMessaging.subscribe("*");
             jsonMessaging.start();
 
             Service.serviceChecker.setAdvertisment(Service.advertisement.set(
@@ -48,7 +49,6 @@ public class EventsService implements Runnable {
 
             while (!shutdown) {
 
-                // Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
                 final JsonEnvelope envelope = jsonMessaging.receive(100);
                 if (envelope != null) {
 

@@ -12,9 +12,7 @@ import ru.iris.common.Utils;
 import ru.iris.common.devices.ZWaveDevice;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.GetInventoryAdvertisement;
-import ru.iris.common.messaging.model.ServiceStatus;
-import ru.iris.common.messaging.model.SetDeviceLevelAdvertisement;
+import ru.iris.common.messaging.model.*;
 import ru.iris.common.messaging.model.zwave.*;
 import ru.iris.devices.Service;
 
@@ -475,6 +473,8 @@ public class ZWaveService implements Runnable {
 
             jsonMessaging.subscribe("event.devices.setvalue");
             jsonMessaging.subscribe("event.devices.getinventory");
+            jsonMessaging.subscribe("event.devices.setname");
+            jsonMessaging.subscribe("event.devices.setzone");
 
             jsonMessaging.start();
 
@@ -562,6 +562,26 @@ public class ZWaveService implements Runnable {
 
                                 jsonMessaging.broadcast("event.devices.responseinventory", responseZWaveDeviceInventoryAdvertisement.set(jsonElement));
                             }
+                        }
+
+                    } else if (envelope.getObject() instanceof SetDeviceNameAdvertisement) {
+
+                        SetDeviceNameAdvertisement advertisement = envelope.getObject();
+
+                        ZWaveDevice zdv = getZWaveDeviceByUUID(advertisement.getDeviceUUID());
+                        if (zdv != null) {
+                            zdv.setName(advertisement.getName());
+                            zdv.save();
+                        }
+
+                    } else if (envelope.getObject() instanceof SetDeviceZoneAdvertisement) {
+
+                        SetDeviceZoneAdvertisement advertisement = envelope.getObject();
+
+                        ZWaveDevice zdv = getZWaveDeviceByUUID(advertisement.getDeviceUUID());
+                        if (zdv != null) {
+                            zdv.setZone(advertisement.getZone());
+                            zdv.save();
                         }
 
                     } else if (envelope.getReceiverInstance() == null) {

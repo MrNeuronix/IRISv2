@@ -9,6 +9,8 @@ import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.GetInventoryAdvertisement;
 import ru.iris.common.messaging.model.SetDeviceLevelAdvertisement;
+import ru.iris.common.messaging.model.SetDeviceNameAdvertisement;
+import ru.iris.common.messaging.model.SetDeviceZoneAdvertisement;
 import ru.iris.common.messaging.model.zwave.ResponseZWaveDeviceArrayInventoryAdvertisement;
 import ru.iris.common.messaging.model.zwave.ResponseZWaveDeviceInventoryAdvertisement;
 
@@ -34,6 +36,8 @@ public class DevicesREST {
     private final UUID InstanceId = UUID.randomUUID();
     private JsonMessaging messaging;
     private SetDeviceLevelAdvertisement setDeviceLevelAdvertisement = new SetDeviceLevelAdvertisement();
+    private SetDeviceNameAdvertisement setDeviceNameAdvertisement = new SetDeviceNameAdvertisement();
+    private SetDeviceZoneAdvertisement setDeviceZoneAdvertisement = new SetDeviceZoneAdvertisement();
     private GetInventoryAdvertisement getInventoryAdvertisement = new GetInventoryAdvertisement();
     private final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 
@@ -51,6 +55,34 @@ public class DevicesREST {
     public String devSetLevel(@PathParam("uuid") String uuid, @PathParam("label") String label, @PathParam("level") String level) {
         log.info(i18n.message("rest.set.level.0.on.1.device", level, uuid));
         return "{ status: " + sendLevelMessage(uuid, label, level) + " }";
+    }
+
+    @GET
+    @Path("/{uuid}/name/{name}")
+    @Consumes(MediaType.TEXT_PLAIN + ";charset=utf-8")
+    public String devSetName(@PathParam("uuid") String uuid, @PathParam("name") String name) {
+
+        log.info("Setting name \"" + name + "\" for " + uuid);
+
+        messaging = new JsonMessaging(InstanceId);
+        messaging.broadcast("event.devices.setname", setDeviceNameAdvertisement.set(uuid, name));
+        messaging.close();
+
+        return "{ status: \"" + i18n.message("done") + "\"}";
+    }
+
+    @GET
+    @Path("/{uuid}/zone/{zone}")
+    @Consumes(MediaType.TEXT_PLAIN + ";charset=utf-8")
+    public String devSetZone(@PathParam("uuid") String uuid, @PathParam("zone") int zone) {
+
+        log.info("Setting zone \"" + zone + "\" for " + uuid);
+
+        messaging = new JsonMessaging(InstanceId);
+        messaging.broadcast("event.devices.setzone", setDeviceZoneAdvertisement.set(uuid, zone));
+        messaging.close();
+
+        return "{ status: \"" + i18n.message("done") + "\"}";
     }
 
     private String sendLevelMessage(String uuid, String label, String value) {
