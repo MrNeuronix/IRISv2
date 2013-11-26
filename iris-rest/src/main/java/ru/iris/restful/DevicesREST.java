@@ -87,7 +87,8 @@ public class DevicesREST {
                     return gson.toJson(advertisement.getDevices());
                 } else if (envelope.getObject() instanceof ResponseZWaveDeviceInventoryAdvertisement) {
                     messaging.close();
-                    return ((ResponseZWaveDeviceInventoryAdvertisement) envelope.getObject()).getDevice().toString();
+                    ResponseZWaveDeviceInventoryAdvertisement advertisement = envelope.getObject();
+                    return gson.toJson(advertisement.getDevice());
                 } else {
                     log.info("Unknown response! " + envelope.getObject());
                     messaging.close();

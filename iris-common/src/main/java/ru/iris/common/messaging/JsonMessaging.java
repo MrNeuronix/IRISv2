@@ -148,27 +148,32 @@ public class JsonMessaging {
                     while (rs.next()) {
 
                         String subject = rs.getString("subject");
-                        String jsonString = rs.getString("json");
-                        String className = rs.getString("class");
-                        int id = rs.getInt("id");
 
-                        if (jsonSubjects.contains(subject)
-                                && !StringUtils.isEmpty(className)
-                                && !StringUtils.isEmpty(jsonString)
-                                && id != myLastID) {
+                        // Check wildcard
+                        for (String jsonSubj : jsonSubjects) {
+                            if (wildCardMatch(jsonSubj, subject) || jsonSubjects.contains(subject)) {
+                                String jsonString = rs.getString("json");
+                                String className = rs.getString("class");
+                                int id = rs.getInt("id");
 
-                            final Class clazz = Class.forName(className);
-                            Object object = gson.fromJson(jsonString, clazz);
-                            JsonEnvelope envelope = new JsonEnvelope(rs.getString("sender"), null, subject, object);
+                                if (!StringUtils.isEmpty(className)
+                                        && !StringUtils.isEmpty(jsonString)
+                                        && id != myLastID) {
 
-                            LOGGER.debug("Received message: "
-                                    + " sender: " + envelope.getSenderInstance()
-                                    + " receiver: " + envelope.getReceiverInstance()
-                                    + " to subject: "
-                                    + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")"
-                                    + " JSON: " + jsonString);
-                            myLastID = id;
-                            jsonReceiveQueue.put(envelope);
+                                    final Class clazz = Class.forName(className);
+                                    Object object = gson.fromJson(jsonString, clazz);
+                                    JsonEnvelope envelope = new JsonEnvelope(rs.getString("sender"), null, subject, object);
+
+                                    LOGGER.debug("Received message: "
+                                            + " sender: " + envelope.getSenderInstance()
+                                            + " receiver: " + envelope.getReceiverInstance()
+                                            + " to subject: "
+                                            + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")"
+                                            + " JSON: " + jsonString);
+                                    myLastID = id;
+                                    jsonReceiveQueue.put(envelope);
+                                }
+                            }
                         }
                     }
 
@@ -189,5 +194,47 @@ public class JsonMessaging {
             LOGGER.error("Error JsonMessaging: " + e.toString());
             e.printStackTrace();
         }
+    }
+
+
+    /**
+     * Performs a wildcard matching for the text and pattern
+     * provided.
+     *
+     * @param text    the text to be tested for matches.
+     * @param pattern the pattern to be matched for.
+     *                This can contain the wildcard character '*' (asterisk).
+     * @return <tt>true</tt> if a match is found, <tt>false</tt>
+     *         otherwise.
+     */
+
+    private boolean wildCardMatch(String pattern, String text) {
+        // add sentinel so don't need to worry about *'s at end of pattern
+        text += '\0';
+        pattern += '\0';
+
+        int N = pattern.length();
+
+        boolean[] states = new boolean[N + 1];
+        boolean[] old = new boolean[N + 1];
+        old[0] = true;
+
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            states = new boolean[N + 1];       // initialized to false
+            for (int j = 0; j < N; j++) {
+                char p = pattern.charAt(j);
+
+                // hack to handle *'s that match 0 characters
+                if (old[j] && (p == '*')) old[j + 1] = true;
+
+                if (old[j] && (p == c)) states[j + 1] = true;
+                if (old[j] && (p == '.')) states[j + 1] = true;
+                if (old[j] && (p == '*')) states[j] = true;
+                if (old[j] && (p == '*')) states[j + 1] = true;
+            }
+            old = states;
+        }
+        return states[N];
     }
 }

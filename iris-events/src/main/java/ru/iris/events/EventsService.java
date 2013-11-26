@@ -5,11 +5,7 @@ import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.ServiceAdvertisement;
-import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
-
-import java.util.Arrays;
 
 /**
  * Created with IntelliJ IDEA.
@@ -44,13 +40,7 @@ public class EventsService implements Runnable {
 
             final JsonMessaging jsonMessaging = new JsonMessaging(Service.serviceId);
 
-            jsonMessaging.subscribe("event.status");
-            jsonMessaging.subscribe("event.devices.setvalue");
-            jsonMessaging.subscribe("event.devices.getinventory");
-            jsonMessaging.subscribe("event.devices.responseinventory");
-            jsonMessaging.subscribe("event.speak");
-            jsonMessaging.subscribe("event.speak.recognized");
-
+            jsonMessaging.subscribe("event.*");
             jsonMessaging.start();
 
             Service.serviceChecker.setAdvertisment(Service.advertisement.set(
@@ -61,30 +51,9 @@ public class EventsService implements Runnable {
                 // Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
                 final JsonEnvelope envelope = jsonMessaging.receive(100);
                 if (envelope != null) {
-                    if (envelope.getObject() instanceof ServiceAdvertisement) {
-                        // We know of service advertisement. Lets log it properly.
-                        final ServiceAdvertisement serviceAdvertisement = envelope.getObject();
-                        log.info("Service '" + serviceAdvertisement.getName()
-                                + "' status: '" + serviceAdvertisement.getStatus()
-                                + " instance: '" + serviceAdvertisement.getInstanceId()
-                                + "'"
-                        );
 
-                    } else if (envelope.getReceiverInstance() == null) {
-                        // We received unknown broadcast message. Lets make generic log entry.
-                        log.info("Received broadcast "
-                                + " from " + envelope.getSenderInstance()
-                                + " to " + envelope.getReceiverInstance()
-                                + " at '" + envelope.getSubject()
-                                + ": " + envelope.getObject());
-                    } else {
-                        // We received unknown request message. Lets make generic log entry.
-                        log.info("Received request "
-                                + " from " + envelope.getSenderInstance()
-                                + " to " + envelope.getReceiverInstance()
-                                + " at '" + envelope.getSubject()
-                                + ": " + envelope.getObject());
-                    }
+                    log.info("EVENT DETECTED! " + envelope.getObject());
+
                 }
             }
 
