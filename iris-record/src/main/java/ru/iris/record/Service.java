@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
-import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
 
 import javax.jms.JMSException;
@@ -35,7 +34,7 @@ public class Service {
 
     public static void main(String[] args) throws IOException, SQLException, JMSException, URISyntaxException {
 
-        DOMConfigurator.configure("conf/etc/log4j.xml");
+        DOMConfigurator.configure("conf/log4j.xml");
 
         serviceChecker = new ServiceChecker(serviceId, advertisement.set(
                 "Record", serviceId, ServiceStatus.STARTUP));

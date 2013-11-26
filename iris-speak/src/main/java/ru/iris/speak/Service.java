@@ -8,7 +8,6 @@ import ru.iris.common.I18N;
 import ru.iris.common.Speak;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
-import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
 import ru.iris.speak.google.GoogleSpeakService;
 import ru.iris.speak.voicerss.VoiceRSSSpeakService;
@@ -35,7 +34,7 @@ public class Service {
 
     public static void main(String[] args) throws Exception {
 
-        DOMConfigurator.configure("conf/etc/log4j.xml");
+        DOMConfigurator.configure("conf/log4j.xml");
 
         serviceChecker = new ServiceChecker(serviceId, advertisement.set(
                 "Speak", serviceId, ServiceStatus.STARTUP));

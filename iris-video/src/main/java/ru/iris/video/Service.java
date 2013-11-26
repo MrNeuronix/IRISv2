@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
-import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
 
 import java.util.UUID;
@@ -29,7 +28,7 @@ public class Service {
 
     public static void main(String[] args) throws Exception {
 
-        DOMConfigurator.configure("conf/etc/log4j.xml");
+        DOMConfigurator.configure("conf/log4j.xml");
 
         serviceChecker = new ServiceChecker(serviceId, advertisement.set(
                 "Video", serviceId, ServiceStatus.STARTUP));

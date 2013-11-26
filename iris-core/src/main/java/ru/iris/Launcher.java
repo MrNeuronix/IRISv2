@@ -22,7 +22,7 @@ public class Launcher {
 
     public static void main(String[] args) throws Exception {
 
-        DOMConfigurator.configure("conf/etc/log4j.xml");
+        DOMConfigurator.configure("conf/log4j.xml");
 
         // Enable internationalization
         I18N i18n = new I18N();

@@ -35,7 +35,7 @@ public class Service {
 
     public static void main(String[] args) throws IOException, SQLException {
 
-        DOMConfigurator.configure("conf/etc/log4j.xml");
+        DOMConfigurator.configure("conf/log4j.xml");
         I18N i18n = new I18N();
 
         serviceChecker = new ServiceChecker(serviceId, advertisement.set(

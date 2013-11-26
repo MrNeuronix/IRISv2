@@ -35,7 +35,7 @@ public class Service {
 
     public static void main(String[] args) throws IOException, SQLException, URISyntaxException {
 
-        DOMConfigurator.configure("conf/etc/log4j.xml");
+        DOMConfigurator.configure("conf/log4j.xml");
 
         serviceChecker = new ServiceChecker(serviceId, advertisement.set(
                 "Rest", serviceId, ServiceStatus.STARTUP));
