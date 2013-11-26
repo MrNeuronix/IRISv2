@@ -21,9 +21,13 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.SQL;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -46,8 +50,7 @@ public class JsonMessaging {
     private SQL sql = new SQL();
     private final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
-    public JsonMessaging(final UUID sender)
-    {
+    public JsonMessaging(final UUID sender) {
         this.sender = sender;
     }
 
@@ -80,9 +83,7 @@ public class JsonMessaging {
     }
 
     /**
-     * Closes connection to AMQP message broker.
-     *
-     * @throws Exception
+     * Closes connection to SQL message broker.
      */
     public void close() {
         try {
@@ -104,10 +105,10 @@ public class JsonMessaging {
      */
     public void broadcast(final String subject, final Object object) {
 
-            final String className = object.getClass().getName();
-            final String jsonString = gson.toJson(object);
+        final String className = object.getClass().getName();
+        final String jsonString = gson.toJson(object);
 
-            sql.doQuery("INSERT INTO messages (time, subject, sender, class, json) VALUES (CURRENT_TIMESTAMP(), '"+subject+"', '"+sender+"', '"+className+"', '"+jsonString+"')");
+        sql.doQuery("INSERT INTO messages (time, subject, sender, class, json) VALUES (CURRENT_TIMESTAMP(), '" + subject + "', '" + sender + "', '" + className + "', '" + jsonString + "')");
     }
 
     /**
@@ -140,41 +141,38 @@ public class JsonMessaging {
     private void listenBroadcasts() {
 
         try {
-            while (!shutdownThreads)
-            {
-                try
-                {
+            while (!shutdownThreads) {
+                try {
                     ResultSet rs = sql.select("SELECT * FROM messages WHERE time > (now() - INTERVAL 2 SECOND)");
 
-                        while (rs.next()) {
+                    while (rs.next()) {
 
-                            String subject = rs.getString("subject");
-                            String jsonString = rs.getString("json");
-                            String className = rs.getString("class");
-                            int id = rs.getInt("id");
+                        String subject = rs.getString("subject");
+                        String jsonString = rs.getString("json");
+                        String className = rs.getString("class");
+                        int id = rs.getInt("id");
 
-                            if (jsonSubjects.contains(subject)
-                                    && !StringUtils.isEmpty(className)
-                                    && !StringUtils.isEmpty(jsonString)
-                                    && id != myLastID) {
+                        if (jsonSubjects.contains(subject)
+                                && !StringUtils.isEmpty(className)
+                                && !StringUtils.isEmpty(jsonString)
+                                && id != myLastID) {
 
-                                LOGGER.info("JSON: "+jsonString);
+                            final Class clazz = Class.forName(className);
+                            Object object = gson.fromJson(jsonString, clazz);
+                            JsonEnvelope envelope = new JsonEnvelope(rs.getString("sender"), null, subject, object);
 
-                                final Class clazz = Class.forName(className);
-                                Object object = gson.fromJson(jsonString, clazz);
-                                JsonEnvelope envelope = new JsonEnvelope(rs.getString("sender"), null, subject, object);
-
-                                LOGGER.debug("Received message: "
-                                        + " sender: " + envelope.getSenderInstance()
-                                        + " receiver: " + envelope.getReceiverInstance()
-                                        + " to subject: "
-                                        + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
-                                myLastID = id;
-                                jsonReceiveQueue.put(envelope);
-                            }
+                            LOGGER.debug("Received message: "
+                                    + " sender: " + envelope.getSenderInstance()
+                                    + " receiver: " + envelope.getReceiverInstance()
+                                    + " to subject: "
+                                    + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")"
+                                    + " JSON: " + jsonString);
+                            myLastID = id;
+                            jsonReceiveQueue.put(envelope);
                         }
+                    }
 
-                        rs.close();
+                    rs.close();
 
                     Thread.sleep(1000L);
 
@@ -182,14 +180,13 @@ public class JsonMessaging {
                     LOGGER.debug("Error receiving JSON message ", e);
                 } catch (final ClassNotFoundException e) {
                     LOGGER.error("Error deserializing JSON message ", e);
-                } catch (final InterruptedException e)
-                {
-                    LOGGER.error("Interrupt erro in JSOM message ", e);
+                } catch (final InterruptedException e) {
+                    //LOGGER.error("Interrupt erro in JSOM message ", e);
                 }
 
             }
         } catch (Exception e) {
-            LOGGER.error("Error JsonMessaging: "+e.toString());
+            LOGGER.error("Error JsonMessaging: " + e.toString());
             e.printStackTrace();
         }
     }

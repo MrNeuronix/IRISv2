@@ -1,10 +1,7 @@
 package ru.iris.devices.zwave;
 
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zwave4j.*;
@@ -15,13 +12,19 @@ import ru.iris.common.Utils;
 import ru.iris.common.devices.ZWaveDevice;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.*;
+import ru.iris.common.messaging.model.GetInventoryAdvertisement;
+import ru.iris.common.messaging.model.ServiceStatus;
+import ru.iris.common.messaging.model.SetDeviceLevelAdvertisement;
 import ru.iris.common.messaging.model.zwave.*;
 import ru.iris.devices.Service;
+
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -76,8 +79,8 @@ public class ZWaveService implements Runnable {
     @Override
     public synchronized void run() {
 
-            messaging = new JsonMessaging(UUID.randomUUID());
-            config = new Config().getConfig();
+        messaging = new JsonMessaging(UUID.randomUUID());
+        config = new Config().getConfig();
 
         ResultSet rs = sql.select("SELECT * FROM devices");
 
@@ -508,7 +511,7 @@ public class ZWaveService implements Runnable {
 
                         final GetInventoryAdvertisement advertisement = envelope.getObject();
 
-                        ArrayList<String> inventory = new ArrayList<>();
+                        JsonArray inventory = new JsonArray();
 
                         if (advertisement.getDeviceUUID().equals("all")) {
 
@@ -534,7 +537,7 @@ public class ZWaveService implements Runnable {
 
                                 jsonElement.getAsJsonObject().add("values", jsValues);
 
-                                inventory.add(gson.toJson(jsonElement));
+                                inventory.add(jsonElement);
                             }
 
                             jsonMessaging.broadcast("event.devices.responseinventory", responseZWaveDeviceArrayInventoryAdvertisement.set(inventory));

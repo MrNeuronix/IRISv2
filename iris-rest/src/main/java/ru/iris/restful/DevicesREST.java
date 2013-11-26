@@ -1,5 +1,7 @@
 package ru.iris.restful;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
@@ -33,6 +35,7 @@ public class DevicesREST {
     private JsonMessaging messaging;
     private SetDeviceLevelAdvertisement setDeviceLevelAdvertisement = new SetDeviceLevelAdvertisement();
     private GetInventoryAdvertisement getInventoryAdvertisement = new GetInventoryAdvertisement();
+    private final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 
     @GET
     @Path("/{uuid}")
@@ -80,7 +83,8 @@ public class DevicesREST {
             if (envelope != null) {
                 if (envelope.getObject() instanceof ResponseZWaveDeviceArrayInventoryAdvertisement) {
                     messaging.close();
-                    return ((ResponseZWaveDeviceArrayInventoryAdvertisement) envelope.getObject()).getDevices().toString();
+                    ResponseZWaveDeviceArrayInventoryAdvertisement advertisement = envelope.getObject();
+                    return gson.toJson(advertisement.getDevices());
                 } else if (envelope.getObject() instanceof ResponseZWaveDeviceInventoryAdvertisement) {
                     messaging.close();
                     return ((ResponseZWaveDeviceInventoryAdvertisement) envelope.getObject()).getDevice().toString();
@@ -90,7 +94,6 @@ public class DevicesREST {
                     return "{ \"error\": \"Unknown response! Class: " + envelope.getObject().getClass() + " Response: " + envelope.getObject() + "\" }";
                 }
             }
-
         } catch (final Throwable t) {
             log.error("Unexpected exception in DevicesREST", t);
             messaging.close();
