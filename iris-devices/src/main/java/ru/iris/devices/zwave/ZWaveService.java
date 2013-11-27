@@ -1,7 +1,8 @@
 package ru.iris.devices.zwave;
 
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zwave4j.*;
@@ -10,6 +11,7 @@ import ru.iris.common.I18N;
 import ru.iris.common.SQL;
 import ru.iris.common.Utils;
 import ru.iris.common.devices.ZWaveDevice;
+import ru.iris.common.devices.ZWaveDeviceValue;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.*;
@@ -194,8 +196,7 @@ public class ZWaveService implements Runnable {
 
                         ZWaveDevice zcZWaveDevice = getZWaveDeviceByNode(node);
 
-                        if(zcZWaveDevice != null)
-                        {
+                        if (zcZWaveDevice != null) {
                             // Check for awaked after sleeping nodes
                             if (manager.isNodeAwake(homeId, zcZWaveDevice.getNode()) && zcZWaveDevice.getStatus().equals("Sleeping")) {
                                 log.info("Setting node " + zcZWaveDevice.getNode() + " to LISTEN state");
@@ -332,7 +333,12 @@ public class ZWaveService implements Runnable {
                             break;
                         }
 
-                        zrZWaveDevice.removeValueID(manager.getValueLabel(notification.getValueId()));
+                        zrZWaveDevice.removeValue(new ZWaveDeviceValue(
+                                manager.getValueLabel(notification.getValueId()),
+                                String.valueOf(Utils.getValue(notification.getValueId())),
+                                Utils.getValueType(notification.getValueId()),
+                                Manager.get().getValueUnits(notification.getValueId()),
+                                notification.getValueId()));
 
                         messaging.broadcast("event.devices.value.removed",
                                 zWaveDeviceValueRemoved.set(
@@ -378,7 +384,12 @@ public class ZWaveService implements Runnable {
                                 Utils.getValue((ValueId) ZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))),
                                 Utils.getValue(notification.getValueId())));
 
-                        ZWaveDevice.updateValueID(manager.getValueLabel(notification.getValueId()), notification.getValueId());
+                        ZWaveDevice.updateValue(new ZWaveDeviceValue(
+                                manager.getValueLabel(notification.getValueId()),
+                                String.valueOf(Utils.getValue(notification.getValueId())),
+                                Utils.getValueType(notification.getValueId()),
+                                Manager.get().getValueUnits(notification.getValueId()),
+                                notification.getValueId()));
 
                         messaging.broadcast("event.devices.value.changed",
                                 zWaveDeviceValueChanged.set(
@@ -510,56 +521,16 @@ public class ZWaveService implements Runnable {
 
                         final GetInventoryAdvertisement advertisement = envelope.getObject();
 
-                        JsonArray inventory = new JsonArray();
-
                         if (advertisement.getDeviceUUID().equals("all")) {
 
-                            Iterator it = zDevices.entrySet().iterator();
-                            while (it.hasNext()) {
-
-                                Map.Entry pairs = (Map.Entry) it.next();
-
-                                ZWaveDevice zwd = (ZWaveDevice) pairs.getValue();
-                                JsonElement jsonElement = gson.toJsonTree(zwd);
-                                JsonObject jsValues = new JsonObject();
-
-                                Iterator itDigits = zwd.getValueIDs().entrySet().iterator();
-                                while (itDigits.hasNext()) {
-
-                                    Map.Entry pair = (Map.Entry) itDigits.next();
-
-                                    String olabel = String.valueOf(pair.getKey());
-                                    ValueId ovalue = (ValueId) pair.getValue();
-
-                                    jsValues.addProperty(olabel, String.valueOf(Utils.getValue(ovalue)));
-                                }
-
-                                jsonElement.getAsJsonObject().add("values", jsValues);
-
-                                inventory.add(jsonElement);
-                            }
-
-                            jsonMessaging.broadcast("event.devices.responseinventory", responseZWaveDeviceArrayInventoryAdvertisement.set(inventory));
+                            jsonMessaging.broadcast("event.devices.responseinventory", responseZWaveDeviceArrayInventoryAdvertisement.set(zDevices));
 
                         } else {
+
                             ZWaveDevice zdv = getZWaveDeviceByUUID(advertisement.getDeviceUUID());
+
                             if (zdv != null) {
-                                JsonElement jsonElement = gson.toJsonTree(zdv);
-                                JsonObject jsValues = new JsonObject();
-
-                                for (Map.Entry<String, Object> stringObjectEntry : zdv.getValueIDs().entrySet()) {
-
-                                    Map.Entry pair = (Map.Entry) stringObjectEntry;
-
-                                    String olabel = String.valueOf(pair.getKey());
-                                    ValueId ovalue = (ValueId) pair.getValue();
-
-                                    jsValues.addProperty(olabel, String.valueOf(Utils.getValue(ovalue)));
-                                }
-
-                                jsonElement.getAsJsonObject().add("values", jsValues);
-
-                                jsonMessaging.broadcast("event.devices.responseinventory", responseZWaveDeviceInventoryAdvertisement.set(jsonElement));
+                                jsonMessaging.broadcast("event.devices.responseinventory", responseZWaveDeviceInventoryAdvertisement.set(zdv));
                             }
                         }
 
@@ -663,21 +634,11 @@ public class ZWaveService implements Runnable {
 
     private void setValue(String uuid, String label, String value) {
         ZWaveDevice device = getZWaveDeviceByUUID(uuid);
-        HashMap<String, Object> valueIDs = device.getValueIDs();
 
-        Iterator it = valueIDs.entrySet().iterator();
-
-        if (!it.hasNext())
-            log.info("ValueID set is empty!");
-
-        while (it.hasNext()) {
-
-            Map.Entry pairs = (Map.Entry) it.next();
-            ValueId valueId = (ValueId) pairs.getValue();
-
-            if (Manager.get().getValueLabel(valueId).equals(label)) {
-                if (!Manager.get().isValueReadOnly(valueId)) {
-                    setTypedValue(valueId, String.valueOf(value));
+        for (ZWaveDeviceValue zv : device.getValueIDs()) {
+            if (zv.getLabel().equals(label)) {
+                if (!Manager.get().isValueReadOnly(zv.getValueId())) {
+                    setTypedValue(zv.getValueId(), value);
                 } else {
                     log.info("Value \"" + label + "\" is read-only! Skip.");
                 }
@@ -743,7 +704,13 @@ public class ZWaveService implements Runnable {
                 ZWaveDevice.setManufName(manufName);
                 ZWaveDevice.setProductName(productName);
                 ZWaveDevice.setStatus(state);
-                ZWaveDevice.setValueID(label, notification.getValueId());
+                ZWaveDevice.addValue(
+                        new ZWaveDeviceValue(
+                                label,
+                                String.valueOf(Utils.getValue(notification.getValueId())),
+                                Utils.getValueType(notification.getValueId()),
+                                Manager.get().getValueUnits(notification.getValueId()),
+                                notification.getValueId()));
 
             } catch (IOException | SQLException e) {
                 e.printStackTrace();
@@ -758,7 +725,12 @@ public class ZWaveService implements Runnable {
             ZWaveDevice.setStatus(state);
 
             log.info(i18n.message("zwave.node.0.add.value.to.device.1.2", ZWaveDevice.getNode(), label, Utils.getValue(notification.getValueId())));
-            ZWaveDevice.setValueID(label, notification.getValueId());
+            ZWaveDevice.addValue(new ZWaveDeviceValue(
+                    label,
+                    String.valueOf(Utils.getValue(notification.getValueId())),
+                    Utils.getValueType(notification.getValueId()),
+                    Manager.get().getValueUnits(notification.getValueId()),
+                    notification.getValueId()));
         }
 
         // catch and save into database value changes after init complete

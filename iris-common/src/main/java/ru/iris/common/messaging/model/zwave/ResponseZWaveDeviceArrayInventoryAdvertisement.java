@@ -1,8 +1,10 @@
 package ru.iris.common.messaging.model.zwave;
 
-import com.google.gson.JsonArray;
 import com.google.gson.annotations.Expose;
+import ru.iris.common.devices.ZWaveDevice;
 import ru.iris.common.messaging.model.Advertisement;
+
+import java.util.Map;
 
 /**
  * IRISv2 Project
@@ -18,18 +20,18 @@ public class ResponseZWaveDeviceArrayInventoryAdvertisement extends Advertisemen
      * Devices Map
      */
     @Expose
-    private JsonArray devices;
+    private Map<String, ZWaveDevice> devices;
 
-    public ResponseZWaveDeviceArrayInventoryAdvertisement set(JsonArray devices) {
+    public ResponseZWaveDeviceArrayInventoryAdvertisement set(Map<String, ZWaveDevice> devices) {
         this.devices = devices;
         return this;
     }
 
-    public JsonArray getDevices() {
+    public Map<String, ZWaveDevice> getDevices() {
         return devices;
     }
 
-    public void setDevices(JsonArray devices) {
+    public void setDevices(Map<String, ZWaveDevice> devices) {
         this.devices = devices;
     }
 }

@@ -125,4 +125,31 @@ public class Utils {
                 return null;
         }
     }
+
+    public static String getValueType(ValueId valueId) {
+        switch (valueId.getType()) {
+            case BOOL:
+                return "BOOL";
+            case BYTE:
+                return "BYTE";
+            case DECIMAL:
+                return "DECIMAL";
+            case INT:
+                return "INT";
+            case LIST:
+                return "LIST";
+            case SCHEDULE:
+                return "SCHEDULE";
+            case SHORT:
+                return "SHORT";
+            case STRING:
+                return "STRING";
+            case BUTTON:
+                return "BUTTON";
+            case RAW:
+                return "RAW";
+            default:
+                return null;
+        }
+    }
 }

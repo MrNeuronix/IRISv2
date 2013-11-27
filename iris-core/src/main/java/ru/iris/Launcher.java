@@ -4,6 +4,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
+import ru.iris.common.SQL;
 
 import java.io.IOException;
 
@@ -30,6 +31,11 @@ public class Launcher {
         log.info("----------------------------------------");
         log.info(i18n.message("irisv2.is.starting"));
         log.info("----------------------------------------");
+
+        // clear all message data
+        SQL sql = new SQL();
+        sql.doQuery("TRUNCATE messages");
+        sql.close();
 
         // Modules poll
         new StatusChecker();

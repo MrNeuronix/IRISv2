@@ -9,74 +9,55 @@ package ru.iris.common.devices;
  * Time: 16:01
  */
 
-import org.zwave4j.ValueId;
+import com.google.gson.annotations.Expose;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.ArrayList;
 
-public class ZWaveDevice extends Device implements Serializable {
+public class ZWaveDevice extends Device {
+
+    @Expose
+    private ArrayList<ZWaveDeviceValue> values = new ArrayList<>();
 
     public ZWaveDevice() throws IOException, SQLException {
         super();
         this.source = "zwave";
     }
 
-    public HashMap<String, Object> getValueIDs() {
-        return LabelsValues;
+    public ArrayList<ZWaveDeviceValue> getValueIDs() {
+        return values;
     }
 
-    public void setValueID(String label, Object value) {
-
-        if (label == null)
-            label = i18n.message("none.set");
-
-        this.LabelsValues.put(label, value);
+    public void addValue(ZWaveDeviceValue value) {
+        values.add(value);
     }
 
-    public void updateValueID(String label, Object value) {
+    public void updateValue(ZWaveDeviceValue value) {
 
-        HashMap<String, Object> zDv = new HashMap<>();
+        ArrayList<ZWaveDeviceValue> zDv = new ArrayList<>();
 
-        Iterator it = LabelsValues.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pairs = (Map.Entry) it.next();
-
-            String olabel = String.valueOf(pairs.getKey());
-            ValueId ovalue = (ValueId) pairs.getValue();
-
-            if (label.equals(olabel)) {
-                zDv.put(label, value);
-            } else {
-                zDv.put(olabel, ovalue);
+        for (ZWaveDeviceValue zvalue : values) {
+            if (zvalue.getLabel().equals(value.getLabel())) {
+                zDv.remove(zvalue);
+                zDv.add(value);
             }
         }
 
-        LabelsValues = zDv;
+        values = zDv;
     }
 
-    public void removeValueID(String label) {
+    public void removeValue(ZWaveDeviceValue value) {
 
-        if (label == null)
-            label = i18n.message("none.set");
+        ArrayList<ZWaveDeviceValue> zDv = new ArrayList<>();
 
-        HashMap<String, Object> zDv = new HashMap<>();
-
-        Iterator it = LabelsValues.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pairs = (Map.Entry) it.next();
-
-            String olabel = String.valueOf(pairs.getKey());
-            ValueId ovalue = (ValueId) pairs.getValue();
-
-            if (!label.equals(olabel))
-                zDv.put(olabel, ovalue);
+        for (ZWaveDeviceValue zvalue : values) {
+            if (zvalue.getLabel().equals(value.getLabel())) {
+                zDv.remove(zvalue);
+            }
         }
 
-        LabelsValues = zDv;
+        values = zDv;
     }
 
     public void save() throws SQLException {
@@ -94,6 +75,12 @@ public class ZWaveDevice extends Device implements Serializable {
             name = i18n.message("not.set");
 
         sql.doQuery("DELETE FROM devices WHERE uuid='" + uuid + "'");
+        sql.doQuery("DELETE FROM devicesvalues WHERE uuid='" + uuid + "'");
         sql.doQuery("INSERT INTO devices (source, uuid, internaltype, type, manufname, node, status, name, zone, productname, internalname) VALUES ('zwave','" + uuid + "','" + internalType + "','" + type + "','" + manufName + "','" + node + "','" + status + "','" + name + "','" + zone + "','" + productName + "','" + internalName + "')");
+
+        for (ZWaveDeviceValue zvalue : values) {
+            sql.doQuery("INSERT INTO devicesvalues (uuid, label, value, type, units)" +
+                    " VALUES ('" + uuid + "','" + zvalue.getLabel() + "','" + zvalue.getValue() + "','" + zvalue.getValueType() + "','" + zvalue.getValueUnits() + "')");
+        }
     }
 }
