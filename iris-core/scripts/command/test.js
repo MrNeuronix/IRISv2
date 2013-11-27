@@ -12,6 +12,5 @@ obj = { run: function () {
 } }
 obj.run();
 
-defineClass("ru.iris.common.script.SpeakJS");
-new SpeakJS().say("Test java script engine successfully");
-
+importClass(Packages.ru.iris.common.Speak);
+new Speak().say("Test java script engine successfully");

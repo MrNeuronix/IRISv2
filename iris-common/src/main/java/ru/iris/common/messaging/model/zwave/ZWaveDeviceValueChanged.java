@@ -64,7 +64,7 @@ public class ZWaveDeviceValueChanged {
 
     @Override
     public String toString() {
-        return "ZWaveDeviceValueAdded{" +
+        return "ZWaveDeviceValueChanged{" +
                 "zwaveDevice=" + device.getInternalName() +
                 '}';
     }

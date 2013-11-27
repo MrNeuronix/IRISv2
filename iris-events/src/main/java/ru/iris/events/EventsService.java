@@ -17,6 +17,7 @@ import ru.iris.common.messaging.model.ServiceStatus;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FilenameFilter;
 
 /**
  * Created with IntelliJ IDEA.
@@ -62,6 +63,13 @@ public class EventsService implements Runnable {
             ScriptableObject.putProperty(scope, "jsonMessaging", Context.javaToJS(jsonMessaging, scope));
             ScriptableObject.putProperty(scope, "out", Context.javaToJS(System.out, scope));
 
+            // filter js files
+            final FilenameFilter filter = new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.endsWith(".js");
+                }
+            };
+
             // subscribe to anything
             jsonMessaging.subscribe("*");
             jsonMessaging.start();
@@ -77,18 +85,35 @@ public class EventsService implements Runnable {
                     // Check command and launch script
                     if (envelope.getObject() instanceof CommandAdvertisement) {
                         CommandAdvertisement advertisement = envelope.getObject();
-                        log.info("Launch script: " + advertisement.getCommand());
+                        log.info("Launch command script: " + advertisement.getCommand());
 
-                        File jsFile = new File("./scripts/" + advertisement.getCommand() + ".js");
+                        File jsFile = new File("./scripts/command/" + advertisement.getCommand() + ".js");
 
                         try {
-                            Object result = cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
-                            jsonMessaging.broadcast("event.command.result", commandResult.set(advertisement.getCommand(), result));
+                            cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
                         } catch (FileNotFoundException e) {
-                            log.error("Script file scripts/" + advertisement.getCommand() + ".js not found!");
+                            log.error("Script file scripts/command/" + advertisement.getCommand() + ".js not found!");
                         } catch (Exception e) {
-                            log.error("Error in script scripts/" + advertisement.getCommand() + ".js: " + e.toString());
+                            log.error("Error in script scripts/command/" + advertisement.getCommand() + ".js: " + e.toString());
                             e.printStackTrace();
+                        }
+                    }
+                    // run all scripts
+                    else {
+                        File folder = new File("./scripts/");
+
+                        for (File jsFile : folder.listFiles(filter)) {
+                            log.debug("Launch script: " + jsFile);
+
+                            try {
+                                ScriptableObject.putProperty(scope, "advertisement", Context.javaToJS(envelope.getObject(), scope));
+                                cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
+                            } catch (FileNotFoundException e) {
+                                log.error("Script file " + jsFile + " not found!");
+                            } catch (Exception e) {
+                                log.error("Error in script " + jsFile + ": " + e.toString());
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }

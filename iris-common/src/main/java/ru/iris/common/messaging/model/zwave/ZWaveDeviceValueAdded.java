@@ -1,7 +1,6 @@
 package ru.iris.common.messaging.model.zwave;
 
 import com.google.gson.annotations.Expose;
-import org.zwave4j.ValueId;
 import ru.iris.common.devices.ZWaveDevice;
 
 /**

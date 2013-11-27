@@ -230,7 +230,6 @@ public class JsonMessaging {
                 if (old[j] && (p == '*')) old[j + 1] = true;
 
                 if (old[j] && (p == c)) states[j + 1] = true;
-                if (old[j] && (p == '.')) states[j + 1] = true;
                 if (old[j] && (p == '*')) states[j] = true;
                 if (old[j] && (p == '*')) states[j + 1] = true;
             }
