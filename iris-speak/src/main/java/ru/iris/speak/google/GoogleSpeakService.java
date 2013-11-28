@@ -18,14 +18,13 @@ import ru.iris.common.Config;
 import ru.iris.common.I18N;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.ServiceAdvertisement;
-import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
 import ru.iris.common.messaging.model.SpeakAdvertisement;
 import ru.iris.speak.Service;
 
 import javax.sound.sampled.*;
 import java.io.File;
+import java.util.Map;
 import java.util.UUID;
 
 public class GoogleSpeakService implements Runnable {
@@ -51,12 +50,13 @@ public class GoogleSpeakService implements Runnable {
 
         Clip clip = null;
         AudioInputStream audioIn;
-
+        Map<String, String> conf = config.getConfig();
+        final Synthesiser synthesiser = new Synthesiser(conf.get("language"));
 
         Service.serviceChecker.setAdvertisment(
                 Service.advertisement.set("Speak", Service.serviceId, ServiceStatus.AVAILABLE));
 
-        if (config.getConfig().get("silence").equals("0")) {
+        if (conf.get("silence").equals("0")) {
             try {
                 audioIn = AudioSystem.getAudioInputStream(new File("./conf/beep.wav"));
                 AudioFormat format = audioIn.getFormat();
@@ -95,20 +95,20 @@ public class GoogleSpeakService implements Runnable {
 
                         SpeakAdvertisement advertisement = envelope.getObject();
 
-                        if (config.getConfig().get("silence").equals("0")) {
+                        if (conf.get("silence").equals("0")) {
                             log.info(i18n.message("speak.confidence.0", advertisement.getConfidence()));
                             log.info(i18n.message("speak.text.0", advertisement.getText()));
 
-                            if (!config.getConfig().get("silence").equals("1")) {
+                            if (!conf.get("silence").equals("1")) {
                                 clip.setFramePosition(0);
                                 clip.start();
                                 clip.start();
                             }
 
-                            Synthesiser synthesiser = new Synthesiser(config.getConfig().get("language"));
                             final Player player = new Player(synthesiser.getMP3Data(advertisement.getText()));
                             player.play();
                             player.close();
+
                         } else {
                             log.info(i18n.message("speak.silence.mode.enabled.ignore.speak.request"));
                         }
@@ -125,7 +125,7 @@ public class GoogleSpeakService implements Runnable {
             }
 
             Service.serviceChecker.setAdvertisment(
-                   Service.advertisement.set("Speak", Service.serviceId, ServiceStatus.SHUTDOWN));
+                    Service.advertisement.set("Speak", Service.serviceId, ServiceStatus.SHUTDOWN));
 
             // Close JSON messaging.
             jsonMessaging.close();

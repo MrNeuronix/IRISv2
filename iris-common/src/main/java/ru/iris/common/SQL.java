@@ -41,8 +41,7 @@ public class SQL {
             connection = DriverManager.getConnection(connectionURL, username, password);
 
         } catch (ClassNotFoundException | SQLException e) {
-            LOGGER.error("[sql] Error load driver");
-            System.exit(1);
+            LOGGER.error("[sql] Error load driver: " + e.toString());
         }
     }
 

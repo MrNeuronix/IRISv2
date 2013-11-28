@@ -16,14 +16,13 @@ import ru.iris.common.Config;
 import ru.iris.common.I18N;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.ServiceAdvertisement;
-import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
 import ru.iris.common.messaging.model.SpeakAdvertisement;
 import ru.iris.speak.Service;
 
 import javax.sound.sampled.*;
 import java.io.File;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,11 +52,13 @@ public class VoiceRSSSpeakService implements Runnable {
 
         Clip clip = null;
         AudioInputStream audioIn = null;
+        Map<String, String> conf = config.getConfig();
+
 
         Service.serviceChecker.setAdvertisment(
                 Service.advertisement.set("Speak", Service.serviceId, ServiceStatus.AVAILABLE));
 
-        if (config.getConfig().get("silence").equals("0")) {
+        if (conf.get("silence").equals("0")) {
             try {
                 audioIn = AudioSystem.getAudioInputStream(new File("./conf/beep.wav"));
                 AudioFormat format = audioIn.getFormat();
@@ -96,11 +97,11 @@ public class VoiceRSSSpeakService implements Runnable {
 
                         SpeakAdvertisement advertisement = envelope.getObject();
 
-                        if (config.getConfig().get("silence").equals("0")) {
+                        if (conf.get("silence").equals("0")) {
                             log.info(i18n.message("speak.confidence.0", advertisement.getConfidence()));
                             log.info(i18n.message("speak.text.0", advertisement.getText()));
 
-                            if (!config.getConfig().get("silence").equals("1")) {
+                            if (!conf.get("silence").equals("1")) {
                                 clip.setFramePosition(0);
                                 clip.start();
                                 clip.start();
