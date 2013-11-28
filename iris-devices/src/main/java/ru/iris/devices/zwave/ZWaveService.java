@@ -352,39 +352,42 @@ public class ZWaveService implements Runnable {
                         break;
                     case VALUE_CHANGED:
 
-                        ZWaveDevice ZWaveDevice = getZWaveDeviceByNode(node);
+                        ZWaveDevice zWaveDevice = getZWaveDeviceByNode(node);
 
                         // Check for awaked after sleeping nodes
-                        if (manager.isNodeAwake(homeId, ZWaveDevice.getNode()) && ZWaveDevice.getStatus().equals("Sleeping")) {
-                            log.info("Setting node " + ZWaveDevice.getNode() + " to LISTEN state");
-                            ZWaveDevice.setStatus("Listening");
+                        if (manager.isNodeAwake(homeId, zWaveDevice.getNode()) && zWaveDevice.getStatus().equals("Sleeping")) {
+                            log.info("Setting node " + zWaveDevice.getNode() + " to LISTEN state");
+                            zWaveDevice.setStatus("Listening");
                             try {
-                                ZWaveDevice.save();
+                                zWaveDevice.save();
                             } catch (SQLException e) {
                                 e.printStackTrace();
                             }
                         }
 
-                        if (ZWaveDevice == null) {
+                        if (zWaveDevice == null) {
                             log.info(i18n.message("zwave.error.while.save.value.change.cannot.find.device.with.node.id.0", node));
                             break;
                         }
 
                         // break if same value
                         try {
-                            if (Utils.getValue((ValueId) ZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))) == Utils.getValue(notification.getValueId()))
+                            if (Utils.getValue(zWaveDevice.getValue(manager.getValueLabel(notification.getValueId())).getValueId()) == Utils.getValue(notification.getValueId()))
                                 break;
                         } catch (NullPointerException e) {
-                            break;
+                            log.info("ZWAVEDEVICE: "+zWaveDevice);
+                            log.info("ZWAVEDEVICELABEL: "+manager.getValueLabel(notification.getValueId()));
+                            log.info("ZWAVEDEVICEVALUE: "+zWaveDevice.getValue(manager.getValueLabel(notification.getValueId())));
+                            System.exit(1);
                         }
 
                         log.info(i18n.message("zwave.node.0.value.for.label.1.changed.2.3",
-                                ZWaveDevice.getNode(),
+                                zWaveDevice.getNode(),
                                 manager.getValueLabel(notification.getValueId()),
-                                Utils.getValue((ValueId) ZWaveDevice.getValue(manager.getValueLabel(notification.getValueId()))),
+                                Utils.getValue(zWaveDevice.getValue(manager.getValueLabel(notification.getValueId())).getValueId()),
                                 Utils.getValue(notification.getValueId())));
 
-                        ZWaveDevice.updateValue(new ZWaveDeviceValue(
+                        zWaveDevice.updateValue(new ZWaveDeviceValue(
                                 manager.getValueLabel(notification.getValueId()),
                                 String.valueOf(Utils.getValue(notification.getValueId())),
                                 Utils.getValueType(notification.getValueId()),
@@ -393,7 +396,7 @@ public class ZWaveService implements Runnable {
 
                         messaging.broadcast("event.devices.value.changed",
                                 zWaveDeviceValueChanged.set(
-                                        ZWaveDevice,
+                                        zWaveDevice,
                                         Manager.get().getValueLabel(notification.getValueId()),
                                         String.valueOf(Utils.getValue(notification.getValueId()))));
 

@@ -29,13 +29,23 @@ public class ZWaveDevice extends Device {
         return values;
     }
 
+    public ZWaveDeviceValue getValue(String value) {
+
+        for (ZWaveDeviceValue zvalue : values) {
+            if (zvalue.getLabel().equals(value)) {
+                return zvalue;
+            }
+        }
+        return null;
+    }
+
     public void addValue(ZWaveDeviceValue value) {
         values.add(value);
     }
 
     public void updateValue(ZWaveDeviceValue value) {
 
-        ArrayList<ZWaveDeviceValue> zDv = new ArrayList<>();
+        ArrayList<ZWaveDeviceValue> zDv = (ArrayList<ZWaveDeviceValue>) values.clone();
 
         for (ZWaveDeviceValue zvalue : values) {
             if (zvalue.getLabel().equals(value.getLabel())) {
@@ -45,11 +55,12 @@ public class ZWaveDevice extends Device {
         }
 
         values = zDv;
+        zDv = null;
     }
 
     public void removeValue(ZWaveDeviceValue value) {
 
-        ArrayList<ZWaveDeviceValue> zDv = new ArrayList<>();
+        ArrayList<ZWaveDeviceValue> zDv = (ArrayList<ZWaveDeviceValue>) values.clone();
 
         for (ZWaveDeviceValue zvalue : values) {
             if (zvalue.getLabel().equals(value.getLabel())) {
@@ -58,6 +69,7 @@ public class ZWaveDevice extends Device {
         }
 
         values = zDv;
+        zDv = null;
     }
 
     public void save() throws SQLException {
@@ -82,5 +94,12 @@ public class ZWaveDevice extends Device {
             sql.doQuery("INSERT INTO devicesvalues (uuid, label, value, type, units)" +
                     " VALUES ('" + uuid + "','" + zvalue.getLabel() + "','" + zvalue.getValue() + "','" + zvalue.getValueType() + "','" + zvalue.getValueUnits() + "')");
         }
+    }
+
+    @Override
+    public String toString() {
+        return "ZWaveDevice{" +
+                "values=" + values +
+                '}';
     }
 }

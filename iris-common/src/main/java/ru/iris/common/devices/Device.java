@@ -48,8 +48,6 @@ public class Device implements Serializable {
     @Expose
     protected String internalName = i18n.message("unknown");
 
-    protected HashMap<String, Object> LabelsValues = new HashMap<String, Object>();
-
     protected SQL sql;
 
     public Device() throws IOException, SQLException {
@@ -98,23 +96,6 @@ public class Device implements Serializable {
 
     public void setZone(int zone) {
         this.zone = zone;
-    }
-
-    public Object getValue(String label) {
-
-        if (label == null)
-            label = i18n.message("none.set");
-
-        try {
-            return this.LabelsValues.get(label);
-        } catch (NullPointerException e) {
-            return null;
-        }
-
-    }
-
-    public Map<String, Object> getLabelsValues() {
-        return this.LabelsValues;
     }
 
     public String getType() {
