@@ -61,7 +61,7 @@ public class Launcher {
 
     private static void runModule(String module) throws IOException {
 
-        ProcessBuilder builder = new ProcessBuilder("java -jar iris-" + module + ".jar").redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectErrorStream(true);
+        ProcessBuilder builder = new ProcessBuilder("java", "-jar", "iris-" + module + ".jar").redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectErrorStream(true);
         builder.start();
     }
 }
