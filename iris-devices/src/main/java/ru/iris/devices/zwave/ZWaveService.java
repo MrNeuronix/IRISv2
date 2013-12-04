@@ -375,10 +375,8 @@ public class ZWaveService implements Runnable {
                             if (Utils.getValue(zWaveDevice.getValue(manager.getValueLabel(notification.getValueId())).getValueId()) == Utils.getValue(notification.getValueId()))
                                 break;
                         } catch (NullPointerException e) {
-                            log.info("ZWAVEDEVICE: "+zWaveDevice);
-                            log.info("ZWAVEDEVICELABEL: "+manager.getValueLabel(notification.getValueId()));
-                            log.info("ZWAVEDEVICEVALUE: "+zWaveDevice.getValue(manager.getValueLabel(notification.getValueId())));
-                            System.exit(1);
+                            log.error("Error while change value: " + e.toString());
+                            break;
                         }
 
                         log.info(i18n.message("zwave.node.0.value.for.label.1.changed.2.3",

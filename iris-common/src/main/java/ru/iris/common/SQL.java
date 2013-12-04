@@ -34,7 +34,7 @@ public class SQL {
             // Create a connection to the database
             Config config = new Config();
             String serverName = config.getConfig().get("dbHost");
-            String mydatabase = config.getConfig().get("dbName") + "?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8";
+            String mydatabase = config.getConfig().get("dbName") + "?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true";
             String connectionURL = "jdbc:mysql://" + serverName + "/" + mydatabase;
             String username = config.getConfig().get("dbUsername");
             String password = config.getConfig().get("dbPassword");
