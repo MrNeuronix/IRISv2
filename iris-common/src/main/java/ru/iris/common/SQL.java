@@ -22,17 +22,19 @@ public class SQL {
      */
     private static Logger LOGGER = LoggerFactory.getLogger(SQL.class);
     private Connection connection;
+    private final Config config = new Config();
 
     public SQL() {
+        connect();
+    }
 
+    private void connect() {
         try {
-
             String driverName = "com.mysql.jdbc.Driver";
 
             Class.forName(driverName);
 
             // Create a connection to the database
-            Config config = new Config();
             String serverName = config.getConfig().get("dbHost");
             String mydatabase = config.getConfig().get("dbName") + "?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true";
             String connectionURL = "jdbc:mysql://" + serverName + "/" + mydatabase;
@@ -46,6 +48,13 @@ public class SQL {
     }
 
     public boolean doQuery(String sql) {
+
+        try {
+            if (!connection.isValid(1))
+                connect();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         Statement statement = null;
 
@@ -74,6 +83,13 @@ public class SQL {
     }
 
     public ResultSet select(String sql) {
+
+        try {
+            if (!connection.isValid(1))
+                connect();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         ResultSet resultSet = null;
         Statement statement = null;
