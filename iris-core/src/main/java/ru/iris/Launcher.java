@@ -41,27 +41,27 @@ public class Launcher {
         new StatusChecker();
 
         // Launch events module
-        runModule("java -jar iris-events.jar");
+        runModule("events");
 
         // Launch capture sound module
-        runModule("java -jar iris-record.jar");
+        runModule("record");
 
         // Launch speak synth module
-        runModule("java -jar iris-speak.jar");
+        runModule("speak");
 
         // Launch module for work with devices
-        runModule("java -jar iris-devices.jar");
+        runModule("devices");
 
         // Launch schedule module
-        runModule("java -jar iris-scheduler.jar");
+        runModule("scheduler");
 
         // Lauch REST service
-        runModule("java -jar iris-rest.jar");
+        runModule("rest");
     }
 
-    private static void runModule(String cmd) throws IOException {
+    private static void runModule(String module) throws IOException {
 
-        ProcessBuilder builder = new ProcessBuilder(cmd.split("\\s+")).redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectErrorStream(true);
+        ProcessBuilder builder = new ProcessBuilder("java -jar iris-" + module + ".jar").redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectErrorStream(true);
         builder.start();
     }
 }
