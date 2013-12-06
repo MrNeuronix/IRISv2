@@ -15,8 +15,6 @@ import ru.iris.common.I18N;
 import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.CommandAdvertisement;
-import ru.iris.common.messaging.model.ServiceAdvertisement;
-import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
 
 import java.sql.ResultSet;
@@ -93,7 +91,7 @@ public class ScheduleService implements Runnable {
                     if (task.getDateAsString(now).equals(task.getDateAsString(task.getDate()))) {
                         log.info(i18n.message("scheduler.executing.task.0.1.2", task.getId(), task.getEclass(), task.getCommand()));
 
-                        messaging.broadcast("event.command", commandAdvertisement.set(task.getCommand()));
+                        messaging.broadcast("event.command", commandAdvertisement.set(task.getEclass(), task.getCommand()));
 
                         if (task.getType() == 1) {
                             log.info(i18n.message("scheduler.next.run.at.0", task.nextRunAsString()));

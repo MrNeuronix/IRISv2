@@ -18,8 +18,12 @@ public class CommandAdvertisement extends Advertisement {
     @Expose
     private String command;
 
-    public CommandAdvertisement set(String command) {
+    @Expose
+    private String klazz;
+
+    public CommandAdvertisement set(String klazz, String command) {
         this.command = command;
+        this.klazz = klazz;
         return this;
     }
 
@@ -31,8 +35,19 @@ public class CommandAdvertisement extends Advertisement {
         this.command = command;
     }
 
+    public String getTaskClass() {
+        return klazz;
+    }
+
+    public void setTaskClass(String klazz) {
+        this.klazz = klazz;
+    }
+
     @Override
     public String toString() {
-        return "CommandAdvertisement { command: " + command + " }";
+        return "CommandAdvertisement{" +
+                "command='" + command + '\'' +
+                ", klazz='" + klazz + '\'' +
+                '}';
     }
 }
