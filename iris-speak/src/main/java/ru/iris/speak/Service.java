@@ -1,5 +1,7 @@
 package ru.iris.speak;
 
+import net.xeoh.plugins.base.annotations.PluginImplementation;
+import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,8 @@ import java.util.UUID;
  * Time: 21:32
  */
 
-public class Service {
+@PluginImplementation
+public class Service implements SpeakPlugin {
 
     private static I18N i18n = new I18N();
     public static ServiceChecker serviceChecker;
@@ -32,7 +35,8 @@ public class Service {
 
     private static Logger log = LoggerFactory.getLogger(Service.class);
 
-    public static void main(String[] args) throws Exception {
+    @Init
+    public void init() throws Exception {
 
         DOMConfigurator.configure("conf/log4j.xml");
 

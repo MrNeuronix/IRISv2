@@ -1,11 +1,14 @@
 package ru.iris;
 
+import net.xeoh.plugins.base.PluginManager;
+import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.I18N;
 import ru.iris.common.SQL;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -40,17 +43,9 @@ public class Launcher {
         // Modules poll
         new StatusChecker();
 
-        // Launch events module
-        runModule("events");
+        // load plugins
+        PluginManager pm = PluginManagerFactory.createPluginManager();
+        pm.addPluginsFrom(new File("extensions/").toURI());
 
-        // Launch module for work with devices
-        runModule("devices");
-
-    }
-
-    private static void runModule(String module) throws IOException {
-
-        ProcessBuilder builder = new ProcessBuilder("java", "-jar", "iris-" + module + ".jar").redirectOutput(ProcessBuilder.Redirect.INHERIT).redirectErrorStream(true);
-        builder.start();
     }
 }

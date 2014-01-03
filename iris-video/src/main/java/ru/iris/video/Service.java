@@ -10,6 +10,8 @@ package ru.iris.video;
  * License: GPL v3
  */
 
+import net.xeoh.plugins.base.annotations.PluginImplementation;
+import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,14 +21,16 @@ import ru.iris.common.messaging.model.ServiceStatus;
 
 import java.util.UUID;
 
-public class Service {
+@PluginImplementation
+public class Service implements VideoPlugin {
 
     private static Logger log = LoggerFactory.getLogger(Service.class);
     private static ServiceChecker serviceChecker;
     public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
     public static final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6008");
 
-    public static void main(String[] args) throws Exception {
+    @Init
+    public void init() throws Exception {
 
         DOMConfigurator.configure("conf/log4j.xml");
 

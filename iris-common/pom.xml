@@ -122,6 +122,11 @@
             <artifactId>rhino</artifactId>
             <version>1.7R4</version>
         </dependency>
+        <dependency>
+            <groupId>net.xeoh.jspf</groupId>
+            <artifactId>jspf-core</artifactId>
+            <version>1.0.2</version>
+        </dependency>
     </dependencies>
 
 </project>

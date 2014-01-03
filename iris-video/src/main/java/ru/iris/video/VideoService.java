@@ -30,5 +30,7 @@ public class VideoService implements Runnable {
     }
 
     public synchronized void run() {
+
+        log.info("HELLO FROM VIDEO PLUGLN");
     }
 }

@@ -10,6 +10,8 @@ package ru.iris.devices;
  * License: GPL v3
  */
 
+import net.xeoh.plugins.base.annotations.PluginImplementation;
+import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,17 +27,18 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 
-public class Service {
+@PluginImplementation
+public class Service implements DevicesPlugin {
 
-    public static ServiceChecker serviceChecker;
-    public static final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6002");
-    public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
+    public ServiceChecker serviceChecker;
+    public final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6002");
+    public ServiceAdvertisement advertisement = new ServiceAdvertisement();
 
     private static Logger log = LoggerFactory.getLogger(Service.class);
 
-    public static void main(String[] args) throws IOException, SQLException {
+    @Init
+    public void init() throws IOException, SQLException {
 
-        DOMConfigurator.configure("conf/log4j.xml");
         I18N i18n = new I18N();
 
         serviceChecker = new ServiceChecker(serviceId, advertisement.set(

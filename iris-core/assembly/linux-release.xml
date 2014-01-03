@@ -43,14 +43,14 @@
             <directory>target</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>/extensions</outputDirectory>
             <includes>
                 <include>*.jar</include>
             </includes>
             <directory>../iris-devices/target</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>/extensions</outputDirectory>
             <includes>
                 <include>*.jar</include>
             </includes>

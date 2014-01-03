@@ -21,6 +21,10 @@
             <id>IRIS</id>
             <url>http://ph-systems.ru:8081/artifactory/repo</url>
         </repository>
+        <repository>
+            <id>jspf</id>
+            <url>http://maven.formreturn.com/repository</url>
+        </repository>
     </repositories>
 
     <build>

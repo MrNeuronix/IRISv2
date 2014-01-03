@@ -14,6 +14,8 @@ import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.net.httpserver.HttpServer;
+import net.xeoh.plugins.base.annotations.PluginImplementation;
+import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.log4j.xml.DOMConfigurator;
 import ru.iris.common.Config;
 import ru.iris.common.messaging.ServiceChecker;
@@ -26,14 +28,16 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.UUID;
 
-public class Service {
+@PluginImplementation
+public class Service implements RestPlugin {
 
     private static Map<String, String> config;
     public static ServiceChecker serviceChecker;
     public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
     public static final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6005");
 
-    public static void main(String[] args) throws IOException, SQLException, URISyntaxException {
+    @Init
+    public void init() throws IOException, SQLException, URISyntaxException {
 
         DOMConfigurator.configure("conf/log4j.xml");
 
