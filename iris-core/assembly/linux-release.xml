@@ -21,6 +21,13 @@
             </excludes>
         </fileSet>
         <fileSet>
+            <outputDirectory>/extensions</outputDirectory>
+            <directory>extensions</directory>
+            <excludes>
+                <exclude>*</exclude>
+            </excludes>
+        </fileSet>
+        <fileSet>
             <outputDirectory>/conf</outputDirectory>
             <directory>conf</directory>
         </fileSet>
@@ -50,35 +57,35 @@
             <directory>../iris-events/target</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>/extensions</outputDirectory>
             <includes>
                 <include>*.jar</include>
             </includes>
             <directory>../iris-record/target</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>/extensions</outputDirectory>
             <includes>
                 <include>*.jar</include>
             </includes>
             <directory>../iris-video/target</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>/extensions</outputDirectory>
             <includes>
                 <include>*.jar</include>
             </includes>
             <directory>../iris-rest/target</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>/extensions</outputDirectory>
             <includes>
                 <include>*.jar</include>
             </includes>
             <directory>../iris-scheduler/target</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/</outputDirectory>
+            <outputDirectory>/extensions</outputDirectory>
             <includes>
                 <include>*.jar</include>
             </includes>

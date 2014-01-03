@@ -43,20 +43,9 @@ public class Launcher {
         // Launch events module
         runModule("events");
 
-        // Launch capture sound module
-        runModule("record");
-
-        // Launch speak synth module
-        runModule("speak");
-
         // Launch module for work with devices
         runModule("devices");
 
-        // Launch schedule module
-        runModule("scheduler");
-
-        // Lauch REST service
-        runModule("rest");
     }
 
     private static void runModule(String module) throws IOException {
