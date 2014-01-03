@@ -38,8 +38,6 @@ public class Service implements SpeakPlugin {
     @Init
     public void init() throws Exception {
 
-        DOMConfigurator.configure("conf/log4j.xml");
-
         serviceChecker = new ServiceChecker(serviceId, advertisement.set(
                 "Speak", serviceId, ServiceStatus.STARTUP));
 

@@ -30,9 +30,9 @@ import java.util.UUID;
 @PluginImplementation
 public class Service implements DevicesPlugin {
 
-    public ServiceChecker serviceChecker;
-    public final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6002");
-    public ServiceAdvertisement advertisement = new ServiceAdvertisement();
+    public static ServiceChecker serviceChecker;
+    public static final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6002");
+    public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
 
     private static Logger log = LoggerFactory.getLogger(Service.class);
 

@@ -39,8 +39,6 @@ public class Service implements RecordPlugin {
     @Init
     public void init() throws IOException, SQLException, JMSException, URISyntaxException {
 
-        DOMConfigurator.configure("conf/log4j.xml");
-
         serviceChecker = new ServiceChecker(serviceId, advertisement.set(
                 "Record", serviceId, ServiceStatus.STARTUP));
 

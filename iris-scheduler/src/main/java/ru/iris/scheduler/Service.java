@@ -33,8 +33,6 @@ public class Service implements SchedulerPlugin {
     @Init
     public void init() throws Exception {
 
-        DOMConfigurator.configure("conf/log4j.xml");
-
         serviceChecker = new ServiceChecker(serviceId, advertisement.set(
                 "Scheduler", serviceId, ServiceStatus.STARTUP));
 

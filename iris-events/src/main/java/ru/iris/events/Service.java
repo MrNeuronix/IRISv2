@@ -32,8 +32,6 @@ public class Service implements EventsPlugin {
     @Init
     public void init() throws Exception {
 
-        DOMConfigurator.configure("conf/log4j.xml");
-
         serviceChecker = new ServiceChecker(serviceId, advertisement.set(
                 "Events", serviceId, ServiceStatus.STARTUP));
 
