@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.iris.common.Config;
 import ru.iris.common.I18N;
+import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.ServiceStatus;
@@ -34,6 +35,7 @@ public class GoogleSpeakService implements Runnable {
     private I18N i18n = new I18N();
     private boolean shutdown = false;
     private Config config = new Config();
+    private SQL sql = new SQL();
 
     public GoogleSpeakService() {
         t = new Thread(this);
@@ -98,6 +100,7 @@ public class GoogleSpeakService implements Runnable {
                         if (conf.get("silence").equals("0")) {
                             log.info(i18n.message("speak.confidence.0", advertisement.getConfidence()));
                             log.info(i18n.message("speak.text.0", advertisement.getText()));
+                            log.info("Device: " + advertisement.getDevice());
 
                             if (!conf.get("silence").equals("1")) {
                                 clip.setFramePosition(0);
@@ -105,9 +108,20 @@ public class GoogleSpeakService implements Runnable {
                                 clip.start();
                             }
 
-                            final Player player = new Player(synthesiser.getMP3Data(advertisement.getText()));
-                            player.play();
-                            player.close();
+                            if(advertisement.getDevice().equals("all"))
+                            {
+                                final Player player = new Player(synthesiser.getMP3Data(advertisement.getText()));
+                                player.play();
+                                player.close();
+
+                                sql.doQuery("INSERT INTO speaks (text, confidence, device) " +
+                                        "VALUES ('" + advertisement.getText() + "', '" + advertisement.getConfidence() + "', '" + advertisement.getDevice() + "')");
+                            }
+                            else
+                            {
+                                sql.doQuery("INSERT INTO speaks (text, confidence, device) " +
+                                        "VALUES ('" + advertisement.getText() + "', '" + advertisement.getConfidence() + "', '" + advertisement.getDevice() + "')");
+                            }
 
                         } else {
                             log.info(i18n.message("speak.silence.mode.enabled.ignore.speak.request"));

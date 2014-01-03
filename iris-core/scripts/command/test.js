@@ -13,4 +13,4 @@ obj = { run: function () {
 obj.run();
 
 importClass(Packages.ru.iris.common.Speak);
-new Speak().say("Test java script engine successfully");
+new Speak().say("Тест пройден");

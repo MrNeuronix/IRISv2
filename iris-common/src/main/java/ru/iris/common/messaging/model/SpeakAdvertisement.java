@@ -24,9 +24,23 @@ public class SpeakAdvertisement extends Advertisement {
     @Expose
     private double confidence;
 
+    /**
+     * Device where we speak
+     */
+    @Expose
+    private String device;
+
     public SpeakAdvertisement set(String text, double confidence) {
         this.text = text;
         this.confidence = confidence;
+        this.device = "all";
+        return this;
+    }
+
+    public SpeakAdvertisement set(String text, double confidence, String device) {
+        this.text = text;
+        this.confidence = confidence;
+        this.device = device;
         return this;
     }
 
@@ -46,8 +60,20 @@ public class SpeakAdvertisement extends Advertisement {
         this.confidence = confidence;
     }
 
+    public String getDevice() {
+        return device;
+    }
+
+    public void setDevice(String device) {
+        this.device = device;
+    }
+
     @Override
     public String toString() {
-        return "SpeakAdvertisement { text: " + text + ", confidence: " + confidence + " }";
+        return "SpeakAdvertisement{" +
+                "text='" + text + '\'' +
+                ", confidence=" + confidence +
+                ", device='" + device + '\'' +
+                '}';
     }
 }

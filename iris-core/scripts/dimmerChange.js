@@ -18,6 +18,6 @@ if (clazz == "ZWaveDeviceValueChanged") {
 
     if (label == "Level") {
         // lets speak!
-        new Speak().say("Lighting level change to " + value);
+        new Speak().say("Уровень света выставлен на " + value + " процентов");
     }
 }

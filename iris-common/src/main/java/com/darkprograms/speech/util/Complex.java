@@ -1,24 +1,21 @@
 package com.darkprograms.speech.util;
 
 
-/**
- * **********************************************************************
- * Compilation:  javac Complex.java
- * Execution:    java Complex
- * <p/>
- * Data type for complex numbers.
- * <p/>
- * The data type is "immutable" so once you create and initialize
- * a Complex object, you cannot change it. The "final" keyword
- * when declaring re and im enforces this rule, making it a
- * compile-time error to change the .re or .im fields after
- * they've been initialized.
- * <p/>
- * Class based off of Princeton University's Complex.java class
+/*************************************************************************
+ *  Compilation:  javac Complex.java
+ *  Execution:    java Complex
  *
- * @author Aaron Gokaslan, Princeton University
- *         ***********************************************************************
- */
+ *  Data type for complex numbers.
+ *
+ *  The data type is "immutable" so once you create and initialize
+ *  a Complex object, you cannot change it. The "final" keyword
+ *  when declaring re and im enforces this rule, making it a
+ *  compile-time error to change the .re or .im fields after
+ *  they've been initialized.
+ *
+ *  Class based off of Princeton University's Complex.java class
+ *  @author Aaron Gokaslan, Princeton University
+ *************************************************************************/
 
 public class Complex {
     private final double re;   // the real part
@@ -34,18 +31,13 @@ public class Complex {
     public String toString() {
         if (im == 0) return re + "";
         if (re == 0) return im + "i";
-        if (im < 0) return re + " - " + (-im) + "i";
+        if (im <  0) return re + " - " + (-im) + "i";
         return re + " + " + im + "i";
     }
 
     // return abs/modulus/magnitude and angle/phase/argument
-    public double abs() {
-        return Math.hypot(re, im);
-    }  // Math.sqrt(re*re + im*im)
-
-    public double phase() {
-        return Math.atan2(im, re);
-    }  // between -pi and pi
+    public double abs()   { return Math.hypot(re, im); }  // Math.sqrt(re*re + im*im)
+    public double phase() { return Math.atan2(im, re); }  // between -pi and pi
 
     // return a new Complex object whose value is (this + b)
     public Complex plus(Complex b) {
@@ -78,24 +70,17 @@ public class Complex {
     }
 
     // return a new Complex object whose value is the conjugate of this
-    public Complex conjugate() {
-        return new Complex(re, -im);
-    }
+    public Complex conjugate() {  return new Complex(re, -im); }
 
     // return a new Complex object whose value is the reciprocal of this
     public Complex reciprocal() {
-        double scale = re * re + im * im;
+        double scale = re*re + im*im;
         return new Complex(re / scale, -im / scale);
     }
 
     // return the real or imaginary part
-    public double re() {
-        return re;
-    }
-
-    public double im() {
-        return im;
-    }
+    public double re() { return re; }
+    public double im() { return im; }
 
     // return a / b
     public Complex divides(Complex b) {
@@ -124,12 +109,12 @@ public class Complex {
     }
 
     // returns the magnitude of the imaginary number.
-    public double getMagnitude() {
-        return Math.sqrt(re * re + im * im);
+    public double getMagnitude(){
+    	return Math.sqrt(re*re+im*im);
     }
-
-    public boolean equals(Complex other) {
-        return (re == other.re) && (im == other.im);
+    
+    public boolean equals(Complex other){
+    	return (re==other.re) && (im==other.im);
     }
-
+    
 }
