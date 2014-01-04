@@ -102,12 +102,6 @@ public class GoogleSpeakService implements Runnable {
                             log.info(i18n.message("speak.text.0", advertisement.getText()));
                             log.info("Device: " + advertisement.getDevice());
 
-                            if (!conf.get("silence").equals("1")) {
-                                clip.setFramePosition(0);
-                                clip.start();
-                                clip.start();
-                            }
-
                             if(advertisement.getDevice().equals("all"))
                             {
                                 final Player player = new Player(synthesiser.getMP3Data(advertisement.getText()));

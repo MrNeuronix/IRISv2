@@ -11,15 +11,8 @@ dbPassword=root
 # Audio section
 #################################
 
-recordStreams=3
-recordDuration=5
-
-# Total of connected microphones
-microphones=1
-
-# Microphone name in system (unlimited)
-microphoneDevice2=hw2,0
-microphoneDevice3=hw3,0
+startThreshold=9
+stopThreshold=5
 
 #################################
 # REST section

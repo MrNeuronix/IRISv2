@@ -1,17 +1,18 @@
 package ru.iris.record;
 
-import javaFlacEncoder.FLAC_FileEncoder;
+import com.darkprograms.speech.microphone.MicrophoneAnalyzer;
+import com.darkprograms.speech.recognizer.GoogleResponse;
+import com.darkprograms.speech.recognizer.Recognizer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
 import ru.iris.common.I18N;
-import ru.iris.common.httpPOST;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.ServiceStatus;
 import ru.iris.common.messaging.model.SpeakRecognizedAdvertisement;
 
+import javax.sound.sampled.AudioFileFormat;
 import java.io.File;
-import java.io.IOException;
 import java.util.Random;
 import java.util.UUID;
 
@@ -39,74 +40,63 @@ public class RecordService implements Runnable {
     @Override
     public synchronized void run() {
 
-        int threads = Integer.valueOf(config.getConfig().get("recordStreams"));
-        int micro = Integer.valueOf(config.getConfig().get("microphones"));
+        final int startThreshold = Integer.valueOf(config.getConfig().get("startThreshold"));
+        final int stopThreshold = Integer.valueOf(config.getConfig().get("stopThreshold"));
 
-            messaging = new JsonMessaging(UUID.randomUUID());
-
-        log.info(i18n.message("record.configured.to.run.0.threads.on.1.microphones", threads, micro));
+        messaging = new JsonMessaging(UUID.randomUUID());
 
         Service.serviceChecker.setAdvertisment(Service.advertisement.set("Record", Service.serviceId, ServiceStatus.AVAILABLE));
 
-        for (int m = 1; m <= micro; m++) {
-            final int finalM = m;
+                        Recognizer rec = new Recognizer("ru");
 
-            // Запускам потоки с записью с промежутком в 1с
-            for (int i = 1; i <= threads; i++) {
-                log.info(i18n.message("record.start.thread.0.on.microphone.1", i, finalM));
+                        boolean shutdown = false;
 
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        while (true) {
-                            Random randomGenerator = new Random();
-                            String strFilename = "infile-" + randomGenerator.nextInt(1000) + ".wav";
-                            File outputFile = new File("./data/" + strFilename);
+                        while (!shutdown)
+                        {
+                            final MicrophoneAnalyzer mic = new MicrophoneAnalyzer(AudioFileFormat.Type.WAVE);
+                            mic.open();
 
-                            ProcessBuilder procBuilder = null;
+                            int avgVolume;
+                            boolean speaking = false;
+                            long captureStartMillis = System.currentTimeMillis();
 
-                            if (finalM == 1) {
-                                procBuilder = new ProcessBuilder("rec", "-q", "-c", "1", "-r", "16000", "./data/" + strFilename, "trim", "0", config.getConfig().get("recordDuration"));
-                            } else {
-                                procBuilder = new ProcessBuilder("rec", "-q", "-c", "1", "-r", "16000", "-d", config.getConfig().get("microphoneDevice" + finalM), "./data/" + strFilename, "trim", "0", config.getConfig().get("recordDuration"));
-                            }
-
-                            httpPOST SendFile = new httpPOST();
-
-                            Process process = null;
-                            try {
-                                process = procBuilder.start();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+                            Random randomGenerator = new Random ();
+                            String strFilename = "infile-" + randomGenerator.nextInt (1000) + ".wav";
+                            File filename = new File ("./data/" + strFilename);
 
                             try {
-                                process.waitFor();
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
 
-                            FLAC_FileEncoder encoder1 = new FLAC_FileEncoder();
-                            File infile = outputFile;
-                            File outfile = new File("./data/" + strFilename + ".flac");
-                            encoder1.useThreads(true);
-                            encoder1.encode(infile, outfile);
+                                avgVolume = mic.getAudioVolume();
 
-                            String googleSpeechAPIResponse = SendFile.postFile(System.getProperty("user.dir") + "/data/" + strFilename + ".flac");
+                                for(int i = 0; i<1000||speaking; i++)
+                                {
+                                    int volume = mic.getAudioVolume();
+                                    avgVolume = (2 * avgVolume + 1 * volume) / 3;
 
-                            // debug
-                            if (!googleSpeechAPIResponse.contains("\"utterance\":")) {
-                                // System.err.println("[record] Recognizer: No Data");
-                            } else {
-                                // Include -> System.out.println(wGetResponse); // to view the Raw output
-                                int startIndex = googleSpeechAPIResponse.indexOf("\"utterance\":") + 13; //Account for term "utterance":"<TARGET>","confidence"
-                                int stopIndex = googleSpeechAPIResponse.indexOf(",\"confidence\":") - 1; //End position
-                                String text = googleSpeechAPIResponse.substring(startIndex, stopIndex);
+                                    log.debug("Current volume: " + volume + " Average: " + avgVolume);
 
-                                // Determine Confidence
-                                startIndex = stopIndex + 15;
-                                stopIndex = googleSpeechAPIResponse.indexOf("}]}") - 1;
-                                double confidence = Double.parseDouble(googleSpeechAPIResponse.substring(startIndex, stopIndex));
+                                    if(! speaking && avgVolume >= startThreshold) {
+                                        try {
+                                            mic.captureAudioToFile(filename);
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                        speaking = true;
+                                        log.info("Speaking detected");
+                                        captureStartMillis = System.currentTimeMillis();
+                                    }
+                                    if(System.currentTimeMillis() - captureStartMillis > 1000 && speaking && stopThreshold >= avgVolume){
+                                        log.info("Done speaking to "+filename);
+                                        break;
+                                    }
+                                    Thread.sleep(100);
+
+                                }
+                                mic.close();
+
+                                GoogleResponse response = rec.getRecognizedDataForWave(filename);
+                                String text = response.getResponse();
+                                double confidence = Double.valueOf(response.getConfidence());
 
                                 log.info(i18n.message("data.utterance.0", text.toUpperCase()));
                                 log.info(i18n.message("data.confidence.level.0", confidence * 100));
@@ -134,24 +124,16 @@ public class RecordService implements Runnable {
                                         }
                                     }
                                 }
-                            }
 
-                            try {
-                                outputFile.delete();
-                                outfile.delete();
-                                infile.delete();
+
+                                try {
+                                    filename.delete();
+                                } catch (Exception ignored) {
+                                }
+
+
                             } catch (Exception ignored) {
                             }
                         }
-                    }
-                }).start();
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 }

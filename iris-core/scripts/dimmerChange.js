@@ -13,11 +13,13 @@ importPackage(Packages.ru.iris.common);
 var clazz = advertisement.getClass().getSimpleName();
 
 if (clazz == "ZWaveDeviceValueChanged") {
+
     var label = advertisement.getLabel();
     var value = advertisement.getValue();
+    var device = advertisement.getDevice();
 
     if (label == "Level") {
         // lets speak!
-        new Speak().say("Уровень света выставлен на " + value + " процентов");
+        new Speak().say("Уровень яркости на устройстве " + device.getNode() + " выставлен на " + value + " процентов");
     }
 }
