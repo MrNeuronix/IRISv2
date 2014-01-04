@@ -23,14 +23,12 @@ public class Speak {
 
     public void say(String text) throws JMSException, URISyntaxException {
 
-        I18N i18n = new I18N();
-
         try {
             JsonMessaging messaging = new JsonMessaging(UUID.randomUUID());
             messaging.broadcast("event.speak", advertisement.set(text, 100.0));
             messaging.close();
         } catch (Exception e) {
-            log.info(i18n.message("error.failed.speak.0", text));
+            log.info("Error! Failed to speak: "+ text);
         }
     }
 }

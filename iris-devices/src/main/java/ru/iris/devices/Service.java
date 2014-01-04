@@ -15,7 +15,6 @@ import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
-import ru.iris.common.I18N;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
 import ru.iris.common.messaging.model.ServiceStatus;
@@ -38,22 +37,20 @@ public class Service implements DevicesPlugin {
     @Init
     public void init() throws IOException, SQLException {
 
-        I18N i18n = new I18N();
-
         serviceChecker = new ServiceChecker(serviceId, advertisement.set(
                 "Devices", serviceId, ServiceStatus.STARTUP));
 
         Map<String, String> config = new Config().getConfig();
 
 
-        log.info(i18n.message("iris.devices.service.starting"));
+        log.info("Device module starting");
 
         if (config.get("zwaveEnabled").equals("1")) {
-            log.info(i18n.message("zwave.zwave.support.is.enabled.starting"));
+            log.info("ZWave support is enabled. Starting");
             new ZWaveService();
         }
         if (config.get("onewireEnabled").equals("1")) {
-            log.info(i18n.message("1.wire.1.wire.support.is.enabled.starting"));
+            log.info("1-Wire support is enabled. Starting");
         }
     }
 }

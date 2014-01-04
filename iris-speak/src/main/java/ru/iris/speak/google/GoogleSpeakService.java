@@ -15,7 +15,6 @@ import javazoom.jl.player.Player;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
-import ru.iris.common.I18N;
 import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
@@ -32,7 +31,6 @@ public class GoogleSpeakService implements Runnable {
 
     private Thread t = null;
     private Logger log = LogManager.getLogger(GoogleSpeakService.class.getName());
-    private I18N i18n = new I18N();
     private boolean shutdown = false;
     private Config config = new Config();
     private SQL sql = new SQL();
@@ -48,7 +46,7 @@ public class GoogleSpeakService implements Runnable {
 
     @Override
     public synchronized void run() {
-        log.info(i18n.message("speak.service.started.tts.google"));
+        log.info("Speak service started (TTS: Google)");
 
         Clip clip = null;
         AudioInputStream audioIn;
@@ -98,8 +96,8 @@ public class GoogleSpeakService implements Runnable {
                         SpeakAdvertisement advertisement = envelope.getObject();
 
                         if (conf.get("silence").equals("0")) {
-                            log.info(i18n.message("speak.confidence.0", advertisement.getConfidence()));
-                            log.info(i18n.message("speak.text.0", advertisement.getText()));
+                            log.info("Confidence: " + advertisement.getConfidence());
+                            log.info("Text: " + advertisement.getText());
                             log.info("Device: " + advertisement.getDevice());
 
                             if(advertisement.getDevice().equals("all"))
@@ -108,17 +106,17 @@ public class GoogleSpeakService implements Runnable {
                                 player.play();
                                 player.close();
 
-                                sql.doQuery("INSERT INTO speaks (text, confidence, device) " +
-                                        "VALUES ('" + advertisement.getText() + "', '" + advertisement.getConfidence() + "', '" + advertisement.getDevice() + "')");
+                                sql.doQuery("INSERT INTO speaks (text, confidence, device, isActive) " +
+                                        "VALUES ('" + advertisement.getText() + "', '" + advertisement.getConfidence() + "', '" + advertisement.getDevice() + "', true)");
                             }
                             else
                             {
-                                sql.doQuery("INSERT INTO speaks (text, confidence, device) " +
-                                        "VALUES ('" + advertisement.getText() + "', '" + advertisement.getConfidence() + "', '" + advertisement.getDevice() + "')");
+                                sql.doQuery("INSERT INTO speaks (text, confidence, device, isActive) " +
+                                        "VALUES ('" + advertisement.getText() + "', '" + advertisement.getConfidence() + "', '" + advertisement.getDevice() + "', true)");
                             }
 
                         } else {
-                            log.info(i18n.message("speak.silence.mode.enabled.ignore.speak.request"));
+                            log.info("Silence mode enabled. Ignoring speak request.");
                         }
 
                     } else {

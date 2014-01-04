@@ -4,7 +4,6 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.common.I18N;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
 import ru.iris.common.messaging.model.ServiceStatus;
@@ -23,7 +22,6 @@ import java.util.UUID;
 @PluginImplementation
 public class Service implements SchedulerPlugin {
 
-    private static I18N i18n = new I18N();
     public static ServiceChecker serviceChecker;
     public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
     public static UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6006");
@@ -35,7 +33,7 @@ public class Service implements SchedulerPlugin {
         serviceChecker = new ServiceChecker(serviceId, advertisement.set(
                 "Scheduler", serviceId, ServiceStatus.STARTUP));
 
-        log.info(i18n.message("iris.scheduler.starting"));
+        log.info("Scheduler sevice started");
 
         new ScheduleService();
     }

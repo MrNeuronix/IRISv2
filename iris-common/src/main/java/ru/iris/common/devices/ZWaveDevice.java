@@ -75,16 +75,16 @@ public class ZWaveDevice extends Device {
     public void save() throws SQLException {
 
         if (type == null)
-            type = i18n.message("undefined");
+            type = "undefined";
 
         if (manufName == null || manufName.isEmpty())
-            manufName = i18n.message("undefined");
+            manufName = "undefined";
 
         if (status == null)
-            status = i18n.message("unknown");
+            status = "unknown";
 
         if (name == null)
-            name = i18n.message("not.set");
+            name = "not.set";
 
         sql.doQuery("DELETE FROM devices WHERE uuid='" + uuid + "'");
         sql.doQuery("DELETE FROM devicesvalues WHERE uuid='" + uuid + "'");

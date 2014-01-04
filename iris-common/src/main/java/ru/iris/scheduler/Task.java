@@ -3,7 +3,6 @@ package ru.iris.scheduler;
 import com.google.gson.annotations.Expose;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.common.I18N;
 import ru.iris.common.SQL;
 
 import java.io.IOException;
@@ -26,7 +25,6 @@ import java.util.Date;
 public class Task {
 
     private static Logger log = LogManager.getLogger(Task.class);
-    private static I18N i18n = new I18N();
     private static SQL sql = new SQL();
     private boolean isNew = false;
 
@@ -59,12 +57,12 @@ public class Task {
         this.id = lastid++;
         rs.close();
 
-        log.debug(i18n.message("scheduler.create.new.task.instance.with.id.0", id));
+        log.debug("Create new task instance with ID: " + id);
     }
 
     public Task(int id) throws SQLException, IOException {
 
-        log.debug(i18n.message("scheduler.create.task.instance.from.id.0", id));
+        log.debug("Create new task instance with ID: " + id);
 
         ResultSet rs = sql.select("SELECT * FROM scheduler WHERE id='" + id + "'");
 
@@ -162,7 +160,7 @@ public class Task {
     }
 
     public boolean save() {
-        log.info(i18n.message("scheduler.saving.task.0", id));
+        log.info("Save task with ID: " + id);
 
         if(isNew)
         {

@@ -12,41 +12,36 @@ package ru.iris.common.devices;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
-import ru.iris.common.I18N;
 import ru.iris.common.SQL;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class Device implements Serializable {
 
-    protected I18N i18n = new I18N();
-
     @Expose
-    protected String name = i18n.message("not.set");
+    protected String name = "not set";
     @Expose
     protected short node = 0;
     @Expose
     protected int zone = 0;
     @Expose
-    protected String type = i18n.message("unknown");
+    protected String type = "unknown";
     @Expose
-    protected String internalType = i18n.message("unknown");
+    protected String internalType = "unknown";
     @Expose
-    protected String manufName = i18n.message("unknown");
+    protected String manufName = "unknown";
     @Expose
-    protected String productName = i18n.message("unknown");
+    protected String productName = "unknown";
     @Expose
-    protected String uuid = i18n.message("unknown");
+    protected String uuid = "unknown";
     @Expose
-    protected String status = i18n.message("unknown");
+    protected String status = "unknown";
     @Expose
-    protected String source = i18n.message("unknown");
+    protected String source = "unknown";
     @Expose
-    protected String internalName = i18n.message("unknown");
+    protected String internalName = "unknown";
 
     protected SQL sql;
 

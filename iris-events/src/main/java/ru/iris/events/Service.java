@@ -4,7 +4,6 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.common.I18N;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
 import ru.iris.common.messaging.model.ServiceStatus;
@@ -22,7 +21,7 @@ import java.util.UUID;
 
 @PluginImplementation
 public class Service implements EventsPlugin {
-    private static I18N i18n = new I18N();
+
     public static ServiceChecker serviceChecker;
     public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
     private static Logger log = LogManager.getLogger(Service.class);
@@ -34,7 +33,7 @@ public class Service implements EventsPlugin {
         serviceChecker = new ServiceChecker(serviceId, advertisement.set(
                 "Events", serviceId, ServiceStatus.STARTUP));
 
-        log.info(i18n.message("iris.events.engine.starting"));
+        log.info("Events engine started");
 
         new EventsService();
     }

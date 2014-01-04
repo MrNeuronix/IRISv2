@@ -6,7 +6,6 @@ import com.darkprograms.speech.recognizer.Recognizer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
-import ru.iris.common.I18N;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.ServiceStatus;
 import ru.iris.common.messaging.model.SpeakRecognizedAdvertisement;
@@ -27,7 +26,6 @@ public class RecordService implements Runnable {
 
     private Logger log = LogManager.getLogger(RecordService.class.getName());
     private boolean busy = false;
-    private I18N i18n = new I18N();
     private JsonMessaging messaging;
     private Config config = new Config();
     private static SpeakRecognizedAdvertisement advertisement = new SpeakRecognizedAdvertisement();
@@ -98,21 +96,21 @@ public class RecordService implements Runnable {
                                 String text = response.getResponse();
                                 double confidence = Double.valueOf(response.getConfidence());
 
-                                log.info(i18n.message("data.utterance.0", text.toUpperCase()));
-                                log.info(i18n.message("data.confidence.level.0", confidence * 100));
+                                log.info("Utterance: " + text.toUpperCase());
+                                log.info("Confidence: " + confidence * 100);
 
                                 if (confidence * 100 > 65) {
                                     if (text.contains(config.getConfig().get("systemName"))) {
-                                        log.info(i18n.message("record.system.name.detected"));
+                                        log.info("System name detected");
 
                                         if (busy) {
-                                            log.info(i18n.message("command.system.is.busy.skipping"));
+                                            log.info("System is busy. Skipping");
                                             break;
                                         }
 
                                         busy = true;
 
-                                        log.info(i18n.message("command.got.0.command", text));
+                                        log.info("Got command: " + text);
 
                                         try {
                                             messaging.broadcast("event.speak.recognized", advertisement.set(text, confidence));

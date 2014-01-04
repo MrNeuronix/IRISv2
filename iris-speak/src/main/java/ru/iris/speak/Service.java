@@ -5,7 +5,6 @@ import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
-import ru.iris.common.I18N;
 import ru.iris.common.Speak;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
@@ -26,7 +25,6 @@ import java.util.UUID;
 @PluginImplementation
 public class Service implements SpeakPlugin {
 
-    private static I18N i18n = new I18N();
     public static ServiceChecker serviceChecker;
     public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
     public static final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6007");
@@ -43,13 +41,13 @@ public class Service implements SpeakPlugin {
 
         Speak speak = new Speak();
 
-        log.info(i18n.message("iris.speak.service.starting"));
+        log.info("Speak service starting");
 
         if (cfg.getConfig().get("ttsEngine").equals("google")) {
             new GoogleSpeakService();
-            speak.say(i18n.message("syth.voice.launched"));
+            speak.say("Модуль синтеза речи Гугл запущен!");
         } else {
-            log.info(i18n.message("speak.no.tts.system.specified.in.config.file"));
+            log.info("No TTS feed specified in config file");
         }
     }
 }
