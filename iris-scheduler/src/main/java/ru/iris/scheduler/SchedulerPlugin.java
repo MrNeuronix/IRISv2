@@ -1,5 +1,7 @@
 package ru.iris.scheduler;
 
+import net.xeoh.plugins.base.Plugin;
+
 /**
  * IRISv2 Project
  * Author: Nikolay A. Viguro
@@ -9,5 +11,5 @@ package ru.iris.scheduler;
  * Time: 0:18
  * License: GPL v3
  */
-public interface SchedulerPlugin {
+public interface SchedulerPlugin extends Plugin {
 }
