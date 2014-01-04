@@ -37,11 +37,8 @@ httpPassword=changeme
 # Silence mode
 silence=0
 
-# Voice engine (google, voicerss)
+# Voice engine (google)
 ttsEngine=google
-
-# VoiceRSS API (can be obtain for free)
-voicerssAPI=
 
 #################################
 # Zwave section

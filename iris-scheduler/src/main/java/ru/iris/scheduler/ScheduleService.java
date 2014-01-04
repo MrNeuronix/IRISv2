@@ -9,8 +9,8 @@ package ru.iris.scheduler;
  * Time: 13:26
  */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.iris.common.I18N;
 import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonMessaging;
@@ -24,7 +24,7 @@ import java.util.UUID;
 public class ScheduleService implements Runnable {
 
     private Thread t = null;
-    private Logger log = LoggerFactory.getLogger(ScheduleService.class);
+    private Logger log = LogManager.getLogger(ScheduleService.class);
     private I18N i18n = new I18N();
     private SQL sql = new SQL();
     private JsonMessaging messaging;

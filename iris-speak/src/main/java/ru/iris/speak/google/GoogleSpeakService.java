@@ -12,8 +12,8 @@ package ru.iris.speak.google;
 
 import com.darkprograms.speech.synthesiser.Synthesiser;
 import javazoom.jl.player.Player;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
 import ru.iris.common.I18N;
 import ru.iris.common.SQL;
@@ -31,7 +31,7 @@ import java.util.UUID;
 public class GoogleSpeakService implements Runnable {
 
     private Thread t = null;
-    private Logger log = LoggerFactory.getLogger(GoogleSpeakService.class.getName());
+    private Logger log = LogManager.getLogger(GoogleSpeakService.class.getName());
     private I18N i18n = new I18N();
     private boolean shutdown = false;
     private Config config = new Config();

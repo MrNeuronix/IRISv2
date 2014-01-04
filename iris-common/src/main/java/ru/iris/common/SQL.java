@@ -11,8 +11,8 @@ package ru.iris.common;
 
 
 import com.sun.rowset.CachedRowSetImpl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 
@@ -20,7 +20,7 @@ public class SQL {
     /**
      * The logger.
      */
-    private static Logger LOGGER = LoggerFactory.getLogger(SQL.class);
+    private static Logger LOGGER = LogManager.getLogger(SQL.class);
     private Connection connection;
     private final Config config = new Config();
 

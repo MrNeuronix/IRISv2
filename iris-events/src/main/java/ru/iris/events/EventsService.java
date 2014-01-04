@@ -6,8 +6,8 @@ import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.tools.shell.Global;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.iris.common.I18N;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
@@ -29,7 +29,7 @@ import java.io.FilenameFilter;
 
 public class EventsService implements Runnable {
 
-    private Logger log = LoggerFactory.getLogger(EventsService.class.getName());
+    private Logger log = LogManager.getLogger(EventsService.class.getName());
     private final I18N i18n = new I18N();
     private boolean shutdown = false;
     private final CommandResult commandResult = new CommandResult();

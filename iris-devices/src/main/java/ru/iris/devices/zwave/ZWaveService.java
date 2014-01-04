@@ -3,8 +3,8 @@ package ru.iris.devices.zwave;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.zwave4j.*;
 import ru.iris.common.Config;
 import ru.iris.common.I18N;
@@ -35,7 +35,7 @@ import java.util.UUID;
  */
 public class ZWaveService implements Runnable {
 
-    private Logger log = LoggerFactory.getLogger(ZWaveService.class.getName());
+    private Logger log = LogManager.getLogger(ZWaveService.class.getName());
     private long homeId;
     private boolean ready = false;
     private static final Map<String, ZWaveDevice> zDevices = new HashMap<>();

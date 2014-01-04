@@ -1,15 +1,12 @@
 package ru.iris;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
-import ru.iris.common.messaging.model.ServiceCapability;
 import ru.iris.common.messaging.model.ServiceStatus;
-
-import java.util.Arrays;
 import java.util.UUID;
 
 /**
@@ -30,7 +27,7 @@ import java.util.UUID;
 
 public class StatusChecker implements Runnable {
 
-    private static Logger log = LoggerFactory.getLogger(StatusChecker.class.getName());
+    private static Logger log = LogManager.getLogger(StatusChecker.class.getName());
     private static boolean shutdown = false;
     private SQL sql;
     private static ServiceAdvertisement advertisement = new ServiceAdvertisement();

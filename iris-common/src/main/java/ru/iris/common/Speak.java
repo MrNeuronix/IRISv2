@@ -1,7 +1,7 @@
 package ru.iris.common;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.SpeakAdvertisement;
 
@@ -18,7 +18,7 @@ import java.util.UUID;
  */
 public class Speak {
 
-    private static Logger log = LoggerFactory.getLogger(Speak.class);
+    private static Logger log = LogManager.getLogger(Speak.class);
     private static SpeakAdvertisement advertisement = new SpeakAdvertisement();
 
     public void say(String text) throws JMSException, URISyntaxException {

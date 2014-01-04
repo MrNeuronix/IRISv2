@@ -2,14 +2,13 @@ package ru.iris;
 
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
-import org.apache.log4j.xml.DOMConfigurator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
 import ru.iris.common.I18N;
 import ru.iris.common.SQL;
 
 import java.io.File;
-import java.io.IOException;
 
 /**
  * IRISv2 Project
@@ -20,13 +19,16 @@ import java.io.IOException;
  * Time: 22:52
  * License: GPL v3
  */
-public class Launcher {
+public class Core {
 
-    private static Logger log = LoggerFactory.getLogger(Launcher.class);
+    // Specify log4j2 configuration file
+    static {
+        System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, "./conf/log4j2.xml");
+    }
+
+    private static Logger log = LogManager.getLogger(Core.class.getName());
 
     public static void main(String[] args) throws Exception {
-
-        DOMConfigurator.configure("conf/log4j.xml");
 
         // Enable internationalization
         I18N i18n = new I18N();

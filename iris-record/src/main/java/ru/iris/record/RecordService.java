@@ -1,8 +1,8 @@
 package ru.iris.record;
 
 import javaFlacEncoder.FLAC_FileEncoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
 import ru.iris.common.I18N;
 import ru.iris.common.httpPOST;
@@ -10,10 +10,8 @@ import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.ServiceStatus;
 import ru.iris.common.messaging.model.SpeakRecognizedAdvertisement;
 
-import javax.jms.JMSException;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Random;
 import java.util.UUID;
 
@@ -26,7 +24,7 @@ import java.util.UUID;
  */
 public class RecordService implements Runnable {
 
-    private Logger log = LoggerFactory.getLogger(RecordService.class.getName());
+    private Logger log = LogManager.getLogger(RecordService.class.getName());
     private boolean busy = false;
     private I18N i18n = new I18N();
     private JsonMessaging messaging;

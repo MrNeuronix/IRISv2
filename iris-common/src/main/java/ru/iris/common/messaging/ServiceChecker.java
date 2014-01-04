@@ -10,8 +10,8 @@ package ru.iris.common.messaging;
  * License: GPL v3
  */
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.UUID;
 
@@ -33,7 +33,7 @@ import java.util.UUID;
 
 public class ServiceChecker implements Runnable {
 
-    private Logger log = LoggerFactory.getLogger(ServiceChecker.class.getName());
+    private Logger log = LogManager.getLogger(ServiceChecker.class.getName());
     private boolean shutdown = false;
     private UUID instanceId = UUID.randomUUID();
     private Object advertisment;

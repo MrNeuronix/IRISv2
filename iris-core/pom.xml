@@ -44,7 +44,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>ru.iris.Launcher</mainClass>
+                            <mainClass>ru.iris.Core</mainClass>
                         </manifest>
                     </archive>
                     <finalName>iris-core</finalName>

@@ -18,8 +18,8 @@ package ru.iris.common.messaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.iris.common.SQL;
 
 import java.sql.ResultSet;
@@ -40,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 
 public class JsonMessaging {
 
-    private static Logger LOGGER = LoggerFactory.getLogger(JsonMessaging.class);
+    private static Logger LOGGER = LogManager.getLogger(JsonMessaging.class);
     private UUID sender;
     private boolean shutdownThreads = false;
     private Set<String> jsonSubjects = Collections.synchronizedSet(new HashSet<String>());

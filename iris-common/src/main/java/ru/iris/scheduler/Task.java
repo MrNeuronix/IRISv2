@@ -1,8 +1,8 @@
 package ru.iris.scheduler;
 
 import com.google.gson.annotations.Expose;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import ru.iris.common.I18N;
 import ru.iris.common.SQL;
 
@@ -25,7 +25,7 @@ import java.util.Date;
 
 public class Task {
 
-    private static Logger log = LoggerFactory.getLogger(Task.class);
+    private static Logger log = LogManager.getLogger(Task.class);
     private static I18N i18n = new I18N();
     private static SQL sql = new SQL();
     private boolean isNew = false;
