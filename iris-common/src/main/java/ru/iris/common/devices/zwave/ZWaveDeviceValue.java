@@ -34,38 +34,6 @@ public class ZWaveDeviceValue extends DeviceValue {
         super(label, value, valueType, valueUnits);
     }
 
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getValueType() {
-        return valueType;
-    }
-
-    public void setValueType(String valueType) {
-        this.valueType = valueType;
-    }
-
-    public String getValueUnits() {
-        return valueUnits;
-    }
-
-    public void setValueUnits(String valueUnits) {
-        this.valueUnits = valueUnits;
-    }
-
     public ValueId getValueId() {
         return valueId;
     }

@@ -1,6 +1,6 @@
 package ru.iris.common.devices.noolite;
 
-import com.google.gson.annotations.Expose;
+import ru.iris.common.devices.DeviceValue;
 
 /**
  * IRISv2 Project
@@ -12,55 +12,14 @@ import com.google.gson.annotations.Expose;
  * License: GPL v3
  */
 
-public class NooliteDeviceValue {
-
-    @Expose
-    protected String label = "unknown";
-    @Expose
-    protected String value = "unknown";
-    @Expose
-    protected String valueType = "unknown";
-    @Expose
-    protected String valueUnits = "unknown";
+public class NooliteDeviceValue extends DeviceValue {
 
     public NooliteDeviceValue(String label, String value) {
-        this.label = label;
-        this.value = value;
+        super(label, value);
     }
 
     public NooliteDeviceValue(String label, String value, String valueType, String valueUnits) {
-        this.label = label;
-        this.value = value;
-        this.valueType = valueType;
-        this.valueUnits = valueUnits;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public String getValueType() {
-        return valueType;
-    }
-
-    public String getValueUnits() {
-        return valueUnits;
-    }
-
-    public void setValueUnits(String valueUnits) {
-        this.valueUnits = valueUnits;
+        super(label, value, valueType, valueUnits);
     }
 
     @Override
