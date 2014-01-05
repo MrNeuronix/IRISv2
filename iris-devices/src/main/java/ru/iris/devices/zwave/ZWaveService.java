@@ -1,16 +1,13 @@
 package ru.iris.devices.zwave;
 
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.zwave4j.*;
 import ru.iris.common.Config;
 import ru.iris.common.SQL;
 import ru.iris.common.Utils;
-import ru.iris.common.devices.ZWaveDevice;
-import ru.iris.common.devices.ZWaveDeviceValue;
+import ru.iris.common.devices.zwave.ZWaveDevice;
+import ru.iris.common.devices.zwave.ZWaveDeviceValue;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.*;
@@ -26,12 +23,15 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Created with IntelliJ IDEA.
+ * IRISv2 Project
  * Author: Nikolay A. Viguro
+ * WWW: iris.ph-systems.ru
+ * E-Mail: nv@ph-systems.ru
  * Date: 09.09.12
  * Time: 13:57
  * License: GPL v3
  */
+
 public class ZWaveService implements Runnable {
 
     private Logger log = LogManager.getLogger(ZWaveService.class.getName());
@@ -75,27 +75,13 @@ public class ZWaveService implements Runnable {
         messaging = new JsonMessaging(UUID.randomUUID());
         config = new Config().getConfig();
 
-        ResultSet rs = sql.select("SELECT * FROM devices");
+        ResultSet rs = sql.select("SELECT uuid, internalname FROM devices WHERE source='zwave'");
 
         try {
             while (rs.next()) {
 
-                ZWaveDevice zDevice = new ZWaveDevice();
-
-                zDevice.setManufName(rs.getString("manufname"));
-                zDevice.setName(rs.getString("name"));
-                zDevice.setNode(rs.getShort("node"));
-                zDevice.setStatus(rs.getString("status"));
-                zDevice.setInternalType(rs.getString("internaltype"));
-                zDevice.setType(rs.getString("type"));
-                zDevice.setUUID(rs.getString("uuid"));
-                zDevice.setZone(rs.getInt("zone"));
-                zDevice.setProductName(rs.getString("productname"));
-                zDevice.setInternalName(rs.getString("internalname"));
-
-                log.info("Loading device " + zDevice.getInternalType() + "(node: " + zDevice.getNode() + ") from database");
-
-                zDevices.put("zwave/" + zDevice.getInternalType() + "/" + zDevice.getNode(), zDevice);
+                log.info("Loading device " + rs.getString("internalname") + " from database");
+                zDevices.put(rs.getString("internalname"), new ZWaveDevice().load(rs.getString("uuid")));
             }
 
             rs.close();
@@ -666,7 +652,7 @@ public class ZWaveService implements Runnable {
                 ZWaveDevice.setManufName(manufName);
                 ZWaveDevice.setProductName(productName);
                 ZWaveDevice.setStatus(state);
-                ZWaveDevice.addValue(
+                ZWaveDevice.updateValue(
                         new ZWaveDeviceValue(
                                 label,
                                 String.valueOf(Utils.getValue(notification.getValueId())),
@@ -687,7 +673,8 @@ public class ZWaveService implements Runnable {
             ZWaveDevice.setStatus(state);
 
             log.info("Node " + ZWaveDevice.getNode() + ": Add \"" + label + "\" value \"" + Utils.getValue(notification.getValueId()) + "\"");
-            ZWaveDevice.addValue(new ZWaveDeviceValue(
+
+            ZWaveDevice.updateValue(new ZWaveDeviceValue(
                     label,
                     String.valueOf(Utils.getValue(notification.getValueId())),
                     Utils.getValueType(notification.getValueId()),

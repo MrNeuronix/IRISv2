@@ -1,7 +1,7 @@
 package ru.iris.common.messaging.model.noolite;
 
 import com.google.gson.annotations.Expose;
-import ru.iris.common.devices.NooliteDevice;
+import ru.iris.common.devices.noolite.NooliteDevice;
 import ru.iris.common.messaging.model.Advertisement;
 
 /**

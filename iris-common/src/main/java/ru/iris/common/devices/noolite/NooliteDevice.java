@@ -1,4 +1,4 @@
-package ru.iris.common.devices;
+package ru.iris.common.devices.noolite;
 
 /**
  * IRISv2 Project
@@ -10,60 +10,64 @@ package ru.iris.common.devices;
  */
 
 import com.google.gson.annotations.Expose;
+import ru.iris.common.devices.Device;
 
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-public class ZWaveDevice extends Device {
+public class NooliteDevice extends Device {
 
     @Expose
-    private ArrayList<ZWaveDeviceValue> values = new ArrayList<>();
+    private ArrayList<NooliteDeviceValue> values = new ArrayList<>();
 
-    public ZWaveDevice() throws IOException, SQLException {
+    public NooliteDevice() throws IOException, SQLException {
         super();
-        this.source = "zwave";
+        this.source = "noolite";
     }
 
-    public ArrayList<ZWaveDeviceValue> getValueIDs() {
+    public ArrayList<NooliteDeviceValue> getValueIDs() {
         return values;
     }
 
-    public ZWaveDeviceValue getValue(String value) {
+    public NooliteDeviceValue getValue(String val) {
 
-        for (ZWaveDeviceValue zvalue : values) {
-            if (zvalue.getLabel().equals(value)) {
-                return zvalue;
+        for (NooliteDeviceValue value : values) {
+            if (value.getLabel().equals(val)) {
+                return value;
             }
         }
         return null;
     }
 
-    public void addValue(ZWaveDeviceValue value) {
-        values.add(value);
-    }
+    public void updateValue(NooliteDeviceValue value) {
 
-    public void updateValue(ZWaveDeviceValue value) {
+        ArrayList<NooliteDeviceValue> zDv = (ArrayList<NooliteDeviceValue>) values.clone();
+        boolean flag = false;
 
-        ArrayList<ZWaveDeviceValue> zDv = (ArrayList<ZWaveDeviceValue>) values.clone();
-
-        for (ZWaveDeviceValue zvalue : values) {
+        for (NooliteDeviceValue zvalue : values) {
             if (zvalue.getLabel().equals(value.getLabel())) {
                 zDv.remove(zvalue);
                 zDv.add(value);
+                flag = true;
             }
+        }
+
+        if(!flag)
+        {
+            zDv.add(value);
         }
 
         values = zDv;
         zDv = null;
     }
 
-    public void removeValue(ZWaveDeviceValue value) {
+    public void removeValue(NooliteDeviceValue value) {
 
-        ArrayList<ZWaveDeviceValue> zDv = (ArrayList<ZWaveDeviceValue>) values.clone();
+        ArrayList<NooliteDeviceValue> zDv = (ArrayList<NooliteDeviceValue>) values.clone();
 
-        for (ZWaveDeviceValue zvalue : values) {
+        for (NooliteDeviceValue zvalue : values) {
             if (zvalue.getLabel().equals(value.getLabel())) {
                 zDv.remove(zvalue);
             }
@@ -73,25 +77,25 @@ public class ZWaveDevice extends Device {
         zDv = null;
     }
 
-    public ZWaveDevice load(String uuid)
+    public NooliteDevice load(String uuid)
     {
         ResultSet rs = sql.select("SELECT * FROM devices WHERE uuid='" + uuid + "'");
 
         try {
             while (rs.next()) {
 
-                    this.manufName = rs.getString("manufname");
-                    this.name = rs.getString("name");
-                    this.node = rs.getShort("node");
-                    this.status = rs.getString("status");
-                    this.internalType = rs.getString("internaltype");
-                    this.type = rs.getString("type");
-                    this.uuid = rs.getString("uuid");
-                    this.zone = rs.getInt("zone");
-                    this.productName = rs.getString("productname");
-                    this.internalName = rs.getString("internalname");
-                    this.source = rs.getString("source");
-                }
+                this.manufName = rs.getString("manufname");
+                this.name = rs.getString("name");
+                this.node = rs.getShort("node");
+                this.status = rs.getString("status");
+                this.internalType = rs.getString("internaltype");
+                this.type = rs.getString("type");
+                this.uuid = rs.getString("uuid");
+                this.zone = rs.getInt("zone");
+                this.productName = rs.getString("productname");
+                this.internalName = rs.getString("internalname");
+                this.source = rs.getString("source");
+            }
 
             rs.close();
 
@@ -104,14 +108,11 @@ public class ZWaveDevice extends Device {
         try {
             while (rs.next()) {
 
-                System.out.println("ZW 8");
-
-                addValue(new ZWaveDeviceValue(
+                updateValue(new NooliteDeviceValue(
                         rs.getString("label"),
                         rs.getString("value"),
                         rs.getString("type"),
                         rs.getString("units")
-                        // ValueID is unknown!
                 ));
             }
 
@@ -136,13 +137,13 @@ public class ZWaveDevice extends Device {
             status = "unknown";
 
         if (name == null)
-            name = "not.set";
+            name = "not set";
 
         sql.doQuery("DELETE FROM devices WHERE uuid='" + uuid + "'");
         sql.doQuery("DELETE FROM devicesvalues WHERE uuid='" + uuid + "'");
         sql.doQuery("INSERT INTO devices (source, uuid, internaltype, type, manufname, node, status, name, zone, productname, internalname) VALUES ('zwave','" + uuid + "','" + internalType + "','" + type + "','" + manufName + "','" + node + "','" + status + "','" + name + "','" + zone + "','" + productName + "','" + internalName + "')");
 
-        for (ZWaveDeviceValue zvalue : values) {
+        for (NooliteDeviceValue zvalue : values) {
             sql.doQuery("INSERT INTO devicesvalues (uuid, label, value, type, units)" +
                     " VALUES ('" + uuid + "','" + zvalue.getLabel() + "','" + zvalue.getValue() + "','" + zvalue.getValueType() + "','" + zvalue.getValueUnits() + "')");
         }

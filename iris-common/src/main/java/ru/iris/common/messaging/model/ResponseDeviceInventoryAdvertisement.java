@@ -1,7 +1,6 @@
 package ru.iris.common.messaging.model;
 
 import com.google.gson.annotations.Expose;
-import ru.iris.common.devices.ZWaveDevice;
 
 import java.util.Map;
 

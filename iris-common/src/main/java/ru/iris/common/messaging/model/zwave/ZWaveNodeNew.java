@@ -1,7 +1,6 @@
 package ru.iris.common.messaging.model.zwave;
 
-import com.google.gson.annotations.Expose;
-import ru.iris.common.devices.ZWaveDevice;
+import ru.iris.common.devices.zwave.ZWaveDevice;
 
 /**
  * IRISv2 Project
