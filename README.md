@@ -1,8 +1,8 @@
 # IRISv2
 
-A new version of IRIS-X with strong modular system and RESTful service.
-IRISv2 is home automation system with voice control and REST API.
-This is core part of smart home system with no human interface. Interface is available from **IRISv2-Web** repository.
+A new version of IRIS-X (home automation system) with strong modular system.
+This is core part of smart home system with no human interface.
+Interface is available from **IRISv2-Web** repository.
 
 [![Build Status](https://travis-ci.org/Neuronix2/IRISv2.png?branch=master)](https://travis-ci.org/Neuronix2/IRISv2)
 
