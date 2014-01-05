@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
@@ -41,7 +40,6 @@ public class ZWaveService implements Runnable {
     private boolean initComplete = false;
     private boolean shutdown = false;
     private JsonMessaging messaging;
-    private Map<String, String> config;
     private SQL sql = new SQL();
 
     // Adverstiments
@@ -73,7 +71,7 @@ public class ZWaveService implements Runnable {
     public synchronized void run() {
 
         messaging = new JsonMessaging(UUID.randomUUID());
-        config = new Config().getConfig();
+        Map<String, String> config = new Config().getConfig();
 
         ResultSet rs = sql.select("SELECT uuid, internalname FROM devices WHERE source='zwave'");
 
@@ -596,10 +594,9 @@ public class ZWaveService implements Runnable {
 
     private ZWaveDevice hasInstance(String key) {
 
-        Iterator it = zDevices.entrySet().iterator();
-        while (it.hasNext()) {
+        for (Object o : zDevices.entrySet()) {
 
-            Map.Entry pairs = (Map.Entry) it.next();
+            Map.Entry pairs = (Map.Entry) o;
 
             if (key.equals(pairs.getKey())) {
                 return (ZWaveDevice) pairs.getValue();
@@ -685,7 +682,9 @@ public class ZWaveService implements Runnable {
         // catch and save into database value changes after init complete
         try {
             if (initComplete)
-                ZWaveDevice.save();
+                if (ZWaveDevice != null) {
+                    ZWaveDevice.save();
+                }
         } catch (Exception e) {
             e.printStackTrace();
         }
