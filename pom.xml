@@ -68,6 +68,7 @@
         <module>iris-scheduler</module>
         <module>iris-speak</module>
         <module>iris-video</module>
+        <module>iris-ai</module>
     </modules>
 
 </project>

@@ -91,6 +91,13 @@
             </includes>
             <directory>../iris-speak/target</directory>
         </fileSet>
+        <fileSet>
+            <outputDirectory>/extensions</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
+            <directory>../iris-ai/target</directory>
+        </fileSet>
     </fileSets>
     <!-- use this section if you want to package dependencies -->
     <dependencySets>
@@ -107,6 +114,7 @@
                 <exclude>ru.iris:iris-scheduler</exclude>
                 <exclude>ru.iris:iris-video</exclude>
                 <exclude>ru.iris:iris-speak</exclude>
+                <exclude>ru.iris:iris-ai</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

@@ -26,7 +26,6 @@ public class NooliteService implements Runnable {
     private boolean initComplete = false;
     private boolean shutdown = false;
     private JsonMessaging messaging;
-    private Map<String, String> config;
     private SQL sql = new SQL();
     private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
@@ -42,7 +41,7 @@ public class NooliteService implements Runnable {
     public synchronized void run() {
 
         messaging = new JsonMessaging(UUID.randomUUID());
-        config = new Config().getConfig();
+        Map<String, String> config = new Config().getConfig();
 
     }
 }
