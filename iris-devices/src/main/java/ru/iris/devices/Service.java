@@ -18,6 +18,7 @@ import ru.iris.common.Config;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
 import ru.iris.common.messaging.model.ServiceStatus;
+import ru.iris.devices.noolite.NooliteService;
 import ru.iris.devices.zwave.ZWaveService;
 
 import java.io.IOException;
@@ -49,8 +50,9 @@ public class Service implements DevicesPlugin {
             log.info("ZWave support is enabled. Starting");
             new ZWaveService();
         }
-        if (config.get("onewireEnabled").equals("1")) {
-            log.info("1-Wire support is enabled. Starting");
+        if (config.get("nooliteeEnabled").equals("1")) {
+            log.info("NooLite support is enabled. Starting");
+            new NooliteService();
         }
     }
 }

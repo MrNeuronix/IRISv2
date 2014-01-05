@@ -49,8 +49,11 @@ zwaveDebug=false
 openzwaveCfgPath=./conf/zwave-conf
 
 #################################
-# 1-wire section
+# NooLite section
 #################################
 
-onewireEnabled=0
+nooliteEnabled=0
+
+# Controller port
+noolitePort=/dev/ttyUSB1
 
