@@ -43,7 +43,6 @@ public class ZWaveService implements Runnable {
     private JsonMessaging messaging;
     private Map<String, String> config;
     private SQL sql = new SQL();
-    private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
     // Adverstiments
     private ZWaveDriverReady zWaveDriverReady = new ZWaveDriverReady();
@@ -64,9 +63,6 @@ public class ZWaveService implements Runnable {
     private ZWaveDeviceValueRemoved zWaveDeviceValueRemoved = new ZWaveDeviceValueRemoved();
     private ZWaveEssentialNodeQueriesComplete zWaveEssentialNodeQueriesComplete = new ZWaveEssentialNodeQueriesComplete();
     private ZWavePolling zWavePolling = new ZWavePolling();
-    private ResponseZWaveDeviceArrayInventoryAdvertisement responseZWaveDeviceArrayInventoryAdvertisement = new ResponseZWaveDeviceArrayInventoryAdvertisement();
-    private ResponseZWaveDeviceInventoryAdvertisement responseZWaveDeviceInventoryAdvertisement = new ResponseZWaveDeviceInventoryAdvertisement();
-
 
     public ZWaveService() {
         Thread t = new Thread(this);
@@ -206,7 +202,7 @@ public class ZWaveService implements Runnable {
                             case "Portable Remote Controller":
 
                                 zw = addZWaveDeviceOrValue("controller", notification);
-                                messaging.broadcast("event.devices.value.added",
+                                messaging.broadcast("event.devices.zwave.value.added",
                                         zWaveDeviceValueAdded.set(
                                                 zw,
                                                 Manager.get().getValueLabel(notification.getValueId()),
@@ -218,7 +214,7 @@ public class ZWaveService implements Runnable {
                             case "Multilevel Power Switch":
 
                                 zw = addZWaveDeviceOrValue("dimmer", notification);
-                                messaging.broadcast("event.devices.value.added",
+                                messaging.broadcast("event.devices.zwave.value.added",
                                         zWaveDeviceValueAdded.set(
                                                 zw,
                                                 Manager.get().getValueLabel(notification.getValueId()),
@@ -230,7 +226,7 @@ public class ZWaveService implements Runnable {
                             case "Routing Alarm Sensor":
 
                                 zw = addZWaveDeviceOrValue("alarmsensor", notification);
-                                messaging.broadcast("event.devices.value.added",
+                                messaging.broadcast("event.devices.zwave.value.added",
                                         zWaveDeviceValueAdded.set(
                                                 zw,
                                                 Manager.get().getValueLabel(notification.getValueId()),
@@ -240,7 +236,7 @@ public class ZWaveService implements Runnable {
                             case "Binary Power Switch":
 
                                 zw = addZWaveDeviceOrValue("switch", notification);
-                                messaging.broadcast("event.devices.value.added",
+                                messaging.broadcast("event.devices.zwave.value.added",
                                         zWaveDeviceValueAdded.set(
                                                 zw,
                                                 Manager.get().getValueLabel(notification.getValueId()),
@@ -250,7 +246,7 @@ public class ZWaveService implements Runnable {
                             case "Routing Binary Sensor":
 
                                 zw = addZWaveDeviceOrValue("binarysensor", notification);
-                                messaging.broadcast("event.devices.value.added",
+                                messaging.broadcast("event.devices.zwave.value.added",
                                         zWaveDeviceValueAdded.set(
                                                 zw,
                                                 Manager.get().getValueLabel(notification.getValueId()),
@@ -262,7 +258,7 @@ public class ZWaveService implements Runnable {
                             case "Routing Multilevel Sensor":
 
                                 zw = addZWaveDeviceOrValue("multilevelsensor", notification);
-                                messaging.broadcast("event.devices.value.added",
+                                messaging.broadcast("event.devices.zwave.value.added",
                                         zWaveDeviceValueAdded.set(
                                                 zw,
                                                 Manager.get().getValueLabel(notification.getValueId()),
@@ -274,7 +270,7 @@ public class ZWaveService implements Runnable {
                             case "Simple Meter":
 
                                 zw = addZWaveDeviceOrValue("metersensor", notification);
-                                messaging.broadcast("event.devices.value.added",
+                                messaging.broadcast("event.devices.zwave.value.added",
                                         zWaveDeviceValueAdded.set(
                                                 zw,
                                                 Manager.get().getValueLabel(notification.getValueId()),
@@ -286,7 +282,7 @@ public class ZWaveService implements Runnable {
                             case "Simple Window Covering":
 
                                 zw = addZWaveDeviceOrValue("drapes", notification);
-                                messaging.broadcast("event.devices.value.added",
+                                messaging.broadcast("event.devices.zwave.value.added",
                                         zWaveDeviceValueAdded.set(
                                                 zw,
                                                 Manager.get().getValueLabel(notification.getValueId()),
@@ -298,7 +294,7 @@ public class ZWaveService implements Runnable {
                             case "Setpoint Thermostat":
 
                                 zw = addZWaveDeviceOrValue("thermostat", notification);
-                                messaging.broadcast("event.devices.value.added",
+                                messaging.broadcast("event.devices.zwave.value.added",
                                         zWaveDeviceValueAdded.set(
                                                 zw,
                                                 Manager.get().getValueLabel(notification.getValueId()),
@@ -345,7 +341,7 @@ public class ZWaveService implements Runnable {
                                 Manager.get().getValueUnits(notification.getValueId()),
                                 notification.getValueId()));
 
-                        messaging.broadcast("event.devices.value.removed",
+                        messaging.broadcast("event.devices.zwave.value.removed",
                                 zWaveDeviceValueRemoved.set(
                                         zrZWaveDevice,
                                         Manager.get().getValueLabel(notification.getValueId()),
@@ -381,7 +377,8 @@ public class ZWaveService implements Runnable {
                                 break;
                         } catch (NullPointerException e) {
                             log.error("Error while change value: " + e.toString());
-                            break;
+                            e.printStackTrace();
+                            //break;
                         }
 
                         log.info("Node " +
@@ -397,7 +394,7 @@ public class ZWaveService implements Runnable {
                                 Manager.get().getValueUnits(notification.getValueId()),
                                 notification.getValueId()));
 
-                        messaging.broadcast("event.devices.value.changed",
+                        messaging.broadcast("event.devices.zwave.value.changed",
                                 zWaveDeviceValueChanged.set(
                                         zWaveDevice,
                                         Manager.get().getValueLabel(notification.getValueId()),
@@ -486,10 +483,7 @@ public class ZWaveService implements Runnable {
 
             JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
 
-            jsonMessaging.subscribe("event.devices.setvalue");
-            jsonMessaging.subscribe("event.devices.getinventory");
-            jsonMessaging.subscribe("event.devices.setname");
-            jsonMessaging.subscribe("event.devices.setzone");
+            jsonMessaging.subscribe("event.devices.zwave.setvalue");
 
             jsonMessaging.start();
 
@@ -520,43 +514,6 @@ public class ZWaveService implements Runnable {
                             setValue(uuid, label, level);
                         } else {
                             log.info("Node: " + node + " Cant set empty value or node dead");
-                        }
-
-                    } else if (envelope.getObject() instanceof GetInventoryAdvertisement) {
-
-                        final GetInventoryAdvertisement advertisement = envelope.getObject();
-
-                        if (advertisement.getDeviceUUID().equals("all")) {
-
-                            jsonMessaging.broadcast("event.devices.responseinventory", responseZWaveDeviceArrayInventoryAdvertisement.set(zDevices));
-
-                        } else {
-
-                            ZWaveDevice zdv = getZWaveDeviceByUUID(advertisement.getDeviceUUID());
-
-                            if (zdv != null) {
-                                jsonMessaging.broadcast("event.devices.responseinventory", responseZWaveDeviceInventoryAdvertisement.set(zdv));
-                            }
-                        }
-
-                    } else if (envelope.getObject() instanceof SetDeviceNameAdvertisement) {
-
-                        SetDeviceNameAdvertisement advertisement = envelope.getObject();
-
-                        ZWaveDevice zdv = getZWaveDeviceByUUID(advertisement.getDeviceUUID());
-                        if (zdv != null) {
-                            zdv.setName(advertisement.getName());
-                            zdv.save();
-                        }
-
-                    } else if (envelope.getObject() instanceof SetDeviceZoneAdvertisement) {
-
-                        SetDeviceZoneAdvertisement advertisement = envelope.getObject();
-
-                        ZWaveDevice zdv = getZWaveDeviceByUUID(advertisement.getDeviceUUID());
-                        if (zdv != null) {
-                            zdv.setZone(advertisement.getZone());
-                            zdv.save();
                         }
 
                     } else if (envelope.getReceiverInstance() == null) {

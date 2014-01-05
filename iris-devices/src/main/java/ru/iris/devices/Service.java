@@ -43,14 +43,16 @@ public class Service implements DevicesPlugin {
 
         Map<String, String> config = new Config().getConfig();
 
-
         log.info("Device module starting");
+
+        // Generic device functions
+        new CommonDeviceService();
 
         if (config.get("zwaveEnabled").equals("1")) {
             log.info("ZWave support is enabled. Starting");
             new ZWaveService();
         }
-        if (config.get("nooliteeEnabled").equals("1")) {
+        if (config.get("nooliteEnabled").equals("1")) {
             log.info("NooLite support is enabled. Starting");
             new NooliteService();
         }

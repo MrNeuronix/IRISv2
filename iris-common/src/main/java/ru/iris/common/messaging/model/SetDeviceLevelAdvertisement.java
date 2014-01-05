@@ -15,16 +15,19 @@ import java.util.UUID;
  * License: GPL v3
  */
 public class SetDeviceLevelAdvertisement extends Advertisement {
+
     /**
      * Device UUID
      */
     @Expose
     private String deviceUUID;
+
     /**
      * Label, what value we want change.
      */
     @Expose
     private String label;
+
     /**
      * Label value.
      */
