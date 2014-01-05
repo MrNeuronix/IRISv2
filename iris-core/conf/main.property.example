@@ -57,3 +57,9 @@ nooliteEnabled=0
 # Controller port
 noolitePort=/dev/ttyUSB1
 
+##################################
+# AI
+##################################
+
+witaiEnabled=1
+witaiKey=6AVGJKDP4EEAAS5IKNCxxxxxxxxx
