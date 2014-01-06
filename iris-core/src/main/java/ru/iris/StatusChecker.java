@@ -29,7 +29,7 @@ public class StatusChecker implements Runnable {
 
     private static Logger log = LogManager.getLogger(StatusChecker.class.getName());
     private static boolean shutdown = false;
-    private SQL sql;
+    private SQL sql = Core.getSQL();
     private static ServiceAdvertisement advertisement = new ServiceAdvertisement();
 
     public StatusChecker() {

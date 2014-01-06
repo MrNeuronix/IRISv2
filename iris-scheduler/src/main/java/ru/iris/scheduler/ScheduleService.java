@@ -24,7 +24,7 @@ public class ScheduleService implements Runnable {
 
     private Thread t = null;
     private Logger log = LogManager.getLogger(ScheduleService.class);
-    private SQL sql = new SQL();
+    private SQL sql = Service.getSQL();
     private JsonMessaging messaging;
     private static CommandAdvertisement commandAdvertisement = new CommandAdvertisement();
 

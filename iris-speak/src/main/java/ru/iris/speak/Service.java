@@ -5,6 +5,7 @@ import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
+import ru.iris.common.SQL;
 import ru.iris.common.Speak;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
@@ -28,6 +29,12 @@ public class Service implements SpeakPlugin {
     public static ServiceChecker serviceChecker;
     public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
     public static final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6007");
+    private static SQL sql = new SQL();
+
+    public static SQL getSQL()
+    {
+        return sql;
+    }
 
     private static Logger log = LogManager.getLogger(Service.class);
 

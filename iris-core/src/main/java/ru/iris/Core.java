@@ -27,6 +27,12 @@ public class Core {
 
     private static Logger log = LogManager.getLogger(Core.class.getName());
 
+    private static SQL sql = new SQL();
+
+    public static SQL getSQL() {
+        return sql;
+    }
+
     public static void main(String[] args) throws Exception {
 
         log.info("----------------------------------------");

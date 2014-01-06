@@ -8,6 +8,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.tools.shell.Global;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.CommandAdvertisement;
@@ -17,6 +18,8 @@ import ru.iris.common.messaging.model.ServiceStatus;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,6 +34,7 @@ public class EventsService implements Runnable {
     private Logger log = LogManager.getLogger(EventsService.class.getName());
     private boolean shutdown = false;
     private final CommandResult commandResult = new CommandResult();
+    private SQL sql = Service.getSQL();
 
     public EventsService() {
         Thread t = new Thread(this);
@@ -78,6 +82,7 @@ public class EventsService implements Runnable {
             while (!shutdown) {
 
                 final JsonEnvelope envelope = jsonMessaging.receive(100);
+
                 if (envelope != null) {
 
                     // Check command and launch script
@@ -96,22 +101,35 @@ public class EventsService implements Runnable {
                             e.printStackTrace();
                         }
                     }
-                    // run all scripts
+
                     else {
-                        File folder = new File("./scripts/");
 
-                        for (File jsFile : folder.listFiles(filter)) {
-                            log.debug("Launch script: " + jsFile);
+                        // seek event in db
+                        ResultSet rs = sql.select("SELECT * FROM events WHERE subject='" + envelope.getSubject() + "'");
 
-                            try {
-                                ScriptableObject.putProperty(scope, "advertisement", Context.javaToJS(envelope.getObject(), scope));
-                                cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
-                            } catch (FileNotFoundException e) {
-                                log.error("Script file " + jsFile + " not found!");
-                            } catch (Exception e) {
-                                log.error("Error in script " + jsFile + ": " + e.toString());
-                                e.printStackTrace();
+                        try {
+                            while (rs.next()) {
+
+                                File jsFile= new File("./scripts/" + rs.getString("script"));
+
+                                    log.info("Launch script: " + jsFile);
+
+                                    try {
+                                        ScriptableObject.putProperty(scope, "advertisement", Context.javaToJS(envelope.getObject(), scope));
+                                        cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
+                                    } catch (FileNotFoundException e) {
+                                        log.error("Script file " + jsFile + " not found!");
+                                    } catch (Exception e) {
+                                        log.error("Error in script " + jsFile + ": " + e.toString());
+                                        e.printStackTrace();
+                                    }
+
                             }
+
+                            rs.close();
+
+                        } catch (SQLException e) {
+                            e.printStackTrace();
                         }
                     }
                 }

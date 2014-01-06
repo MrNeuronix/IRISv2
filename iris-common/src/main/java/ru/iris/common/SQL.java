@@ -42,8 +42,12 @@ public class SQL {
             String password = config.getConfig().get("dbPassword");
             connection = DriverManager.getConnection(connectionURL, username, password);
 
+            // set connection timeout
+            doQuery("SET wait_timeout = 30");
+
         } catch (ClassNotFoundException | SQLException e) {
             LOGGER.error("[sql] Error load driver: " + e.toString());
+            e.printStackTrace();
         }
     }
 

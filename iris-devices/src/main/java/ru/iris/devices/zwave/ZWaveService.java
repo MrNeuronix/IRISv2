@@ -40,7 +40,7 @@ public class ZWaveService implements Runnable {
     private boolean initComplete = false;
     private boolean shutdown = false;
     private JsonMessaging messaging;
-    private SQL sql = new SQL();
+    private SQL sql = Service.getSQL();
 
     // Adverstiments
     private ZWaveDriverReady zWaveDriverReady = new ZWaveDriverReady();

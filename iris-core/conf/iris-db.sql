@@ -130,6 +130,25 @@ CREATE TABLE IF NOT EXISTS `speaks` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
+--
+-- Структура таблицы `events`
+--
+
+CREATE TABLE IF NOT EXISTS `events` (
+  `id` int(11) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `script` varchar(255) NOT NULL,
+  `isEnabled` bit(1) NOT NULL DEFAULT b'0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `events`
+--
+
+INSERT INTO `events` (`id`, `subject`, `script`, `isEnabled`) VALUES
+  (1, 'event.devices.zwave.value.changed', 'dimmerChange.js', b'1');
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

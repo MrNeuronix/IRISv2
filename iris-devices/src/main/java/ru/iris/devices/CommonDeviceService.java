@@ -36,7 +36,7 @@ public class CommonDeviceService implements Runnable {
     private boolean shutdown = false;
     private JsonMessaging messaging;
     private Map<String, String> config;
-    private SQL sql = new SQL();
+    private SQL sql = Service.getSQL();
     private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
     // Adverstiments

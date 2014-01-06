@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.ai.witai.WitAiService;
 import ru.iris.common.Config;
+import ru.iris.common.SQL;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.ServiceAdvertisement;
 import ru.iris.common.messaging.model.ServiceStatus;
@@ -29,6 +30,11 @@ public class Service implements AIPlugin {
     public static ServiceChecker serviceChecker;
     public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
     public static final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6009");
+    private static SQL sql = new SQL();
+
+    public static SQL getSQL() {
+        return sql;
+    }
 
     @Init
     public void init() throws Exception {

@@ -7,6 +7,8 @@ import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
 import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.devices.Service;
+
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,7 +28,7 @@ public class NooliteService implements Runnable {
     private boolean initComplete = false;
     private boolean shutdown = false;
     private JsonMessaging messaging;
-    private SQL sql = new SQL();
+    private SQL sql = Service.getSQL();
     private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
 
     // Adverstiments

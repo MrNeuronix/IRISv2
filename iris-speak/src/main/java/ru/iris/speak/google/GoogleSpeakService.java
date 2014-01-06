@@ -33,7 +33,7 @@ public class GoogleSpeakService implements Runnable {
     private Logger log = LogManager.getLogger(GoogleSpeakService.class.getName());
     private boolean shutdown = false;
     private Config config = new Config();
-    private SQL sql = new SQL();
+    private SQL sql = Service.getSQL();
 
     public GoogleSpeakService() {
         t = new Thread(this);

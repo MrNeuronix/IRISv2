@@ -37,7 +37,7 @@ public class WitAiService implements Runnable {
     private Thread t = null;
     private Logger log = LogManager.getLogger(WitAiService.class);
     private boolean shutdown = false;
-    private SQL sql = new SQL();
+    private SQL sql = Service.getSQL();
 
     public WitAiService() {
         this.t = new Thread(this);
