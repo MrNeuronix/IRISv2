@@ -10,9 +10,9 @@ import ru.iris.common.devices.noolite.NooliteDevice;
 import ru.iris.common.devices.zwave.ZWaveDevice;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.*;
-import ru.iris.common.messaging.model.noolite.ResponseNooliteDeviceInventoryAdvertisement;
-import ru.iris.common.messaging.model.zwave.ResponseZWaveDeviceInventoryAdvertisement;
+import ru.iris.common.messaging.model.devices.*;
+import ru.iris.common.messaging.model.devices.noolite.ResponseNooliteDeviceInventoryAdvertisement;
+import ru.iris.common.messaging.model.devices.zwave.ResponseZWaveDeviceInventoryAdvertisement;
 
 import java.io.IOException;
 import java.sql.ResultSet;

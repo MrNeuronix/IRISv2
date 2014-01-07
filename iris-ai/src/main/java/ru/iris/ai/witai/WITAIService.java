@@ -23,10 +23,12 @@ import org.apache.logging.log4j.Logger;
 import ru.iris.ai.Service;
 import ru.iris.common.Config;
 import ru.iris.common.SQL;
+import ru.iris.common.ai.WitAiResponse;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.ServiceStatus;
-import ru.iris.common.messaging.model.SpeakRecognizedAdvertisement;
+import ru.iris.common.messaging.model.ai.AIResponseAdvertisement;
+import ru.iris.common.messaging.model.service.ServiceStatus;
+import ru.iris.common.messaging.model.speak.SpeakRecognizedAdvertisement;
 
 import java.io.InputStream;
 import java.net.URLEncoder;
@@ -38,6 +40,7 @@ public class WitAiService implements Runnable {
     private Logger log = LogManager.getLogger(WitAiService.class);
     private boolean shutdown = false;
     private SQL sql = Service.getSQL();
+    private AIResponseAdvertisement aiResponseAdvertisement = new AIResponseAdvertisement();
 
     public WitAiService() {
         this.t = new Thread(this);
@@ -100,14 +103,24 @@ public class WitAiService implements Runnable {
                                 try {
                                     String content = IOUtils.toString(instream, "UTF-8");
 
-                                    //TODO testing
-
-                                    log.info("Content: " + content);
+                                    log.debug("AI response: "+content);
 
                                     WitAiResponse json = gson.fromJson(content, WitAiResponse.class);
 
-                                    log.info("Action value: "+json.getOutcome().getEntities().get("action").getValue());
+                                    Double confidence = json.getOutcome().getConfidence();
 
+                                    log.debug("Confidence: "+confidence);
+
+                                    if(confidence > 0.55)
+                                    {
+                                        String object = json.getOutcome().getEntities().get("object").getValue();
+
+                                        if(object != null)
+                                        {
+                                            log.info("Get response from AI: " + json.getMsg_body() + " to object: " + object);
+                                            jsonMessaging.broadcast("event.ai.response.object." + object, aiResponseAdvertisement.set(json));
+                                        }
+                                    }
                                 } finally {
                                     instream.close();
                                 }

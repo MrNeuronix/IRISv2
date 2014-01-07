@@ -11,9 +11,9 @@ import org.apache.logging.log4j.Logger;
 import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.CommandAdvertisement;
-import ru.iris.common.messaging.model.CommandResult;
-import ru.iris.common.messaging.model.ServiceStatus;
+import ru.iris.common.messaging.model.command.CommandAdvertisement;
+import ru.iris.common.messaging.model.command.CommandResult;
+import ru.iris.common.messaging.model.service.ServiceStatus;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -112,7 +112,7 @@ public class EventsService implements Runnable {
 
                                 File jsFile= new File("./scripts/" + rs.getString("script"));
 
-                                    log.info("Launch script: " + jsFile);
+                                    log.debug("Launch script: " + rs.getString("script"));
 
                                     try {
                                         ScriptableObject.putProperty(scope, "advertisement", Context.javaToJS(envelope.getObject(), scope));
@@ -123,7 +123,6 @@ public class EventsService implements Runnable {
                                         log.error("Error in script " + jsFile + ": " + e.toString());
                                         e.printStackTrace();
                                     }
-
                             }
 
                             rs.close();

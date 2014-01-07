@@ -7,8 +7,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.ServiceStatus;
-import ru.iris.common.messaging.model.SpeakRecognizedAdvertisement;
+import ru.iris.common.messaging.model.service.ServiceStatus;
+import ru.iris.common.messaging.model.speak.SpeakRecognizedAdvertisement;
 
 import javax.sound.sampled.AudioFileFormat;
 import java.io.File;

@@ -3,7 +3,7 @@ package ru.iris.common;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.SpeakAdvertisement;
+import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
 
 import javax.jms.JMSException;
 import java.net.URISyntaxException;

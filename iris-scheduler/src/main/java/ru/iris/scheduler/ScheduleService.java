@@ -13,8 +13,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.CommandAdvertisement;
-import ru.iris.common.messaging.model.ServiceStatus;
+import ru.iris.common.messaging.model.command.CommandAdvertisement;
+import ru.iris.common.messaging.model.service.ServiceStatus;
 
 import java.sql.ResultSet;
 import java.util.Date;

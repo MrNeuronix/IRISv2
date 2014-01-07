@@ -4,10 +4,9 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.common.SQL;
 import ru.iris.common.messaging.ServiceChecker;
-import ru.iris.common.messaging.model.ServiceAdvertisement;
-import ru.iris.common.messaging.model.ServiceStatus;
+import ru.iris.common.messaging.model.service.ServiceAdvertisement;
+import ru.iris.common.messaging.model.service.ServiceStatus;
 
 import javax.jms.JMSException;
 import java.io.IOException;

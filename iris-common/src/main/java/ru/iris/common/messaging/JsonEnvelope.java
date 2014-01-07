@@ -15,9 +15,6 @@
  */
 package ru.iris.common.messaging;
 
-import javax.jms.Destination;
-import java.util.UUID;
-
 /**
  * Value object to contain JSON messaging envelope information.
  *

@@ -10,8 +10,9 @@ import ru.iris.common.devices.zwave.ZWaveDevice;
 import ru.iris.common.devices.zwave.ZWaveDeviceValue;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.*;
-import ru.iris.common.messaging.model.zwave.*;
+import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
+import ru.iris.common.messaging.model.service.ServiceStatus;
+import ru.iris.common.messaging.model.devices.zwave.*;
 import ru.iris.devices.Service;
 
 import java.io.IOException;

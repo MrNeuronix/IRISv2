@@ -144,7 +144,7 @@ public class JsonMessaging {
         try {
             while (!shutdownThreads) {
                 try {
-                    ResultSet rs = sql.select("SELECT * FROM messages WHERE time > (now() - INTERVAL 3 SECOND)");
+                    ResultSet rs = sql.select("SELECT * FROM messages WHERE time > (now() - INTERVAL 2 SECOND)");
 
                     while (rs.next()) {
 
@@ -180,7 +180,7 @@ public class JsonMessaging {
 
                     rs.close();
 
-                    Thread.sleep(500L);
+                    Thread.sleep(1000L);
 
                 } catch (final SQLException e) {
                     LOGGER.debug("Error receiving JSON message ", e);

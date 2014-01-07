@@ -18,8 +18,8 @@ import ru.iris.common.Config;
 import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.ServiceStatus;
-import ru.iris.common.messaging.model.SpeakAdvertisement;
+import ru.iris.common.messaging.model.service.ServiceStatus;
+import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
 import ru.iris.speak.Service;
 
 import javax.sound.sampled.*;

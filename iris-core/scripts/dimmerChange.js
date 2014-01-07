@@ -8,18 +8,12 @@
 // importing all classes in package (like import ru.iris.common.* in java)
 importPackage(Packages.ru.iris.common);
 
-// get simple class name
-// advertisment - is java object, passed to script
-var clazz = advertisement.getClass().getSimpleName();
-
-if (clazz == "ZWaveDeviceValueChanged") {
-
     var label = advertisement.getLabel();
     var value = advertisement.getValue();
     var device = advertisement.getDevice();
 
     if (label == "Level") {
         // lets speak!
+        out.println("Уровень яркости на устройстве " + device.getNode() + " выставлен на " + value + " процентов");
         new Speak().say("Уровень яркости на устройстве " + device.getNode() + " выставлен на " + value + " процентов");
     }
-}

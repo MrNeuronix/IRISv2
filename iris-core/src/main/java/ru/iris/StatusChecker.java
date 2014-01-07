@@ -5,8 +5,8 @@ import org.apache.logging.log4j.Logger;
 import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.ServiceAdvertisement;
-import ru.iris.common.messaging.model.ServiceStatus;
+import ru.iris.common.messaging.model.service.ServiceAdvertisement;
+import ru.iris.common.messaging.model.service.ServiceStatus;
 import java.util.UUID;
 
 /**
