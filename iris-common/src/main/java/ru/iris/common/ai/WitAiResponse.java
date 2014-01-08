@@ -1,5 +1,7 @@
 package ru.iris.common.ai;
 
+import com.google.gson.annotations.Expose;
+
 import java.util.HashMap;
 
 /**
@@ -13,8 +15,11 @@ import java.util.HashMap;
  */
 public class WitAiResponse {
 
+    @Expose
     private String msg_id;
+    @Expose
     private String msg_body;
+    @Expose
     private Outcome outcome;
 
     public String getMsg_id() {
@@ -31,8 +36,11 @@ public class WitAiResponse {
 
     public class Outcome {
 
+        @Expose
         private String intent;
+        @Expose
         private HashMap<String, Entity> entities;
+        @Expose
         private Double confidence;
 
         public HashMap<String, Entity> getEntities() {
@@ -50,9 +58,13 @@ public class WitAiResponse {
 
     public class Entity {
 
+        @Expose
         private Integer start;
+        @Expose
         private Integer end;
+        @Expose
         private String value;
+        @Expose
         private String body;
 
         public Integer getStart() {
