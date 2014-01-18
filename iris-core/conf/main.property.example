@@ -52,10 +52,13 @@ openzwaveCfgPath=./conf/zwave-conf
 # NooLite section
 #################################
 
-nooliteEnabled=0
+nooliteEnabled=1
 
-# Controller port
-noolitePort=/dev/ttyUSB1
+# Is Noolite sender dongle present?
+nooliteTXPresent=1
+
+# Is Noolite receiver dongle present?
+nooliteRXPresent=1
 
 ##################################
 # AI

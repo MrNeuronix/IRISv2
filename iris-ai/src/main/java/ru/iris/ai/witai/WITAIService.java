@@ -22,7 +22,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.ai.Service;
 import ru.iris.common.Config;
-import ru.iris.common.SQL;
 import ru.iris.common.ai.WitAiResponse;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
@@ -39,7 +38,6 @@ public class WitAiService implements Runnable {
     private Thread t = null;
     private Logger log = LogManager.getLogger(WitAiService.class);
     private boolean shutdown = false;
-    private SQL sql = Service.getSQL();
     private AIResponseAdvertisement aiResponseAdvertisement = new AIResponseAdvertisement();
 
     public WitAiService() {
@@ -111,7 +109,7 @@ public class WitAiService implements Runnable {
 
                                     log.debug("Confidence: "+confidence);
 
-                                    if(confidence > 0.55)
+                                    if(confidence > 0.65)
                                     {
                                         String object = json.getOutcome().getEntities().get("object").getValue();
 

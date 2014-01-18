@@ -102,6 +102,11 @@
             <artifactId>jspf-core</artifactId>
             <version>1.0.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.codeminders</groupId>
+            <artifactId>hidapi</artifactId>
+            <version>1.1</version>
+        </dependency>
     </dependencies>
 
 </project>

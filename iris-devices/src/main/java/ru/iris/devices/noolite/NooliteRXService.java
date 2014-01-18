@@ -22,9 +22,9 @@ import java.util.UUID;
  * License: GPL v3
  */
 
-public class NooliteService implements Runnable {
+public class NooliteRXService implements Runnable {
 
-    private Logger log = LogManager.getLogger(NooliteService.class.getName());
+    private Logger log = LogManager.getLogger(NooliteRXService.class.getName());
     private boolean initComplete = false;
     private boolean shutdown = false;
     private JsonMessaging messaging;
@@ -34,7 +34,7 @@ public class NooliteService implements Runnable {
     // Adverstiments
 
 
-    public NooliteService() {
+    public NooliteRXService() {
         Thread t = new Thread(this);
         t.start();
     }

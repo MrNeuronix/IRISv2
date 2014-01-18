@@ -432,7 +432,7 @@ public class ZWaveService implements Runnable {
         log.info("Initialization complete. Found " + zDevices.size() + " devices");
 
 
-        Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices", Service.serviceId, ServiceStatus.AVAILABLE));
+        Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-ZWave", Service.serviceId, ServiceStatus.AVAILABLE));
 
 
         for (ZWaveDevice ZWaveDevice : zDevices.values()) {
@@ -521,7 +521,7 @@ public class ZWaveService implements Runnable {
 
             // Broadcast that this service is shutdown.
             Service.serviceChecker.setAdvertisment(Service.advertisement.set(
-                    "Devices", Service.serviceId, ServiceStatus.SHUTDOWN));
+                    "Devices-ZWave", Service.serviceId, ServiceStatus.SHUTDOWN));
 
             // Close JSON messaging.
             jsonMessaging.close();

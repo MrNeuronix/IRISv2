@@ -19,7 +19,8 @@ import ru.iris.common.SQL;
 import ru.iris.common.messaging.ServiceChecker;
 import ru.iris.common.messaging.model.service.ServiceAdvertisement;
 import ru.iris.common.messaging.model.service.ServiceStatus;
-import ru.iris.devices.noolite.NooliteService;
+import ru.iris.devices.noolite.NooliteRXService;
+import ru.iris.devices.noolite.NooliteTXService;
 import ru.iris.devices.zwave.ZWaveService;
 
 import java.io.IOException;
@@ -62,7 +63,10 @@ public class Service implements DevicesPlugin {
         }
         if (config.get("nooliteEnabled").equals("1")) {
             log.info("NooLite support is enabled. Starting");
-            new NooliteService();
+            if(config.get("nooliteTXPresent").equals("1"))
+                new NooliteTXService();
+            if(config.get("nooliteRXPresent").equals("1"))
+                new NooliteRXService();
         }
     }
 }

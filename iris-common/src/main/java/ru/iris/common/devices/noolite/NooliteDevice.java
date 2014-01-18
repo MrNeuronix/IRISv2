@@ -151,7 +151,7 @@ public class NooliteDevice extends Device {
 
     @Override
     public String toString() {
-        return "ZWaveDevice{" +
+        return "NooliteDevice{" +
                 "values=" + values +
                 '}';
     }
