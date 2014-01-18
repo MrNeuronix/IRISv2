@@ -1,8 +1,11 @@
 package ru.iris.devices.noolite;
 
-import com.codeminders.hidapi.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import de.ailis.usb4java.libusb.Context;
+import de.ailis.usb4java.libusb.DeviceHandle;
+import de.ailis.usb4java.libusb.LibUsb;
+import de.ailis.usb4java.libusb.LibUsbException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
@@ -15,6 +18,7 @@ import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.devices.Service;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -39,18 +43,11 @@ public class NooliteTXService implements Runnable {
     private JsonMessaging messaging;
     private SQL sql = Service.getSQL();
     private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
-
-    private static final long READ_UPDATE_DELAY_MS = 50L;
-
-    static
-    {
-        System.loadLibrary("hidapi-jni");
-    }
+    private final Context context = new Context();
 
     // Noolite PC USB TX HID
-    static final int VENDOR_ID = 0x16c0;
-    static final int PRODUCT_ID = 0x05df;
-    private static final int BUFSIZE = 2048;
+    static final int VENDOR_ID = 5824; //0x16c0;
+    static final int PRODUCT_ID = 1503; //0x05df;
 
     // byte array with command
     private byte[] command = {0x30,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -68,6 +65,15 @@ public class NooliteTXService implements Runnable {
 
         messaging = new JsonMessaging(UUID.randomUUID());
         Map<String, String> config = new Config().getConfig();
+
+        // Initialize the libusb context
+        int result = LibUsb.init(context);
+        if (result < 0)
+            try {
+                throw new LibUsbException("Unable to initialize libusb", result);
+            } catch (LibUsbException e) {
+                e.printStackTrace();
+            }
 
         ResultSet rs = sql.select("SELECT uuid, internalname FROM devices WHERE source='noolite'");
 
@@ -139,6 +145,7 @@ public class NooliteTXService implements Runnable {
             // Close JSON messaging.
             jsonMessaging.close();
             messaging.close();
+            LibUsb.exit(context);
 
         } catch (final Throwable t) {
             t.printStackTrace();
@@ -146,14 +153,38 @@ public class NooliteTXService implements Runnable {
         }
     }
 
-    private void writeToHID(byte[] command) throws IOException {
+    private void writeToHID(ByteBuffer command) throws IOException {
 
-        HIDManager mgr = HIDManager.getInstance();
-        HIDDevice dev = mgr.openById(VENDOR_ID, PRODUCT_ID, null);
-        dev.disableBlocking();
-        dev.write(command);
-        dev.close();
-        //mgr.release();
+        DeviceHandle handle = LibUsb.openDeviceWithVidPid(context, VENDOR_ID, PRODUCT_ID);
+
+        if(handle == null)
+        {
+            log.error("Noolite TX device not found!");
+            shutdown = true;
+            return;
+        }
+
+        if (LibUsb.kernelDriverActive(handle, 0) == 1)
+            LibUsb.detachKernelDriver(handle, 0);
+
+        int ret = LibUsb.setConfiguration(handle, 1);
+
+        if (ret < 0)
+        {
+            log.error("Configuration error");
+            LibUsb.close(handle);
+            if (ret == LibUsb.ERROR_BUSY)
+                log.error("Device busy");
+            return;
+        }
+
+        LibUsb.claimInterface(handle, 0);
+
+        //send
+        LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE, 0x9, 0x300, 0, command, 8);
+
+        LibUsb.attachKernelDriver(handle, 0);
+        LibUsb.close(handle);
     }
 
 

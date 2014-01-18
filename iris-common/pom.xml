@@ -103,9 +103,9 @@
             <version>1.0.2</version>
         </dependency>
         <dependency>
-            <groupId>com.codeminders</groupId>
-            <artifactId>hidapi</artifactId>
-            <version>1.1</version>
+            <groupId>de.ailis.usb4java</groupId>
+            <artifactId>usb4java</artifactId>
+            <version>1.0.0</version>
         </dependency>
     </dependencies>
 

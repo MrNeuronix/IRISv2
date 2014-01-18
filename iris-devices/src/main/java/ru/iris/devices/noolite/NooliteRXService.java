@@ -2,13 +2,26 @@ package ru.iris.devices.noolite;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import de.ailis.usb4java.libusb.Context;
+import de.ailis.usb4java.libusb.DeviceHandle;
+import de.ailis.usb4java.libusb.LibUsb;
+import de.ailis.usb4java.libusb.LibUsbException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
 import ru.iris.common.SQL;
+import ru.iris.common.devices.noolite.NooliteDevice;
+import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
+import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.devices.Service;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -25,14 +38,18 @@ import java.util.UUID;
 public class NooliteRXService implements Runnable {
 
     private Logger log = LogManager.getLogger(NooliteRXService.class.getName());
-    private boolean initComplete = false;
     private boolean shutdown = false;
+    private static final Map<String, NooliteDevice> nooDevices = new HashMap<>();
     private JsonMessaging messaging;
     private SQL sql = Service.getSQL();
     private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
+    private final Context context = new Context();
 
-    // Adverstiments
+    private static final long READ_UPDATE_DELAY_MS = 1000L;
 
+    // Noolite PC USB RX HID
+    static final int VENDOR_ID = 5824; // 0x16c0;
+    static final int PRODUCT_ID = 1500; // 0x05dc;
 
     public NooliteRXService() {
         Thread t = new Thread(this);
@@ -42,8 +59,103 @@ public class NooliteRXService implements Runnable {
     @Override
     public synchronized void run() {
 
+        // Make sure we exit the wait loop if we receive shutdown signal.
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                shutdown = true;
+            }
+        }));
+
         messaging = new JsonMessaging(UUID.randomUUID());
-        Map<String, String> config = new Config().getConfig();
+
+        ResultSet rs = sql.select("SELECT uuid, internalname FROM devices WHERE source='noolite'");
+
+        try {
+            while (rs.next()) {
+
+                log.info("Loading device " + rs.getString("internalname") + " from database");
+                nooDevices.put(rs.getString("internalname"), new NooliteDevice().load(rs.getString("uuid")));
+            }
+
+            rs.close();
+
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+
+        Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-NooliteRX", Service.serviceId, ServiceStatus.AVAILABLE));
+
+        ///////////////////////////////////////////////////////////////
+
+        // Initialize the libusb context
+        int result = LibUsb.init(context);
+        if (result < 0)
+            try {
+                throw new LibUsbException("Unable to initialize libusb", result);
+            } catch (LibUsbException e) {
+                e.printStackTrace();
+            }
+
+        DeviceHandle handle = LibUsb.openDeviceWithVidPid(context, VENDOR_ID, PRODUCT_ID);
+
+        if(handle == null)
+        {
+            log.error("Noolite TX device not found!");
+            shutdown = true;
+            return;
+        }
+
+        if (LibUsb.kernelDriverActive(handle, 0) == 1)
+            LibUsb.detachKernelDriver(handle, 0);
+
+        int ret = LibUsb.setConfiguration(handle, 1);
+
+        if (ret < 0)
+        {
+            log.error("Configuration error");
+            LibUsb.close(handle);
+            if (ret == LibUsb.ERROR_BUSY)
+                log.error("Device busy");
+            return;
+        }
+
+        LibUsb.claimInterface(handle, 0);
+
+        byte isNewCommand = 0;
+
+        while(!shutdown)
+        {
+            // receiving area
+            ByteBuffer buf = ByteBuffer.allocateDirect(8);
+            LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS|LibUsb.RECIPIENT_INTERFACE|LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 8);
+
+            if(buf.get(0) != isNewCommand)
+            {
+                log.info("New command detected!");
+                log.info("Buffer: " + buf.get(0) + " " + buf.get(1) + " " + buf.get(2) + " " + buf.get(3) + " " + buf.get(4) + " " + buf.get(5) + " " + buf.get(6)
+                        + " " + buf.get(7) + " " + buf.get(8));
+
+                isNewCommand = buf.get(0);
+            }
+
+            try
+            {
+                Thread.sleep(READ_UPDATE_DELAY_MS);
+            } catch(InterruptedException e)
+            {
+                //Ignore
+                e.printStackTrace();
+            }
+        }
+
+        LibUsb.attachKernelDriver(handle, 0);
+        LibUsb.close(handle);
+        LibUsb.exit(context);
+
+        // Broadcast that this service is shutdown.
+        Service.serviceChecker.setAdvertisment(Service.advertisement.set(
+                "Devices-NooliteRX", Service.serviceId, ServiceStatus.SHUTDOWN));
 
     }
 }

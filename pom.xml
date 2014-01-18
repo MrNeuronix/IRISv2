@@ -25,6 +25,11 @@
             <id>jspf</id>
             <url>http://maven.formreturn.com/repository</url>
         </repository>
+        <repository>
+            <id>ailis</id>
+            <name>Ailis Maven Releases</name>
+            <url>http://nexus.ailis.de/content/groups/public/</url>
+        </repository>
     </repositories>
 
     <build>
