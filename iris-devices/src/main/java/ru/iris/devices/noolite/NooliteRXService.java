@@ -1,19 +1,18 @@
 package ru.iris.devices.noolite;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import de.ailis.usb4java.libusb.Context;
 import de.ailis.usb4java.libusb.DeviceHandle;
 import de.ailis.usb4java.libusb.LibUsb;
 import de.ailis.usb4java.libusb.LibUsbException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.common.Config;
 import ru.iris.common.SQL;
 import ru.iris.common.devices.noolite.NooliteDevice;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
+import ru.iris.common.messaging.model.devices.noolite.BindRXChannelAdvertisment;
+import ru.iris.common.messaging.model.devices.noolite.UnbindAllRXChannelAdvertisment;
+import ru.iris.common.messaging.model.devices.noolite.UnbindRXChannelAdvertisment;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.devices.Service;
 
@@ -42,10 +41,11 @@ public class NooliteRXService implements Runnable {
     private static final Map<String, NooliteDevice> nooDevices = new HashMap<>();
     private JsonMessaging messaging;
     private SQL sql = Service.getSQL();
-    private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
-    private final Context context = new Context();
+    protected final Context context = new Context();
+    protected DeviceHandle handle;
+    protected boolean pause = false;
 
-    private static final long READ_UPDATE_DELAY_MS = 1000L;
+    private static final long READ_UPDATE_DELAY_MS = 500L;
 
     // Noolite PC USB RX HID
     static final int VENDOR_ID = 5824; // 0x16c0;
@@ -97,7 +97,7 @@ public class NooliteRXService implements Runnable {
                 e.printStackTrace();
             }
 
-        DeviceHandle handle = LibUsb.openDeviceWithVidPid(context, VENDOR_ID, PRODUCT_ID);
+        handle = LibUsb.openDeviceWithVidPid(context, VENDOR_ID, PRODUCT_ID);
 
         if(handle == null)
         {
@@ -122,21 +122,23 @@ public class NooliteRXService implements Runnable {
 
         LibUsb.claimInterface(handle, 0);
 
-        byte isNewCommand = 0;
+        ByteBuffer tmpBuf = ByteBuffer.allocateDirect(8);
+
+        new InternalCommands();
 
         while(!shutdown)
         {
             // receiving area
             ByteBuffer buf = ByteBuffer.allocateDirect(8);
-            LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS|LibUsb.RECIPIENT_INTERFACE|LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 8);
+            if(!pause)
+                LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS|LibUsb.RECIPIENT_INTERFACE|LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 100);
 
-            if(buf.get(0) != isNewCommand)
+            if(!buf.equals(tmpBuf))
             {
-                log.info("New command detected!");
                 log.info("Buffer: " + buf.get(0) + " " + buf.get(1) + " " + buf.get(2) + " " + buf.get(3) + " " + buf.get(4) + " " + buf.get(5) + " " + buf.get(6)
-                        + " " + buf.get(7) + " " + buf.get(8));
+                        + " " + buf.get(7));
 
-                isNewCommand = buf.get(0);
+                tmpBuf = buf;
             }
 
             try
@@ -157,5 +159,134 @@ public class NooliteRXService implements Runnable {
         Service.serviceChecker.setAdvertisment(Service.advertisement.set(
                 "Devices-NooliteRX", Service.serviceId, ServiceStatus.SHUTDOWN));
 
+    }
+
+    ///
+    ///  For intenal commands
+    ///
+
+    private class InternalCommands implements Runnable
+    {
+        public InternalCommands() {
+            Thread t = new Thread(this);
+            t.start();
+        }
+
+        @Override
+        public synchronized void run() {
+
+            Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-NooliteRX-Internal", Service.serviceId, ServiceStatus.AVAILABLE));
+
+            try {
+                JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
+
+                jsonMessaging.subscribe("event.devices.noolite.rx.bindchannel");
+                jsonMessaging.subscribe("event.devices.noolite.rx.unbindchannel");
+                jsonMessaging.subscribe("event.devices.noolite.rx.unbindallchannel");
+
+                jsonMessaging.start();
+
+                while (!shutdown) {
+
+                    // Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
+                    final JsonEnvelope envelope = jsonMessaging.receive(100);
+                    if (envelope != null) {
+                        if (envelope.getObject() instanceof BindRXChannelAdvertisment) {
+
+                            final BindRXChannelAdvertisment advertisement = envelope.getObject();
+                            NooliteDevice device = (NooliteDevice) getDeviceByUUID(advertisement.getDeviceUUID());
+                            int channel = Integer.valueOf(device.getValue("channel").getValue());
+
+                            ByteBuffer buf = ByteBuffer.allocateDirect(8);
+                            buf.put((byte)1);
+                            buf.put((byte)channel);
+
+                            pause = true;
+                            LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS|LibUsb.RECIPIENT_INTERFACE|LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 100);
+                            pause = false;
+
+                        } else if (envelope.getObject() instanceof UnbindRXChannelAdvertisment) {
+
+                            final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
+                            NooliteDevice device = (NooliteDevice) getDeviceByUUID(advertisement.getDeviceUUID());
+                            int channel = Integer.valueOf(device.getValue("channel").getValue());
+
+                            ByteBuffer buf = ByteBuffer.allocateDirect(8);
+                            buf.put((byte)3);
+                            buf.put((byte)channel);
+
+                            pause = true;
+                            LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS|LibUsb.RECIPIENT_INTERFACE|LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 100);
+                            pause = false;
+
+                        } else if (envelope.getObject() instanceof UnbindAllRXChannelAdvertisment) {
+
+                            ByteBuffer buf = ByteBuffer.allocateDirect(8);
+                            buf.put((byte)4);
+
+                            pause = true;
+                            LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS|LibUsb.RECIPIENT_INTERFACE|LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 100);
+                            pause = false;
+
+                        } else if (envelope.getReceiverInstance() == null) {
+                            // We received unknown broadcast message. Lets make generic log entry.
+                            log.info("Received broadcast "
+                                    + " from " + envelope.getSenderInstance()
+                                    + " to " + envelope.getReceiverInstance()
+                                    + " at '" + envelope.getSubject()
+                                    + ": " + envelope.getObject());
+                        } else {
+                            // We received unknown request message. Lets make generic log entry.
+                            log.info("Received request "
+                                    + " from " + envelope.getSenderInstance()
+                                    + " to " + envelope.getReceiverInstance()
+                                    + " at '" + envelope.getSubject()
+                                    + ": " + envelope.getObject());
+                        }
+                    }
+                }
+
+                // Broadcast that this service is shutdown.
+                Service.serviceChecker.setAdvertisment(Service.advertisement.set(
+                        "Devices-NooliteRX-Internal", Service.serviceId, ServiceStatus.SHUTDOWN));
+
+                // Close JSON messaging.
+                jsonMessaging.close();
+                messaging.close();
+
+            } catch (final Throwable t) {
+                t.printStackTrace();
+                log.error("Unexpected exception in NooliteRX-Internal", t);
+            }
+
+        }
+
+        private Object getDeviceByUUID(String uuid)
+        {
+            ResultSet rs = sql.select("SELECT * FROM devices WHERE uuid='" + uuid + "'");
+
+            try {
+                while (rs.next()) {
+
+                    if(rs.getString("source").equals("noolite"))
+                    {
+                        return new NooliteDevice().load(uuid);
+                    }
+                    // generic device
+                    else
+                    {
+                        log.error("Unknown device!");
+                        return null;
+                    }
+                }
+
+                rs.close();
+
+            } catch (SQLException | IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
     }
 }

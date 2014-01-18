@@ -14,6 +14,10 @@ import ru.iris.common.devices.noolite.NooliteDevice;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
+import ru.iris.common.messaging.model.devices.noolite.BindRXChannelAdvertisment;
+import ru.iris.common.messaging.model.devices.noolite.BindTXChannelAdvertisment;
+import ru.iris.common.messaging.model.devices.noolite.UnbindRXChannelAdvertisment;
+import ru.iris.common.messaging.model.devices.noolite.UnbindTXChannelAdvertisment;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.devices.Service;
 
@@ -48,12 +52,6 @@ public class NooliteTXService implements Runnable {
     // Noolite PC USB TX HID
     static final int VENDOR_ID = 5824; //0x16c0;
     static final int PRODUCT_ID = 1503; //0x05df;
-
-    // byte array with command
-    private byte[] command = {0x30,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-
-    // Adverstiments
-
 
     public NooliteTXService() {
         Thread t = new Thread(this);
@@ -104,6 +102,8 @@ public class NooliteTXService implements Runnable {
             JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
 
             jsonMessaging.subscribe("event.devices.noolite.setvalue");
+            jsonMessaging.subscribe("event.devices.noolite.tx.bindchannel");
+            jsonMessaging.subscribe("event.devices.noolite.tx.unbindchannel");
 
             jsonMessaging.start();
 
@@ -113,12 +113,88 @@ public class NooliteTXService implements Runnable {
                 final JsonEnvelope envelope = jsonMessaging.receive(100);
                 if (envelope != null) {
                     if (envelope.getObject() instanceof SetDeviceLevelAdvertisement) {
+
                         // We know of service advertisement
                         final SetDeviceLevelAdvertisement advertisement = envelope.getObject();
 
                         String uuid = advertisement.getDeviceUUID();
-                        String label = advertisement.getLabel();
-                        String level = advertisement.getValue();
+                        byte level = Byte.valueOf(advertisement.getValue());
+                        NooliteDevice device = (NooliteDevice) getDeviceByUUID(uuid);
+                        int channel = Integer.valueOf(device.getValue("channel").getValue());
+
+                        ByteBuffer buf = ByteBuffer.allocateDirect(8);
+                        buf.put((byte)0x30);
+
+                        //if noolite device dimmer (user set)
+                        if(advertisement.getDeviceInternal().contains("dimmer"))
+                        {
+
+                            buf.put((byte)6);
+                            buf.put((byte)1);
+
+                            if (level > 99 || level == 99)
+                            {
+                                level = 100;
+                            }
+                            if (level < 0)
+                            {
+                                level = 0;
+                            }
+
+                            buf.position(5);
+                            buf.put(level);
+
+                            buf.position(4);
+                            buf.put((byte)channel);
+
+                            writeToHID(buf);
+                        }
+                        else
+                        {
+                            if(level < 0 || level == 0)
+                            {
+                                // turn off
+                                buf.put((byte)0);
+                            }
+                            else
+                            {
+                                // turn on
+                                buf.put((byte)2);
+                            }
+
+                            buf.position(4);
+                            buf.put((byte)channel);
+
+                            writeToHID(buf);
+                        }
+
+                    } else if (envelope.getObject() instanceof BindTXChannelAdvertisment) {
+
+                        final BindRXChannelAdvertisment advertisement = envelope.getObject();
+                        NooliteDevice device = (NooliteDevice) getDeviceByUUID(advertisement.getDeviceUUID());
+                        int channel = Integer.valueOf(device.getValue("channel").getValue());
+
+                        ByteBuffer buf = ByteBuffer.allocateDirect(8);
+                        buf.put((byte)0x30);
+                        buf.put((byte)15);
+                        buf.position(4);
+                        buf.put((byte)channel);
+
+                        writeToHID(buf);
+
+                    } else if (envelope.getObject() instanceof UnbindTXChannelAdvertisment) {
+
+                        final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
+                        NooliteDevice device = (NooliteDevice) getDeviceByUUID(advertisement.getDeviceUUID());
+                        int channel = Integer.valueOf(device.getValue("channel").getValue());
+
+                        ByteBuffer buf = ByteBuffer.allocateDirect(8);
+                        buf.put((byte)0x30);
+                        buf.put((byte)9);
+                        buf.position(4);
+                        buf.put((byte)channel);
+
+                        writeToHID(buf);
 
                     } else if (envelope.getReceiverInstance() == null) {
                         // We received unknown broadcast message. Lets make generic log entry.
@@ -181,10 +257,38 @@ public class NooliteTXService implements Runnable {
         LibUsb.claimInterface(handle, 0);
 
         //send
-        LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE, 0x9, 0x300, 0, command, 8);
+        LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE, 0x9, 0x300, 0, command, 100);
 
         LibUsb.attachKernelDriver(handle, 0);
         LibUsb.close(handle);
+    }
+
+    private Object getDeviceByUUID(String uuid)
+    {
+        ResultSet rs = sql.select("SELECT * FROM devices WHERE uuid='" + uuid + "'");
+
+        try {
+            while (rs.next()) {
+
+                if(rs.getString("source").equals("noolite"))
+                {
+                    return new NooliteDevice().load(uuid);
+                }
+                // generic device
+                else
+                {
+                    log.error("Unknown device!");
+                    return null;
+                }
+            }
+
+            rs.close();
+
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 
