@@ -134,10 +134,10 @@ public class NooliteRXService implements Runnable {
 
             if(!buf.equals(tmpBuf))
             {
-                log.info("Buffer: " + buf.get(0) + " " + buf.get(1) + " " + buf.get(2) + " " + buf.get(3) + " " + buf.get(4) + " " + buf.get(5) + " " + buf.get(6)
+                log.debug("RX Buffer: " + buf.get(0) + " " + buf.get(1) + " " + buf.get(2) + " " + buf.get(3) + " " + buf.get(4) + " " + buf.get(5) + " " + buf.get(6)
                         + " " + buf.get(7));
 
-                byte channel = (byte) (buf.get(1)+1);
+                Integer channel = (buf.get(1)+1);
                 byte action = buf.get(2);
                 Integer dimmerValue = (int) buf.get(4);
 
@@ -158,8 +158,9 @@ public class NooliteRXService implements Runnable {
                         device.setType("Generic Noolite Device");
                         device.setManufName("Nootechnika");
                         device.setUUID(UUID.randomUUID().toString());
+                        device.updateValue(new NooliteDeviceValue("channel", channel.toString(), "", ""));
 
-                        nooDevices.put("noolite/channel/"+channel, device);
+                        nooDevices.put("noolite/channel/" + channel, device);
                     } catch (IOException | SQLException e) {
                         e.printStackTrace();
                     }

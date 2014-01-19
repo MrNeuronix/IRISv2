@@ -15,6 +15,11 @@ Please remember that this project is in deep alpha and now is mostly for develop
 * JavaScript based dynamic scripts support for better automation
 * More other stuff :)
 
+## Protocol support
+
+* ZWave
+* Noolite
+
 ## Install
 
 **mvn package**

@@ -77,7 +77,7 @@ public class NooliteDevice extends Device {
         zDv = null;
     }
 
-    public NooliteDevice loadByChannel(byte channel)
+    public NooliteDevice loadByChannel(int channel)
     {
         ResultSet rs = sql.select("SELECT * FROM devices WHERE internalname='noolite/channel/" + channel + "'");
         try {
