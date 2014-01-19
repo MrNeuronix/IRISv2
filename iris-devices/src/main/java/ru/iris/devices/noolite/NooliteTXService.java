@@ -114,6 +114,8 @@ public class NooliteTXService implements Runnable {
                 if (envelope != null) {
                     if (envelope.getObject() instanceof SetDeviceLevelAdvertisement) {
 
+                        log.debug("Get SetDeviceLevel advertisement");
+
                         // We know of service advertisement
                         final SetDeviceLevelAdvertisement advertisement = envelope.getObject();
 
@@ -170,6 +172,8 @@ public class NooliteTXService implements Runnable {
 
                     } else if (envelope.getObject() instanceof BindTXChannelAdvertisment) {
 
+                        log.debug("Get BindTXChannel advertisement");
+
                         final BindRXChannelAdvertisment advertisement = envelope.getObject();
                         NooliteDevice device = (NooliteDevice) getDeviceByUUID(advertisement.getDeviceUUID());
                         int channel = Integer.valueOf(device.getValue("channel").getValue());
@@ -183,6 +187,8 @@ public class NooliteTXService implements Runnable {
                         writeToHID(buf);
 
                     } else if (envelope.getObject() instanceof UnbindTXChannelAdvertisment) {
+
+                        log.debug("Get UnbindTXChannel advertisement");
 
                         final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
                         NooliteDevice device = (NooliteDevice) getDeviceByUUID(advertisement.getDeviceUUID());

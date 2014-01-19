@@ -8,11 +8,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.SQL;
 import ru.iris.common.devices.noolite.NooliteDevice;
+import ru.iris.common.devices.noolite.NooliteDeviceValue;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.devices.noolite.BindRXChannelAdvertisment;
-import ru.iris.common.messaging.model.devices.noolite.UnbindAllRXChannelAdvertisment;
-import ru.iris.common.messaging.model.devices.noolite.UnbindRXChannelAdvertisment;
+import ru.iris.common.messaging.model.devices.noolite.*;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.devices.Service;
 
@@ -138,6 +137,77 @@ public class NooliteRXService implements Runnable {
                 log.info("Buffer: " + buf.get(0) + " " + buf.get(1) + " " + buf.get(2) + " " + buf.get(3) + " " + buf.get(4) + " " + buf.get(5) + " " + buf.get(6)
                         + " " + buf.get(7));
 
+                byte channel = (byte) (buf.get(1)+1);
+                byte action = buf.get(2);
+                Integer dimmerValue = (int) buf.get(4);
+
+                NooliteDevice device = null;
+
+                try {
+                    device = new NooliteDevice().loadByChannel(channel);
+                } catch (IOException | SQLException e) {
+                    e.printStackTrace();
+                }
+
+                if(device == null)
+                {
+                    try {
+                        device = new NooliteDevice();
+                        device.setInternalName("noolite/channel/"+channel);
+                        device.setStatus("listening");
+                        device.setType("Generic Noolite Device");
+                        device.setManufName("Nootechnika");
+                        device.setUUID(UUID.randomUUID().toString());
+
+                        nooDevices.put("noolite/channel/"+channel, device);
+                    } catch (IOException | SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                // turn off
+                if(action == 0) {
+                    device.updateValue(new NooliteDeviceValue("Level", "0", "", ""));
+                    messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "0"));
+                    try {
+                        device.save();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+                // dim
+                else if(action == 1) {
+                    messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "0"));
+                }
+                // turn on
+                else if(action == 2) {
+                    device.updateValue(new NooliteDeviceValue("Level", "100", "", ""));
+                    messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "100"));
+                    try {
+                        device.save();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+                // bright
+                else if(action == 3) {
+                    messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelBrightAdvertisement().set(device.getUUID()));
+                }
+                // set level
+                else if(action == 6) {
+                    device.updateValue(new NooliteDeviceValue("Level", dimmerValue.toString(), "", ""));
+                    messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelDimAdvertisement().set(device.getUUID()));
+                    try {
+                        device.save();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+                // stop dim/bright
+                else if(action == 10) {
+                    messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelStopDimBrightAdvertisement().set(device.getUUID()));
+                }
+
                 tmpBuf = buf;
             }
 
@@ -193,6 +263,8 @@ public class NooliteRXService implements Runnable {
                     if (envelope != null) {
                         if (envelope.getObject() instanceof BindRXChannelAdvertisment) {
 
+                            log.debug("Get BindRXChannel advertisement");
+
                             final BindRXChannelAdvertisment advertisement = envelope.getObject();
                             NooliteDevice device = (NooliteDevice) getDeviceByUUID(advertisement.getDeviceUUID());
                             int channel = Integer.valueOf(device.getValue("channel").getValue());
@@ -207,6 +279,8 @@ public class NooliteRXService implements Runnable {
 
                         } else if (envelope.getObject() instanceof UnbindRXChannelAdvertisment) {
 
+                            log.debug("Get UnbindRXChannel advertisement");
+
                             final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
                             NooliteDevice device = (NooliteDevice) getDeviceByUUID(advertisement.getDeviceUUID());
                             int channel = Integer.valueOf(device.getValue("channel").getValue());
@@ -220,6 +294,8 @@ public class NooliteRXService implements Runnable {
                             pause = false;
 
                         } else if (envelope.getObject() instanceof UnbindAllRXChannelAdvertisment) {
+
+                            log.debug("Get UnbindAllRXChannel advertisement");
 
                             ByteBuffer buf = ByteBuffer.allocateDirect(8);
                             buf.put((byte)4);

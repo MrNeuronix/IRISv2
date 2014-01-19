@@ -77,6 +77,23 @@ public class NooliteDevice extends Device {
         zDv = null;
     }
 
+    public NooliteDevice loadByChannel(byte channel)
+    {
+        ResultSet rs = sql.select("SELECT * FROM devices WHERE internalname='noolite/channel/" + channel + "'");
+        try {
+
+            while (rs.next())
+            {
+                return load(rs.getString("uuid"));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public NooliteDevice load(String uuid)
     {
         ResultSet rs = sql.select("SELECT * FROM devices WHERE uuid='" + uuid + "'");
@@ -138,6 +155,24 @@ public class NooliteDevice extends Device {
 
         if (name == null)
             name = "not set";
+
+        if(node == 0)
+        {
+            ResultSet rs = sql.select("SELECT node FROM devices ORDER BY node DESC LIMIT 0,1");
+            rs.next();
+
+            // noolite node numeration starting > 500
+            if(rs.getShort("node") < 500)
+            {
+                node = 500;
+            }
+            else
+            {
+                node = (short) (rs.getShort("node")+1);
+            }
+
+            rs.close();
+        }
 
         sql.doQuery("DELETE FROM devices WHERE uuid='" + uuid + "'");
         sql.doQuery("DELETE FROM devicesvalues WHERE uuid='" + uuid + "'");
