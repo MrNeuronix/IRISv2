@@ -159,16 +159,22 @@ public class NooliteDevice extends Device {
         if(node == 0)
         {
             ResultSet rs = sql.select("SELECT node FROM devices ORDER BY node DESC LIMIT 0,1");
-            rs.next();
+            while(rs.next())
+            {
+                // noolite node numeration starting > 500
+                if(rs.getShort("node") < 500)
+                {
+                    node = 500;
+                }
+                else
+                {
+                    node = (short) (rs.getShort("node")+1);
+                }
+            }
 
-            // noolite node numeration starting > 500
-            if(rs.getShort("node") < 500)
+            if(node == 0)
             {
                 node = 500;
-            }
-            else
-            {
-                node = (short) (rs.getShort("node")+1);
             }
 
             rs.close();
