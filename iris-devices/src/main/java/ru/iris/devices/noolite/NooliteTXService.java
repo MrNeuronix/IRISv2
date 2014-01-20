@@ -122,14 +122,13 @@ public class NooliteTXService implements Runnable {
                         String uuid = advertisement.getDeviceUUID();
                         byte level = Byte.valueOf(advertisement.getValue());
                         NooliteDevice device = (NooliteDevice) getDeviceByUUID(uuid);
-                        int channel = Integer.valueOf(device.getValue("channel").getValue());
+                        int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
 
                         ByteBuffer buf = ByteBuffer.allocateDirect(8);
                         buf.put((byte)0x30);
 
                         //if noolite device dimmer (user set)
-                        if(advertisement.getDeviceInternal().contains("dimmer"))
-                        {
+                        if (device.getValue("type") != null && device.getValue("type").getValue().contains("dimmer")) {
 
                             buf.put((byte)6);
                             buf.put((byte)1);
@@ -176,7 +175,7 @@ public class NooliteTXService implements Runnable {
 
                         final BindRXChannelAdvertisment advertisement = envelope.getObject();
                         NooliteDevice device = (NooliteDevice) getDeviceByUUID(advertisement.getDeviceUUID());
-                        int channel = Integer.valueOf(device.getValue("channel").getValue());
+                        int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
 
                         ByteBuffer buf = ByteBuffer.allocateDirect(8);
                         buf.put((byte)0x30);
@@ -192,7 +191,7 @@ public class NooliteTXService implements Runnable {
 
                         final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
                         NooliteDevice device = (NooliteDevice) getDeviceByUUID(advertisement.getDeviceUUID());
-                        int channel = Integer.valueOf(device.getValue("channel").getValue());
+                        int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
 
                         ByteBuffer buf = ByteBuffer.allocateDirect(8);
                         buf.put((byte)0x30);
@@ -261,6 +260,10 @@ public class NooliteTXService implements Runnable {
         }
 
         LibUsb.claimInterface(handle, 0);
+
+        log.debug("TX Buffer: " + command.get(0) + " " + command.get(1) + " " + command.get(2) + " " + command.get(3)
+                + " " + command.get(4) + " " + command.get(5) + " " + command.get(6)
+                + " " + command.get(7));
 
         //send
         LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE, 0x9, 0x300, 0, command, 100);

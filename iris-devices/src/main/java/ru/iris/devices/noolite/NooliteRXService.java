@@ -159,6 +159,7 @@ public class NooliteRXService implements Runnable {
                         device.setManufName("Nootechnika");
                         device.setUUID(UUID.randomUUID().toString());
                         device.updateValue(new NooliteDeviceValue("channel", channel.toString(), "", ""));
+                        device.updateValue(new NooliteDeviceValue("type", "generic", "", ""));
 
                         nooDevices.put("noolite/channel/" + channel, device);
                     } catch (IOException | SQLException e) {
