@@ -11,8 +11,21 @@ dbPassword=root
 # Audio section
 #################################
 
+# Capture sound on mics, connected to server
+recordOnServer=0
+
+# Capture method. May be internal (pure java) or external (using sox from rec)
+recordMethod=intenal
+
+# Internal method settings
+# Capture levels on mics, connected to server
+# Set logs to debug, to see your levels
 startThreshold=9
 stopThreshold=5
+
+# External method settings
+recordStreams=4
+microphones=1
 
 #################################
 # REST section
