@@ -1,7 +1,5 @@
 package ru.iris.devices.noolite;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import de.ailis.usb4java.libusb.Context;
 import de.ailis.usb4java.libusb.DeviceHandle;
 import de.ailis.usb4java.libusb.LibUsb;
@@ -46,7 +44,6 @@ public class NooliteTXService implements Runnable {
     private static final Map<String, NooliteDevice> nooDevices = new HashMap<>();
     private JsonMessaging messaging;
     private SQL sql = Service.getSQL();
-    private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
     private final Context context = new Context();
 
     // Noolite PC USB TX HID
@@ -125,16 +122,15 @@ public class NooliteTXService implements Runnable {
                         int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
 
                         ByteBuffer buf = ByteBuffer.allocateDirect(8);
-                        buf.put((byte)0x30);
+                        buf.put((byte) 0x30);
 
                         //if noolite device dimmer (user set)
                         if (device.getValue("type") != null && device.getValue("type").getValue().contains("dimmer")) {
 
-                            buf.put((byte)6);
-                            buf.put((byte)1);
+                            buf.put((byte) 6);
+                            buf.put((byte) 1);
 
-                            if (level > 99 || level == 99)
-                            {
+                            if (level > 99 || level == 99) {
                                 log.info("Turn on device on channel " + channel);
                                 level = 100;
                             } else if (level < 0) {
@@ -148,27 +144,22 @@ public class NooliteTXService implements Runnable {
                             buf.put(level);
 
                             buf.position(4);
-                            buf.put((byte)channel);
+                            buf.put((byte) channel);
 
                             writeToHID(buf);
-                        }
-                        else
-                        {
-                            if(level < 0 || level == 0)
-                            {
+                        } else {
+                            if (level < 0 || level == 0) {
                                 // turn off
                                 log.info("Turn off device on channel " + channel);
-                                buf.put((byte)0);
-                            }
-                            else
-                            {
+                                buf.put((byte) 0);
+                            } else {
                                 // turn on
                                 log.info("Turn on device on channel " + channel);
-                                buf.put((byte)2);
+                                buf.put((byte) 2);
                             }
 
                             buf.position(4);
-                            buf.put((byte)channel);
+                            buf.put((byte) channel);
 
                             writeToHID(buf);
                         }
@@ -182,10 +173,10 @@ public class NooliteTXService implements Runnable {
                         int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
 
                         ByteBuffer buf = ByteBuffer.allocateDirect(8);
-                        buf.put((byte)0x30);
-                        buf.put((byte)15);
+                        buf.put((byte) 0x30);
+                        buf.put((byte) 15);
                         buf.position(4);
-                        buf.put((byte)channel);
+                        buf.put((byte) channel);
 
                         log.info("Binding device to channel " + channel);
 
@@ -200,10 +191,10 @@ public class NooliteTXService implements Runnable {
                         int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
 
                         ByteBuffer buf = ByteBuffer.allocateDirect(8);
-                        buf.put((byte)0x30);
-                        buf.put((byte)9);
+                        buf.put((byte) 0x30);
+                        buf.put((byte) 9);
                         buf.position(4);
-                        buf.put((byte)channel);
+                        buf.put((byte) channel);
 
                         log.info("Unbinding device from channel " + channel);
 
@@ -246,8 +237,7 @@ public class NooliteTXService implements Runnable {
 
         DeviceHandle handle = LibUsb.openDeviceWithVidPid(context, VENDOR_ID, PRODUCT_ID);
 
-        if(handle == null)
-        {
+        if (handle == null) {
             log.error("Noolite TX device not found!");
             shutdown = true;
             return;
@@ -258,8 +248,7 @@ public class NooliteTXService implements Runnable {
 
         int ret = LibUsb.setConfiguration(handle, 1);
 
-        if (ret < 0)
-        {
+        if (ret < 0) {
             log.error("Configuration error");
             LibUsb.close(handle);
             if (ret == LibUsb.ERROR_BUSY)
@@ -280,20 +269,17 @@ public class NooliteTXService implements Runnable {
         LibUsb.close(handle);
     }
 
-    private Object getDeviceByUUID(String uuid)
-    {
+    private Object getDeviceByUUID(String uuid) {
         ResultSet rs = sql.select("SELECT * FROM devices WHERE uuid='" + uuid + "'");
 
         try {
             while (rs.next()) {
 
-                if(rs.getString("source").equals("noolite"))
-                {
+                if (rs.getString("source").equals("noolite")) {
                     return new NooliteDevice().load(uuid);
                 }
                 // generic device
-                else
-                {
+                else {
                     log.error("Unknown device!");
                     return null;
                 }
