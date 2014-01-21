@@ -169,6 +169,9 @@ public class NooliteRXService implements Runnable {
 
                 // turn off
                 if(action == 0) {
+
+                    log.info("Channel " + channel + ": Got OFF command");
+
                     device.updateValue(new NooliteDeviceValue("Level", "0", "", ""));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "0"));
                     try {
@@ -179,10 +182,13 @@ public class NooliteRXService implements Runnable {
                 }
                 // dim
                 else if(action == 1) {
-                    messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "0"));
+
+                    log.info("Channel " + channel + ": Got DIM command");
+                    messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelDimAdvertisement().set(device.getUUID()));
                 }
                 // turn on
                 else if(action == 2) {
+                    log.info("Channel " + channel + ": Got ON command");
                     device.updateValue(new NooliteDeviceValue("Level", "100", "", ""));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "100"));
                     try {
@@ -193,12 +199,14 @@ public class NooliteRXService implements Runnable {
                 }
                 // bright
                 else if(action == 3) {
+                    log.info("Channel " + channel + ": Got BRIGHT command");
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelBrightAdvertisement().set(device.getUUID()));
                 }
                 // set level
                 else if(action == 6) {
+                    log.info("Channel " + channel + ": Got SETLEVEL command.");
                     device.updateValue(new NooliteDeviceValue("Level", dimmerValue.toString(), "", ""));
-                    messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelDimAdvertisement().set(device.getUUID()));
+                    messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", dimmerValue.toString()));
                     try {
                         device.save();
                     } catch (SQLException e) {
@@ -207,6 +215,7 @@ public class NooliteRXService implements Runnable {
                 }
                 // stop dim/bright
                 else if(action == 10) {
+                    log.info("Channel " + channel + ": Got STOPDIMBRIGHT command.");
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelStopDimBrightAdvertisement().set(device.getUUID()));
                 }
 

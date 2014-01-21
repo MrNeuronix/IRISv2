@@ -135,11 +135,13 @@ public class NooliteTXService implements Runnable {
 
                             if (level > 99 || level == 99)
                             {
+                                log.info("Turn on device on channel " + channel);
                                 level = 100;
-                            }
-                            if (level < 0)
-                            {
+                            } else if (level < 0) {
+                                log.info("Turn off device on channel " + channel);
                                 level = 0;
+                            } else {
+                                log.info("Setting device on channel " + channel + " to level " + level);
                             }
 
                             buf.position(5);
@@ -155,11 +157,13 @@ public class NooliteTXService implements Runnable {
                             if(level < 0 || level == 0)
                             {
                                 // turn off
+                                log.info("Turn off device on channel " + channel);
                                 buf.put((byte)0);
                             }
                             else
                             {
                                 // turn on
+                                log.info("Turn on device on channel " + channel);
                                 buf.put((byte)2);
                             }
 
@@ -183,6 +187,8 @@ public class NooliteTXService implements Runnable {
                         buf.position(4);
                         buf.put((byte)channel);
 
+                        log.info("Binding device to channel " + channel);
+
                         writeToHID(buf);
 
                     } else if (envelope.getObject() instanceof UnbindTXChannelAdvertisment) {
@@ -198,6 +204,8 @@ public class NooliteTXService implements Runnable {
                         buf.put((byte)9);
                         buf.position(4);
                         buf.put((byte)channel);
+
+                        log.info("Unbinding device from channel " + channel);
 
                         writeToHID(buf);
 
