@@ -1,18 +1,17 @@
 package ru.iris.events;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.tools.shell.Global;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.command.CommandAdvertisement;
-import ru.iris.common.messaging.model.command.CommandResult;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 
 import java.io.File;
@@ -33,7 +32,6 @@ public class EventsService implements Runnable {
 
     private Logger log = LogManager.getLogger(EventsService.class.getName());
     private boolean shutdown = false;
-    private final CommandResult commandResult = new CommandResult();
     private SQL sql = Service.getSQL();
 
     public EventsService() {
@@ -90,9 +88,10 @@ public class EventsService implements Runnable {
                         CommandAdvertisement advertisement = envelope.getObject();
                         log.info("Launch command script: " + advertisement.getCommand());
 
-                        File jsFile = new File("./scripts/command/" + advertisement.getCommand() + ".js");
+                        File jsFile = new File("./scripts/command/" + advertisement.getTaskClass() + ".js");
 
                         try {
+                            ScriptableObject.putProperty(scope, "commandParams", Context.javaToJS(advertisement.getCommand(), scope));
                             cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
                         } catch (FileNotFoundException e) {
                             log.error("Script file scripts/command/" + advertisement.getCommand() + ".js not found!");
