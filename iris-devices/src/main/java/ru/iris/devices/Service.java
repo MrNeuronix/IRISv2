@@ -48,7 +48,7 @@ public class Service implements DevicesPlugin {
     public void init() throws IOException, SQLException {
 
         serviceChecker = new ServiceChecker(serviceId, advertisement.set(
-                "Devices", serviceId, ServiceStatus.STARTUP));
+                "Devices-Common", serviceId, ServiceStatus.STARTUP));
 
         Map<String, String> config = new Config().getConfig();
 

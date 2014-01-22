@@ -74,6 +74,8 @@ public class ZWaveService implements Runnable {
         messaging = new JsonMessaging(UUID.randomUUID());
         Map<String, String> config = new Config().getConfig();
 
+        Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-ZWave", Service.serviceId, ServiceStatus.STARTUP));
+
         ResultSet rs = sql.select("SELECT uuid, internalname FROM devices WHERE source='zwave'");
 
         try {

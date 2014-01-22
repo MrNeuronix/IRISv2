@@ -64,6 +64,8 @@ public class NooliteTXService implements Runnable {
         messaging = new JsonMessaging(UUID.randomUUID());
         Map<String, String> config = new Config().getConfig();
 
+        Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-NooliteTX", Service.serviceId, ServiceStatus.STARTUP));
+
         // Initialize the libusb context
         int result = LibUsb.init(context);
         if (result < 0)
@@ -95,6 +97,7 @@ public class NooliteTXService implements Runnable {
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-NooliteTX", Service.serviceId, ServiceStatus.SHUTDOWN));
                     shutdown = true;
                 }
             }));
@@ -219,10 +222,6 @@ public class NooliteTXService implements Runnable {
                     }
                 }
             }
-
-            // Broadcast that this service is shutdown.
-            Service.serviceChecker.setAdvertisment(Service.advertisement.set(
-                    "Devices-NooliteTX", Service.serviceId, ServiceStatus.SHUTDOWN));
 
             // Close JSON messaging.
             jsonMessaging.close();

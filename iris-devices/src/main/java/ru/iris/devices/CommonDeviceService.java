@@ -1,7 +1,5 @@
 package ru.iris.devices;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
@@ -13,6 +11,7 @@ import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.devices.*;
 import ru.iris.common.messaging.model.devices.noolite.ResponseNooliteDeviceInventoryAdvertisement;
 import ru.iris.common.messaging.model.devices.zwave.ResponseZWaveDeviceInventoryAdvertisement;
+import ru.iris.common.messaging.model.service.ServiceStatus;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -32,15 +31,10 @@ import java.util.*;
 public class CommonDeviceService implements Runnable {
 
     private Logger log = LogManager.getLogger(CommonDeviceService.class.getName());
-    private boolean initComplete = false;
     private boolean shutdown = false;
     private JsonMessaging messaging;
     private Map<String, String> config;
     private SQL sql = Service.getSQL();
-    private Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().setPrettyPrinting().create();
-
-    // Adverstiments
-
 
     public CommonDeviceService() {
         Thread t = new Thread(this);
@@ -58,6 +52,7 @@ public class CommonDeviceService implements Runnable {
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-Common", Service.serviceId, ServiceStatus.SHUTDOWN));
                     shutdown = true;
                 }
             }));
@@ -70,6 +65,8 @@ public class CommonDeviceService implements Runnable {
             jsonMessaging.subscribe("event.devices.setzone");
 
             jsonMessaging.start();
+
+            Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-Common", Service.serviceId, ServiceStatus.AVAILABLE));
 
             while (!shutdown) {
 
