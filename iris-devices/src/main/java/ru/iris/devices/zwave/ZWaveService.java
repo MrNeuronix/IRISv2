@@ -10,9 +10,10 @@ import ru.iris.common.devices.zwave.ZWaveDevice;
 import ru.iris.common.devices.zwave.ZWaveDeviceValue;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
-import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.common.messaging.model.devices.zwave.*;
+import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.devices.Service;
 
 import java.io.IOException;
@@ -42,6 +43,7 @@ public class ZWaveService implements Runnable {
     private boolean shutdown = false;
     private JsonMessaging messaging;
     private SQL sql = Service.getSQL();
+    private ServiceCheckEmitter serviceCheckEmitter;
 
     // Adverstiments
     private ZWaveDriverReady zWaveDriverReady = new ZWaveDriverReady();
@@ -74,7 +76,8 @@ public class ZWaveService implements Runnable {
         messaging = new JsonMessaging(UUID.randomUUID());
         Map<String, String> config = new Config().getConfig();
 
-        Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-ZWave", Service.serviceId, ServiceStatus.STARTUP));
+        serviceCheckEmitter = new ServiceCheckEmitter("Devices-ZWave");
+        serviceCheckEmitter.setState(ServiceStatus.STARTUP);
 
         ResultSet rs = sql.select("SELECT uuid, internalname FROM devices WHERE source='zwave'");
 
@@ -434,7 +437,7 @@ public class ZWaveService implements Runnable {
         log.info("Initialization complete. Found " + zDevices.size() + " devices");
 
 
-        Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-ZWave", Service.serviceId, ServiceStatus.AVAILABLE));
+        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
 
         for (ZWaveDevice ZWaveDevice : zDevices.values()) {
@@ -522,8 +525,7 @@ public class ZWaveService implements Runnable {
             }
 
             // Broadcast that this service is shutdown.
-            Service.serviceChecker.setAdvertisment(Service.advertisement.set(
-                    "Devices-ZWave", Service.serviceId, ServiceStatus.SHUTDOWN));
+            serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 
             // Close JSON messaging.
             jsonMessaging.close();

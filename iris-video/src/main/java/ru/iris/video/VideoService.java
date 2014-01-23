@@ -12,6 +12,7 @@ package ru.iris.video;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.iris.common.messaging.model.service.ServiceStatus;
 
 public class VideoService implements Runnable {
 
@@ -29,6 +30,6 @@ public class VideoService implements Runnable {
 
     public synchronized void run() {
 
-        log.info("HELLO FROM VIDEO PLUGLN");
+        Service.serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
     }
 }

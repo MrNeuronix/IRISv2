@@ -74,8 +74,7 @@ public class EventsService implements Runnable {
             jsonMessaging.subscribe("*");
             jsonMessaging.start();
 
-            Service.serviceChecker.setAdvertisment(Service.advertisement.set(
-                    "Events", Service.serviceId, ServiceStatus.AVAILABLE));
+            Service.serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
             while (!shutdown) {
 
@@ -99,9 +98,7 @@ public class EventsService implements Runnable {
                             log.error("Error in script scripts/command/" + advertisement.getCommand() + ".js: " + e.toString());
                             e.printStackTrace();
                         }
-                    }
-
-                    else {
+                    } else {
 
                         // seek event in db
                         ResultSet rs = sql.select("SELECT * FROM events WHERE subject='" + envelope.getSubject() + "'");
@@ -109,19 +106,19 @@ public class EventsService implements Runnable {
                         try {
                             while (rs.next()) {
 
-                                File jsFile= new File("./scripts/" + rs.getString("script"));
+                                File jsFile = new File("./scripts/" + rs.getString("script"));
 
-                                    log.debug("Launch script: " + rs.getString("script"));
+                                log.debug("Launch script: " + rs.getString("script"));
 
-                                    try {
-                                        ScriptableObject.putProperty(scope, "advertisement", Context.javaToJS(envelope.getObject(), scope));
-                                        cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
-                                    } catch (FileNotFoundException e) {
-                                        log.error("Script file " + jsFile + " not found!");
-                                    } catch (Exception e) {
-                                        log.error("Error in script " + jsFile + ": " + e.toString());
-                                        e.printStackTrace();
-                                    }
+                                try {
+                                    ScriptableObject.putProperty(scope, "advertisement", Context.javaToJS(envelope.getObject(), scope));
+                                    cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
+                                } catch (FileNotFoundException e) {
+                                    log.error("Script file " + jsFile + " not found!");
+                                } catch (Exception e) {
+                                    log.error("Error in script " + jsFile + ": " + e.toString());
+                                    e.printStackTrace();
+                                }
                             }
 
                             rs.close();
@@ -134,8 +131,7 @@ public class EventsService implements Runnable {
             }
 
             // Broadcast that this service is shutdown.
-            Service.serviceChecker.setAdvertisment(Service.advertisement.set(
-                    "Events", Service.serviceId, ServiceStatus.SHUTDOWN));
+            Service.serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 
             // Close JSON messaging.
             jsonMessaging.close();

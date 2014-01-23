@@ -73,8 +73,7 @@ public class ScheduleService implements Runnable {
 
         // Запускаем выполнение тасков
 
-        Service.serviceChecker.setAdvertisment(
-                Service.advertisement.set("Scheduler", Service.serviceId, ServiceStatus.AVAILABLE));
+        Service.serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
         while (true) {
             try {
@@ -117,8 +116,7 @@ public class ScheduleService implements Runnable {
             try {
                 Thread.sleep(1000L);
             } catch (InterruptedException e) {
-                Service.serviceChecker.setAdvertisment(
-                        Service.advertisement.set("Scheduler", Service.serviceId, ServiceStatus.SHUTDOWN));
+                Service.serviceCheckEmitter.setState(ServiceStatus.ERROR);
             }
         }
     }

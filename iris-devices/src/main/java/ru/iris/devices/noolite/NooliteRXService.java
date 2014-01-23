@@ -11,6 +11,7 @@ import ru.iris.common.devices.noolite.NooliteDevice;
 import ru.iris.common.devices.noolite.NooliteDeviceValue;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.devices.noolite.*;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.devices.Service;
@@ -43,6 +44,7 @@ public class NooliteRXService implements Runnable {
     protected final Context context = new Context();
     protected DeviceHandle handle;
     protected boolean pause = false;
+    private ServiceCheckEmitter serviceCheckEmitter;
 
     private static final long READ_UPDATE_DELAY_MS = 500L;
 
@@ -51,6 +53,10 @@ public class NooliteRXService implements Runnable {
     static final int PRODUCT_ID = 1500; // 0x05dc;
 
     public NooliteRXService() {
+
+        serviceCheckEmitter = new ServiceCheckEmitter("Devices-NooliteRX");
+        serviceCheckEmitter.setState(ServiceStatus.STARTUP);
+
         Thread t = new Thread(this);
         t.start();
     }
@@ -83,7 +89,7 @@ public class NooliteRXService implements Runnable {
             e.printStackTrace();
         }
 
-        Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-NooliteRX", Service.serviceId, ServiceStatus.AVAILABLE));
+        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
         ///////////////////////////////////////////////////////////////
 
@@ -98,8 +104,7 @@ public class NooliteRXService implements Runnable {
 
         handle = LibUsb.openDeviceWithVidPid(context, VENDOR_ID, PRODUCT_ID);
 
-        if(handle == null)
-        {
+        if (handle == null) {
             log.error("Noolite TX device not found!");
             shutdown = true;
             return;
@@ -110,8 +115,7 @@ public class NooliteRXService implements Runnable {
 
         int ret = LibUsb.setConfiguration(handle, 1);
 
-        if (ret < 0)
-        {
+        if (ret < 0) {
             log.error("Configuration error");
             LibUsb.close(handle);
             if (ret == LibUsb.ERROR_BUSY)
@@ -125,19 +129,17 @@ public class NooliteRXService implements Runnable {
 
         new InternalCommands();
 
-        while(!shutdown)
-        {
+        while (!shutdown) {
             // receiving area
             ByteBuffer buf = ByteBuffer.allocateDirect(8);
-            if(!pause)
-                LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS|LibUsb.RECIPIENT_INTERFACE|LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 100);
+            if (!pause)
+                LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE | LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 100);
 
-            if(!buf.equals(tmpBuf))
-            {
+            if (!buf.equals(tmpBuf)) {
                 log.debug("RX Buffer: " + buf.get(0) + " " + buf.get(1) + " " + buf.get(2) + " " + buf.get(3) + " " + buf.get(4) + " " + buf.get(5) + " " + buf.get(6)
                         + " " + buf.get(7));
 
-                Integer channel = (buf.get(1)+1);
+                Integer channel = (buf.get(1) + 1);
                 byte action = buf.get(2);
                 Integer dimmerValue = (int) buf.get(4);
 
@@ -149,11 +151,10 @@ public class NooliteRXService implements Runnable {
                     e.printStackTrace();
                 }
 
-                if(device == null)
-                {
+                if (device == null) {
                     try {
                         device = new NooliteDevice();
-                        device.setInternalName("noolite/channel/"+channel);
+                        device.setInternalName("noolite/channel/" + channel);
                         device.setStatus("listening");
                         device.setType("Generic Noolite Device");
                         device.setManufName("Nootechnika");
@@ -168,7 +169,7 @@ public class NooliteRXService implements Runnable {
                 }
 
                 // turn off
-                if(action == 0) {
+                if (action == 0) {
 
                     log.info("Channel " + channel + ": Got OFF command");
 
@@ -181,13 +182,13 @@ public class NooliteRXService implements Runnable {
                     }
                 }
                 // dim
-                else if(action == 1) {
+                else if (action == 1) {
 
                     log.info("Channel " + channel + ": Got DIM command");
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelDimAdvertisement().set(device.getUUID()));
                 }
                 // turn on
-                else if(action == 2) {
+                else if (action == 2) {
                     log.info("Channel " + channel + ": Got ON command");
                     device.updateValue(new NooliteDeviceValue("Level", "100", "", ""));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "100"));
@@ -198,12 +199,12 @@ public class NooliteRXService implements Runnable {
                     }
                 }
                 // bright
-                else if(action == 3) {
+                else if (action == 3) {
                     log.info("Channel " + channel + ": Got BRIGHT command");
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelBrightAdvertisement().set(device.getUUID()));
                 }
                 // set level
-                else if(action == 6) {
+                else if (action == 6) {
                     log.info("Channel " + channel + ": Got SETLEVEL command.");
                     device.updateValue(new NooliteDeviceValue("Level", dimmerValue.toString(), "", ""));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", dimmerValue.toString()));
@@ -214,7 +215,7 @@ public class NooliteRXService implements Runnable {
                     }
                 }
                 // stop dim/bright
-                else if(action == 10) {
+                else if (action == 10) {
                     log.info("Channel " + channel + ": Got STOPDIMBRIGHT command.");
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelStopDimBrightAdvertisement().set(device.getUUID()));
                 }
@@ -222,11 +223,9 @@ public class NooliteRXService implements Runnable {
                 tmpBuf = buf;
             }
 
-            try
-            {
+            try {
                 Thread.sleep(READ_UPDATE_DELAY_MS);
-            } catch(InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 //Ignore
                 e.printStackTrace();
             }
@@ -237,8 +236,7 @@ public class NooliteRXService implements Runnable {
         LibUsb.exit(context);
 
         // Broadcast that this service is shutdown.
-        Service.serviceChecker.setAdvertisment(Service.advertisement.set(
-                "Devices-NooliteRX", Service.serviceId, ServiceStatus.SHUTDOWN));
+        serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 
     }
 
@@ -246,9 +244,14 @@ public class NooliteRXService implements Runnable {
     ///  For intenal commands
     ///
 
-    private class InternalCommands implements Runnable
-    {
+    private class InternalCommands implements Runnable {
+        private ServiceCheckEmitter serviceCheckEmitter;
+
         public InternalCommands() {
+
+            serviceCheckEmitter = new ServiceCheckEmitter("Devices-NooliteRX-Internal");
+            serviceCheckEmitter.setState(ServiceStatus.STARTUP);
+
             Thread t = new Thread(this);
             t.start();
         }
@@ -256,7 +259,7 @@ public class NooliteRXService implements Runnable {
         @Override
         public synchronized void run() {
 
-            Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-NooliteRX-Internal", Service.serviceId, ServiceStatus.AVAILABLE));
+            serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
             try {
                 JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
@@ -281,11 +284,11 @@ public class NooliteRXService implements Runnable {
                             int channel = Integer.valueOf(device.getValue("channel").getValue());
 
                             ByteBuffer buf = ByteBuffer.allocateDirect(8);
-                            buf.put((byte)1);
-                            buf.put((byte)channel);
+                            buf.put((byte) 1);
+                            buf.put((byte) channel);
 
                             pause = true;
-                            LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS|LibUsb.RECIPIENT_INTERFACE|LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 100);
+                            LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE | LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 100);
                             pause = false;
 
                         } else if (envelope.getObject() instanceof UnbindRXChannelAdvertisment) {
@@ -297,11 +300,11 @@ public class NooliteRXService implements Runnable {
                             int channel = Integer.valueOf(device.getValue("channel").getValue());
 
                             ByteBuffer buf = ByteBuffer.allocateDirect(8);
-                            buf.put((byte)3);
-                            buf.put((byte)channel);
+                            buf.put((byte) 3);
+                            buf.put((byte) channel);
 
                             pause = true;
-                            LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS|LibUsb.RECIPIENT_INTERFACE|LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 100);
+                            LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE | LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 100);
                             pause = false;
 
                         } else if (envelope.getObject() instanceof UnbindAllRXChannelAdvertisment) {
@@ -309,10 +312,10 @@ public class NooliteRXService implements Runnable {
                             log.debug("Get UnbindAllRXChannel advertisement");
 
                             ByteBuffer buf = ByteBuffer.allocateDirect(8);
-                            buf.put((byte)4);
+                            buf.put((byte) 4);
 
                             pause = true;
-                            LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS|LibUsb.RECIPIENT_INTERFACE|LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 100);
+                            LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE | LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 100);
                             pause = false;
 
                         } else if (envelope.getReceiverInstance() == null) {
@@ -334,8 +337,7 @@ public class NooliteRXService implements Runnable {
                 }
 
                 // Broadcast that this service is shutdown.
-                Service.serviceChecker.setAdvertisment(Service.advertisement.set(
-                        "Devices-NooliteRX-Internal", Service.serviceId, ServiceStatus.SHUTDOWN));
+                serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 
                 // Close JSON messaging.
                 jsonMessaging.close();
@@ -348,20 +350,17 @@ public class NooliteRXService implements Runnable {
 
         }
 
-        private Object getDeviceByUUID(String uuid)
-        {
+        private Object getDeviceByUUID(String uuid) {
             ResultSet rs = sql.select("SELECT * FROM devices WHERE uuid='" + uuid + "'");
 
             try {
                 while (rs.next()) {
 
-                    if(rs.getString("source").equals("noolite"))
-                    {
+                    if (rs.getString("source").equals("noolite")) {
                         return new NooliteDevice().load(uuid);
                     }
                     // generic device
-                    else
-                    {
+                    else {
                         log.error("Unknown device!");
                         return null;
                     }

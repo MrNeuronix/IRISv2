@@ -63,20 +63,20 @@ public class ServiceAdvertisement {
         this.name = name;
     }
 
-    public UUID getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(UUID instanceId) {
-        this.instanceId = instanceId;
-    }
-
     public ServiceStatus getStatus() {
         return status;
     }
 
     public void setStatus(ServiceStatus status) {
         this.status = status;
+    }
+
+    public UUID getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(UUID instanceId) {
+        this.instanceId = instanceId;
     }
 
     @Override

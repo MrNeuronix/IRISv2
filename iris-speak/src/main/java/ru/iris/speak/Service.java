@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
 import ru.iris.common.SQL;
 import ru.iris.common.Speak;
-import ru.iris.common.messaging.ServiceChecker;
+import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.service.ServiceAdvertisement;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.speak.google.GoogleSpeakService;
@@ -26,13 +26,12 @@ import java.util.UUID;
 @PluginImplementation
 public class Service implements SpeakPlugin {
 
-    public static ServiceChecker serviceChecker;
+    public static ServiceCheckEmitter serviceCheckEmitter;
     public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
     public static final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6007");
     private static SQL sql = new SQL();
 
-    public static SQL getSQL()
-    {
+    public static SQL getSQL() {
         return sql;
     }
 
@@ -41,8 +40,8 @@ public class Service implements SpeakPlugin {
     @Init
     public void init() throws Exception {
 
-        serviceChecker = new ServiceChecker(serviceId, advertisement.set(
-                "Speak", serviceId, ServiceStatus.STARTUP));
+        serviceCheckEmitter = new ServiceCheckEmitter("Speak");
+        serviceCheckEmitter.setState(ServiceStatus.STARTUP);
 
         Config cfg = new Config();
 

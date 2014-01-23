@@ -53,8 +53,7 @@ public class GoogleSpeakService implements Runnable {
         Map<String, String> conf = config.getConfig();
         final Synthesiser synthesiser = new Synthesiser(conf.get("language"));
 
-        Service.serviceChecker.setAdvertisment(
-                Service.advertisement.set("Speak", Service.serviceId, ServiceStatus.AVAILABLE));
+        Service.serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
         if (conf.get("silence").equals("0")) {
             try {
@@ -100,17 +99,14 @@ public class GoogleSpeakService implements Runnable {
                             log.info("Text: " + advertisement.getText());
                             log.info("Device: " + advertisement.getDevice());
 
-                            if(advertisement.getDevice().equals("all"))
-                            {
+                            if (advertisement.getDevice().equals("all")) {
                                 final Player player = new Player(synthesiser.getMP3Data(advertisement.getText()));
                                 player.play();
                                 player.close();
 
                                 sql.doQuery("INSERT INTO speaks (text, confidence, device, isActive) " +
                                         "VALUES ('" + advertisement.getText() + "', '" + advertisement.getConfidence() + "', '" + advertisement.getDevice() + "', true)");
-                            }
-                            else
-                            {
+                            } else {
                                 sql.doQuery("INSERT INTO speaks (text, confidence, device, isActive) " +
                                         "VALUES ('" + advertisement.getText() + "', '" + advertisement.getConfidence() + "', '" + advertisement.getDevice() + "', true)");
                             }
@@ -130,8 +126,7 @@ public class GoogleSpeakService implements Runnable {
                 }
             }
 
-            Service.serviceChecker.setAdvertisment(
-                    Service.advertisement.set("Speak", Service.serviceId, ServiceStatus.SHUTDOWN));
+            Service.serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 
             // Close JSON messaging.
             jsonMessaging.close();
@@ -139,9 +134,7 @@ public class GoogleSpeakService implements Runnable {
         } catch (final Throwable t) {
 
             log.error("Unexpected exception in Speak", t);
-
-            Service.serviceChecker.setAdvertisment(
-                    Service.advertisement.set("Speak", Service.serviceId, ServiceStatus.SHUTDOWN));
+            Service.serviceCheckEmitter.setState(ServiceStatus.ERROR);
             t.printStackTrace();
         }
     }

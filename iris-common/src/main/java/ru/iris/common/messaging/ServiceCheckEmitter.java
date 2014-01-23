@@ -12,6 +12,8 @@ package ru.iris.common.messaging;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.iris.common.messaging.model.service.ServiceAdvertisement;
+import ru.iris.common.messaging.model.service.ServiceStatus;
 
 import java.util.UUID;
 
@@ -31,18 +33,16 @@ import java.util.UUID;
  * limitations under the License.
  */
 
-public class ServiceChecker implements Runnable {
+public class ServiceCheckEmitter implements Runnable {
 
-    private Logger log = LogManager.getLogger(ServiceChecker.class.getName());
+    private Logger log = LogManager.getLogger(ServiceCheckEmitter.class.getName());
     private boolean shutdown = false;
     private UUID instanceId = UUID.randomUUID();
-    private Object advertisment;
     private boolean reinitialize = false;
+    private ServiceAdvertisement advertisement = new ServiceAdvertisement();
 
-    public ServiceChecker(UUID instanceId, Object advertisment) {
-        this.instanceId = instanceId;
-        this.advertisment = advertisment;
-
+    public ServiceCheckEmitter(String moduleName) {
+        advertisement.setName(moduleName);
         Thread t = new Thread(this);
         t.start();
     }
@@ -55,8 +55,8 @@ public class ServiceChecker implements Runnable {
         return instanceId;
     }
 
-    public void setAdvertisment(Object advertisment) {
-        this.advertisment = advertisment;
+    public void setState(ServiceStatus state) {
+        this.advertisement.setStatus(state);
         this.reinitialize = true;
     }
 
@@ -74,7 +74,7 @@ public class ServiceChecker implements Runnable {
 
             JsonMessaging jsonMessaging = new JsonMessaging(instanceId);
 
-            jsonMessaging.broadcast("service.status", advertisment);
+            jsonMessaging.broadcast("service.status", advertisement);
 
             long lastStatusBroadcastMillis = System.currentTimeMillis();
 
@@ -82,7 +82,7 @@ public class ServiceChecker implements Runnable {
 
                 // If there is more than 30 seconds from last availability broadcasts then lets redo this.
                 if (30000L < System.currentTimeMillis() - lastStatusBroadcastMillis || reinitialize) {
-                    jsonMessaging.broadcast("service.status", advertisment);
+                    jsonMessaging.broadcast("service.status", advertisement);
                     lastStatusBroadcastMillis = System.currentTimeMillis();
                     if (reinitialize)
                         reinitialize = false;
@@ -93,7 +93,7 @@ public class ServiceChecker implements Runnable {
             }
 
             // Broadcast that this service is shutdown.
-            jsonMessaging.broadcast("service.status", advertisment);
+            jsonMessaging.broadcast("service.status", advertisement);
 
             // Close JSON messaging.
             jsonMessaging.close();

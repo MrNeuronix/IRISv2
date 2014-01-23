@@ -51,7 +51,7 @@ public class ExternalRecordService implements Runnable {
 
         log.info("Configured to run" + threads + " on " + micro + " mics");
 
-        Service.serviceChecker.setAdvertisment(Service.advertisement.set("Record", Service.serviceId, ServiceStatus.AVAILABLE));
+        Service.serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
         for (int m = 1; m <= micro; m++) {
             final int finalM = m;

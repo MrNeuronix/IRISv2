@@ -11,6 +11,7 @@ import ru.iris.common.SQL;
 import ru.iris.common.devices.noolite.NooliteDevice;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
 import ru.iris.common.messaging.model.devices.noolite.BindRXChannelAdvertisment;
 import ru.iris.common.messaging.model.devices.noolite.BindTXChannelAdvertisment;
@@ -45,6 +46,7 @@ public class NooliteTXService implements Runnable {
     private JsonMessaging messaging;
     private SQL sql = Service.getSQL();
     private final Context context = new Context();
+    private ServiceCheckEmitter serviceCheckEmitter;
 
     // Noolite PC USB TX HID
     static final int VENDOR_ID = 5824; //0x16c0;
@@ -61,7 +63,8 @@ public class NooliteTXService implements Runnable {
         messaging = new JsonMessaging(UUID.randomUUID());
         Map<String, String> config = new Config().getConfig();
 
-        Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-NooliteTX", Service.serviceId, ServiceStatus.STARTUP));
+        serviceCheckEmitter = new ServiceCheckEmitter("Devices-NooliteTX");
+        serviceCheckEmitter.setState(ServiceStatus.STARTUP);
 
         // Initialize the libusb context
         int result = LibUsb.init(context);
@@ -87,14 +90,13 @@ public class NooliteTXService implements Runnable {
             e.printStackTrace();
         }
 
-        Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-NooliteTX", Service.serviceId, ServiceStatus.AVAILABLE));
+        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
         try {
             // Make sure we exit the wait loop if we receive shutdown signal.
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-NooliteTX", Service.serviceId, ServiceStatus.SHUTDOWN));
                     shutdown = true;
                 }
             }));
@@ -222,6 +224,7 @@ public class NooliteTXService implements Runnable {
             }
 
             // Close JSON messaging.
+            serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
             jsonMessaging.close();
             messaging.close();
             LibUsb.exit(context);

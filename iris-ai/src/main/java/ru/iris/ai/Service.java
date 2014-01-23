@@ -17,19 +17,14 @@ import org.apache.logging.log4j.Logger;
 import ru.iris.ai.witai.WitAiService;
 import ru.iris.common.Config;
 import ru.iris.common.SQL;
-import ru.iris.common.messaging.ServiceChecker;
-import ru.iris.common.messaging.model.service.ServiceAdvertisement;
+import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.service.ServiceStatus;
-
-import java.util.UUID;
 
 @PluginImplementation
 public class Service implements AIPlugin {
 
     private static Logger log = LogManager.getLogger(Service.class);
-    public static ServiceChecker serviceChecker;
-    public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
-    public static final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6009");
+    public static ServiceCheckEmitter serviceCheckEmitter;
     private static SQL sql = new SQL();
 
     public static SQL getSQL() {
@@ -39,8 +34,8 @@ public class Service implements AIPlugin {
     @Init
     public void init() throws Exception {
 
-        serviceChecker = new ServiceChecker(serviceId, advertisement.set(
-                "AI", serviceId, ServiceStatus.STARTUP));
+        serviceCheckEmitter = new ServiceCheckEmitter("AI");
+        serviceCheckEmitter.setState(ServiceStatus.STARTUP);
 
         log.info("AI service starting");
 
@@ -50,6 +45,7 @@ public class Service implements AIPlugin {
             new WitAiService();
         } else {
             log.info("No AI specified in config file");
+            serviceCheckEmitter.setState(ServiceStatus.ERROR);
         }
     }
 }

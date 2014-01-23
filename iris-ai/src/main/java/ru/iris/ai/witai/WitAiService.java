@@ -51,8 +51,7 @@ public class WitAiService implements Runnable {
 
     public synchronized void run() {
 
-        Service.serviceChecker.setAdvertisment(
-                Service.advertisement.set("AI", Service.serviceId, ServiceStatus.AVAILABLE));
+        Service.serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
         Config cfg = new Config();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
@@ -89,7 +88,7 @@ public class WitAiService implements Runnable {
                         HttpGet httpget = new HttpGet(url);
 
                         // auth on wit.ai
-                        httpget.addHeader("Authorization", "Bearer "+cfg.getConfig().get("witaiKey"));
+                        httpget.addHeader("Authorization", "Bearer " + cfg.getConfig().get("witaiKey"));
 
                         CloseableHttpResponse response = httpclient.execute(httpget);
                         try {
@@ -101,20 +100,18 @@ public class WitAiService implements Runnable {
                                 try {
                                     String content = IOUtils.toString(instream, "UTF-8");
 
-                                    log.debug("AI response: "+content);
+                                    log.debug("AI response: " + content);
 
                                     WitAiResponse json = gson.fromJson(content, WitAiResponse.class);
 
                                     Double confidence = json.getOutcome().getConfidence();
 
-                                    log.debug("Confidence: "+confidence);
+                                    log.debug("Confidence: " + confidence);
 
-                                    if(confidence > 0.65)
-                                    {
+                                    if (confidence > 0.65) {
                                         String object = json.getOutcome().getEntities().get("object").getValue();
 
-                                        if(object != null)
-                                        {
+                                        if (object != null) {
                                             log.info("Get response from AI: " + json.getMsg_body() + " to object: " + object);
                                             jsonMessaging.broadcast("event.ai.response.object." + object, aiResponseAdvertisement.set(json));
                                         }
@@ -140,8 +137,7 @@ public class WitAiService implements Runnable {
                 }
             }
 
-            Service.serviceChecker.setAdvertisment(
-                    Service.advertisement.set("AI", Service.serviceId, ServiceStatus.SHUTDOWN));
+            Service.serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 
             // Close JSON messaging.
             jsonMessaging.close();
@@ -149,9 +145,7 @@ public class WitAiService implements Runnable {
         } catch (final Throwable t) {
 
             log.error("Unexpected exception in AI", t);
-
-            Service.serviceChecker.setAdvertisment(
-                    Service.advertisement.set("AI", Service.serviceId, ServiceStatus.SHUTDOWN));
+            Service.serviceCheckEmitter.setState(ServiceStatus.ERROR);
             t.printStackTrace();
         }
 

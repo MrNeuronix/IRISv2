@@ -5,7 +5,7 @@ import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
-import ru.iris.common.messaging.ServiceChecker;
+import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.service.ServiceAdvertisement;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 
@@ -28,7 +28,7 @@ import java.util.UUID;
 @PluginImplementation
 public class Service implements RecordPlugin {
 
-    public static ServiceChecker serviceChecker;
+    public static ServiceCheckEmitter serviceCheckEmitter;
     public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
     public static UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6004");
     private Config config = new Config();
@@ -39,8 +39,8 @@ public class Service implements RecordPlugin {
     public void init() throws IOException, SQLException, JMSException, URISyntaxException {
 
         if (config.getConfig().get("recordOnServer").equals("1")) {
-            serviceChecker = new ServiceChecker(serviceId, advertisement.set(
-                    "Record", serviceId, ServiceStatus.STARTUP));
+            serviceCheckEmitter = new ServiceCheckEmitter("Record");
+            serviceCheckEmitter.setState(ServiceStatus.STARTUP);
 
             if (config.getConfig().get("recordMethod").equals("internal")) {
                 log.info("Internal record service started");
@@ -49,6 +49,7 @@ public class Service implements RecordPlugin {
                 log.info("External record service started");
                 new ExternalRecordService();
             } else {
+                serviceCheckEmitter.setState(ServiceStatus.ERROR);
                 log.error("No record method specified!");
             }
         }

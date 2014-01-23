@@ -16,7 +16,9 @@ import ru.iris.common.messaging.model.service.ServiceStatus;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * IRISv2 Project
@@ -52,7 +54,7 @@ public class CommonDeviceService implements Runnable {
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-Common", Service.serviceId, ServiceStatus.SHUTDOWN));
+                    Service.serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
                     shutdown = true;
                 }
             }));
@@ -66,7 +68,7 @@ public class CommonDeviceService implements Runnable {
 
             jsonMessaging.start();
 
-            Service.serviceChecker.setAdvertisment(Service.advertisement.set("Devices-Common", Service.serviceId, ServiceStatus.AVAILABLE));
+            Service.serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
             while (!shutdown) {
 
@@ -95,18 +97,15 @@ public class CommonDeviceService implements Runnable {
                             continue;
                         }
 
-                        if(device instanceof ZWaveDevice)
-                        {
+                        if (device instanceof ZWaveDevice) {
                             jsonMessaging.broadcast("event.devices.zwave.setvalue", new SetDeviceLevelAdvertisement().set(uuid, label, level));
-                        }
-                        else if(device instanceof NooliteDevice)
-                        {
+                        } else if (device instanceof NooliteDevice) {
                             jsonMessaging.broadcast("event.devices.noolite.setvalue", new SetDeviceLevelAdvertisement().set(uuid, label, level));
                         }
 
-                    ////////////////////////////////////////////
-                    //// Get inventory                      ////
-                    ////////////////////////////////////////////
+                        ////////////////////////////////////////////
+                        //// Get inventory                      ////
+                        ////////////////////////////////////////////
 
                     } else if (envelope.getObject() instanceof GetInventoryAdvertisement) {
 
@@ -125,18 +124,15 @@ public class CommonDeviceService implements Runnable {
                                 while (rs.next()) {
 
                                     // if device has zwave source
-                                    if(rs.getString("source").equals("zwave"))
-                                    {
+                                    if (rs.getString("source").equals("zwave")) {
                                         devices.put(rs.getString("internalname"), new ZWaveDevice().load(rs.getString("uuid")));
                                     }
                                     // if device has noolite source
-                                    else if(rs.getString("source").equals("noolite"))
-                                    {
+                                    else if (rs.getString("source").equals("noolite")) {
                                         devices.put(rs.getString("internalname"), new NooliteDevice().load(rs.getString("uuid")));
                                     }
                                     // generic device
-                                    else
-                                    {
+                                    else {
                                         log.error("Unknown device!");
                                     }
                                 }
@@ -149,7 +145,7 @@ public class CommonDeviceService implements Runnable {
 
                             jsonMessaging.broadcast("event.devices.responseinventory", new ResponseDeviceInventoryAdvertisement().set(devices));
 
-                        // send one device specified by UUID
+                            // send one device specified by UUID
                         } else {
 
                             Object device = getDeviceByUUID(uuid);
@@ -159,19 +155,16 @@ public class CommonDeviceService implements Runnable {
                                 continue;
                             }
 
-                            if(device instanceof ZWaveDevice)
-                            {
+                            if (device instanceof ZWaveDevice) {
                                 jsonMessaging.broadcast("event.devices.responseinventory", new ResponseZWaveDeviceInventoryAdvertisement().set((ZWaveDevice) device));
-                            }
-                            else if(device instanceof NooliteDevice)
-                            {
+                            } else if (device instanceof NooliteDevice) {
                                 jsonMessaging.broadcast("event.devices.responseinventory", new ResponseNooliteDeviceInventoryAdvertisement().set((NooliteDevice) device));
                             }
                         }
 
-                    ////////////////////////////////////////////
-                    //// Set device name                    ////
-                    ////////////////////////////////////////////
+                        ////////////////////////////////////////////
+                        //// Set device name                    ////
+                        ////////////////////////////////////////////
 
                     } else if (envelope.getObject() instanceof SetDeviceNameAdvertisement) {
 
@@ -187,23 +180,20 @@ public class CommonDeviceService implements Runnable {
 
                         log.info("Setting name \"" + advertisement.getName() + "\" to device " + uuid);
 
-                        if(device instanceof ZWaveDevice)
-                        {
+                        if (device instanceof ZWaveDevice) {
                             ZWaveDevice zWaveDevice = (ZWaveDevice) device;
                             zWaveDevice.setName(advertisement.getName());
                             zWaveDevice.save();
-                        }
-                        else if(device instanceof NooliteDevice)
-                        {
+                        } else if (device instanceof NooliteDevice) {
                             NooliteDevice nooliteDevice = (NooliteDevice) device;
                             nooliteDevice.setName(advertisement.getName());
                             nooliteDevice.save();
                         }
 
 
-                    ////////////////////////////////////////////
-                    //// Set device zone                    ////
-                    ////////////////////////////////////////////
+                        ////////////////////////////////////////////
+                        //// Set device zone                    ////
+                        ////////////////////////////////////////////
 
                     } else if (envelope.getObject() instanceof SetDeviceZoneAdvertisement) {
 
@@ -219,22 +209,19 @@ public class CommonDeviceService implements Runnable {
 
                         log.info("Setting zone " + advertisement.getZone() + " to device " + uuid);
 
-                        if(device instanceof ZWaveDevice)
-                        {
+                        if (device instanceof ZWaveDevice) {
                             ZWaveDevice zWaveDevice = (ZWaveDevice) device;
                             zWaveDevice.setZone(advertisement.getZone());
                             zWaveDevice.save();
-                        }
-                        else if(device instanceof NooliteDevice)
-                        {
+                        } else if (device instanceof NooliteDevice) {
                             NooliteDevice nooliteDevice = (NooliteDevice) device;
                             nooliteDevice.setZone(advertisement.getZone());
                             nooliteDevice.save();
                         }
 
-                    ////////////////////////////////////////////
-                    //// Unknown broadcast                  ////
-                    ////////////////////////////////////////////
+                        ////////////////////////////////////////////
+                        //// Unknown broadcast                  ////
+                        ////////////////////////////////////////////
 
                     } else if (envelope.getReceiverInstance() == null) {
                         // We received unknown broadcast message. Lets make generic log entry.
@@ -244,9 +231,9 @@ public class CommonDeviceService implements Runnable {
                                 + " at '" + envelope.getSubject()
                                 + ": " + envelope.getObject());
 
-                    ////////////////////////////////////////////
-                    //// Unknown request                    ////
-                    ////////////////////////////////////////////
+                        ////////////////////////////////////////////
+                        //// Unknown request                    ////
+                        ////////////////////////////////////////////
 
                     } else {
                         // We received unknown request message. Lets make generic log entry.
@@ -259,7 +246,10 @@ public class CommonDeviceService implements Runnable {
                 }
             }
 
-    } catch (InterruptedException e) {
+            jsonMessaging.close();
+            Service.serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
+
+        } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -268,33 +258,29 @@ public class CommonDeviceService implements Runnable {
 
     //////////////////////////////////////////////////
 
-    private Object getDeviceByUUID(String uuid)
-    {
+    private Object getDeviceByUUID(String uuid) {
         ResultSet rs = sql.select("SELECT * FROM devices WHERE uuid='" + uuid + "'");
 
         try {
             while (rs.next()) {
 
                 // if device has zwave source
-                if(rs.getString("source").equals("zwave"))
-                {
+                if (rs.getString("source").equals("zwave")) {
                     return new ZWaveDevice().load(uuid);
                 }
                 // if device has noolite source
-                else if(rs.getString("source").equals("noolite"))
-                {
+                else if (rs.getString("source").equals("noolite")) {
                     return new NooliteDevice().load(uuid);
                 }
                 // generic device
-                else
-                {
+                else {
                     log.error("Unknown device!");
                     return null;
                 }
 
             }
 
-         rs.close();
+            rs.close();
 
         } catch (SQLException | IOException e) {
             e.printStackTrace();

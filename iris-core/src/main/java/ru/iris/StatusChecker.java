@@ -7,6 +7,7 @@ import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.service.ServiceAdvertisement;
 import ru.iris.common.messaging.model.service.ServiceStatus;
+
 import java.util.UUID;
 
 /**
@@ -48,8 +49,6 @@ public class StatusChecker implements Runnable {
                     shutdown = true;
                 }
             }));
-
-            sql = new SQL();
 
             final UUID instanceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6501");
             final JsonMessaging jsonMessagingStatus = new JsonMessaging(instanceId);
