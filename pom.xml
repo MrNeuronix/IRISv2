@@ -19,7 +19,8 @@
     <repositories>
         <repository>
             <id>IRIS</id>
-            <url>http://ph-systems.ru:8081/artifactory/repo</url>
+            <name>IRIS-releases</name>
+            <url>http://ph-systems.ru:8081/artifactory/ext-release-local</url>
         </repository>
         <repository>
             <id>jspf</id>
