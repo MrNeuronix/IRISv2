@@ -1,7 +1,5 @@
 package ru.iris.common.devices.zwave;
 
-import com.google.gson.annotations.Expose;
-import org.zwave4j.Manager;
 import org.zwave4j.ValueId;
 import ru.iris.common.devices.DeviceValue;
 
@@ -16,18 +14,12 @@ import ru.iris.common.devices.DeviceValue;
  */
 public class ZWaveDeviceValue extends DeviceValue {
 
-    @Expose
-    private boolean readOnly = false;
-
     private ValueId valueId;
 
     public ZWaveDeviceValue(String label, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly) {
 
         super(label, value, valueType, valueUnits, isReadonly);
         this.valueId = valueId;
-
-        if (Manager.get().isValueReadOnly(valueId))
-            this.readOnly = true;
     }
 
     public ZWaveDeviceValue(String label, String value, String valueType, String valueUnits, boolean isReadonly) {
