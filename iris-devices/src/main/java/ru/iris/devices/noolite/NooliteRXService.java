@@ -159,8 +159,8 @@ public class NooliteRXService implements Runnable {
                         device.setType("Generic Noolite Device");
                         device.setManufName("Nootechnika");
                         device.setUUID(UUID.randomUUID().toString());
-                        device.updateValue(new NooliteDeviceValue("channel", channel.toString(), "", ""));
-                        device.updateValue(new NooliteDeviceValue("type", "generic", "", ""));
+                        device.updateValue(new NooliteDeviceValue("channel", channel.toString(), "", "", true));
+                        device.updateValue(new NooliteDeviceValue("type", "generic", "", "", false));
 
                         nooDevices.put("noolite/channel/" + channel, device);
                     } catch (IOException | SQLException e) {
@@ -173,7 +173,7 @@ public class NooliteRXService implements Runnable {
 
                     log.info("Channel " + channel + ": Got OFF command");
 
-                    device.updateValue(new NooliteDeviceValue("Level", "0", "", ""));
+                    device.updateValue(new NooliteDeviceValue("Level", "0", "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "0"));
                     try {
                         device.save();
@@ -190,7 +190,7 @@ public class NooliteRXService implements Runnable {
                 // turn on
                 else if (action == 2) {
                     log.info("Channel " + channel + ": Got ON command");
-                    device.updateValue(new NooliteDeviceValue("Level", "100", "", ""));
+                    device.updateValue(new NooliteDeviceValue("Level", "100", "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "100"));
                     try {
                         device.save();
@@ -206,7 +206,7 @@ public class NooliteRXService implements Runnable {
                 // set level
                 else if (action == 6) {
                     log.info("Channel " + channel + ": Got SETLEVEL command.");
-                    device.updateValue(new NooliteDeviceValue("Level", dimmerValue.toString(), "", ""));
+                    device.updateValue(new NooliteDeviceValue("Level", dimmerValue.toString(), "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", dimmerValue.toString()));
                     try {
                         device.save();

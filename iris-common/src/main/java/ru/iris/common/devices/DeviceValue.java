@@ -22,17 +22,21 @@ public class DeviceValue {
     protected String valueType = "unknown";
     @Expose
     protected String valueUnits = "unknown";
+    @Expose
+    protected boolean isReadonly = false;
 
-    public DeviceValue(String label, String value) {
+    public DeviceValue(String label, String value, boolean isReadonly) {
         this.label = label;
         this.value = value;
+        this.isReadonly = isReadonly;
     }
 
-    public DeviceValue(String label, String value, String valueType, String valueUnits) {
+    public DeviceValue(String label, String value, String valueType, String valueUnits, boolean isReadonly) {
         this.label = label;
         this.value = value;
         this.valueType = valueType;
         this.valueUnits = valueUnits;
+        this.isReadonly = isReadonly;
     }
 
     public String getLabel() {
@@ -63,6 +67,18 @@ public class DeviceValue {
         this.valueUnits = valueUnits;
     }
 
+    public boolean isReadonly() {
+        return isReadonly;
+    }
+
+    public void setReadonly(boolean isReadonly) {
+        this.isReadonly = isReadonly;
+    }
+
+    public void setValueType(String valueType) {
+        this.valueType = valueType;
+    }
+
     @Override
     public String toString() {
         return "DeviceValue{" +
@@ -70,6 +86,7 @@ public class DeviceValue {
                 ", value='" + value + '\'' +
                 ", valueType='" + valueType + '\'' +
                 ", valueUnits='" + valueUnits + '\'' +
+                ", isReadonly=" + isReadonly +
                 '}';
     }
 }

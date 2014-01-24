@@ -14,12 +14,12 @@ import ru.iris.common.devices.DeviceValue;
 
 public class NooliteDeviceValue extends DeviceValue {
 
-    public NooliteDeviceValue(String label, String value) {
-        super(label, value);
+    public NooliteDeviceValue(String label, String value, boolean isReadonly) {
+        super(label, value, isReadonly);
     }
 
-    public NooliteDeviceValue(String label, String value, String valueType, String valueUnits) {
-        super(label, value, valueType, valueUnits);
+    public NooliteDeviceValue(String label, String value, String valueType, String valueUnits, boolean isReadonly) {
+        super(label, value, valueType, valueUnits, isReadonly);
     }
 
     @Override
@@ -29,6 +29,7 @@ public class NooliteDeviceValue extends DeviceValue {
                 ", value='" + value + '\'' +
                 ", valueType='" + valueType + '\'' +
                 ", valueUnits='" + valueUnits + '\'' +
+                ", isReadonly='" + isReadonly + '\'' +
                 '}';
     }
 }

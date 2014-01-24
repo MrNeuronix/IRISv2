@@ -54,8 +54,7 @@ public class ZWaveDevice extends Device {
             }
         }
 
-        if(!flag)
-        {
+        if (!flag) {
             zDv.add(value);
         }
 
@@ -77,30 +76,28 @@ public class ZWaveDevice extends Device {
         zDv = null;
     }
 
-    public ZWaveDevice load(String uuid)
-    {
+    public ZWaveDevice load(String uuid) {
         ResultSet rs = sql.select("SELECT * FROM devices WHERE uuid='" + uuid + "'");
 
         try {
             while (rs.next()) {
 
-                    this.manufName = rs.getString("manufname");
-                    this.name = rs.getString("name");
-                    this.node = rs.getShort("node");
-                    this.status = rs.getString("status");
-                    this.internalType = rs.getString("internaltype");
-                    this.type = rs.getString("type");
-                    this.uuid = rs.getString("uuid");
-                    this.zone = rs.getInt("zone");
-                    this.productName = rs.getString("productname");
-                    this.internalName = rs.getString("internalname");
-                    this.source = rs.getString("source");
-                }
+                this.manufName = rs.getString("manufname");
+                this.name = rs.getString("name");
+                this.node = rs.getShort("node");
+                this.status = rs.getString("status");
+                this.internalType = rs.getString("internaltype");
+                this.type = rs.getString("type");
+                this.uuid = rs.getString("uuid");
+                this.zone = rs.getInt("zone");
+                this.productName = rs.getString("productname");
+                this.internalName = rs.getString("internalname");
+                this.source = rs.getString("source");
+            }
 
             rs.close();
 
-        } catch (SQLException ignored)
-        {
+        } catch (SQLException ignored) {
         }
 
         rs = sql.select("SELECT * FROM devicesvalues WHERE uuid='" + uuid + "'");
@@ -112,15 +109,15 @@ public class ZWaveDevice extends Device {
                         rs.getString("label"),
                         rs.getString("value"),
                         rs.getString("type"),
-                        rs.getString("units")
+                        rs.getString("units"),
                         // ValueID is unknown!
+                        rs.getBoolean("isReadonly")
                 ));
             }
 
             rs.close();
 
-        } catch (SQLException ignored)
-        {
+        } catch (SQLException ignored) {
         }
 
         return this;
@@ -145,8 +142,8 @@ public class ZWaveDevice extends Device {
         sql.doQuery("INSERT INTO devices (source, uuid, internaltype, type, manufname, node, status, name, zone, productname, internalname) VALUES ('zwave','" + uuid + "','" + internalType + "','" + type + "','" + manufName + "','" + node + "','" + status + "','" + name + "','" + zone + "','" + productName + "','" + internalName + "')");
 
         for (ZWaveDeviceValue zvalue : values) {
-            sql.doQuery("INSERT INTO devicesvalues (uuid, label, value, type, units)" +
-                    " VALUES ('" + uuid + "','" + zvalue.getLabel() + "','" + zvalue.getValue() + "','" + zvalue.getValueType() + "','" + zvalue.getValueUnits() + "')");
+            sql.doQuery("INSERT INTO devicesvalues (uuid, label, value, type, units, isReadonly)" +
+                    " VALUES ('" + uuid + "','" + zvalue.getLabel() + "','" + zvalue.getValue() + "','" + zvalue.getValueType() + "','" + zvalue.getValueUnits() + "', " + zvalue.isReadonly() + ")");
         }
     }
 

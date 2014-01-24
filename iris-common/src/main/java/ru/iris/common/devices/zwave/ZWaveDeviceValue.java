@@ -21,17 +21,17 @@ public class ZWaveDeviceValue extends DeviceValue {
 
     private ValueId valueId;
 
-    public ZWaveDeviceValue(String label, String value, String valueType, String valueUnits, ValueId valueId) {
+    public ZWaveDeviceValue(String label, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly) {
 
-        super(label, value, valueType, valueUnits);
+        super(label, value, valueType, valueUnits, isReadonly);
         this.valueId = valueId;
 
         if (Manager.get().isValueReadOnly(valueId))
             this.readOnly = true;
     }
 
-    public ZWaveDeviceValue(String label, String value, String valueType, String valueUnits) {
-        super(label, value, valueType, valueUnits);
+    public ZWaveDeviceValue(String label, String value, String valueType, String valueUnits, boolean isReadonly) {
+        super(label, value, valueType, valueUnits, isReadonly);
     }
 
     public ValueId getValueId() {
@@ -50,6 +50,7 @@ public class ZWaveDeviceValue extends DeviceValue {
                 ", valueType='" + valueType + '\'' +
                 ", valueUnits='" + valueUnits + '\'' +
                 ", valueId=" + valueId +
+                ", isReadonly=" + isReadonly +
                 '}';
     }
 }

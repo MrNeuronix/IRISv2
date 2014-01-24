@@ -182,9 +182,9 @@ public class ZWaveService implements Runnable {
 
                         if (zcZWaveDevice != null) {
                             // Check for awaked after sleeping nodes
-                            if (manager.isNodeAwake(homeId, zcZWaveDevice.getNode()) && zcZWaveDevice.getStatus().equals("Sleeping")) {
+                            if (manager.isNodeAwake(homeId, zcZWaveDevice.getNode()) && zcZWaveDevice.getStatus().equals("sleeping")) {
                                 log.info("Setting node " + zcZWaveDevice.getNode() + " to LISTEN state");
-                                zcZWaveDevice.setStatus("Listening");
+                                zcZWaveDevice.setStatus("listening");
                             }
                         }
 
@@ -329,7 +329,8 @@ public class ZWaveService implements Runnable {
                                 String.valueOf(Utils.getValue(notification.getValueId())),
                                 Utils.getValueType(notification.getValueId()),
                                 Manager.get().getValueUnits(notification.getValueId()),
-                                notification.getValueId()));
+                                notification.getValueId(),
+                                Manager.get().isValueReadOnly(notification.getValueId())));
 
                         try {
                             if (initComplete)
@@ -385,7 +386,8 @@ public class ZWaveService implements Runnable {
                                 String.valueOf(Utils.getValue(notification.getValueId())),
                                 Utils.getValueType(notification.getValueId()),
                                 Manager.get().getValueUnits(notification.getValueId()),
-                                notification.getValueId()));
+                                notification.getValueId(),
+                                Manager.get().isValueReadOnly(notification.getValueId())));
 
                         try {
                             if (initComplete)
@@ -454,13 +456,13 @@ public class ZWaveService implements Runnable {
                 // Check for dead nodes
                 if (manager.isNodeFailed(homeId, ZWaveDevice.getNode())) {
                     log.info("Setting node " + ZWaveDevice.getNode() + " to DEAD state");
-                    ZWaveDevice.setStatus("Dead");
+                    ZWaveDevice.setStatus("dead");
                 }
 
                 // Check for sleeping nodes
                 if (!manager.isNodeAwake(homeId, ZWaveDevice.getNode())) {
                     log.info("Setting node " + ZWaveDevice.getNode() + " to SLEEP state");
-                    ZWaveDevice.setStatus("Sleeping");
+                    ZWaveDevice.setStatus("sleeping");
                 }
 
                 ZWaveDevice.save();
@@ -666,7 +668,8 @@ public class ZWaveService implements Runnable {
                                 String.valueOf(Utils.getValue(notification.getValueId())),
                                 Utils.getValueType(notification.getValueId()),
                                 Manager.get().getValueUnits(notification.getValueId()),
-                                notification.getValueId()));
+                                notification.getValueId(),
+                                Manager.get().isValueReadOnly(notification.getValueId())));
 
             } catch (IOException | SQLException e) {
                 e.printStackTrace();
@@ -687,7 +690,8 @@ public class ZWaveService implements Runnable {
                     String.valueOf(Utils.getValue(notification.getValueId())),
                     Utils.getValueType(notification.getValueId()),
                     Manager.get().getValueUnits(notification.getValueId()),
-                    notification.getValueId()));
+                    notification.getValueId(),
+                    Manager.get().isValueReadOnly(notification.getValueId())));
         }
 
         // catch and save into database value changes after init complete

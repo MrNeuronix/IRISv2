@@ -124,7 +124,8 @@ public class NooliteDevice extends Device {
                         rs.getString("label"),
                         rs.getString("value"),
                         rs.getString("type"),
-                        rs.getString("units")
+                        rs.getString("units"),
+                        rs.getBoolean("isReadonly")
                 ));
             }
 
@@ -173,8 +174,8 @@ public class NooliteDevice extends Device {
         sql.doQuery("INSERT INTO devices (source, uuid, internaltype, type, manufname, node, status, name, zone, productname, internalname) VALUES ('noolite','" + uuid + "','" + internalType + "','" + type + "','" + manufName + "','" + node + "','" + status + "','" + name + "','" + zone + "','" + productName + "','" + internalName + "')");
 
         for (NooliteDeviceValue zvalue : values) {
-            sql.doQuery("INSERT INTO devicesvalues (uuid, label, value, type, units)" +
-                    " VALUES ('" + uuid + "','" + zvalue.getLabel() + "','" + zvalue.getValue() + "','" + zvalue.getValueType() + "','" + zvalue.getValueUnits() + "')");
+            sql.doQuery("INSERT INTO devicesvalues (uuid, label, value, type, units, isReadonly)" +
+                    " VALUES ('" + uuid + "','" + zvalue.getLabel() + "','" + zvalue.getValue() + "','" + zvalue.getValueType() + "','" + zvalue.getValueUnits() + "', " + zvalue.isReadonly() + ")");
         }
     }
 
