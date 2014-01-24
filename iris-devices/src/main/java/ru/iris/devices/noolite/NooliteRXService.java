@@ -185,7 +185,14 @@ public class NooliteRXService implements Runnable {
                 else if (action == 1) {
 
                     log.info("Channel " + channel + ": Got DIM command");
+                    // we only know, that the user hold OFF button
+                    device.updateValue(new NooliteDeviceValue("Level", "0", "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelDimAdvertisement().set(device.getUUID()));
+                    try {
+                        device.save();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
                 // turn on
                 else if (action == 2) {
@@ -201,7 +208,14 @@ public class NooliteRXService implements Runnable {
                 // bright
                 else if (action == 3) {
                     log.info("Channel " + channel + ": Got BRIGHT command");
+                    // we only know, that the user hold ON button
+                    device.updateValue(new NooliteDeviceValue("Level", "100", "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelBrightAdvertisement().set(device.getUUID()));
+                    try {
+                        device.save();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
                 }
                 // set level
                 else if (action == 6) {
