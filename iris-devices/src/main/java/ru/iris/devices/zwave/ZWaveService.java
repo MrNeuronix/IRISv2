@@ -331,6 +331,13 @@ public class ZWaveService implements Runnable {
                                 Manager.get().getValueUnits(notification.getValueId()),
                                 notification.getValueId()));
 
+                        try {
+                            if (initComplete)
+                                zrZWaveDevice.save();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+
                         messaging.broadcast("event.devices.zwave.value.removed",
                                 zWaveDeviceValueRemoved.set(
                                         zrZWaveDevice,
@@ -349,11 +356,6 @@ public class ZWaveService implements Runnable {
                         if (manager.isNodeAwake(homeId, zWaveDevice.getNode()) && zWaveDevice.getStatus().equals("Sleeping")) {
                             log.info("Setting node " + zWaveDevice.getNode() + " to LISTEN state");
                             zWaveDevice.setStatus("Listening");
-                            try {
-                                zWaveDevice.save();
-                            } catch (SQLException e) {
-                                e.printStackTrace();
-                            }
                         }
 
                         if (zWaveDevice == null) {
@@ -364,7 +366,8 @@ public class ZWaveService implements Runnable {
                         // break if same value
                         try {
                             if (Utils.getValue(zWaveDevice.getValue(manager.getValueLabel(notification.getValueId())).getValueId()) == Utils.getValue(notification.getValueId()))
-                                break;
+                                log.debug("Same value. Breaking");
+                            break;
                         } catch (NullPointerException e) {
                             log.error("Error while change value: " + e.toString());
                             e.printStackTrace();
@@ -383,6 +386,13 @@ public class ZWaveService implements Runnable {
                                 Utils.getValueType(notification.getValueId()),
                                 Manager.get().getValueUnits(notification.getValueId()),
                                 notification.getValueId()));
+
+                        try {
+                            if (initComplete)
+                                zWaveDevice.save();
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
 
                         messaging.broadcast("event.devices.zwave.value.changed",
                                 zWaveDeviceValueChanged.set(
@@ -436,9 +446,7 @@ public class ZWaveService implements Runnable {
 
         log.info("Initialization complete. Found " + zDevices.size() + " devices");
 
-
         serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
-
 
         for (ZWaveDevice ZWaveDevice : zDevices.values()) {
             try {
@@ -472,9 +480,7 @@ public class ZWaveService implements Runnable {
             }));
 
             JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
-
             jsonMessaging.subscribe("event.devices.zwave.setvalue");
-
             jsonMessaging.start();
 
             while (!shutdown) {
