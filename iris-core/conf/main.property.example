@@ -1,3 +1,10 @@
+#################################
+# General section
+#################################
+
+AMQPhost=localhost
+AMQPport=61616
+
 language=ru
 locale=ru-RU
 systemName=cистема
@@ -26,15 +33,6 @@ stopThreshold=5
 # External method settings
 recordStreams=4
 microphones=1
-
-#################################
-# REST section
-#################################
-
-httpPort=8085
-httpHost=localhost
-httpUser=admin
-httpPassword=changeme
 
 #################################
 # Voice synth section

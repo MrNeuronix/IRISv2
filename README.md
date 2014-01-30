@@ -11,7 +11,7 @@ Please remember that this project is in deep alpha and now is mostly for develop
 ## Features
 
 * Strong modular system
-* Own message protocol based on SQL used for communication between modules
+* AMQP messaging protocol inside (ActiveMQ)
 * JavaScript based dynamic scripts support for better automation
 * More other stuff :)
 

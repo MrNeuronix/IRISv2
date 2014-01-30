@@ -17,17 +17,14 @@ package ru.iris.common.messaging;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.common.SQL;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import javax.jms.*;
+import javax.jms.Queue;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -35,25 +32,110 @@ import java.util.concurrent.TimeUnit;
 /**
  * Prototype for JSON message broadcasting.
  *
- * @author Nikolay A. Viguro
+ * @author Nikolay A. Viguro, Tommi S.E. Laukkanen
  */
 
 public class JsonMessaging {
 
     private static Logger LOGGER = LogManager.getLogger(JsonMessaging.class);
+
     private UUID sender;
+
+    /**
+     * The AMQ connection.
+     */
+    private Connection connection;
+    /**
+     * The message session.
+     */
+    private Session session;
+    /**
+     * The message destination.
+     */
+    private Destination destination;
+    /**
+     * The reply queue.
+     */
+    private Queue replyQueue;
+    /**
+     * The message producer.
+     */
+    private MessageProducer messageProducer;
+    /**
+     * The message consumer.
+     */
+    private MessageConsumer messageConsumer;
+    /**
+     * The reply producer.
+     */
+    private MessageProducer replyProducer;
+    /**
+     * The reply consumer.
+     */
+    private MessageConsumer replyConsumer;
+
+    /**
+     * The instance ID.
+     */
+    private UUID instanceId;
+    /**
+     * Boolean flag reflecting whether threads should be close.
+     */
     private boolean shutdownThreads = false;
+    /**
+     * The subjects that has been registered to receive JSON encoded messages.
+     */
     private Set<String> jsonSubjects = Collections.synchronizedSet(new HashSet<String>());
+    /**
+     * The receive queue for JSON objects.
+     */
+    private BlockingQueue<JsonEnvelope> jsonReceiveQueue = new ArrayBlockingQueue<JsonEnvelope>(100);
+    /**
+     * The JSON broadcast listen thread.
+     */
     private Thread jsonBroadcastListenThread;
-    private BlockingQueue<JsonEnvelope> jsonReceiveQueue = new ArrayBlockingQueue<JsonEnvelope>(50);
-    private int myLastID = 0;
-    private SQL sql = new SQL();
+    /**
+     * The JSON reply listen thread.
+     */
+    private Thread jsonReplyListenThread;
+    /**
+     * The replies.
+     */
+    private Map<String, JsonEnvelope> replies = Collections.synchronizedMap(new HashMap<String, JsonEnvelope>());
+
     private final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
-    public JsonMessaging(final UUID sender) {
-        this.sender = sender;
-    }
+    public JsonMessaging(final UUID instanceId) {
 
+        // Create a ConnectionFactory
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://iris");
+
+        this.instanceId = instanceId;
+
+        // Create a Connection
+        try {
+            connection = connectionFactory.createConnection();
+            connection.start();
+
+            // Create a Session
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+
+            // Create the destination (Topic)
+            destination = session.createTopic("iris");
+
+            replyQueue = session.createTemporaryQueue();
+            messageConsumer = session.createConsumer(destination);
+            messageProducer = session.createProducer(destination);
+
+            messageProducer.setDeliveryMode(DeliveryMode.PERSISTENT);
+
+            replyConsumer = session.createConsumer(replyQueue);
+            replyProducer = session.createProducer(null);
+
+        } catch (JMSException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Starts the messaging to listen for JSON objects.
@@ -78,6 +160,8 @@ public class JsonMessaging {
                 } catch (final InterruptedException e) {
                     LOGGER.debug(e.toString());
                 }
+
+                close();
             }
         });
     }
@@ -87,6 +171,10 @@ public class JsonMessaging {
      */
     public void close() {
         try {
+            messageConsumer.close();
+            messageProducer.close();
+            session.close();
+            connection.close();
             shutdownThreads = true;
             if (jsonBroadcastListenThread != null) {
                 jsonBroadcastListenThread.interrupt();
@@ -98,18 +186,55 @@ public class JsonMessaging {
     }
 
     /**
+     * Gets the JSON message received to subject or null if nothing has been received
+     *
+     * @return the JSON message or null
+     */
+    public JsonEnvelope getJsonObject() {
+        synchronized (jsonReceiveQueue) {
+            if (jsonReceiveQueue.size() > 0) {
+                return jsonReceiveQueue.poll();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Checks whether JSON message has been received.
+     *
+     * @return true if JSON message is available
+     */
+    public int hasJsonObject() {
+        synchronized (jsonReceiveQueue) {
+            return jsonReceiveQueue.size();
+        }
+    }
+
+    /**
      * Sends object as JSON encoded message with given subject.
      *
      * @param subject the subject
      * @param object  the object
      */
-    public void broadcast(final String subject, final Object object) {
+    public <T> void broadcast(final String subject, final Object object) {
 
         final String className = object.getClass().getName();
         final String jsonString = gson.toJson(object);
 
-        sql.doQuery("INSERT INTO messages (time, subject, sender, class, json) " +
-                "VALUES (CURRENT_TIMESTAMP(), '" + subject + "', '" + sender + "', '" + className + "', '" + jsonString + "')");
+        try {
+            // Create a messages
+            MapMessage message = session.createMapMessage();
+            message.setJMSCorrelationID("ID:" + UUID.randomUUID().toString());
+            message.setJMSReplyTo(replyQueue);
+            message.setStringProperty("sender", instanceId.toString());
+            message.setStringProperty("class", className);
+            message.setStringProperty("subject", subject);
+            message.setStringProperty("json", jsonString);
+            messageProducer.send(message);
+
+        } catch (JMSException e) {
+            throw new RuntimeException("Error sending JSON message: " + object + " to subject: " + subject, e);
+        }
     }
 
     /**
@@ -135,106 +260,100 @@ public class JsonMessaging {
      *
      * @param subject the subject
      */
-    public void subscribe(final String subject) {
+    public void subscribe(String subject) {
         jsonSubjects.add(subject);
     }
 
     private void listenBroadcasts() {
 
-        try {
-            while (!shutdownThreads) {
-                try {
-                    ResultSet rs = sql.select("SELECT * FROM messages WHERE time > (now() - INTERVAL 2 SECOND)");
+        while (!shutdownThreads) {
 
-                    while (rs.next()) {
-
-                        String subject = rs.getString("subject");
-
-                        // Check wildcard
-                        for (String jsonSubj : jsonSubjects) {
-                            if (wildCardMatch(jsonSubj, subject) || jsonSubjects.contains(subject)) {
-                                String jsonString = rs.getString("json");
-                                String className = rs.getString("class");
-                                int id = rs.getInt("id");
-
-                                if (!StringUtils.isEmpty(className)
-                                        && !StringUtils.isEmpty(jsonString)
-                                        && id != myLastID) {
-
-                                    final Class clazz = Class.forName(className);
-                                    Object object = gson.fromJson(jsonString, clazz);
-                                    JsonEnvelope envelope = new JsonEnvelope(rs.getString("sender"), null, subject, object);
-
-                                    LOGGER.debug("Received message: "
-                                            + " sender: " + envelope.getSenderInstance()
-                                            + " receiver: " + envelope.getReceiverInstance()
-                                            + " to subject: "
-                                            + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")"
-                                            + " JSON: " + jsonString);
-                                    myLastID = id;
-                                    jsonReceiveQueue.put(envelope);
-                                }
-                            }
-                        }
-                    }
-
-                    rs.close();
-
-                    Thread.sleep(1000L);
-
-                } catch (final SQLException e) {
-                    LOGGER.debug("Error receiving JSON message ", e);
-                } catch (final ClassNotFoundException e) {
-                    LOGGER.error("Error deserializing JSON message ", e);
-                } catch (final InterruptedException e) {
-                    //LOGGER.error("Interrupt error in JSON message ", e);
+            try {
+                MapMessage message = (MapMessage) messageConsumer.receive();
+                if (message == null) {
+                    continue;
                 }
+                String subject = message.getStringProperty("subject");
+                String jsonString = message.getStringProperty("json");
+                String className = message.getStringProperty("class");
 
+                if (wildCardMatch(jsonSubjects, subject)
+                        && !StringUtils.isEmpty(className)
+                        && !StringUtils.isEmpty(jsonString)
+                        || jsonSubjects.contains(subject)
+                        && !StringUtils.isEmpty(className)
+                        && !StringUtils.isEmpty(jsonString)) {
+
+                    Class clazz = Class.forName(className);
+                    Object object = gson.fromJson(jsonString, clazz);
+
+                    JsonEnvelope envelope = new JsonEnvelope(
+                            UUID.fromString(message.getStringProperty("sender")),
+                            message.getStringProperty("receiver") != null ?
+                                    UUID.fromString(message.getStringProperty("receiver")) : null,
+                            message.getJMSCorrelationID(), message.getJMSReplyTo(), subject, object);
+
+                    LOGGER.debug("Received message with ID: " + message.getJMSMessageID()
+                            + " with correlation ID: " + message.getJMSCorrelationID()
+                            + " sender: " + envelope.getSenderInstance()
+                            + " receiver: " + envelope.getReceiverInstance()
+                            + " to subject: "
+                            + envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
+
+                    jsonReceiveQueue.put(envelope);
+                }
+            } catch (final JMSException e) {
+                LOGGER.error("Error receiving JSON message.", e);
+            } catch (final ClassNotFoundException e) {
+                LOGGER.error("Error deserializing JSON message.", e);
+            } catch (InterruptedException e) {
+                LOGGER.error("Error JSON message.", e);
             }
-        } catch (Exception e) {
-            LOGGER.error("Error JsonMessaging: " + e.toString());
-            e.printStackTrace();
         }
     }
-
 
     /**
      * Performs a wildcard matching for the text and pattern
      * provided.
      *
-     * @param text    the text to be tested for matches.
-     * @param pattern the pattern to be matched for.
-     *                This can contain the wildcard character '*' (asterisk).
+     * @param text     the text to be tested for matches.
+     * @param patterns the patterns set to be matched for.
+     *                 This can contain the wildcard character '*' (asterisk).
      * @return <tt>true</tt> if a match is found, <tt>false</tt>
-     *         otherwise.
+     * otherwise.
      */
 
-    private boolean wildCardMatch(String pattern, String text) {
+    private boolean wildCardMatch(Set<String> patterns, String text) {
         // add sentinel so don't need to worry about *'s at end of pattern
-        text += '\0';
-        pattern += '\0';
 
-        int N = pattern.length();
+        for (String pattern : patterns) {
+            text += '\0';
+            pattern += '\0';
 
-        boolean[] states = new boolean[N + 1];
-        boolean[] old = new boolean[N + 1];
-        old[0] = true;
+            int N = pattern.length();
 
-        for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
-            states = new boolean[N + 1];       // initialized to false
-            for (int j = 0; j < N; j++) {
-                char p = pattern.charAt(j);
+            boolean[] states = new boolean[N + 1];
+            boolean[] old = new boolean[N + 1];
+            old[0] = true;
 
-                // hack to handle *'s that match 0 characters
-                if (old[j] && (p == '*')) old[j + 1] = true;
+            for (int i = 0; i < text.length(); i++) {
+                char c = text.charAt(i);
+                states = new boolean[N + 1]; // initialized to false
+                for (int j = 0; j < N; j++) {
+                    char p = pattern.charAt(j);
 
-                if (old[j] && (p == c)) states[j + 1] = true;
-                if (old[j] && (p == '*')) states[j] = true;
-                if (old[j] && (p == '*')) states[j + 1] = true;
+                    // hack to handle *'s that match 0 characters
+                    if (old[j] && (p == '*')) old[j + 1] = true;
+
+                    if (old[j] && (p == c)) states[j + 1] = true;
+                    if (old[j] && (p == '*')) states[j] = true;
+                    if (old[j] && (p == '*')) states[j + 1] = true;
+                }
+                old = states;
             }
-            old = states;
+            if (states[N])
+                return true;
         }
-        return states[N];
+        return false;
     }
 }

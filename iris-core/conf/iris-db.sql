@@ -110,28 +110,6 @@ CREATE TABLE IF NOT EXISTS `log` (
   AUTO_INCREMENT =1;
 
 -- --------------------------------------------------------
-
---
--- Table structure for table `messages`
---
-
-CREATE TABLE IF NOT EXISTS `messages` (
-  `id`      BIGINT(20) NOT NULL AUTO_INCREMENT,
-  `class`   VARCHAR(255) DEFAULT NULL,
-  `json`    TEXT,
-  `sender`  VARCHAR(255) DEFAULT NULL,
-  `subject` VARCHAR(255) DEFAULT NULL,
-  `time`    TIMESTAMP  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-)
-  ENGINE =InnoDB
-  DEFAULT CHARSET =utf8
-  AUTO_INCREMENT =1;
-
---
--- Dumping data for table `messages`
---
-
 -- --------------------------------------------------------
 
 --

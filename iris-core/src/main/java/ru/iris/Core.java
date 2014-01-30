@@ -2,9 +2,11 @@ package ru.iris;
 
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
+import org.apache.activemq.broker.BrokerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
+import ru.iris.common.Config;
 import ru.iris.common.SQL;
 
 import java.io.File;
@@ -26,7 +28,7 @@ public class Core {
     }
 
     private static Logger log = LogManager.getLogger(Core.class.getName());
-
+    private static Config config = new Config();
     private static SQL sql = new SQL();
 
     public static SQL getSQL() {
@@ -39,10 +41,13 @@ public class Core {
         log.info("--        IRISv2 is starting          --");
         log.info("----------------------------------------");
 
-        // clear all message data
-        SQL sql = new SQL();
-        sql.doQuery("TRUNCATE messages");
-        sql.close();
+        // start AMPQ broker
+        BrokerService broker = new BrokerService();
+
+        // configure the broker
+        broker.setBrokerName("iris");
+        broker.addConnector("tcp://" + config.getConfig().get("AMQPhost") + ":" + config.getConfig().get("AMQPport"));
+        broker.start();
 
         // Modules poll
         new StatusChecker();
