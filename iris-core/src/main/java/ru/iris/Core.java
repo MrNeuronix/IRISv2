@@ -42,7 +42,6 @@ public class Core {
         log.info("--        IRISv2 is starting          --");
         log.info("----------------------------------------");
 
-        // reduce threads number
         Properties props = System.getProperties();
         props.setProperty("org.apache.activemq.UseDedicatedTaskRunner", "false");
 

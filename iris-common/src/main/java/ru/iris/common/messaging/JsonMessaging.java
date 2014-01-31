@@ -1,18 +1,3 @@
-/**
- * Copyright 2013 Tommi S.E. Laukkanen
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package ru.iris.common.messaging;
 
 import com.google.gson.Gson;
@@ -21,6 +6,7 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.iris.common.Config;
 
 import javax.jms.*;
 import java.util.Collections;
@@ -90,7 +76,7 @@ public class JsonMessaging {
 
     private ActiveMQConnectionFactory connectionFactory;
 
-    private final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+            private final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     public JsonMessaging(final UUID instanceId) {
 
@@ -101,6 +87,16 @@ public class JsonMessaging {
 
         // Create a Connection
         try {
+            // Create a ConnectionFactory
+            Config config = new Config();
+
+            if (config.getConfig().get("AMQPuseVMconnection").equals("1")) {
+                connectionFactory = new ActiveMQConnectionFactory("vm://iris?jms.prefetchPolicy.all=10");
+            } else {
+                connectionFactory = new ActiveMQConnectionFactory("tcp://" + config.getConfig().get("AMQPhost")
+                        + ":" + config.getConfig().get("AMQPport") + "?jms.prefetchPolicy.all=10");
+            }
+
             connection = connectionFactory.createConnection();
             connection.start();
 
@@ -109,7 +105,6 @@ public class JsonMessaging {
 
             // Create the destination (Topic)
             destination = session.createTopic("iris");
-
             replyQueue = session.createTemporaryQueue();
             messageConsumer = session.createConsumer(destination);
             messageProducer = session.createProducer(destination);
@@ -144,8 +139,6 @@ public class JsonMessaging {
                 } catch (final InterruptedException e) {
                     LOGGER.debug(e.toString());
                 }
-
-                close();
             }
         });
     }
@@ -159,7 +152,7 @@ public class JsonMessaging {
             messageProducer.close();
             session.close();
             connection.close();
-            shutdownThreads = true;
+                    shutdownThreads = true;
             if (jsonBroadcastListenThread != null) {
                 jsonBroadcastListenThread.interrupt();
                 jsonBroadcastListenThread.join();
@@ -173,7 +166,7 @@ public class JsonMessaging {
      * Gets the JSON message received to subject or null if nothing has been received
      *
      * @return the JSON message or null
-     */
+             */
     public JsonEnvelope getJsonObject() {
         synchronized (jsonReceiveQueue) {
             if (jsonReceiveQueue.size() > 0) {
@@ -189,9 +182,9 @@ public class JsonMessaging {
      * @return true if JSON message is available
      */
     public int hasJsonObject() {
-        synchronized (jsonReceiveQueue) {
-            return jsonReceiveQueue.size();
-        }
+                synchronized (jsonReceiveQueue) {
+                    return jsonReceiveQueue.size();
+                }
     }
 
     /**
@@ -238,7 +231,7 @@ public class JsonMessaging {
      * @return the JSON message
      */
     public JsonEnvelope receive(final int timeoutMillis) throws InterruptedException {
-        return jsonReceiveQueue.poll(timeoutMillis, TimeUnit.MILLISECONDS);
+                return jsonReceiveQueue.poll(timeoutMillis, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -342,4 +335,4 @@ public class JsonMessaging {
         }
         return false;
     }
-}
+        }

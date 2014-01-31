@@ -4,6 +4,7 @@
 
 AMQPhost=localhost
 AMQPport=61616
+AMQPuseVMconnection=1
 
 language=ru
 locale=ru-RU
