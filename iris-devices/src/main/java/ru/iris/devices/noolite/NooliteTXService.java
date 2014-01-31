@@ -54,6 +54,7 @@ public class NooliteTXService implements Runnable {
 
     public NooliteTXService() {
         Thread t = new Thread(this);
+        t.setName("Noolite TX Service");
         t.start();
     }
 

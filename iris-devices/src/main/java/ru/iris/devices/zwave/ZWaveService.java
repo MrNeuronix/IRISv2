@@ -67,6 +67,7 @@ public class ZWaveService implements Runnable {
 
     public ZWaveService() {
         Thread t = new Thread(this);
+        t.setName("ZWave Service");
         t.start();
     }
 

@@ -58,6 +58,7 @@ public class NooliteRXService implements Runnable {
         serviceCheckEmitter.setState(ServiceStatus.STARTUP);
 
         Thread t = new Thread(this);
+        t.setName("Noolite RX Service");
         t.start();
     }
 

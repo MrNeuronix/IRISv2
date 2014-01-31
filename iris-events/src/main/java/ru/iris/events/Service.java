@@ -5,10 +5,6 @@ import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.SQL;
-import ru.iris.common.messaging.ServiceCheckEmitter;
-import ru.iris.common.messaging.model.service.ServiceStatus;
-
-import java.util.UUID;
 
 /**
  * IRISv2 Project
@@ -22,9 +18,7 @@ import java.util.UUID;
 @PluginImplementation
 public class Service implements EventsPlugin {
 
-    public static ServiceCheckEmitter serviceCheckEmitter;
     private static Logger log = LogManager.getLogger(Service.class);
-    public static final UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6003");
     private static SQL sql = new SQL();
 
     public static SQL getSQL() {
@@ -34,11 +28,7 @@ public class Service implements EventsPlugin {
     @Init
     public void init() throws Exception {
 
-        serviceCheckEmitter = new ServiceCheckEmitter("Events");
-        serviceCheckEmitter.setState(ServiceStatus.STARTUP);
-
         log.info("Events engine started");
-
         new EventsService();
     }
 }

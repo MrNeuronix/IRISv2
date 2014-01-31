@@ -20,11 +20,11 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.ai.Service;
 import ru.iris.common.Config;
 import ru.iris.common.ai.WitAiResponse;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.ai.AIResponseAdvertisement;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.common.messaging.model.speak.SpeakRecognizedAdvertisement;
@@ -42,6 +42,7 @@ public class WitAiService implements Runnable {
 
     public WitAiService() {
         this.t = new Thread(this);
+        t.setName("WitAI Service");
         this.t.start();
     }
 
@@ -51,7 +52,8 @@ public class WitAiService implements Runnable {
 
     public synchronized void run() {
 
-        Service.serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
+        ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("AI");
+        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
         Config cfg = new Config();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
@@ -137,7 +139,7 @@ public class WitAiService implements Runnable {
                 }
             }
 
-            Service.serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
+            serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 
             // Close JSON messaging.
             jsonMessaging.close();
@@ -145,7 +147,7 @@ public class WitAiService implements Runnable {
         } catch (final Throwable t) {
 
             log.error("Unexpected exception in AI", t);
-            Service.serviceCheckEmitter.setState(ServiceStatus.ERROR);
+            serviceCheckEmitter.setState(ServiceStatus.ERROR);
             t.printStackTrace();
         }
 

@@ -16,8 +16,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
 import ru.iris.common.SQL;
-import ru.iris.common.messaging.ServiceCheckEmitter;
-import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.devices.noolite.NooliteRXService;
 import ru.iris.devices.noolite.NooliteTXService;
 import ru.iris.devices.zwave.ZWaveService;
@@ -29,7 +27,6 @@ import java.util.Map;
 @PluginImplementation
 public class Service implements DevicesPlugin {
 
-    public static ServiceCheckEmitter serviceCheckEmitter;
     private static Logger log = LogManager.getLogger(Service.class);
     private static SQL sql = new SQL();
 
@@ -39,9 +36,6 @@ public class Service implements DevicesPlugin {
 
     @Init
     public void init() throws IOException, SQLException {
-
-        serviceCheckEmitter = new ServiceCheckEmitter("Devices-Common");
-        serviceCheckEmitter.setState(ServiceStatus.STARTUP);
 
         Map<String, String> config = new Config().getConfig();
 

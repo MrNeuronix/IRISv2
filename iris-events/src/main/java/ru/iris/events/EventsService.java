@@ -11,6 +11,7 @@ import org.mozilla.javascript.tools.shell.Global;
 import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.command.CommandAdvertisement;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 
@@ -19,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,6 +38,7 @@ public class EventsService implements Runnable {
 
     public EventsService() {
         Thread t = new Thread(this);
+        t.setName("Event Service");
         t.start();
     }
 
@@ -43,6 +46,10 @@ public class EventsService implements Runnable {
     public synchronized void run() {
 
         try {
+
+            ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("Events");
+            serviceCheckEmitter.setState(ServiceStatus.STARTUP);
+
             // Make sure we exit the wait loop if we receive shutdown signal.
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 @Override
@@ -51,7 +58,7 @@ public class EventsService implements Runnable {
                 }
             }));
 
-            final JsonMessaging jsonMessaging = new JsonMessaging(Service.serviceId);
+            final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
 
             // Initialize rhino engine
             Global global = new Global();
@@ -74,7 +81,7 @@ public class EventsService implements Runnable {
             jsonMessaging.subscribe("*");
             jsonMessaging.start();
 
-            Service.serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
+            serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
             while (!shutdown) {
 
@@ -131,7 +138,7 @@ public class EventsService implements Runnable {
             }
 
             // Broadcast that this service is shutdown.
-            Service.serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
+            serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 
             // Close JSON messaging.
             jsonMessaging.close();

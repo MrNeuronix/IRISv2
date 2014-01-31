@@ -12,6 +12,7 @@ package ru.iris.video;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 
 public class VideoService implements Runnable {
@@ -21,6 +22,7 @@ public class VideoService implements Runnable {
 
     public VideoService() {
         this.t = new Thread(this);
+        t.setName("Video Service");
         this.t.start();
     }
 
@@ -30,6 +32,8 @@ public class VideoService implements Runnable {
 
     public synchronized void run() {
 
-        Service.serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
+
+        ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("Video");
+        serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
     }
 }

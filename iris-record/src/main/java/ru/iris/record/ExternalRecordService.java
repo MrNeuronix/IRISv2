@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.common.messaging.model.speak.SpeakRecognizedAdvertisement;
 
@@ -38,6 +39,7 @@ public class ExternalRecordService implements Runnable {
 
     public ExternalRecordService() {
         Thread t = new Thread(this);
+        t.setName("External Record Service");
         t.start();
     }
 
@@ -51,7 +53,8 @@ public class ExternalRecordService implements Runnable {
 
         log.info("Configured to run" + threads + " on " + micro + " mics");
 
-        Service.serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
+        ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("Record");
+        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
         for (int m = 1; m <= micro; m++) {
             final int finalM = m;

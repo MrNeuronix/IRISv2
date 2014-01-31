@@ -35,6 +35,7 @@ public class StatusChecker implements Runnable {
 
     public StatusChecker() {
         Thread t = new Thread(this);
+        t.setName("Status Checker Service");
         t.start();
     }
 

@@ -18,6 +18,7 @@ import ru.iris.common.Config;
 import ru.iris.common.SQL;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
 import ru.iris.speak.Service;
@@ -37,6 +38,7 @@ public class GoogleSpeakService implements Runnable {
 
     public GoogleSpeakService() {
         t = new Thread(this);
+        t.setName("Google Speak Service");
         t.start();
     }
 
@@ -53,7 +55,8 @@ public class GoogleSpeakService implements Runnable {
         Map<String, String> conf = config.getConfig();
         final Synthesiser synthesiser = new Synthesiser(conf.get("language"));
 
-        Service.serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
+        ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("Speak");
+        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
         if (conf.get("silence").equals("0")) {
             try {
@@ -126,7 +129,7 @@ public class GoogleSpeakService implements Runnable {
                 }
             }
 
-            Service.serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
+            serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 
             // Close JSON messaging.
             jsonMessaging.close();
@@ -134,7 +137,7 @@ public class GoogleSpeakService implements Runnable {
         } catch (final Throwable t) {
 
             log.error("Unexpected exception in Speak", t);
-            Service.serviceCheckEmitter.setState(ServiceStatus.ERROR);
+            serviceCheckEmitter.setState(ServiceStatus.ERROR);
             t.printStackTrace();
         }
     }

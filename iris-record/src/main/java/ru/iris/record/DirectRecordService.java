@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.common.messaging.model.speak.SpeakRecognizedAdvertisement;
 
@@ -32,6 +33,7 @@ public class DirectRecordService implements Runnable {
 
     public DirectRecordService() {
         Thread t = new Thread(this);
+        t.setName("Direct Record Service");
         t.start();
     }
 
@@ -43,7 +45,8 @@ public class DirectRecordService implements Runnable {
 
         messaging = new JsonMessaging(UUID.randomUUID());
 
-        Service.serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
+        ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("Record");
+        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
         Recognizer rec = new Recognizer("ru");
 
@@ -132,7 +135,7 @@ public class DirectRecordService implements Runnable {
             }
         }
 
-        Service.serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
+        serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
         messaging.close();
     }
 }

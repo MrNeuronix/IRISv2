@@ -8,6 +8,7 @@ import ru.iris.common.devices.noolite.NooliteDevice;
 import ru.iris.common.devices.zwave.ZWaveDevice;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.devices.*;
 import ru.iris.common.messaging.model.devices.noolite.ResponseNooliteDeviceInventoryAdvertisement;
 import ru.iris.common.messaging.model.devices.zwave.ResponseZWaveDeviceInventoryAdvertisement;
@@ -38,8 +39,10 @@ public class CommonDeviceService implements Runnable {
     private Map<String, String> config;
     private SQL sql = Service.getSQL();
 
+
     public CommonDeviceService() {
         Thread t = new Thread(this);
+        t.setName("Common Device Service");
         t.start();
     }
 
@@ -50,11 +53,16 @@ public class CommonDeviceService implements Runnable {
         config = new Config().getConfig();
 
         try {
+
+            final ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("Devices-Common");
+            serviceCheckEmitter.setState(ServiceStatus.STARTUP);
+
+
             // Make sure we exit the wait loop if we receive shutdown signal.
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Service.serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
+                    serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
                     shutdown = true;
                 }
             }));
@@ -68,7 +76,7 @@ public class CommonDeviceService implements Runnable {
 
             jsonMessaging.start();
 
-            Service.serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
+            serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
             while (!shutdown) {
 
@@ -247,7 +255,7 @@ public class CommonDeviceService implements Runnable {
             }
 
             jsonMessaging.close();
-            Service.serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
+            serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 
         } catch (InterruptedException e) {
             e.printStackTrace();

@@ -44,6 +44,7 @@ public class ServiceCheckEmitter implements Runnable {
     public ServiceCheckEmitter(String moduleName) {
         advertisement.setName(moduleName);
         Thread t = new Thread(this);
+        t.setName("Service Check Emitter");
         t.start();
     }
 

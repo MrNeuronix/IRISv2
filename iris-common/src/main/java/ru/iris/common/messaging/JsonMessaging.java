@@ -131,6 +131,7 @@ public class JsonMessaging {
                 listenBroadcasts();
             }
         }, "json-broascast-listen");
+        jsonBroadcastListenThread.setName("JSON Messaging Listen Thread");
         jsonBroadcastListenThread.start();
 
         // Add close hook to close the listen thread when JVM exits.

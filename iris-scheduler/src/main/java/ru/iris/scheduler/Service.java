@@ -5,11 +5,6 @@ import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.SQL;
-import ru.iris.common.messaging.ServiceCheckEmitter;
-import ru.iris.common.messaging.model.service.ServiceAdvertisement;
-import ru.iris.common.messaging.model.service.ServiceStatus;
-
-import java.util.UUID;
 
 /**
  * IRISv2 Project
@@ -23,9 +18,6 @@ import java.util.UUID;
 @PluginImplementation
 public class Service implements SchedulerPlugin {
 
-    public static ServiceCheckEmitter serviceCheckEmitter;
-    public static ServiceAdvertisement advertisement = new ServiceAdvertisement();
-    public static UUID serviceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6006");
     private static Logger log = LogManager.getLogger(Service.class);
     private static SQL sql = new SQL();
 
@@ -34,13 +26,9 @@ public class Service implements SchedulerPlugin {
     }
 
     @Init
-    public void init() throws Exception {
-
-        serviceCheckEmitter = new ServiceCheckEmitter("Scheduler");
-        serviceCheckEmitter.setState(ServiceStatus.STARTUP);
+    public void init() {
 
         log.info("Scheduler sevice started");
-
         new ScheduleService();
     }
 }
