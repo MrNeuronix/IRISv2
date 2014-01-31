@@ -23,8 +23,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.jms.*;
-import javax.jms.Queue;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -66,15 +68,6 @@ public class JsonMessaging {
      */
     private MessageConsumer messageConsumer;
     /**
-     * The reply producer.
-     */
-    private MessageProducer replyProducer;
-    /**
-     * The reply consumer.
-     */
-    private MessageConsumer replyConsumer;
-
-    /**
      * The instance ID.
      */
     private UUID instanceId;
@@ -94,21 +87,15 @@ public class JsonMessaging {
      * The JSON broadcast listen thread.
      */
     private Thread jsonBroadcastListenThread;
-    /**
-     * The JSON reply listen thread.
-     */
-    private Thread jsonReplyListenThread;
-    /**
-     * The replies.
-     */
-    private Map<String, JsonEnvelope> replies = Collections.synchronizedMap(new HashMap<String, JsonEnvelope>());
+
+    private ActiveMQConnectionFactory connectionFactory;
 
     private final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     public JsonMessaging(final UUID instanceId) {
 
         // Create a ConnectionFactory
-        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("vm://iris");
+        connectionFactory = new ActiveMQConnectionFactory("vm://iris?jms.prefetchPolicy.all=10");
 
         this.instanceId = instanceId;
 
@@ -126,11 +113,7 @@ public class JsonMessaging {
             replyQueue = session.createTemporaryQueue();
             messageConsumer = session.createConsumer(destination);
             messageProducer = session.createProducer(destination);
-
-            messageProducer.setDeliveryMode(DeliveryMode.PERSISTENT);
-
-            replyConsumer = session.createConsumer(replyQueue);
-            replyProducer = session.createProducer(null);
+            //messageProducer.setDeliveryMode(DeliveryMode.PERSISTENT);
 
         } catch (JMSException e) {
             e.printStackTrace();
@@ -216,10 +199,10 @@ public class JsonMessaging {
      * @param subject the subject
      * @param object  the object
      */
-    public <T> void broadcast(final String subject, final Object object) {
+    public void broadcast(String subject, Object object) {
 
-        final String className = object.getClass().getName();
-        final String jsonString = gson.toJson(object);
+        String className = object.getClass().getName();
+        String jsonString = gson.toJson(object);
 
         try {
             // Create a messages
@@ -231,6 +214,8 @@ public class JsonMessaging {
             message.setStringProperty("subject", subject);
             message.setStringProperty("json", jsonString);
             messageProducer.send(message);
+
+            message = null;
 
         } catch (JMSException e) {
             throw new RuntimeException("Error sending JSON message: " + object + " to subject: " + subject, e);

@@ -10,6 +10,7 @@ import ru.iris.common.Config;
 import ru.iris.common.SQL;
 
 import java.io.File;
+import java.util.Properties;
 
 /**
  * IRISv2 Project
@@ -41,12 +42,16 @@ public class Core {
         log.info("--        IRISv2 is starting          --");
         log.info("----------------------------------------");
 
+        // reduce threads number
+        Properties props = System.getProperties();
+        props.setProperty("org.apache.activemq.UseDedicatedTaskRunner", "false");
+
         // start AMPQ broker
         BrokerService broker = new BrokerService();
 
         // configure the broker
         broker.setBrokerName("iris");
-        broker.addConnector("tcp://" + config.getConfig().get("AMQPhost") + ":" + config.getConfig().get("AMQPport"));
+        broker.addConnector("tcp://" + config.getConfig().get("AMQPhost") + ":" + config.getConfig().get("AMQPport") + "?jms.prefetchPolicy.all=10");
         broker.start();
 
         // Modules poll

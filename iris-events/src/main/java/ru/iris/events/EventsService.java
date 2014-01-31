@@ -85,17 +85,17 @@ public class EventsService implements Runnable {
                     // Check command and launch script
                     if (envelope.getObject() instanceof CommandAdvertisement) {
                         CommandAdvertisement advertisement = envelope.getObject();
-                        log.info("Launch command script: " + advertisement.getCommand());
+                        log.info("Launch command script: " + advertisement.getScript());
 
-                        File jsFile = new File("./scripts/command/" + advertisement.getTaskClass() + ".js");
+                        File jsFile = new File("./scripts/command/" + advertisement.getScript() + ".js");
 
                         try {
-                            ScriptableObject.putProperty(scope, "commandParams", Context.javaToJS(advertisement.getCommand(), scope));
+                            ScriptableObject.putProperty(scope, "commandParams", Context.javaToJS(advertisement.getData(), scope));
                             cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
                         } catch (FileNotFoundException e) {
-                            log.error("Script file scripts/command/" + advertisement.getCommand() + ".js not found!");
+                            log.error("Script file scripts/command/" + advertisement.getScript() + ".js not found!");
                         } catch (Exception e) {
-                            log.error("Error in script scripts/command/" + advertisement.getCommand() + ".js: " + e.toString());
+                            log.error("Error in script scripts/command/" + advertisement.getScript() + ".js: " + e.toString());
                             e.printStackTrace();
                         }
                     } else {

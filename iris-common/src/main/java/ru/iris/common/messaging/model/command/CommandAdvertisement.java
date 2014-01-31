@@ -17,38 +17,38 @@ public class CommandAdvertisement extends Advertisement {
      * Command
      */
     @Expose
-    private String command;
+    private String data;
 
     @Expose
-    private String klazz;
+    private String script;
 
-    public CommandAdvertisement set(String klazz, String command) {
-        this.command = command;
-        this.klazz = klazz;
+    public CommandAdvertisement set(String script, String data) {
+        this.data = data;
+        this.script = script;
         return this;
     }
 
-    public String getCommand() {
-        return command;
+    public String getData() {
+        return data;
     }
 
-    public void setCommand(String command) {
-        this.command = command;
+    public void setData(String data) {
+        this.data = data;
     }
 
-    public String getTaskClass() {
-        return klazz;
+    public String getScript() {
+        return script;
     }
 
-    public void setTaskClass(String klazz) {
-        this.klazz = klazz;
+    public void setScript(String script) {
+        this.script = script;
     }
 
     @Override
     public String toString() {
         return "CommandAdvertisement{" +
-                "command='" + command + '\'' +
-                ", klazz='" + klazz + '\'' +
+                "data='" + data + '\'' +
+                ", script='" + script + '\'' +
                 '}';
     }
 }
