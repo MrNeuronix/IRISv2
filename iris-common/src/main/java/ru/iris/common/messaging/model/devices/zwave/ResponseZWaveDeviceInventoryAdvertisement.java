@@ -1,7 +1,7 @@
 package ru.iris.common.messaging.model.devices.zwave;
 
 import com.google.gson.annotations.Expose;
-import ru.iris.common.devices.zwave.ZWaveDevice;
+import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.model.Advertisement;
 
 /**
@@ -18,18 +18,18 @@ public class ResponseZWaveDeviceInventoryAdvertisement extends Advertisement {
      * Device UUID
      */
     @Expose
-    private ZWaveDevice device;
+    private Device device;
 
-    public ResponseZWaveDeviceInventoryAdvertisement set(ZWaveDevice device) {
+    public ResponseZWaveDeviceInventoryAdvertisement set(Device device) {
         this.device = device;
         return this;
     }
 
-    public ZWaveDevice getDevice() {
+    public Device getDevice() {
         return device;
     }
 
-    public void setDevice(ZWaveDevice device) {
+    public void setDevice(Device device) {
         this.device = device;
     }
 

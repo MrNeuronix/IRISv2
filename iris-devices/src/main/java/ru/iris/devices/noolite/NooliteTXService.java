@@ -1,14 +1,13 @@
 package ru.iris.devices.noolite;
 
+import com.avaje.ebean.Ebean;
 import de.ailis.usb4java.libusb.Context;
 import de.ailis.usb4java.libusb.DeviceHandle;
 import de.ailis.usb4java.libusb.LibUsb;
 import de.ailis.usb4java.libusb.LibUsbException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.common.Config;
-import ru.iris.common.SQL;
-import ru.iris.common.devices.noolite.NooliteDevice;
+import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.ServiceCheckEmitter;
@@ -18,14 +17,9 @@ import ru.iris.common.messaging.model.devices.noolite.BindTXChannelAdvertisment;
 import ru.iris.common.messaging.model.devices.noolite.UnbindRXChannelAdvertisment;
 import ru.iris.common.messaging.model.devices.noolite.UnbindTXChannelAdvertisment;
 import ru.iris.common.messaging.model.service.ServiceStatus;
-import ru.iris.devices.Service;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -42,9 +36,7 @@ public class NooliteTXService implements Runnable {
 
     private Logger log = LogManager.getLogger(NooliteTXService.class.getName());
     private boolean shutdown = false;
-    private static final Map<String, NooliteDevice> nooDevices = new HashMap<>();
     private JsonMessaging messaging;
-    private SQL sql = Service.getSQL();
     private final Context context = new Context();
     private ServiceCheckEmitter serviceCheckEmitter;
 
@@ -62,7 +54,6 @@ public class NooliteTXService implements Runnable {
     public synchronized void run() {
 
         messaging = new JsonMessaging(UUID.randomUUID());
-        Map<String, String> config = new Config().getConfig();
 
         serviceCheckEmitter = new ServiceCheckEmitter("Devices-NooliteTX");
         serviceCheckEmitter.setState(ServiceStatus.STARTUP);
@@ -75,21 +66,6 @@ public class NooliteTXService implements Runnable {
             } catch (LibUsbException e) {
                 e.printStackTrace();
             }
-
-        ResultSet rs = sql.select("SELECT uuid, internalname FROM devices WHERE source='noolite'");
-
-        try {
-            while (rs.next()) {
-
-                log.info("Loading device " + rs.getString("internalname") + " from database");
-                nooDevices.put(rs.getString("internalname"), new NooliteDevice().load(rs.getString("uuid")));
-            }
-
-            rs.close();
-
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
-        }
 
         serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
@@ -121,10 +97,8 @@ public class NooliteTXService implements Runnable {
 
                         // We know of service advertisement
                         final SetDeviceLevelAdvertisement advertisement = envelope.getObject();
-
-                        String uuid = advertisement.getDeviceUUID();
                         byte level = Byte.valueOf(advertisement.getValue());
-                        NooliteDevice device = (NooliteDevice) getDeviceByUUID(uuid);
+                        Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
                         int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
 
                         ByteBuffer buf = ByteBuffer.allocateDirect(8);
@@ -175,7 +149,7 @@ public class NooliteTXService implements Runnable {
                         log.debug("Get BindTXChannel advertisement");
 
                         final BindRXChannelAdvertisment advertisement = envelope.getObject();
-                        NooliteDevice device = (NooliteDevice) getDeviceByUUID(advertisement.getDeviceUUID());
+                        Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
                         int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
 
                         ByteBuffer buf = ByteBuffer.allocateDirect(8);
@@ -193,7 +167,7 @@ public class NooliteTXService implements Runnable {
                         log.debug("Get UnbindTXChannel advertisement");
 
                         final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
-                        NooliteDevice device = (NooliteDevice) getDeviceByUUID(advertisement.getDeviceUUID());
+                        Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
                         int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
 
                         ByteBuffer buf = ByteBuffer.allocateDirect(8);
@@ -271,31 +245,4 @@ public class NooliteTXService implements Runnable {
         LibUsb.attachKernelDriver(handle, 0);
         LibUsb.close(handle);
     }
-
-    private Object getDeviceByUUID(String uuid) {
-        ResultSet rs = sql.select("SELECT * FROM devices WHERE uuid='" + uuid + "'");
-
-        try {
-            while (rs.next()) {
-
-                if (rs.getString("source").equals("noolite")) {
-                    return new NooliteDevice().load(uuid);
-                }
-                // generic device
-                else {
-                    log.error("Unknown device!");
-                    return null;
-                }
-            }
-
-            rs.close();
-
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-
 }

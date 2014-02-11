@@ -15,7 +15,6 @@ import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
-import ru.iris.common.SQL;
 import ru.iris.devices.noolite.NooliteRXService;
 import ru.iris.devices.noolite.NooliteTXService;
 import ru.iris.devices.zwave.ZWaveService;
@@ -28,11 +27,6 @@ import java.util.Map;
 public class Service implements DevicesPlugin {
 
     private static Logger log = LogManager.getLogger(Service.class);
-    private static SQL sql = new SQL();
-
-    public static SQL getSQL() {
-        return sql;
-    }
 
     @Init
     public void init() throws IOException, SQLException {

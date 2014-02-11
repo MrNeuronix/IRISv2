@@ -1,6 +1,7 @@
 package ru.iris.common.messaging.model.devices;
 
 import com.google.gson.annotations.Expose;
+import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.model.Advertisement;
 
 import java.util.Map;
@@ -19,18 +20,18 @@ public class ResponseDeviceInventoryAdvertisement extends Advertisement {
      * Devices Map
      */
     @Expose
-    private Map<String, Object> devices;
+    private Map<?, Device> devices;
 
-    public ResponseDeviceInventoryAdvertisement set(Map<String, Object> devices) {
+    public ResponseDeviceInventoryAdvertisement set(Map<?, Device> devices) {
         this.devices = devices;
         return this;
     }
 
-    public Map<String, Object> getDevices() {
+    public Map<?, Device> getDevices() {
         return devices;
     }
 
-    public void setDevices(Map<String, Object> devices) {
+    public void setDevices(Map<String, Device> devices) {
         this.devices = devices;
     }
 }

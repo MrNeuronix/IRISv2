@@ -5,7 +5,6 @@ import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
-import ru.iris.common.SQL;
 import ru.iris.common.Speak;
 import ru.iris.speak.google.GoogleSpeakService;
 
@@ -20,12 +19,6 @@ import ru.iris.speak.google.GoogleSpeakService;
 
 @PluginImplementation
 public class Service implements SpeakPlugin {
-
-    private static SQL sql = new SQL();
-
-    public static SQL getSQL() {
-        return sql;
-    }
 
     private static Logger log = LogManager.getLogger(Service.class);
 

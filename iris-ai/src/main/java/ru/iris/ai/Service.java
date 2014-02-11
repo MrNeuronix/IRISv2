@@ -16,17 +16,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.ai.witai.WitAiService;
 import ru.iris.common.Config;
-import ru.iris.common.SQL;
 
 @PluginImplementation
 public class Service implements AIPlugin {
 
     private static Logger log = LogManager.getLogger(Service.class);
-    private static SQL sql = new SQL();
-
-    public static SQL getSQL() {
-        return sql;
-    }
 
     @Init
     public void init() throws Exception {

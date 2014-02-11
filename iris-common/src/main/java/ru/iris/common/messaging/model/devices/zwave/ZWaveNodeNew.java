@@ -1,6 +1,6 @@
 package ru.iris.common.messaging.model.devices.zwave;
 
-import ru.iris.common.devices.zwave.ZWaveDevice;
+import ru.iris.common.database.model.devices.Device;
 
 /**
  * IRISv2 Project
@@ -13,7 +13,7 @@ import ru.iris.common.devices.zwave.ZWaveDevice;
  */
 public class ZWaveNodeNew extends ZWaveNode {
 
-    public ZWaveNodeNew set(ZWaveDevice device) {
+    public ZWaveNodeNew set(Device device) {
         super.device = device;
         return this;
     }

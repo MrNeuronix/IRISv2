@@ -6,6 +6,7 @@ target
 *.log
 work
 main.property
+log4j2.xml
 *.keystore
 *.zip
 

@@ -1,7 +1,7 @@
 package ru.iris.common.messaging.model.devices.noolite;
 
 import com.google.gson.annotations.Expose;
-import ru.iris.common.devices.noolite.NooliteDevice;
+import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.model.Advertisement;
 
 /**
@@ -18,18 +18,18 @@ public class ResponseNooliteDeviceInventoryAdvertisement extends Advertisement {
      * Device UUID
      */
     @Expose
-    private NooliteDevice device;
+    private Device device;
 
-    public ResponseNooliteDeviceInventoryAdvertisement set(NooliteDevice device) {
+    public ResponseNooliteDeviceInventoryAdvertisement set(Device device) {
         this.device = device;
         return this;
     }
 
-    public NooliteDevice getDevice() {
+    public Device getDevice() {
         return device;
     }
 
-    public void setDevice(NooliteDevice device) {
+    public void setDevice(Device device) {
         this.device = device;
     }
 

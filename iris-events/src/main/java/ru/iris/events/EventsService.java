@@ -1,5 +1,6 @@
 package ru.iris.events;
 
+import com.avaje.ebean.Ebean;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,7 +9,7 @@ import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.tools.shell.Global;
-import ru.iris.common.SQL;
+import ru.iris.common.database.model.Event;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.ServiceCheckEmitter;
@@ -18,8 +19,7 @@ import ru.iris.common.messaging.model.service.ServiceStatus;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -34,7 +34,6 @@ public class EventsService implements Runnable {
 
     private Logger log = LogManager.getLogger(EventsService.class.getName());
     private boolean shutdown = false;
-    private SQL sql = Service.getSQL();
 
     public EventsService() {
         Thread t = new Thread(this);
@@ -108,14 +107,13 @@ public class EventsService implements Runnable {
                     } else {
 
                         // seek event in db
-                        ResultSet rs = sql.select("SELECT * FROM events WHERE subject='" + envelope.getSubject() + "'");
+                        List<Event> events = Ebean.find(Event.class).findList();
 
-                        try {
-                            while (rs.next()) {
+                        for (Event event : events) {
 
-                                File jsFile = new File("./scripts/" + rs.getString("script"));
+                                File jsFile = new File("./scripts/" + event.getScript());
 
-                                log.debug("Launch script: " + rs.getString("script"));
+                                log.debug("Launch script: " + event.getScript());
 
                                 try {
                                     ScriptableObject.putProperty(scope, "advertisement", Context.javaToJS(envelope.getObject(), scope));
@@ -126,12 +124,6 @@ public class EventsService implements Runnable {
                                     log.error("Error in script " + jsFile + ": " + e.toString());
                                     e.printStackTrace();
                                 }
-                            }
-
-                            rs.close();
-
-                        } catch (SQLException e) {
-                            e.printStackTrace();
                         }
                     }
                 }

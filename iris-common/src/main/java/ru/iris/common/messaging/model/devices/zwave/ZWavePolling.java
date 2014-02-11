@@ -1,7 +1,7 @@
 package ru.iris.common.messaging.model.devices.zwave;
 
 import com.google.gson.annotations.Expose;
-import ru.iris.common.devices.zwave.ZWaveDevice;
+import ru.iris.common.database.model.devices.Device;
 
 /**
  * IRISv2 Project
@@ -20,7 +20,7 @@ public class ZWavePolling extends ZWaveNode {
     /**
      * Default constructor for de-serialisation.
      */
-    public ZWavePolling set(ZWaveDevice device, boolean state) {
+    public ZWavePolling set(Device device, boolean state) {
         super.device = device;
         this.state = state;
         return this;

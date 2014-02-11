@@ -1,11 +1,11 @@
 package ru.iris.devices;
 
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Query;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
-import ru.iris.common.SQL;
-import ru.iris.common.devices.noolite.NooliteDevice;
-import ru.iris.common.devices.zwave.ZWaveDevice;
+import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.ServiceCheckEmitter;
@@ -13,11 +13,6 @@ import ru.iris.common.messaging.model.devices.*;
 import ru.iris.common.messaging.model.devices.noolite.ResponseNooliteDeviceInventoryAdvertisement;
 import ru.iris.common.messaging.model.devices.zwave.ResponseZWaveDeviceInventoryAdvertisement;
 import ru.iris.common.messaging.model.service.ServiceStatus;
-
-import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,7 +32,6 @@ public class CommonDeviceService implements Runnable {
     private boolean shutdown = false;
     private JsonMessaging messaging;
     private Map<String, String> config;
-    private SQL sql = Service.getSQL();
 
 
     public CommonDeviceService() {
@@ -84,7 +78,6 @@ public class CommonDeviceService implements Runnable {
                 final JsonEnvelope envelope = jsonMessaging.receive(100);
                 if (envelope != null) {
 
-
                     ////////////////////////////////////////////
                     //// Setting level to device            ////
                     ////////////////////////////////////////////
@@ -98,16 +91,17 @@ public class CommonDeviceService implements Runnable {
                         String label = advertisement.getLabel();
                         String level = advertisement.getValue();
 
-                        Object device = getDeviceByUUID(uuid);
+                        Device device = Ebean.find(Device.class)
+                                .where().eq("uuid", uuid).findUnique();
 
                         if (device == null) {
                             log.info("Cant find device with UUID " + uuid);
                             continue;
                         }
 
-                        if (device instanceof ZWaveDevice) {
+                        if (device.getSource().equals("zwave")) {
                             jsonMessaging.broadcast("event.devices.zwave.setvalue", new SetDeviceLevelAdvertisement().set(uuid, label, level));
-                        } else if (device instanceof NooliteDevice) {
+                        } else if (device.getSource().equals("noolite")) {
                             jsonMessaging.broadcast("event.devices.noolite.setvalue", new SetDeviceLevelAdvertisement().set(uuid, label, level));
                         }
 
@@ -124,49 +118,27 @@ public class CommonDeviceService implements Runnable {
                         // let send all devices (full inventory)
                         if (uuid.equals("all")) {
 
-                            Map<String, Object> devices = new HashMap<>();
-
-                            ResultSet rs = sql.select("SELECT * FROM devices");
-
-                            try {
-                                while (rs.next()) {
-
-                                    // if device has zwave source
-                                    if (rs.getString("source").equals("zwave")) {
-                                        devices.put(rs.getString("internalname"), new ZWaveDevice().load(rs.getString("uuid")));
-                                    }
-                                    // if device has noolite source
-                                    else if (rs.getString("source").equals("noolite")) {
-                                        devices.put(rs.getString("internalname"), new NooliteDevice().load(rs.getString("uuid")));
-                                    }
-                                    // generic device
-                                    else {
-                                        log.error("Unknown device!");
-                                    }
-                                }
-
-                                rs.close();
-
-                            } catch (SQLException | IOException e) {
-                                e.printStackTrace();
-                            }
+                            Query<Device> query = Ebean.createQuery(Device.class);
+                            query.setMapKey("internalname");
+                            Map<?, Device> devices = query.findMap();
 
                             jsonMessaging.broadcast("event.devices.responseinventory", new ResponseDeviceInventoryAdvertisement().set(devices));
 
                             // send one device specified by UUID
                         } else {
 
-                            Object device = getDeviceByUUID(uuid);
+                            Device device = Ebean.find(Device.class)
+                                    .where().eq("uuid", uuid).findUnique();
 
                             if (device == null) {
                                 log.info("Cant find device with UUID " + uuid);
                                 continue;
                             }
 
-                            if (device instanceof ZWaveDevice) {
-                                jsonMessaging.broadcast("event.devices.responseinventory", new ResponseZWaveDeviceInventoryAdvertisement().set((ZWaveDevice) device));
-                            } else if (device instanceof NooliteDevice) {
-                                jsonMessaging.broadcast("event.devices.responseinventory", new ResponseNooliteDeviceInventoryAdvertisement().set((NooliteDevice) device));
+                            if (device.getSource().equals("zwave")) {
+                                jsonMessaging.broadcast("event.devices.responseinventory", new ResponseZWaveDeviceInventoryAdvertisement().set(device));
+                            } else if (device.getSource().equals("noolite")) {
+                                jsonMessaging.broadcast("event.devices.responseinventory", new ResponseNooliteDeviceInventoryAdvertisement().set(device));
                             }
                         }
 
@@ -179,7 +151,8 @@ public class CommonDeviceService implements Runnable {
                         SetDeviceNameAdvertisement advertisement = envelope.getObject();
 
                         String uuid = advertisement.getDeviceUUID();
-                        Object device = getDeviceByUUID(uuid);
+                        Device device = Ebean.find(Device.class)
+                                .where().eq("uuid", uuid).findUnique();
 
                         if (device == null) {
                             log.info("Cant find device with UUID " + uuid);
@@ -188,16 +161,8 @@ public class CommonDeviceService implements Runnable {
 
                         log.info("Setting name \"" + advertisement.getName() + "\" to device " + uuid);
 
-                        if (device instanceof ZWaveDevice) {
-                            ZWaveDevice zWaveDevice = (ZWaveDevice) device;
-                            zWaveDevice.setName(advertisement.getName());
-                            zWaveDevice.save();
-                        } else if (device instanceof NooliteDevice) {
-                            NooliteDevice nooliteDevice = (NooliteDevice) device;
-                            nooliteDevice.setName(advertisement.getName());
-                            nooliteDevice.save();
-                        }
-
+                        device.setName(advertisement.getName());
+                        Ebean.save(device);
 
                         ////////////////////////////////////////////
                         //// Set device zone                    ////
@@ -208,7 +173,8 @@ public class CommonDeviceService implements Runnable {
                         SetDeviceZoneAdvertisement advertisement = envelope.getObject();
 
                         String uuid = advertisement.getDeviceUUID();
-                        Object device = getDeviceByUUID(uuid);
+                        Device device = Ebean.find(Device.class)
+                                .where().eq("uuid", uuid).findUnique();
 
                         if (device == null) {
                             log.info("Cant find device with UUID " + uuid);
@@ -217,15 +183,8 @@ public class CommonDeviceService implements Runnable {
 
                         log.info("Setting zone " + advertisement.getZone() + " to device " + uuid);
 
-                        if (device instanceof ZWaveDevice) {
-                            ZWaveDevice zWaveDevice = (ZWaveDevice) device;
-                            zWaveDevice.setZone(advertisement.getZone());
-                            zWaveDevice.save();
-                        } else if (device instanceof NooliteDevice) {
-                            NooliteDevice nooliteDevice = (NooliteDevice) device;
-                            nooliteDevice.setZone(advertisement.getZone());
-                            nooliteDevice.save();
-                        }
+                        device.setZone(advertisement.getZone());
+                        Ebean.save(device);
 
                         ////////////////////////////////////////////
                         //// Unknown broadcast                  ////
@@ -259,41 +218,6 @@ public class CommonDeviceService implements Runnable {
 
         } catch (InterruptedException e) {
             e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-    }
-
-    //////////////////////////////////////////////////
-
-    private Object getDeviceByUUID(String uuid) {
-        ResultSet rs = sql.select("SELECT * FROM devices WHERE uuid='" + uuid + "'");
-
-        try {
-            while (rs.next()) {
-
-                // if device has zwave source
-                if (rs.getString("source").equals("zwave")) {
-                    return new ZWaveDevice().load(uuid);
-                }
-                // if device has noolite source
-                else if (rs.getString("source").equals("noolite")) {
-                    return new NooliteDevice().load(uuid);
-                }
-                // generic device
-                else {
-                    log.error("Unknown device!");
-                    return null;
-                }
-
-            }
-
-            rs.close();
-
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
-        }
-
-        return null;
     }
 }

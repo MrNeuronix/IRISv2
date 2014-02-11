@@ -1,4 +1,4 @@
-package ru.iris.common.devices;
+package ru.iris.common.database.model.devices;
 
 /**
  * IRISv2 Project
@@ -12,41 +12,77 @@ package ru.iris.common.devices;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
-import ru.iris.common.SQL;
 
-import java.io.IOException;
+import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
+@Entity
+@Table(name="devices")
 public class Device implements Serializable {
+
+    @Id
+    private Long id;
 
     @Expose
     protected String name = "not set";
+
     @Expose
     protected short node = 0;
+
     @Expose
     protected int zone = 0;
+
     @Expose
     protected String type = "unknown";
+
     @Expose
+    @Column(name="internaltype")
     protected String internalType = "unknown";
+
     @Expose
+    @Column(name="manufname")
     protected String manufName = "unknown";
+
     @Expose
+    @Column(name="productname")
     protected String productName = "unknown";
+
     @Expose
     protected String uuid = "unknown";
+
     @Expose
     protected String status = "unknown";
+
     @Expose
-    protected String source = "unknown";
-    @Expose
+    @Column(name="internalname")
     protected String internalName = "unknown";
 
-    protected SQL sql;
+    @Expose
+    private String source = "unknown";
 
-    public Device() throws IOException, SQLException {
-        sql = new SQL();
+    @Expose
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<DeviceValue> values = new ArrayList<>();
+
+    public Device() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
     }
 
     public void setName(String name) {
@@ -63,10 +99,6 @@ public class Device implements Serializable {
 
     public String getProductName() {
         return this.productName;
-    }
-
-    public String getSource() {
-        return this.source;
     }
 
     public void setNode(short node) {
@@ -131,6 +163,72 @@ public class Device implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public List<DeviceValue> getValues() {
+        return values;
+    }
+
+    public void setValues(List<DeviceValue> values) {
+        this.values = values;
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    @Deprecated
+    public List<DeviceValue> getValueIDs() {
+        return values;
+    }
+
+    public DeviceValue getValue(String value) {
+
+        for (DeviceValue zvalue : values) {
+            if (zvalue.getLabel().equals(value)) {
+                return zvalue;
+            }
+        }
+        return null;
+    }
+
+    public synchronized void updateValue(DeviceValue value) {
+
+        List<DeviceValue> zDv = values;
+        boolean flag = false;
+
+        for (DeviceValue zvalue : new ArrayList<>(values)) {
+            if (zvalue.getLabel().equals(value.getLabel())) {
+                zDv.remove(zvalue);
+                zDv.add(value);
+                flag = true;
+            }
+        }
+
+        if (!flag) {
+            zDv.add(value);
+        }
+
+        values = zDv;
+        zDv = null;
+    }
+
+    public synchronized void removeValue(DeviceValue value) {
+
+        List<DeviceValue> zDv = values;
+
+        for (DeviceValue zvalue : new ArrayList<>(values)) {
+            if (zvalue.getLabel().equals(value.getLabel())) {
+                zDv.remove(zvalue);
+            }
+        }
+
+        values = zDv;
+        zDv = null;
     }
 
     @Override

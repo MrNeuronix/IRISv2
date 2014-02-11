@@ -10,18 +10,18 @@ package ru.iris.speak.google;
  * License: GPL v3
  */
 
+import com.avaje.ebean.Ebean;
 import com.darkprograms.speech.synthesiser.Synthesiser;
 import javazoom.jl.player.Player;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
-import ru.iris.common.SQL;
+import ru.iris.common.database.model.Speaks;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
-import ru.iris.speak.Service;
 
 import javax.sound.sampled.*;
 import java.io.File;
@@ -34,7 +34,6 @@ public class GoogleSpeakService implements Runnable {
     private Logger log = LogManager.getLogger(GoogleSpeakService.class.getName());
     private boolean shutdown = false;
     private Config config = new Config();
-    private SQL sql = Service.getSQL();
 
     public GoogleSpeakService() {
         t = new Thread(this);
@@ -97,7 +96,16 @@ public class GoogleSpeakService implements Runnable {
 
                         SpeakAdvertisement advertisement = envelope.getObject();
 
+                        Speaks speak = new Speaks();
+                        speak.setText(advertisement.getText());
+                        speak.setConfidence(advertisement.getConfidence());
+                        speak.setDevice(advertisement.getDevice());
+                        speak.setActive(true);
+
+                        Ebean.save(speak);
+
                         if (conf.get("silence").equals("0")) {
+
                             log.info("Confidence: " + advertisement.getConfidence());
                             log.info("Text: " + advertisement.getText());
                             log.info("Device: " + advertisement.getDevice());
@@ -106,12 +114,6 @@ public class GoogleSpeakService implements Runnable {
                                 final Player player = new Player(synthesiser.getMP3Data(advertisement.getText()));
                                 player.play();
                                 player.close();
-
-                                sql.doQuery("INSERT INTO speaks (text, confidence, device, isActive) " +
-                                        "VALUES ('" + advertisement.getText() + "', '" + advertisement.getConfidence() + "', '" + advertisement.getDevice() + "', true)");
-                            } else {
-                                sql.doQuery("INSERT INTO speaks (text, confidence, device, isActive) " +
-                                        "VALUES ('" + advertisement.getText() + "', '" + advertisement.getConfidence() + "', '" + advertisement.getDevice() + "', true)");
                             }
 
                         } else {

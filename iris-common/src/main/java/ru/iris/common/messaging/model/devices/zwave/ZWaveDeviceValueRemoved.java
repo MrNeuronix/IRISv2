@@ -1,7 +1,7 @@
 package ru.iris.common.messaging.model.devices.zwave;
 
 import com.google.gson.annotations.Expose;
-import ru.iris.common.devices.zwave.ZWaveDevice;
+import ru.iris.common.database.model.devices.Device;
 
 /**
  * IRISv2 Project
@@ -17,7 +17,7 @@ public class ZWaveDeviceValueRemoved {
      * Zwave device
      */
     @Expose
-    private ZWaveDevice device;
+    private Device device;
 
     @Expose
     private String label;
@@ -25,7 +25,7 @@ public class ZWaveDeviceValueRemoved {
     @Expose
     private String value;
 
-    public ZWaveDeviceValueRemoved set(ZWaveDevice device, String label, String value) {
+    public ZWaveDeviceValueRemoved set(Device device, String label, String value) {
         this.device = device;
         this.label = label;
         this.value = value;
@@ -38,11 +38,11 @@ public class ZWaveDeviceValueRemoved {
     public ZWaveDeviceValueRemoved() {
     }
 
-    public ZWaveDevice getDevice() {
+    public Device getDevice() {
         return device;
     }
 
-    public void setDevice(ZWaveDevice device) {
+    public void setDevice(Device device) {
         this.device = device;
     }
 

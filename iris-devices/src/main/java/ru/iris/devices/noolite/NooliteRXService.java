@@ -1,27 +1,23 @@
 package ru.iris.devices.noolite;
 
+import com.avaje.ebean.Ebean;
 import de.ailis.usb4java.libusb.Context;
 import de.ailis.usb4java.libusb.DeviceHandle;
 import de.ailis.usb4java.libusb.LibUsb;
 import de.ailis.usb4java.libusb.LibUsbException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.common.SQL;
-import ru.iris.common.devices.noolite.NooliteDevice;
-import ru.iris.common.devices.noolite.NooliteDeviceValue;
+import ru.iris.common.database.model.devices.Device;
+import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.devices.noolite.*;
 import ru.iris.common.messaging.model.service.ServiceStatus;
-import ru.iris.devices.Service;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -38,9 +34,8 @@ public class NooliteRXService implements Runnable {
 
     private Logger log = LogManager.getLogger(NooliteRXService.class.getName());
     private boolean shutdown = false;
-    private static final Map<String, NooliteDevice> nooDevices = new HashMap<>();
     private JsonMessaging messaging;
-    private SQL sql = Service.getSQL();
+    private List<Device> devices = new ArrayList<>();
     protected final Context context = new Context();
     protected DeviceHandle handle;
     protected boolean pause = false;
@@ -75,20 +70,8 @@ public class NooliteRXService implements Runnable {
 
         messaging = new JsonMessaging(UUID.randomUUID());
 
-        ResultSet rs = sql.select("SELECT uuid, internalname FROM devices WHERE source='noolite'");
-
-        try {
-            while (rs.next()) {
-
-                log.info("Loading device " + rs.getString("internalname") + " from database");
-                nooDevices.put(rs.getString("internalname"), new NooliteDevice().load(rs.getString("uuid")));
-            }
-
-            rs.close();
-
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
-        }
+        devices = Ebean.find(Device.class)
+                .where().eq("source", "noolite").findList();
 
         serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
@@ -144,29 +127,20 @@ public class NooliteRXService implements Runnable {
                 byte action = buf.get(2);
                 Integer dimmerValue = (int) buf.get(4);
 
-                NooliteDevice device = null;
-
-                try {
-                    device = new NooliteDevice().loadByChannel(channel);
-                } catch (IOException | SQLException e) {
-                    e.printStackTrace();
-                }
+                Device device = loadByChannel(channel);
 
                 if (device == null) {
-                    try {
-                        device = new NooliteDevice();
+                        device = new Device();
+                        device.setSource("noolite");
                         device.setInternalName("noolite/channel/" + channel);
                         device.setStatus("listening");
                         device.setType("Generic Noolite Device");
                         device.setManufName("Nootechnika");
                         device.setUUID(UUID.randomUUID().toString());
-                        device.updateValue(new NooliteDeviceValue("channel", channel.toString(), "", "", true));
-                        device.updateValue(new NooliteDeviceValue("type", "generic", "", "", false));
+                        device.updateValue(new DeviceValue("channel", channel.toString(), "", "", true));
+                        device.updateValue(new DeviceValue("type", "generic", "", "", false));
 
-                        nooDevices.put("noolite/channel/" + channel, device);
-                    } catch (IOException | SQLException e) {
-                        e.printStackTrace();
-                    }
+                        devices.add(device);
                 }
 
                 // turn off
@@ -174,60 +148,45 @@ public class NooliteRXService implements Runnable {
 
                     log.info("Channel " + channel + ": Got OFF command");
 
-                    device.updateValue(new NooliteDeviceValue("Level", "0", "", "", false));
+                    device.updateValue(new DeviceValue("Level", "0", "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "0"));
-                    try {
-                        device.save();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+
+                    Ebean.save(device);
                 }
                 // dim
                 else if (action == 1) {
 
                     log.info("Channel " + channel + ": Got DIM command");
                     // we only know, that the user hold OFF button
-                    device.updateValue(new NooliteDeviceValue("Level", "0", "", "", false));
+                    device.updateValue(new DeviceValue("Level", "0", "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelDimAdvertisement().set(device.getUUID()));
-                    try {
-                        device.save();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+
+                    Ebean.save(device);
                 }
                 // turn on
                 else if (action == 2) {
                     log.info("Channel " + channel + ": Got ON command");
-                    device.updateValue(new NooliteDeviceValue("Level", "100", "", "", false));
+                    device.updateValue(new DeviceValue("Level", "100", "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "100"));
-                    try {
-                        device.save();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+
+                    Ebean.save(device);
                 }
                 // bright
                 else if (action == 3) {
                     log.info("Channel " + channel + ": Got BRIGHT command");
                     // we only know, that the user hold ON button
-                    device.updateValue(new NooliteDeviceValue("Level", "100", "", "", false));
+                    device.updateValue(new DeviceValue("Level", "100", "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelBrightAdvertisement().set(device.getUUID()));
-                    try {
-                        device.save();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+
+                    Ebean.save(device);
                 }
                 // set level
                 else if (action == 6) {
                     log.info("Channel " + channel + ": Got SETLEVEL command.");
-                    device.updateValue(new NooliteDeviceValue("Level", dimmerValue.toString(), "", "", false));
+                    device.updateValue(new DeviceValue("Level", dimmerValue.toString(), "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", dimmerValue.toString()));
-                    try {
-                        device.save();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+
+                    Ebean.save(device);
                 }
                 // stop dim/bright
                 else if (action == 10) {
@@ -252,8 +211,24 @@ public class NooliteRXService implements Runnable {
 
         // Broadcast that this service is shutdown.
         serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
-
     }
+
+        private Device loadByChannel(int channel)
+        {
+               log.info("Check load DEVICE "+channel);
+
+                for (Device device : devices)
+                {
+                    if(device.getInternalName().equals("noolite/channel/"+channel)) {
+                        log.info("RETURN DEVICE "+channel);
+                        return device;
+                    }
+
+                }
+
+            log.info("NO DEVICE "+channel);
+            return null;
+        }
 
     ///
     ///  For intenal commands
@@ -295,7 +270,7 @@ public class NooliteRXService implements Runnable {
                             log.debug("Get BindRXChannel advertisement");
 
                             final BindRXChannelAdvertisment advertisement = envelope.getObject();
-                            NooliteDevice device = (NooliteDevice) getDeviceByUUID(advertisement.getDeviceUUID());
+                            Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
                             int channel = Integer.valueOf(device.getValue("channel").getValue());
 
                             ByteBuffer buf = ByteBuffer.allocateDirect(8);
@@ -311,7 +286,7 @@ public class NooliteRXService implements Runnable {
                             log.debug("Get UnbindRXChannel advertisement");
 
                             final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
-                            NooliteDevice device = (NooliteDevice) getDeviceByUUID(advertisement.getDeviceUUID());
+                            Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
                             int channel = Integer.valueOf(device.getValue("channel").getValue());
 
                             ByteBuffer buf = ByteBuffer.allocateDirect(8);
@@ -363,31 +338,6 @@ public class NooliteRXService implements Runnable {
                 log.error("Unexpected exception in NooliteRX-Internal", t);
             }
 
-        }
-
-        private Object getDeviceByUUID(String uuid) {
-            ResultSet rs = sql.select("SELECT * FROM devices WHERE uuid='" + uuid + "'");
-
-            try {
-                while (rs.next()) {
-
-                    if (rs.getString("source").equals("noolite")) {
-                        return new NooliteDevice().load(uuid);
-                    }
-                    // generic device
-                    else {
-                        log.error("Unknown device!");
-                        return null;
-                    }
-                }
-
-                rs.close();
-
-            } catch (SQLException | IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
         }
     }
 }

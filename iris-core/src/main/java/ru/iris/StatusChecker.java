@@ -1,13 +1,15 @@
 package ru.iris;
 
+import com.avaje.ebean.Ebean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.common.SQL;
+import ru.iris.common.database.model.ModuleStatus;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.service.ServiceAdvertisement;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 
 /**
@@ -30,7 +32,6 @@ public class StatusChecker implements Runnable {
 
     private static Logger log = LogManager.getLogger(StatusChecker.class.getName());
     private static boolean shutdown = false;
-    private SQL sql = Core.getSQL();
     private static ServiceAdvertisement advertisement = new ServiceAdvertisement();
 
     public StatusChecker() {
@@ -72,13 +73,26 @@ public class StatusChecker implements Runnable {
                         final ServiceAdvertisement serviceAdvertisement = envelope.getObject();
 
                         log.debug("Service '" + serviceAdvertisement.getName()
-                                + "' status: '" + serviceAdvertisement.getStatus()
-                                + " instance: '" + serviceAdvertisement.getInstanceId()
+                                + "', status: '" + serviceAdvertisement.getStatus()
+                                + "', instance: '" + serviceAdvertisement.getInstanceId()
                                 + "'"
                         );
 
-                        sql.doQuery("DELETE FROM modulestatus WHERE name='" + serviceAdvertisement.getName() + "'");
-                        sql.doQuery("INSERT INTO modulestatus (name, lastseen, state) VALUES ('" + serviceAdvertisement.getName() + "',NOW(),'" + serviceAdvertisement.getStatus() + "')");
+                        ModuleStatus module = Ebean.find(ModuleStatus.class)
+                                .where().eq("name", serviceAdvertisement.getName()).findUnique();
+
+                        if(module != null) {
+                            module.setState(serviceAdvertisement.getStatus().toString());
+                            module.setLastseen(new Timestamp(new java.util.Date().getTime()));
+                            Ebean.save(module);
+                        }
+                        else {
+                            module = new ModuleStatus();
+                            module.setState(serviceAdvertisement.getStatus().toString());
+                            module.setLastseen(new Timestamp(new java.util.Date().getTime()));
+                            module.setName(serviceAdvertisement.getName());
+                            Ebean.save(module);
+                        }
 
                     } else if (envelope.getReceiverInstance() == null) {
                         // We received unknown broadcast message. Lets make generic log entry.

@@ -122,6 +122,11 @@
             <artifactId>activemq-kahadb-store</artifactId>
             <version>5.9.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.avaje</groupId>
+            <artifactId>ebean</artifactId>
+            <version>2.7.1</version>
+        </dependency>
     </dependencies>
 
 </project>
