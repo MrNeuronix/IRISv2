@@ -212,7 +212,7 @@ public class JsonMessaging {
             message = null;
 
         } catch (JMSException e) {
-            throw new RuntimeException("Error sending JSON message: " + object + " to subject: " + subject, e);
+            LOGGER.debug("Error sending JSON message: " + object + " to subject: " + subject, e);
         }
     }
 

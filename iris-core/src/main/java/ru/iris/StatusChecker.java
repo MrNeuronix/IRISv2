@@ -84,7 +84,7 @@ public class StatusChecker implements Runnable {
                         if(module != null) {
                             module.setState(serviceAdvertisement.getStatus().toString());
                             module.setLastseen(new Timestamp(new java.util.Date().getTime()));
-                            Ebean.save(module);
+                            Ebean.update(module);
                         }
                         else {
                             module = new ModuleStatus();

@@ -61,7 +61,7 @@ public class ScheduleService implements Runnable {
                 if (task.getType() == 1) {
                     log.info("Actualizing task. Next run: " + task.nextRun());
                     task.setTaskdate(task.nextRun());
-                    Ebean.save(task);
+                    Ebean.update(task);
                 } else if (task.getType() == 3) {
                     if (task.getValidto().before(task.nextRun())) {
                         log.info("Actualizing task. Set task to disable");
@@ -70,7 +70,7 @@ public class ScheduleService implements Runnable {
                         log.info("Actualizing task. Next run: " + task.nextRun());
                         task.setTaskdate(task.nextRun());
                     }
-                    Ebean.save(task);
+                    Ebean.update(task);
                 } else {
                     log.info("Skip task");
                 }
@@ -100,20 +100,20 @@ public class ScheduleService implements Runnable {
                         if (task.getType() == 1) {
                             log.info("Next run: " + task.nextRun());
                             task.setTaskdate(task.nextRun());
-                            Ebean.save(task);
+                            Ebean.update(task);
                         } else if (task.getType() == 2) {
                             log.info("Set task to disable");
                             task.setEnabled(false);
-                            Ebean.save(task);
+                            Ebean.update(task);
                         } else {
                             if (task.getValidto().before(task.nextRun())) {
                                 log.info("Set task to disable");
                                 task.setEnabled(false);
-                                Ebean.save(task);
+                                Ebean.update(task);
                             } else {
                                 log.info("Next run: " + task.nextRun());
                                 task.setTaskdate(task.nextRun());
-                                Ebean.save(task);
+                                Ebean.update(task);
                             }
                         }
                     }

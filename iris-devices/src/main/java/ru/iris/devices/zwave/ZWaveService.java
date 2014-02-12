@@ -317,7 +317,7 @@ public class ZWaveService implements Runnable {
                                 Manager.get().isValueReadOnly(notification.getValueId())));
 
                             if (initComplete)
-                                Ebean.save(zrZWaveDevice);
+                                Ebean.update(zrZWaveDevice);
 
                         messaging.broadcast("event.devices.zwave.value.removed",
                                 zWaveDeviceValueRemoved.set(
@@ -333,22 +333,23 @@ public class ZWaveService implements Runnable {
 
                         Device zWaveDevice = getZWaveDeviceByNode(node);
 
+                        if (zWaveDevice == null) {
+                            break;
+                        }
+
                         // Check for awaked after sleeping nodes
                         if (manager.isNodeAwake(homeId, zWaveDevice.getNode()) && zWaveDevice.getStatus().equals("Sleeping")) {
                             log.info("Setting node " + zWaveDevice.getNode() + " to LISTEN state");
                             zWaveDevice.setStatus("Listening");
                         }
 
-                        if (zWaveDevice == null) {
-                            log.info("While save change value, node " + node + " not found");
-                            break;
-                        }
-
                         // break if same value
                         try {
                             if (Utils.getValue(zWaveDevice.getValue(manager.getValueLabel(notification.getValueId())).getValueId()) == Utils.getValue(notification.getValueId()))
+                            {
                                 log.debug("Same value. Breaking");
-                            break;
+                                break;
+                            }
                         } catch (NullPointerException e) {
                             log.error("Error while change value: " + e.toString());
                             e.printStackTrace();
@@ -357,8 +358,7 @@ public class ZWaveService implements Runnable {
 
                         log.info("Node " +
                                 zWaveDevice.getNode() + ": " +
-                                " Value for label \"" + manager.getValueLabel(notification.getValueId()) + "\" changed " +
-                                "\"" + Utils.getValue(zWaveDevice.getValue(manager.getValueLabel(notification.getValueId())).getValueId()) + "\" --> " +
+                                " Value for label \"" + manager.getValueLabel(notification.getValueId()) + "\" changed  --> " +
                                 "\"" + Utils.getValue(notification.getValueId()) + "\"");
 
                         zWaveDevice.updateValue(new DeviceValue(
@@ -370,7 +370,7 @@ public class ZWaveService implements Runnable {
                                 Manager.get().isValueReadOnly(notification.getValueId())));
 
                             if (initComplete)
-                                Ebean.save(zWaveDevice);
+                                Ebean.update(zWaveDevice);
 
                         messaging.broadcast("event.devices.zwave.value.changed",
                                 zWaveDeviceValueChanged.set(
@@ -424,25 +424,38 @@ public class ZWaveService implements Runnable {
 
         log.info("Initialization complete. Found " + devices.size() + " devices");
 
-        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
+        for(Device ZWaveDevice : devices)
+        {
+            // Check for dead nodes
+            if (Manager.get().isNodeFailed(homeId, ZWaveDevice.getNode())) {
+                log.info("Setting node " + ZWaveDevice.getNode() + " to DEAD state");
+                ZWaveDevice.setStatus("dead");
+            }
 
-        for (Device ZWaveDevice : devices) {
+            // Check for sleeping nodes
+            if (!Manager.get().isNodeAwake(homeId, ZWaveDevice.getNode())) {
+                log.info("Setting node " + ZWaveDevice.getNode() + " to SLEEP state");
+                ZWaveDevice.setStatus("sleeping");
+            }
 
-                // Check for dead nodes
-                if (manager.isNodeFailed(homeId, ZWaveDevice.getNode())) {
-                    log.info("Setting node " + ZWaveDevice.getNode() + " to DEAD state");
-                    ZWaveDevice.setStatus("dead");
-                }
-
-                // Check for sleeping nodes
-                if (!manager.isNodeAwake(homeId, ZWaveDevice.getNode())) {
-                    log.info("Setting node " + ZWaveDevice.getNode() + " to SLEEP state");
-                    ZWaveDevice.setStatus("sleeping");
-                }
-
+            if(ZWaveDevice.getId() == null)
+            {
+                log.debug("Save new Z-Wave device");
                 Ebean.save(ZWaveDevice);
-                initComplete = true;
+            }
+            else
+            {
+                log.debug("Update existing Z-Wave device");
+                Ebean.update(ZWaveDevice);
+            }
         }
+
+        devices = Ebean.find(Device.class)
+                .where().eq("source", "zwave").findList();
+
+        initComplete = true;
+
+        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
         try {
             // Make sure we exit the wait loop if we receive shutdown signal.
@@ -590,19 +603,26 @@ public class ZWaveService implements Runnable {
     }
 
     private Device getZWaveDeviceByUUID(String uuid) {
-        for (Device ZWaveDevice : devices) {
-            if (ZWaveDevice.getUUID().equals(uuid))
-                return ZWaveDevice;
+
+        for (Device device : devices) {
+
+            if (uuid.equals(device.getUuid())) {
+                return device;
+            }
         }
+
         return null;
     }
 
     private Device getZWaveDeviceByNode(short id) {
-        for (Device ZWaveDevice : devices) {
-            if (ZWaveDevice.getNode() == id) {
-                return ZWaveDevice;
+
+        for (Device device : devices) {
+
+            if (device.getNode() == id) {
+                return device;
             }
         }
+
         return null;
     }
 
@@ -660,14 +680,9 @@ public class ZWaveService implements Runnable {
                     Manager.get().isValueReadOnly(notification.getValueId())));
         }
 
-        // catch and save into database value changes after init complete
-        try {
-            if (initComplete)
-                if (ZWaveDevice != null) {
-                    Ebean.save(ZWaveDevice);
-                }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(initComplete)
+        {
+            Ebean.update(ZWaveDevice);
         }
 
         return ZWaveDevice;

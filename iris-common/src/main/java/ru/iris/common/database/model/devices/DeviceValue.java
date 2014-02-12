@@ -22,23 +22,26 @@ public class DeviceValue {
     @Id
     private Long id;
 
-    @Expose
-    protected String label = "unknown";
+    @ManyToOne
+    private Device device;
 
     @Expose
-    protected String value = "unknown";
+    private String label = "unknown";
+
+    @Expose
+    private String value = "unknown";
 
     @Expose
     @Column(name="type")
-    protected String valueType = "unknown";
+    private String valueType = "unknown";
 
     @Expose
     @Column(name="units")
-    protected String valueUnits = "unknown";
+    private String valueUnits = "unknown";
 
     @Expose
     @Transient
-    protected boolean isReadonly = false;
+    private boolean isReadonly = false;
 
     @Transient
     private ValueId valueId;
@@ -63,6 +66,14 @@ public class DeviceValue {
 
         this(label, value, valueType, valueUnits, isReadonly);
         this.valueId = valueId;
+    }
+
+    public Device getDevice() {
+        return device;
+    }
+
+    public void setDevice(Device device) {
+        this.device = device;
     }
 
     public Long getId() {

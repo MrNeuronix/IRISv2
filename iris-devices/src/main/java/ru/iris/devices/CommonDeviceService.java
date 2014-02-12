@@ -162,7 +162,7 @@ public class CommonDeviceService implements Runnable {
                         log.info("Setting name \"" + advertisement.getName() + "\" to device " + uuid);
 
                         device.setName(advertisement.getName());
-                        Ebean.save(device);
+                        Ebean.update(device);
 
                         ////////////////////////////////////////////
                         //// Set device zone                    ////
@@ -184,7 +184,7 @@ public class CommonDeviceService implements Runnable {
                         log.info("Setting zone " + advertisement.getZone() + " to device " + uuid);
 
                         device.setZone(advertisement.getZone());
-                        Ebean.save(device);
+                        Ebean.update(device);
 
                         ////////////////////////////////////////////
                         //// Unknown broadcast                  ////

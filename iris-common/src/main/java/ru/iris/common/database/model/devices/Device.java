@@ -198,6 +198,9 @@ public class Device implements Serializable {
 
     public synchronized void updateValue(DeviceValue value) {
 
+        // bi-directional relationship
+        value.setDevice(this);
+
         List<DeviceValue> zDv = values;
         boolean flag = false;
 
