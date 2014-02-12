@@ -28,7 +28,7 @@ public class Speaks {
 
     @Expose
     @Column(columnDefinition = "timestamp")
-    private Timestamp date;
+    private Timestamp speakdate;
 
     @Expose
     @Column(columnDefinition = "TEXT")
@@ -55,12 +55,12 @@ public class Speaks {
         this.id = id;
     }
 
-    public Timestamp getDate() {
-        return date;
+    public Timestamp getSpeakdate() {
+        return speakdate;
     }
 
-    public void setDate(Timestamp date) {
-        this.date = date;
+    public void setSpeakdate(Timestamp speakdate) {
+        this.speakdate = speakdate;
     }
 
     public String getText() {

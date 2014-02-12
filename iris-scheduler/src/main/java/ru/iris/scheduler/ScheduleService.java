@@ -51,7 +51,7 @@ public class ScheduleService implements Runnable {
         try {
 
             List<Task> tasks = Ebean.find(Task.class)
-                    .where().and(Expr.lt("date", new Timestamp(System.currentTimeMillis())), Expr.eq("enabled", true)).findList();
+                    .where().and(Expr.lt("taskdate", new Timestamp(System.currentTimeMillis())), Expr.eq("enabled", true)).findList();
 
             messaging = new JsonMessaging(UUID.randomUUID());
 
@@ -60,7 +60,7 @@ public class ScheduleService implements Runnable {
 
                 if (task.getType() == 1) {
                     log.info("Actualizing task. Next run: " + task.nextRun());
-                    task.setDate(task.nextRun());
+                    task.setTaskdate(task.nextRun());
                     Ebean.save(task);
                 } else if (task.getType() == 3) {
                     if (task.getValidto().before(task.nextRun())) {
@@ -68,7 +68,7 @@ public class ScheduleService implements Runnable {
                         task.setEnabled(false);
                     } else {
                         log.info("Actualizing task. Next run: " + task.nextRun());
-                        task.setDate(task.nextRun());
+                        task.setTaskdate(task.nextRun());
                     }
                     Ebean.save(task);
                 } else {
@@ -92,14 +92,14 @@ public class ScheduleService implements Runnable {
 
                 for (Task task : tasks) {
 
-                    if (new Timestamp(new Date().getTime()).equals(task.getDate())) {
+                    if (new Timestamp(new Date().getTime()).equals(task.getTaskdate())) {
                         log.info("Executing task " + task.getId() + " (class: " + task.getEclass() + ", command: " + task.getCommand() + ")");
 
                         messaging.broadcast("event.command", commandAdvertisement.set(task.getEclass(), task.getCommand()));
 
                         if (task.getType() == 1) {
                             log.info("Next run: " + task.nextRun());
-                            task.setDate(task.nextRun());
+                            task.setTaskdate(task.nextRun());
                             Ebean.save(task);
                         } else if (task.getType() == 2) {
                             log.info("Set task to disable");
@@ -112,7 +112,7 @@ public class ScheduleService implements Runnable {
                                 Ebean.save(task);
                             } else {
                                 log.info("Next run: " + task.nextRun());
-                                task.setDate(task.nextRun());
+                                task.setTaskdate(task.nextRun());
                                 Ebean.save(task);
                             }
                         }

@@ -89,7 +89,7 @@ public class NooliteRXService implements Runnable {
         handle = LibUsb.openDeviceWithVidPid(context, VENDOR_ID, PRODUCT_ID);
 
         if (handle == null) {
-            log.error("Noolite TX device not found!");
+            log.error("Noolite RX device not found!");
             shutdown = true;
             return;
         }

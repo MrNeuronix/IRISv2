@@ -21,7 +21,7 @@ public class Log {
     private long id;
 
     @Column(columnDefinition = "timestamp")
-    private Timestamp date;
+    private Timestamp logdate;
 
     private String level;
     private String message;
@@ -30,12 +30,20 @@ public class Log {
     public Log() {
     }
 
-    public Timestamp getDate() {
-        return date;
+    public long getId() {
+        return id;
     }
 
-    public void setDate(Timestamp date) {
-        this.date = date;
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public Timestamp getLogdate() {
+        return logdate;
+    }
+
+    public void setLogdate(Timestamp logdate) {
+        this.logdate = logdate;
     }
 
     public String getLevel() {

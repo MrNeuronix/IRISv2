@@ -282,11 +282,11 @@ public class JsonMessaging {
                     jsonReceiveQueue.put(envelope);
                 }
             } catch (final JMSException e) {
-                LOGGER.error("Error receiving JSON message.", e);
+                    LOGGER.debug("Error receiving JSON message.", e);
             } catch (final ClassNotFoundException e) {
-                LOGGER.error("Error deserializing JSON message.", e);
+                LOGGER.debug("Error deserializing JSON message.", e);
             } catch (InterruptedException e) {
-                LOGGER.error("Error JSON message.", e);
+                    LOGGER.debug("Error JSON message.", e);
             }
         }
     }
@@ -303,8 +303,8 @@ public class JsonMessaging {
      */
 
     private boolean wildCardMatch(Set<String> patterns, String text) {
-        // add sentinel so don't need to worry about *'s at end of pattern
 
+        // add sentinel so don't need to worry about *'s at end of pattern
         for (String pattern : patterns) {
             text += '\0';
             pattern += '\0';

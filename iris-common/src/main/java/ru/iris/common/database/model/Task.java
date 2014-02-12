@@ -27,7 +27,7 @@ public class Task {
 
     @Expose
     @Column(columnDefinition = "timestamp")
-    private Timestamp date;
+    private Timestamp taskdate;
 
     @Expose
     @Column(name="class")
@@ -61,14 +61,6 @@ public class Task {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Timestamp date) {
-        this.date = date;
     }
 
     public String getEclass() {
@@ -125,6 +117,22 @@ public class Task {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public Timestamp getTaskdate() {
+        return taskdate;
+    }
+
+    public void setTaskdate(Timestamp taskdate) {
+        this.taskdate = taskdate;
+    }
+
+    public String getIntervalDate() {
+        return intervalDate;
+    }
+
+    public void setIntervalDate(String intervalDate) {
+        this.intervalDate = intervalDate;
     }
 
     public Timestamp nextRun() throws ParseException {
