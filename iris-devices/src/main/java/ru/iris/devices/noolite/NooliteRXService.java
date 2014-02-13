@@ -113,13 +113,17 @@ public class NooliteRXService implements Runnable {
 
         new InternalCommands();
 
+        boolean initComplete = false;
+
         while (!shutdown) {
             // receiving area
             ByteBuffer buf = ByteBuffer.allocateDirect(8);
+
             if (!pause)
                 LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE | LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 100);
 
-            if (!buf.equals(tmpBuf)) {
+            // buf filled by all nulls is correct!
+            if (!buf.equals(tmpBuf) || !initComplete) {
                 log.debug("RX Buffer: " + buf.get(0) + " " + buf.get(1) + " " + buf.get(2) + " " + buf.get(3) + " " + buf.get(4) + " " + buf.get(5) + " " + buf.get(6)
                         + " " + buf.get(7));
 
@@ -141,10 +145,6 @@ public class NooliteRXService implements Runnable {
                         device.updateValue(new DeviceValue("type", "generic", "", "", false));
 
                         devices.add(device);
-                        Ebean.save(device);
-
-                    // reload from database for avoid Ebean.update() key duplicate error
-                    device = Ebean.find(Device.class).where().eq("internalname", device.getInternalName()).findUnique();
                 }
 
                 // turn off
@@ -154,8 +154,6 @@ public class NooliteRXService implements Runnable {
 
                     device.updateValue(new DeviceValue("Level", "0", "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "0"));
-
-                    Ebean.update(device);
                 }
                 // dim
                 else if (action == 1) {
@@ -164,16 +162,12 @@ public class NooliteRXService implements Runnable {
                     // we only know, that the user hold OFF button
                     device.updateValue(new DeviceValue("Level", "0", "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelDimAdvertisement().set(device.getUUID()));
-
-                    Ebean.update(device);
                 }
                 // turn on
                 else if (action == 2) {
                     log.info("Channel " + channel + ": Got ON command");
                     device.updateValue(new DeviceValue("Level", "100", "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "100"));
-
-                    Ebean.update(device);
                 }
                 // bright
                 else if (action == 3) {
@@ -181,21 +175,34 @@ public class NooliteRXService implements Runnable {
                     // we only know, that the user hold ON button
                     device.updateValue(new DeviceValue("Level", "100", "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelBrightAdvertisement().set(device.getUUID()));
-
-                    Ebean.update(device);
                 }
                 // set level
                 else if (action == 6) {
                     log.info("Channel " + channel + ": Got SETLEVEL command.");
                     device.updateValue(new DeviceValue("Level", dimmerValue.toString(), "", "", false));
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", dimmerValue.toString()));
-
-                    Ebean.update(device);
                 }
                 // stop dim/bright
                 else if (action == 10) {
                     log.info("Channel " + channel + ": Got STOPDIMBRIGHT command.");
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelStopDimBrightAdvertisement().set(device.getUUID()));
+                }
+
+                if (device.getId() == null) {
+                    log.info("Save new Noolite device");
+                    Ebean.save(device);
+                } else {
+                    log.info("Update existing Noolite device");
+                    Ebean.update(device);
+                }
+
+                // reload from database for avoid Ebean.update() key duplicate error
+                if (!initComplete) {
+                    log.info("Reloading noolite devices");
+                    devices = Ebean.find(Device.class)
+                            .where().eq("source", "noolite").findList();
+
+                    initComplete = true;
                 }
 
                 tmpBuf = buf;
@@ -337,7 +344,6 @@ public class NooliteRXService implements Runnable {
                 t.printStackTrace();
                 log.error("Unexpected exception in NooliteRX-Internal", t);
             }
-
         }
     }
 }
