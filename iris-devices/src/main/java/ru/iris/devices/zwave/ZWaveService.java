@@ -1,6 +1,8 @@
 package ru.iris.devices.zwave;
 
 import com.avaje.ebean.Ebean;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.zwave4j.*;
@@ -39,6 +41,7 @@ public class ZWaveService implements Runnable {
     private boolean shutdown = false;
     private JsonMessaging messaging;
     private ServiceCheckEmitter serviceCheckEmitter;
+    private final Gson gson = new GsonBuilder().create();
 
     // Adverstiments
     private ZWaveDriverReady zWaveDriverReady = new ZWaveDriverReady();
@@ -343,10 +346,15 @@ public class ZWaveService implements Runnable {
                             zWaveDevice.setStatus("Listening");
                         }
 
+                        ValueId valueId = gson.fromJson(
+                                zWaveDevice.getValue(
+                                        manager.getValueLabel(notification.getValueId())
+                                ).getValueId(),
+                                ValueId.class);
+
                         // break if same value
                         try {
-                            if (Utils.getValue(zWaveDevice.getValue(manager.getValueLabel(notification.getValueId())).getValueId()) == Utils.getValue(notification.getValueId()))
-                            {
+                            if (Utils.getValue(valueId) == Utils.getValue(notification.getValueId())) {
                                 log.debug("Same value. Breaking");
                                 break;
                             }
@@ -450,6 +458,7 @@ public class ZWaveService implements Runnable {
             }
         }
 
+        // reload from database for avoid Ebean.update() key duplicate error
         devices = Ebean.find(Device.class)
                 .where().eq("source", "zwave").findList();
 
@@ -581,8 +590,8 @@ public class ZWaveService implements Runnable {
 
         for (DeviceValue zv : device.getValueIDs()) {
             if (zv.getLabel().equals(label)) {
-                if (!Manager.get().isValueReadOnly(zv.getValueId())) {
-                    setTypedValue(zv.getValueId(), value);
+                if (!Manager.get().isValueReadOnly(gson.fromJson(zv.getValueId(), ValueId.class))) {
+                    setTypedValue(gson.fromJson(zv.getValueId(), ValueId.class), value);
                 } else {
                     log.info("Value \"" + label + "\" is read-only! Skip.");
                 }

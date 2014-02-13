@@ -142,6 +142,9 @@ public class NooliteRXService implements Runnable {
 
                         devices.add(device);
                         Ebean.save(device);
+
+                    // reload from database for avoid Ebean.update() key duplicate error
+                    device = Ebean.find(Device.class).where().eq("internalname", device.getInternalName()).findUnique();
                 }
 
                 // turn off
@@ -216,18 +219,14 @@ public class NooliteRXService implements Runnable {
 
         private Device loadByChannel(int channel)
         {
-               log.info("Check load DEVICE "+channel);
-
                 for (Device device : devices)
                 {
                     if(device.getInternalName().equals("noolite/channel/"+channel)) {
-                        log.info("RETURN DEVICE "+channel);
                         return device;
                     }
 
                 }
 
-            log.info("NO DEVICE "+channel);
             return null;
         }
 

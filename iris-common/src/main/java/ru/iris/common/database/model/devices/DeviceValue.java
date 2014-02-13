@@ -1,5 +1,7 @@
 package ru.iris.common.database.model.devices;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import org.zwave4j.ValueId;
 
@@ -16,7 +18,7 @@ import javax.persistence.*;
  */
 
 @Entity
-@Table(name="devicesvalues")
+@Table(name = "devicesvalues")
 public class DeviceValue {
 
     @Id
@@ -32,21 +34,24 @@ public class DeviceValue {
     private String value = "unknown";
 
     @Expose
-    @Column(name="type")
+    @Column(name = "type")
     private String valueType = "unknown";
 
     @Expose
-    @Column(name="units")
+    @Column(name = "units")
     private String valueUnits = "unknown";
 
     @Expose
     @Transient
     private boolean isReadonly = false;
 
-    @Transient
-    private ValueId valueId;
+    private String valueId = "{ }";
 
-    public DeviceValue() {}
+    @Transient
+    private final Gson gson = new GsonBuilder().create();
+
+    public DeviceValue() {
+    }
 
     public DeviceValue(String label, String value, boolean isReadonly) {
         this.label = label;
@@ -65,7 +70,7 @@ public class DeviceValue {
     public DeviceValue(String label, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly) {
 
         this(label, value, valueType, valueUnits, isReadonly);
-        this.valueId = valueId;
+        this.valueId = gson.toJson(valueId);
     }
 
     public Device getDevice() {
@@ -124,12 +129,16 @@ public class DeviceValue {
         this.valueType = valueType;
     }
 
-    public ValueId getValueId() {
+    public void setValueId(String valueId) {
+        this.valueId = valueId;
+    }
+
+    public String getValueId() {
         return valueId;
     }
 
     public void setValueId(ValueId valueId) {
-        this.valueId = valueId;
+        this.valueId = gson.toJson(valueId);
     }
 
     /////////////////////////////////
@@ -137,11 +146,14 @@ public class DeviceValue {
     @Override
     public String toString() {
         return "DeviceValue{" +
-                "label='" + label + '\'' +
+                "id=" + id +
+                ", device=" + device +
+                ", label='" + label + '\'' +
                 ", value='" + value + '\'' +
                 ", valueType='" + valueType + '\'' +
                 ", valueUnits='" + valueUnits + '\'' +
                 ", isReadonly=" + isReadonly +
+                ", valueId='" + valueId + '\'' +
                 '}';
     }
 }

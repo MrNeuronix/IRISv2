@@ -76,7 +76,7 @@ public class JsonMessaging {
 
     private ActiveMQConnectionFactory connectionFactory;
 
-            private final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+    private final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
 
     public JsonMessaging(final UUID instanceId) {
 
@@ -97,7 +97,7 @@ public class JsonMessaging {
                         + ":" + config.getConfig().get("AMQPport") + "?jms.prefetchPolicy.all=10");
             }
 
-            connection = connectionFactory.createConnection();
+            connection = connectionFactory.createTopicConnection();
             connection.start();
 
             // Create a Session
@@ -152,7 +152,7 @@ public class JsonMessaging {
             messageProducer.close();
             session.close();
             connection.close();
-                    shutdownThreads = true;
+            shutdownThreads = true;
             if (jsonBroadcastListenThread != null) {
                 jsonBroadcastListenThread.interrupt();
                 jsonBroadcastListenThread.join();
@@ -166,7 +166,7 @@ public class JsonMessaging {
      * Gets the JSON message received to subject or null if nothing has been received
      *
      * @return the JSON message or null
-             */
+     */
     public JsonEnvelope getJsonObject() {
         synchronized (jsonReceiveQueue) {
             if (jsonReceiveQueue.size() > 0) {
@@ -182,9 +182,9 @@ public class JsonMessaging {
      * @return true if JSON message is available
      */
     public int hasJsonObject() {
-                synchronized (jsonReceiveQueue) {
-                    return jsonReceiveQueue.size();
-                }
+        synchronized (jsonReceiveQueue) {
+            return jsonReceiveQueue.size();
+        }
     }
 
     /**
@@ -231,7 +231,7 @@ public class JsonMessaging {
      * @return the JSON message
      */
     public JsonEnvelope receive(final int timeoutMillis) throws InterruptedException {
-                return jsonReceiveQueue.poll(timeoutMillis, TimeUnit.MILLISECONDS);
+        return jsonReceiveQueue.poll(timeoutMillis, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -282,11 +282,11 @@ public class JsonMessaging {
                     jsonReceiveQueue.put(envelope);
                 }
             } catch (final JMSException e) {
-                    LOGGER.debug("Error receiving JSON message.", e);
+                LOGGER.debug("Error receiving JSON message.", e);
             } catch (final ClassNotFoundException e) {
                 LOGGER.debug("Error deserializing JSON message.", e);
             } catch (InterruptedException e) {
-                    LOGGER.debug("Error JSON message.", e);
+                LOGGER.debug("Error JSON message.", e);
             }
         }
     }
@@ -335,4 +335,4 @@ public class JsonMessaging {
         }
         return false;
     }
-        }
+}
