@@ -1,6 +1,7 @@
 package ru.iris.devices.noolite;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Expr;
 import de.ailis.usb4java.libusb.Context;
 import de.ailis.usb4java.libusb.DeviceHandle;
 import de.ailis.usb4java.libusb.LibUsb;
@@ -147,12 +148,20 @@ public class NooliteRXService implements Runnable {
                         devices.add(device);
                 }
 
+                DeviceValue dv = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", device.getId()), Expr.eq("label", "Level")).findUnique();
+
                 // turn off
                 if (action == 0) {
 
                     log.info("Channel " + channel + ": Got OFF command");
 
-                    device.updateValue(new DeviceValue("Level", "0", "", "", false));
+                    if (dv == null) {
+                        device.updateValue(new DeviceValue("Level", "0", "", "", false));
+                    } else {
+                        dv.setValue("0");
+                        Ebean.update(dv);
+                    }
+
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "0"));
                 }
                 // dim
@@ -160,26 +169,56 @@ public class NooliteRXService implements Runnable {
 
                     log.info("Channel " + channel + ": Got DIM command");
                     // we only know, that the user hold OFF button
-                    device.updateValue(new DeviceValue("Level", "0", "", "", false));
+
+                    if (dv == null) {
+                        device.updateValue(new DeviceValue("Level", "0", "", "", false));
+                    } else {
+                        dv.setValue("0");
+                        Ebean.update(dv);
+                    }
+
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelDimAdvertisement().set(device.getUUID()));
                 }
                 // turn on
                 else if (action == 2) {
+
                     log.info("Channel " + channel + ": Got ON command");
-                    device.updateValue(new DeviceValue("Level", "100", "", "", false));
+
+                    if (dv == null) {
+                        device.updateValue(new DeviceValue("Level", "100", "", "", false));
+                    } else {
+                        dv.setValue("100");
+                        Ebean.update(dv);
+                    }
+
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", "100"));
                 }
                 // bright
                 else if (action == 3) {
                     log.info("Channel " + channel + ": Got BRIGHT command");
+
                     // we only know, that the user hold ON button
-                    device.updateValue(new DeviceValue("Level", "100", "", "", false));
+                    if (dv == null) {
+                        device.updateValue(new DeviceValue("Level", "100", "", "", false));
+                    } else {
+                        dv.setValue("100");
+                        Ebean.update(dv);
+                    }
+
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelBrightAdvertisement().set(device.getUUID()));
                 }
                 // set level
                 else if (action == 6) {
+
                     log.info("Channel " + channel + ": Got SETLEVEL command.");
-                    device.updateValue(new DeviceValue("Level", dimmerValue.toString(), "", "", false));
+
+                    if (dv == null) {
+                        device.updateValue(new DeviceValue("Level", dimmerValue.toString(), "", "", false));
+                    } else {
+                        dv.setValue(dimmerValue.toString());
+                        Ebean.update(dv);
+                    }
+
                     messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUUID(), "Level", dimmerValue.toString()));
                 }
                 // stop dim/bright

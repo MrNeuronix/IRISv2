@@ -1,6 +1,7 @@
 package ru.iris.devices.zwave;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Expr;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
@@ -311,15 +312,13 @@ public class ZWaveService implements Runnable {
                             break;
                         }
 
-                        zrZWaveDevice.removeValue(new DeviceValue(
-                                manager.getValueLabel(notification.getValueId()),
-                                String.valueOf(Utils.getValue(notification.getValueId())),
-                                Utils.getValueType(notification.getValueId()),
-                                Manager.get().getValueUnits(notification.getValueId()),
-                                notification.getValueId(),
-                                Manager.get().isValueReadOnly(notification.getValueId())));
+                        DeviceValue dv = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", zrZWaveDevice.getId()), Expr.eq("label", manager.getValueLabel(notification.getValueId()))).findUnique();
 
-                            if (initComplete)
+                        if (dv != null) {
+                            zrZWaveDevice.removeValue(dv);
+                        }
+
+                        if (initComplete)
                                 Ebean.update(zrZWaveDevice);
 
                         messaging.broadcast("event.devices.zwave.value.removed",
@@ -369,15 +368,18 @@ public class ZWaveService implements Runnable {
                                 " Value for label \"" + manager.getValueLabel(notification.getValueId()) + "\" changed  --> " +
                                 "\"" + Utils.getValue(notification.getValueId()) + "\"");
 
-                        zWaveDevice.updateValue(new DeviceValue(
-                                manager.getValueLabel(notification.getValueId()),
-                                String.valueOf(Utils.getValue(notification.getValueId())),
-                                Utils.getValueType(notification.getValueId()),
-                                Manager.get().getValueUnits(notification.getValueId()),
-                                notification.getValueId(),
-                                Manager.get().isValueReadOnly(notification.getValueId())));
+                        DeviceValue udv = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", zWaveDevice.getId()), Expr.eq("label", manager.getValueLabel(notification.getValueId()))).findUnique();
 
-                            if (initComplete)
+                        udv.setLabel(manager.getValueLabel(notification.getValueId()));
+                        udv.setValueType(Utils.getValueType(notification.getValueId()));
+                        udv.setValueId(notification.getValueId());
+                        udv.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));
+                        udv.setValue(String.valueOf(Utils.getValue(notification.getValueId())));
+                        udv.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
+
+                        zWaveDevice.updateValue(udv);
+
+                        if (initComplete)
                                 Ebean.update(zWaveDevice);
 
                         messaging.broadcast("event.devices.zwave.value.changed",
@@ -661,14 +663,14 @@ public class ZWaveService implements Runnable {
                 ZWaveDevice.setManufName(manufName);
                 ZWaveDevice.setProductName(productName);
                 ZWaveDevice.setStatus(state);
-                ZWaveDevice.updateValue(
-                        new DeviceValue(
-                                label,
-                                String.valueOf(Utils.getValue(notification.getValueId())),
-                                Utils.getValueType(notification.getValueId()),
-                                Manager.get().getValueUnits(notification.getValueId()),
-                                notification.getValueId(),
-                                Manager.get().isValueReadOnly(notification.getValueId())));
+
+            ZWaveDevice.updateValue(new DeviceValue(
+                    label,
+                    String.valueOf(Utils.getValue(notification.getValueId())),
+                    Utils.getValueType(notification.getValueId()),
+                    Manager.get().getValueUnits(notification.getValueId()),
+                    notification.getValueId(),
+                    Manager.get().isValueReadOnly(notification.getValueId())));
 
             log.info("Adding device " + type + " (node: " + notification.getNodeId() + ") to array");
             devices.add(ZWaveDevice);
@@ -680,18 +682,26 @@ public class ZWaveService implements Runnable {
 
             log.info("Node " + ZWaveDevice.getNode() + ": Add \"" + label + "\" value \"" + Utils.getValue(notification.getValueId()) + "\"");
 
-            ZWaveDevice.updateValue(new DeviceValue(
-                    label,
-                    String.valueOf(Utils.getValue(notification.getValueId())),
-                    Utils.getValueType(notification.getValueId()),
-                    Manager.get().getValueUnits(notification.getValueId()),
-                    notification.getValueId(),
-                    Manager.get().isValueReadOnly(notification.getValueId())));
-        }
+            DeviceValue udv = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", ZWaveDevice.getId()), Expr.eq("label", Manager.get().getValueLabel(notification.getValueId()))).findUnique();
 
-        if(initComplete)
-        {
-            Ebean.update(ZWaveDevice);
+            if (udv != null) {
+                udv.setLabel(label);
+                udv.setValueType(Utils.getValueType(notification.getValueId()));
+                udv.setValueId(notification.getValueId());
+                udv.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));
+                udv.setValue(String.valueOf(Utils.getValue(notification.getValueId())));
+                udv.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
+
+                ZWaveDevice.updateValue(udv);
+            } else {
+                ZWaveDevice.updateValue(new DeviceValue(
+                        label,
+                        String.valueOf(Utils.getValue(notification.getValueId())),
+                        Utils.getValueType(notification.getValueId()),
+                        Manager.get().getValueUnits(notification.getValueId()),
+                        notification.getValueId(),
+                        Manager.get().isValueReadOnly(notification.getValueId())));
+            }
         }
 
         return ZWaveDevice;

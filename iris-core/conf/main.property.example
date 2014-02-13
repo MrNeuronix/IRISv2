@@ -15,6 +15,13 @@ dbName=iris
 dbUsername=root
 dbPassword=root
 
+# This generate and recreate SQL tables (with DROP!)
+ddlGenerate=true
+ddlRun=true
+
+# Turn on/off SQL debug
+sqlDebug=true
+
 #################################
 # Audio section
 #################################

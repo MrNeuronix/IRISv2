@@ -23,8 +23,7 @@ public class DatabaseConnection {
     private final Config conf = new Config();
     private EbeanServer server;
 
-    public DatabaseConnection()
-    {
+    public DatabaseConnection() {
         ServerConfig config = new ServerConfig();
         config.setName("iris");
 
@@ -33,15 +32,18 @@ public class DatabaseConnection {
         db.setDriver("com.mysql.jdbc.Driver");
         db.setUsername(conf.getConfig().get("dbUsername"));
         db.setPassword(conf.getConfig().get("dbPassword"));
-        db.setUrl("jdbc:mysql://"+conf.getConfig().get("dbHost")+"/"+conf.getConfig().get("dbName")
-                + "?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&dontTrackOpenResources=true");
+        db.setUrl("jdbc:mysql://" + conf.getConfig().get("dbHost") + "/" + conf.getConfig().get("dbName")
+                + "?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8");
         //db.setHeartbeatSql("select count(*) from log");
 
         config.setDataSourceConfig(db);
 
         // set DDL options...
-        config.setDdlGenerate(true);
-        config.setDdlRun(true);
+        config.setDdlGenerate(Boolean.valueOf(conf.getConfig().get("ddlGenerate")));
+        config.setDdlRun(Boolean.valueOf(conf.getConfig().get("ddlRun")));
+
+        config.setDebugSql(Boolean.valueOf(conf.getConfig().get("sqlDebug")));
+        //config.setLoggingLevel(LogLevel.SQL);
 
         config.setDefaultServer(true);
         config.setRegister(true);

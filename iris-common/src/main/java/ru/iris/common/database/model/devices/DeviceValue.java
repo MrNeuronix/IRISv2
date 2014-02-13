@@ -42,7 +42,6 @@ public class DeviceValue {
     private String valueUnits = "unknown";
 
     @Expose
-    @Transient
     private boolean isReadonly = false;
 
     private String valueId = "{ }";
