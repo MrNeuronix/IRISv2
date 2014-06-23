@@ -30,6 +30,9 @@ public class DeviceValue {
     @Expose
     private String label = "unknown";
 
+	@Expose
+	private String uuid = "unknown";
+
     @Expose
     private String value = "unknown";
 
@@ -66,11 +69,20 @@ public class DeviceValue {
         this.isReadonly = isReadonly;
     }
 
-    public DeviceValue(String label, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly) {
+	public DeviceValue(String label, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly)
+	{
 
-        this(label, value, valueType, valueUnits, isReadonly);
-        this.valueId = gson.toJson(valueId);
-    }
+		this(label, value, valueType, valueUnits, isReadonly);
+		this.valueId = gson.toJson(valueId);
+	}
+
+	public DeviceValue(String label, String uuid, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly)
+	{
+
+		this(label, value, valueType, valueUnits, isReadonly);
+		this.valueId = gson.toJson(valueId);
+		this.uuid = uuid;
+	}
 
     public Device getDevice() {
         return device;
@@ -87,6 +99,16 @@ public class DeviceValue {
     public void setId(Long id) {
         this.id = id;
     }
+
+	public String getUuid()
+	{
+		return uuid;
+	}
+
+	public void setUuid(String uuid)
+	{
+		this.uuid = uuid;
+	}
 
     public String getLabel() {
         return label;

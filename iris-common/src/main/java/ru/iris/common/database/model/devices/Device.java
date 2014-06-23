@@ -77,14 +77,6 @@ public class Device implements Serializable {
         this.id = id;
     }
 
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -109,12 +101,14 @@ public class Device implements Serializable {
         return this.node;
     }
 
-    public String getUUID() {
-        return this.uuid;
+	public String getUuid()
+	{
+		return this.uuid;
     }
 
-    public void setUUID(String uuid) {
-        this.uuid = uuid;
+	public void setUuid(String uuid)
+	{
+		this.uuid = uuid;
     }
 
     public int getZone() {

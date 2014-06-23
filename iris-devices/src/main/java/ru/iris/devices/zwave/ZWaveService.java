@@ -380,6 +380,7 @@ public class ZWaveService implements Runnable {
                         udv.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));
                         udv.setValue(String.valueOf(Utils.getValue(notification.getValueId())));
                         udv.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
+						udv.setUuid(zWaveDevice.getUuid());
 
                         zWaveDevice.updateValue(udv);
 
@@ -663,14 +664,15 @@ public class ZWaveService implements Runnable {
                 ZWaveDevice.setInternalName("zwave/" + type + "/" + notification.getNodeId());
                 ZWaveDevice.setType(Manager.get().getNodeType(notification.getHomeId(), notification.getNodeId()));
                 ZWaveDevice.setNode(notification.getNodeId());
-                ZWaveDevice.setUUID(uuid);
-                ZWaveDevice.setManufName(manufName);
+			ZWaveDevice.setUuid(uuid);
+			ZWaveDevice.setManufName(manufName);
                 ZWaveDevice.setProductName(productName);
                 ZWaveDevice.setStatus(state);
 
             ZWaveDevice.updateValue(new DeviceValue(
                     label,
-                    String.valueOf(Utils.getValue(notification.getValueId())),
+					uuid,
+					String.valueOf(Utils.getValue(notification.getValueId())),
                     Utils.getValueType(notification.getValueId()),
                     Manager.get().getValueUnits(notification.getValueId()),
                     notification.getValueId(),
@@ -690,7 +692,8 @@ public class ZWaveService implements Runnable {
 
             if (udv != null) {
                 udv.setLabel(label);
-                udv.setValueType(Utils.getValueType(notification.getValueId()));
+				udv.setUuid(ZWaveDevice.getUuid());
+				udv.setValueType(Utils.getValueType(notification.getValueId()));
                 udv.setValueId(notification.getValueId());
                 udv.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));
                 udv.setValue(String.valueOf(Utils.getValue(notification.getValueId())));
@@ -700,7 +703,8 @@ public class ZWaveService implements Runnable {
             } else {
                 ZWaveDevice.updateValue(new DeviceValue(
                         label,
-                        String.valueOf(Utils.getValue(notification.getValueId())),
+						ZWaveDevice.getUuid(),
+						String.valueOf(Utils.getValue(notification.getValueId())),
                         Utils.getValueType(notification.getValueId()),
                         Manager.get().getValueUnits(notification.getValueId()),
                         notification.getValueId(),
