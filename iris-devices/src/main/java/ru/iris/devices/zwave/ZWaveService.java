@@ -370,6 +370,10 @@ public class ZWaveService implements Runnable {
 
                         DeviceValue udv = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", zWaveDevice.getId()), Expr.eq("label", manager.getValueLabel(notification.getValueId()))).findUnique();
 
+						// new device
+						if (udv == null)
+							udv = new DeviceValue();
+
                         udv.setLabel(manager.getValueLabel(notification.getValueId()));
                         udv.setValueType(Utils.getValueType(notification.getValueId()));
                         udv.setValueId(notification.getValueId());
