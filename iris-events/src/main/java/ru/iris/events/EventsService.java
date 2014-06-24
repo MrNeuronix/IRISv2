@@ -19,8 +19,7 @@ import ru.iris.common.messaging.model.service.ServiceStatus;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -82,6 +81,9 @@ public class EventsService implements Runnable {
 
             serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
+			// load events from db
+			List<Event> events = Ebean.find(Event.class).findList();
+
             while (!shutdown) {
 
                 JsonEnvelope envelope = jsonMessaging.receive(100);
@@ -106,25 +108,33 @@ public class EventsService implements Runnable {
                         }
                     } else {
 
-                        // seek event in db
-                        List<Event> events = Ebean.find(Event.class).findList();
-
                         for (Event event : events) {
 
-                                File jsFile = new File("./scripts/" + event.getScript());
+							String[] subjects = event.getSubject().split(",");
+							Set<String> set = new HashSet<String>(Arrays.asList(subjects));
 
-                                log.debug("Launch script: " + event.getScript());
+							if (wildCardMatch(set, envelope.getSubject()))
+							{
+								File jsFile = new File("./scripts/" + event.getScript());
 
-                                try {
-                                    ScriptableObject.putProperty(scope, "advertisement", Context.javaToJS(envelope.getObject(), scope));
-                                    cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
-                                } catch (FileNotFoundException e) {
-                                    log.error("Script file " + jsFile + " not found!");
-                                } catch (Exception e) {
-                                    log.error("Error in script " + jsFile + ": " + e.toString());
-                                    e.printStackTrace();
-                                }
-                        }
+								log.debug("Launch script: " + event.getScript());
+
+								try
+								{
+									ScriptableObject.putProperty(scope, "advertisement", Context.javaToJS(envelope.getObject(), scope));
+									cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
+								}
+								catch (FileNotFoundException e)
+								{
+									log.error("Script file " + jsFile + " not found!");
+								}
+								catch (Exception e)
+								{
+									log.error("Error in script " + jsFile + ": " + e.toString());
+									e.printStackTrace();
+								}
+							}
+						}
                     }
                 }
             }
@@ -141,4 +151,46 @@ public class EventsService implements Runnable {
         }
 
     }
+
+	private boolean wildCardMatch(Set<String> patterns, String text)
+	{
+
+		// add sentinel so don't need to worry about *'s at end of pattern
+		for (String pattern : patterns)
+		{
+			text += '\0';
+			pattern += '\0';
+
+			int N = pattern.length();
+
+			boolean[] states = new boolean[N + 1];
+			boolean[] old = new boolean[N + 1];
+			old[0] = true;
+
+			for (int i = 0; i < text.length(); i++)
+			{
+				char c = text.charAt(i);
+				states = new boolean[N + 1]; // initialized to false
+				for (int j = 0; j < N; j++)
+				{
+					char p = pattern.charAt(j);
+
+					// hack to handle *'s that match 0 characters
+					if (old[j] && (p == '*'))
+						old[j + 1] = true;
+
+					if (old[j] && (p == c))
+						states[j + 1] = true;
+					if (old[j] && (p == '*'))
+						states[j] = true;
+					if (old[j] && (p == '*'))
+						states[j + 1] = true;
+				}
+				old = states;
+			}
+			if (states[N])
+				return true;
+		}
+		return false;
+	}
 }

@@ -18,9 +18,9 @@
 
     <repositories>
         <repository>
-            <id>IRIS</id>
-            <name>IRIS-releases</name>
-            <url>http://ph-systems.ru:8081/artifactory/ext-release-local</url>
+            <id>Sonatype</id>
+            <name>Sonatype</name>
+            <url>http://central.sonatype.org</url>
         </repository>
         <repository>
             <id>jspf</id>

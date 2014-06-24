@@ -10,7 +10,10 @@ package ru.iris.common.database.model;
  * License: GPL v3
  */
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.sql.Timestamp;
 
 @Entity
@@ -25,6 +28,8 @@ public class Log {
 
     private String level;
     private String message;
+
+	private String uuid;
 
     // Default
     public Log() {

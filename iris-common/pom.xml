@@ -77,10 +77,9 @@
             <version>1.6.0</version>
         </dependency>
         <dependency>
-            <groupId>org.zwave4j</groupId>
+            <groupId>com.github.zgmnkv</groupId>
             <artifactId>zwave4j</artifactId>
-            <version>0.2-rc1</version>
-            <classifier>ozw-rev-686</classifier>
+            <version>0.3</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

@@ -17,54 +17,64 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name="events")
-public class Event {
+@Table(name = "events")
+public class Event
+{
 
-    @Id
-    private long id;
+	@Id
+	private long id;
 
-    @Expose
-    private String subject;
+	@Expose
+	private String subject;
 
-    @Expose
-    private String script;
+	@Expose
+	private String script;
 
-    @Expose
-    private boolean isEnabled;
+	@Expose
+	private boolean isEnabled;
 
-    // Default
-    public Event() {
-    }
+	// Default
+	public Event()
+	{
+	}
 
-    public long getId() {
-        return id;
-    }
+	public long getId()
+	{
+		return id;
+	}
 
-    public void setId(long id) {
-        this.id = id;
-    }
+	public void setId(long id)
+	{
+		this.id = id;
+	}
 
-    public String getSubject() {
-        return subject;
-    }
+	public String getSubject()
+	{
+		return subject;
+	}
 
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
+	public void setSubject(String subject)
+	{
+		this.subject = subject;
+	}
 
-    public String getScript() {
-        return script;
-    }
+	public String getScript()
+	{
+		return script;
+	}
 
-    public void setScript(String script) {
-        this.script = script;
-    }
+	public void setScript(String script)
+	{
+		this.script = script;
+	}
 
-    public boolean isEnabled() {
-        return isEnabled;
-    }
+	public boolean isEnabled()
+	{
+		return isEnabled;
+	}
 
-    public void setEnabled(boolean isEnabled) {
-        this.isEnabled = isEnabled;
-    }
+	public void setEnabled(boolean isEnabled)
+	{
+		this.isEnabled = isEnabled;
+	}
 }
