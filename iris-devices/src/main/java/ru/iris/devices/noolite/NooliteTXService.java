@@ -7,6 +7,7 @@ import de.ailis.usb4java.libusb.LibUsb;
 import de.ailis.usb4java.libusb.LibUsbException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.iris.common.database.model.Log;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
@@ -112,11 +113,32 @@ public class NooliteTXService implements Runnable {
 
                             if (level > 99 || level == 99) {
                                 log.info("Turn on device on channel " + channel);
+
+								// log change
+								/////////////////////////////////
+								Log logChange = new Log("INFO", "Device is ON", device.getUuid());
+								Ebean.save(logChange);
+								/////////////////////////////////
+
                                 level = 100;
                             } else if (level < 0) {
                                 log.info("Turn off device on channel " + channel);
+
+								// log change
+								/////////////////////////////////
+								Log logChange = new Log("INFO", "Device is OFF", device.getUuid());
+								Ebean.save(logChange);
+								/////////////////////////////////
+
                                 level = 0;
                             } else {
+
+								// log change
+								/////////////////////////////////
+								Log logChange = new Log("INFO", "Device level set: " + level, device.getUuid());
+								Ebean.save(logChange);
+								/////////////////////////////////
+
                                 log.info("Setting device on channel " + channel + " to level " + level);
                             }
 
@@ -131,10 +153,24 @@ public class NooliteTXService implements Runnable {
                             if (level < 0 || level == 0) {
                                 // turn off
                                 log.info("Turn off device on channel " + channel);
+
+								// log change
+								/////////////////////////////////
+								Log logChange = new Log("INFO", "Device is OFF", device.getUuid());
+								Ebean.save(logChange);
+								/////////////////////////////////
+
                                 buf.put((byte) 0);
                             } else {
                                 // turn on
                                 log.info("Turn on device on channel " + channel);
+
+								// log change
+								/////////////////////////////////
+								Log logChange = new Log("INFO", "Device is ON", device.getUuid());
+								Ebean.save(logChange);
+								/////////////////////////////////
+
                                 buf.put((byte) 2);
                             }
 

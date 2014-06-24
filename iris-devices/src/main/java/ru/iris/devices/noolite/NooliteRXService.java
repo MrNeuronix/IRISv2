@@ -8,6 +8,7 @@ import de.ailis.usb4java.libusb.LibUsb;
 import de.ailis.usb4java.libusb.LibUsbException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.iris.common.database.model.Log;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.messaging.JsonEnvelope;
@@ -179,6 +180,12 @@ public class NooliteRXService implements Runnable
 						Ebean.update(dv);
 					}
 
+					// log change
+					/////////////////////////////////
+					Log logChange = new Log("INFO", "Device is OFF", device.getUuid());
+					Ebean.save(logChange);
+					/////////////////////////////////
+
 					messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUuid(), "Level", "0"));
 				}
 				// dim
@@ -198,6 +205,12 @@ public class NooliteRXService implements Runnable
 						Ebean.update(dv);
 					}
 
+					// log change
+					/////////////////////////////////
+					Log logChange = new Log("INFO", "Device is DIM", device.getUuid());
+					Ebean.save(logChange);
+					/////////////////////////////////
+
 					messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelDimAdvertisement().set(device.getUuid()));
 				}
 				// turn on
@@ -215,6 +228,12 @@ public class NooliteRXService implements Runnable
 						dv.setValue("100");
 						Ebean.update(dv);
 					}
+
+					// log change
+					/////////////////////////////////
+					Log logChange = new Log("INFO", "Device is ON", device.getUuid());
+					Ebean.save(logChange);
+					/////////////////////////////////
 
 					messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUuid(), "Level", "100"));
 				}
@@ -234,6 +253,12 @@ public class NooliteRXService implements Runnable
 						Ebean.update(dv);
 					}
 
+					// log change
+					/////////////////////////////////
+					Log logChange = new Log("INFO", "Device is BRIGHT", device.getUuid());
+					Ebean.save(logChange);
+					/////////////////////////////////
+
 					messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelBrightAdvertisement().set(device.getUuid()));
 				}
 				// set level
@@ -252,12 +277,25 @@ public class NooliteRXService implements Runnable
 						Ebean.update(dv);
 					}
 
+					// log change
+					/////////////////////////////////
+					Log logChange = new Log("INFO", "Device get SETLEVEL: " + dimmerValue.toString(), device.getUuid());
+					Ebean.save(logChange);
+					/////////////////////////////////
+
 					messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUuid(), "Level", dimmerValue.toString()));
 				}
 				// stop dim/bright
 				else if (action == 10)
 				{
 					log.info("Channel " + channel + ": Got STOPDIMBRIGHT command.");
+
+					// log change
+					/////////////////////////////////
+					Log logChange = new Log("INFO", "Device is STOPDIMBRIGHT", device.getUuid());
+					Ebean.save(logChange);
+					/////////////////////////////////
+
 					messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelStopDimBrightAdvertisement().set(device.getUuid()));
 				}
 

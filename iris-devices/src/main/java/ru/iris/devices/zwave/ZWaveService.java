@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.zwave4j.*;
 import ru.iris.common.Config;
 import ru.iris.common.Utils;
+import ru.iris.common.database.model.Log;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.messaging.JsonEnvelope;
@@ -383,6 +384,12 @@ public class ZWaveService implements Runnable {
 						udv.setUuid(zWaveDevice.getUuid());
 
                         zWaveDevice.updateValue(udv);
+
+						// log change
+						/////////////////////////////////
+						Log logChange = new Log("INFO", "Value " + manager.getValueLabel(notification.getValueId()) + " changed: " + Utils.getValue(notification.getValueId()), zWaveDevice.getUuid());
+						Ebean.save(logChange);
+						/////////////////////////////////
 
                         if (initComplete)
                                 Ebean.update(zWaveDevice);
