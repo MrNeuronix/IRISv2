@@ -153,11 +153,13 @@ public class NooliteRXService implements Runnable
 					device.setSource("noolite");
 					device.setInternalName("noolite/channel/" + channel);
 					device.setStatus("listening");
-					device.setType("Generic Noolite Device");
+					device.setType("Noolite Device");
 					device.setManufName("Nootechnika");
+					device.setInternalType("switch");
+					device.setNode((short) (1000 + channel));
 					device.setUuid(UUID.randomUUID().toString());
-					device.updateValue(new DeviceValue("channel", channel.toString(), "", "", true));
-					device.updateValue(new DeviceValue("type", "generic", "", "", false));
+					device.updateValue(new DeviceValue("channel", channel.toString(), "", "", device.getUuid(), true));
+					device.updateValue(new DeviceValue("type", "switch", "", "", device.getUuid(), false));
 
 					devices.add(device);
 				}
@@ -172,7 +174,7 @@ public class NooliteRXService implements Runnable
 
 					if (dv == null)
 					{
-						device.updateValue(new DeviceValue("Level", "0", "", "", false));
+						device.updateValue(new DeviceValue("Level", "0", "", "", device.getUuid(), false));
 					}
 					else
 					{
@@ -197,7 +199,7 @@ public class NooliteRXService implements Runnable
 
 					if (dv == null)
 					{
-						device.updateValue(new DeviceValue("Level", "0", "", "", false));
+						device.updateValue(new DeviceValue("Level", "0", "", "", device.getUuid(), false));
 					}
 					else
 					{
@@ -221,7 +223,7 @@ public class NooliteRXService implements Runnable
 
 					if (dv == null)
 					{
-						device.updateValue(new DeviceValue("Level", "100", "", "", false));
+						device.updateValue(new DeviceValue("Level", "100", "", "", device.getUuid(), false));
 					}
 					else
 					{
@@ -245,7 +247,7 @@ public class NooliteRXService implements Runnable
 					// we only know, that the user hold ON button
 					if (dv == null)
 					{
-						device.updateValue(new DeviceValue("Level", "100", "", "", false));
+						device.updateValue(new DeviceValue("Level", "100", "", "", device.getUuid(), false));
 					}
 					else
 					{
@@ -269,7 +271,7 @@ public class NooliteRXService implements Runnable
 
 					if (dv == null)
 					{
-						device.updateValue(new DeviceValue("Level", dimmerValue.toString(), "", "", false));
+						device.updateValue(new DeviceValue("Level", dimmerValue.toString(), "", "", device.getUuid(), false));
 					}
 					else
 					{

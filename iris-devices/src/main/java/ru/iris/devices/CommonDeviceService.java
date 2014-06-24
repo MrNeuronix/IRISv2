@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
 import ru.iris.common.database.model.devices.Device;
+import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.ServiceCheckEmitter;
@@ -13,6 +14,7 @@ import ru.iris.common.messaging.model.devices.*;
 import ru.iris.common.messaging.model.devices.noolite.ResponseNooliteDeviceInventoryAdvertisement;
 import ru.iris.common.messaging.model.devices.zwave.ResponseZWaveDeviceInventoryAdvertisement;
 import ru.iris.common.messaging.model.service.ServiceStatus;
+
 import java.util.Map;
 import java.util.UUID;
 
@@ -104,6 +106,11 @@ public class CommonDeviceService implements Runnable {
                         } else if (device.getSource().equals("noolite")) {
                             jsonMessaging.broadcast("event.devices.noolite.setvalue", new SetDeviceLevelAdvertisement().set(uuid, label, level));
                         }
+
+						// Update device value
+						DeviceValue deviceValue = device.getValue(label);
+						deviceValue.setValue(level);
+						Ebean.update(deviceValue);
 
                         ////////////////////////////////////////////
                         //// Get inventory                      ////

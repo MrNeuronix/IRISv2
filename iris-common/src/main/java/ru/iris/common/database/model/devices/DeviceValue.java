@@ -69,6 +69,16 @@ public class DeviceValue {
         this.isReadonly = isReadonly;
     }
 
+	public DeviceValue(String label, String value, String valueType, String valueUnits, String uuid, boolean isReadonly)
+	{
+		this.label = label;
+		this.value = value;
+		this.valueType = valueType;
+		this.valueUnits = valueUnits;
+		this.isReadonly = isReadonly;
+		this.uuid = uuid;
+	}
+
 	public DeviceValue(String label, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly)
 	{
 
