@@ -1,6 +1,7 @@
 package ru.iris.devices.noolite;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Expr;
 import de.ailis.usb4java.libusb.Context;
 import de.ailis.usb4java.libusb.DeviceHandle;
 import de.ailis.usb4java.libusb.LibUsb;
@@ -9,6 +10,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.database.model.Log;
 import ru.iris.common.database.model.devices.Device;
+import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.ServiceCheckEmitter;
@@ -101,18 +103,34 @@ public class NooliteTXService implements Runnable {
                         byte level = Byte.valueOf(advertisement.getValue());
                         Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
                         int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
+						int channelView = channel + 1;
 
                         ByteBuffer buf = ByteBuffer.allocateDirect(8);
                         buf.put((byte) 0x30);
 
-                        //if noolite device dimmer (user set)
-                        if (device.getValue("type") != null && device.getValue("type").getValue().contains("dimmer")) {
+						DeviceValue dv = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", device.getId()), Expr.eq("label", "Level")).findUnique();
+
+						//if noolite device dimmer (user set)
+						if (device.getValue("type") != null && device.getValue("type").getValue().contains("dimmer")) {
 
                             buf.put((byte) 6);
                             buf.put((byte) 1);
 
                             if (level > 99 || level == 99) {
-                                log.info("Turn on device on channel " + channel);
+
+								log.info("Turn on device on channel " + channelView);
+
+								if (dv == null)
+								{
+									dv = new DeviceValue("Level", "100", "", "", device.getUuid(), false);
+									device.updateValue(dv);
+									Ebean.save(dv);
+								}
+								else
+								{
+									dv.setValue("100");
+									Ebean.update(dv);
+								}
 
 								// log change
 								/////////////////////////////////
@@ -121,8 +139,22 @@ public class NooliteTXService implements Runnable {
 								/////////////////////////////////
 
                                 level = 100;
-                            } else if (level < 0) {
-                                log.info("Turn off device on channel " + channel);
+
+							} else if (level < 0) {
+
+								log.info("Turn off device on channel " + channelView);
+
+								if (dv == null)
+								{
+									dv = new DeviceValue("Level", "0", "", "", device.getUuid(), false);
+									device.updateValue(dv);
+									Ebean.save(dv);
+								}
+								else
+								{
+									dv.setValue("0");
+									Ebean.update(dv);
+								}
 
 								// log change
 								/////////////////////////////////
@@ -131,7 +163,20 @@ public class NooliteTXService implements Runnable {
 								/////////////////////////////////
 
                                 level = 0;
-                            } else {
+
+							} else {
+
+								if (dv == null)
+								{
+									dv = new DeviceValue("Level", String.valueOf(level), "", "", device.getUuid(), false);
+									device.updateValue(dv);
+									Ebean.save(dv);
+								}
+								else
+								{
+									dv.setValue(String.valueOf(level));
+									Ebean.update(dv);
+								}
 
 								// log change
 								/////////////////////////////////
@@ -139,8 +184,8 @@ public class NooliteTXService implements Runnable {
 								Ebean.save(logChange);
 								/////////////////////////////////
 
-                                log.info("Setting device on channel " + channel + " to level " + level);
-                            }
+								log.info("Setting device on channel " + channelView + " to level " + level);
+							}
 
                             buf.position(5);
                             buf.put(level);
@@ -151,8 +196,21 @@ public class NooliteTXService implements Runnable {
                             writeToHID(buf);
                         } else {
                             if (level < 0 || level == 0) {
-                                // turn off
-                                log.info("Turn off device on channel " + channel);
+
+								// turn off
+								log.info("Turn off device on channel " + channelView);
+
+								if (dv == null)
+								{
+									dv = new DeviceValue("Level", "0", "", "", device.getUuid(), false);
+									device.updateValue(dv);
+									Ebean.save(dv);
+								}
+								else
+								{
+									dv.setValue("0");
+									Ebean.update(dv);
+								}
 
 								// log change
 								/////////////////////////////////
@@ -161,9 +219,23 @@ public class NooliteTXService implements Runnable {
 								/////////////////////////////////
 
                                 buf.put((byte) 0);
-                            } else {
-                                // turn on
-                                log.info("Turn on device on channel " + channel);
+
+							} else {
+
+								// turn on
+								log.info("Turn on device on channel " + channelView);
+
+								if (dv == null)
+								{
+									dv = new DeviceValue("Level", "100", "", "", device.getUuid(), false);
+									device.updateValue(dv);
+									Ebean.save(dv);
+								}
+								else
+								{
+									dv.setValue("100");
+									Ebean.update(dv);
+								}
 
 								// log change
 								/////////////////////////////////
@@ -187,6 +259,7 @@ public class NooliteTXService implements Runnable {
                         final BindRXChannelAdvertisment advertisement = envelope.getObject();
                         Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
                         int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
+						int channelView = channel + 1;
 
                         ByteBuffer buf = ByteBuffer.allocateDirect(8);
                         buf.put((byte) 0x30);
@@ -194,7 +267,7 @@ public class NooliteTXService implements Runnable {
                         buf.position(4);
                         buf.put((byte) channel);
 
-                        log.info("Binding device to channel " + channel);
+						log.info("Binding device to channel " + channelView);
 
                         writeToHID(buf);
 
@@ -205,6 +278,7 @@ public class NooliteTXService implements Runnable {
                         final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
                         Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
                         int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
+						int channelView = channel + 1;
 
                         ByteBuffer buf = ByteBuffer.allocateDirect(8);
                         buf.put((byte) 0x30);
@@ -212,7 +286,7 @@ public class NooliteTXService implements Runnable {
                         buf.position(4);
                         buf.put((byte) channel);
 
-                        log.info("Unbinding device from channel " + channel);
+						log.info("Unbinding device from channel " + channelView);
 
                         writeToHID(buf);
 
