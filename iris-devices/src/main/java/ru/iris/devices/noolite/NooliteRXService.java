@@ -174,7 +174,9 @@ public class NooliteRXService implements Runnable
 
 					if (dv == null)
 					{
-						device.updateValue(new DeviceValue("Level", "0", "", "", device.getUuid(), false));
+						dv = new DeviceValue("Level", "0", "", "", device.getUuid(), false);
+						device.updateValue(dv);
+						Ebean.save(dv);
 					}
 					else
 					{
@@ -199,7 +201,9 @@ public class NooliteRXService implements Runnable
 
 					if (dv == null)
 					{
-						device.updateValue(new DeviceValue("Level", "0", "", "", device.getUuid(), false));
+						dv = new DeviceValue("Level", "0", "", "", device.getUuid(), false);
+						device.updateValue(dv);
+						Ebean.save(dv);
 					}
 					else
 					{
@@ -223,7 +227,9 @@ public class NooliteRXService implements Runnable
 
 					if (dv == null)
 					{
-						device.updateValue(new DeviceValue("Level", "100", "", "", device.getUuid(), false));
+						dv = new DeviceValue("Level", "100", "", "", device.getUuid(), false);
+						device.updateValue(dv);
+						Ebean.save(dv);
 					}
 					else
 					{
@@ -247,7 +253,9 @@ public class NooliteRXService implements Runnable
 					// we only know, that the user hold ON button
 					if (dv == null)
 					{
-						device.updateValue(new DeviceValue("Level", "100", "", "", device.getUuid(), false));
+						dv = new DeviceValue("Level", "100", "", "", device.getUuid(), false);
+						device.updateValue(dv);
+						Ebean.save(dv);
 					}
 					else
 					{
@@ -271,7 +279,9 @@ public class NooliteRXService implements Runnable
 
 					if (dv == null)
 					{
-						device.updateValue(new DeviceValue("Level", dimmerValue.toString(), "", "", device.getUuid(), false));
+						dv = new DeviceValue("Level", dimmerValue.toString(), "", "", device.getUuid(), false);
+						device.updateValue(dv);
+						Ebean.save(dv);
 					}
 					else
 					{

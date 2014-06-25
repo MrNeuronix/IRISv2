@@ -385,6 +385,9 @@ public class ZWaveService implements Runnable {
 
                         zWaveDevice.updateValue(udv);
 
+						// Update device value
+						Ebean.update(udv);
+
 						// log change
 						/////////////////////////////////
 						Log logChange = new Log("INFO", "Value " + manager.getValueLabel(notification.getValueId()) + " changed: " + Utils.getValue(notification.getValueId()), zWaveDevice.getUuid());
