@@ -23,8 +23,8 @@ import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
 
-import javax.sound.sampled.*;
-import java.io.File;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.Clip;
 import java.util.Map;
 import java.util.UUID;
 
@@ -56,23 +56,6 @@ public class GoogleSpeakService implements Runnable {
 
         ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("Speak");
         serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
-
-        if (conf.get("silence").equals("0")) {
-            try {
-                audioIn = AudioSystem.getAudioInputStream(new File("./conf/beep.wav"));
-                AudioFormat format = audioIn.getFormat();
-                DataLine.Info info = new DataLine.Info(Clip.class, format);
-                clip = (Clip) AudioSystem.getLine(info);
-                clip.open(audioIn);
-                clip.start();
-
-                while (clip.isRunning()) {
-                    Thread.yield();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
 
         try {
             // Make sure we exit the wait loop if we receive shutdown signal.

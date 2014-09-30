@@ -45,7 +45,8 @@ public class Core {
 
         // configure the broker
         broker.setBrokerName("iris");
-        broker.addConnector("tcp://" + config.getConfig().get("AMQPhost") + ":" + config.getConfig().get("AMQPport") + "?jms.prefetchPolicy.all=10");
+		broker.setPersistent(false);
+		broker.addConnector("tcp://" + config.getConfig().get("AMQPhost") + ":" + config.getConfig().get("AMQPport") + "?jms.prefetchPolicy.all=10");
         broker.start();
 
         // ORM
