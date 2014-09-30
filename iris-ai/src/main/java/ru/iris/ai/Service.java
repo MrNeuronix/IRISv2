@@ -10,22 +10,25 @@ package ru.iris.ai;
  * License: GPL v3
  */
 
-import net.xeoh.plugins.base.annotations.PluginImplementation;
-import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ro.fortsoft.pf4j.Plugin;
+import ro.fortsoft.pf4j.PluginWrapper;
 import ru.iris.ai.witai.WitAiService;
 import ru.iris.common.Config;
 
-@PluginImplementation
-public class Service implements AIPlugin {
+public class Service extends Plugin {
 
     private static Logger log = LogManager.getLogger(Service.class);
 
-    @Init
-    public void init() throws Exception {
+    public Service (PluginWrapper wrapper) {
+        super(wrapper);
+    }
 
-        log.info("AI service starting");
+    @Override
+    public void start() {
+
+        log.info("[Plugin] iris-ai plugin started!");
 
         Config cfg = new Config();
 
@@ -34,5 +37,10 @@ public class Service implements AIPlugin {
         } else {
             log.info("No AI specified in config file");
         }
+    }
+
+    @Override
+    public void stop() {
+        log.info("[Plugin] iris-ai plugin stopped!");
     }
 }

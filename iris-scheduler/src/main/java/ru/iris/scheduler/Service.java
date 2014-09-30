@@ -1,9 +1,9 @@
 package ru.iris.scheduler;
 
-import net.xeoh.plugins.base.annotations.PluginImplementation;
-import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ro.fortsoft.pf4j.Plugin;
+import ro.fortsoft.pf4j.PluginWrapper;
 
 /**
  * IRISv2 Project
@@ -14,15 +14,24 @@ import org.apache.logging.log4j.Logger;
  * Time: 16:32
  */
 
-@PluginImplementation
-public class Service implements SchedulerPlugin {
+public class Service extends Plugin {
 
     private static Logger log = LogManager.getLogger(Service.class);
 
-    @Init
-    public void init() {
+    public Service (PluginWrapper wrapper) {
+        super(wrapper);
+    }
 
-        log.info("Scheduler sevice started");
+    @Override
+    public void start()
+    {
+        log.info("[Plugin] iris-scheduler plugin started!");
+
         new ScheduleService();
+    }
+
+    @Override
+    public void stop() {
+        log.info("[Plugin] iris-scheduler plugin stopped!");
     }
 }

@@ -1,11 +1,11 @@
 package ru.iris;
 
-import net.xeoh.plugins.base.PluginManager;
-import net.xeoh.plugins.base.impl.PluginManagerFactory;
 import org.apache.activemq.broker.BrokerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
+import ro.fortsoft.pf4j.DefaultPluginManager;
+import ro.fortsoft.pf4j.PluginManager;
 import ru.iris.common.Config;
 import ru.iris.common.database.DatabaseConnection;
 
@@ -56,8 +56,9 @@ public class Core {
         new StatusChecker();
 
         // load plugins
-        PluginManager pm = PluginManagerFactory.createPluginManager();
-        pm.addPluginsFrom(new File("extensions/").toURI());
+        PluginManager pluginManager = new DefaultPluginManager(new File("extensions"));
+        pluginManager.loadPlugins();
+        pluginManager.startPlugins();
 
     }
 }

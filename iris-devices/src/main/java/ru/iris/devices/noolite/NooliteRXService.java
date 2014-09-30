@@ -42,7 +42,6 @@ public class NooliteRXService implements Runnable
 	protected final Context context = new Context();
 	protected DeviceHandle handle;
 	protected boolean pause = false;
-	private ServiceCheckEmitter serviceCheckEmitter;
 
 	private static final long READ_UPDATE_DELAY_MS = 500L;
 
@@ -52,10 +51,6 @@ public class NooliteRXService implements Runnable
 
 	public NooliteRXService()
 	{
-
-		serviceCheckEmitter = new ServiceCheckEmitter("Devices-NooliteRX");
-		serviceCheckEmitter.setState(ServiceStatus.STARTUP);
-
 		Thread t = new Thread(this);
 		t.setName("Noolite RX Service");
 		t.start();
@@ -79,8 +74,6 @@ public class NooliteRXService implements Runnable
 
 		devices = Ebean.find(Device.class)
 				.where().eq("source", "noolite").findList();
-
-		serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
 		///////////////////////////////////////////////////////////////
 
@@ -349,9 +342,6 @@ public class NooliteRXService implements Runnable
 		LibUsb.attachKernelDriver(handle, 0);
 		LibUsb.close(handle);
 		LibUsb.exit(context);
-
-		// Broadcast that this service is shutdown.
-		serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 	}
 
 	private Device loadByChannel(int channel)
@@ -478,9 +468,6 @@ public class NooliteRXService implements Runnable
 						}
 					}
 				}
-
-				// Broadcast that this service is shutdown.
-				serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 
 				// Close JSON messaging.
 				jsonMessaging.close();

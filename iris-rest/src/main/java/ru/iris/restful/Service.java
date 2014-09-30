@@ -11,32 +11,34 @@ package ru.iris.restful;
  */
 
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
-import com.sun.jersey.api.core.ClassNamesResourceConfig;
+import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.net.httpserver.HttpServer;
-import net.xeoh.plugins.base.annotations.PluginImplementation;
-import net.xeoh.plugins.base.annotations.events.Init;
+import ro.fortsoft.pf4j.Plugin;
+import ro.fortsoft.pf4j.PluginWrapper;
 import ru.iris.common.Config;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.sql.SQLException;
 import java.util.Map;
 
-@PluginImplementation
-public class Service implements RestPlugin
+public class Service extends Plugin
 {
 
-	@Init
-	public void init() throws IOException, SQLException, URISyntaxException
-	{
+    public Service (PluginWrapper wrapper) {
+        super(wrapper);
+    }
+
+    @Override
+    public void start()
+    {
+        log.info("[Plugin] iris-rest plugin started!");
 
 		Config cfg = new Config();
 		Map<String, String> config = cfg.getConfig();
 
 		try
 		{
-			ResourceConfig rc = new ClassNamesResourceConfig("ru.iris.restful.DevicesREST");
+			ResourceConfig rc = new PackagesResourceConfig("ru.iris.restful");
 			rc.getProperties().put("com.sun.jersey.spi.container.ContainerRequestFilters", "ru.iris.restful.AuthFilter");
 			HttpServer server = HttpServerFactory.create("http://" + config.get("httpHost") + ":" + config.get("httpPort") + "/", rc);
 			server.start();
@@ -44,7 +46,12 @@ public class Service implements RestPlugin
 		}
 		catch (IllegalArgumentException | IOException e)
 		{
-			e.printStackTrace();
+			log.error(e.toString());
 		}
 	}
+
+    @Override
+    public void stop() {
+        log.info("[Plugin] iris-rest plugin stopped!");
+    }
 }

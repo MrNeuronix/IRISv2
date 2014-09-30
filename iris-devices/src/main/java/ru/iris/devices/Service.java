@@ -10,30 +10,30 @@ package ru.iris.devices;
  * License: GPL v3
  */
 
-import net.xeoh.plugins.base.annotations.PluginImplementation;
-import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ro.fortsoft.pf4j.Plugin;
+import ro.fortsoft.pf4j.PluginWrapper;
 import ru.iris.common.Config;
 import ru.iris.devices.noolite.NooliteRXService;
 import ru.iris.devices.noolite.NooliteTXService;
 import ru.iris.devices.zwave.ZWaveService;
-
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Map;
 
-@PluginImplementation
-public class Service implements DevicesPlugin {
+public class Service extends Plugin {
 
     private static Logger log = LogManager.getLogger(Service.class);
 
-    @Init
-    public void init() throws IOException, SQLException {
+    public Service (PluginWrapper wrapper) {
+        super(wrapper);
+    }
 
+    @Override
+    public void start()
+    {
         Map<String, String> config = new Config().getConfig();
 
-        log.info("Device module starting");
+        log.info("[Plugin] iris-devices plugin started!");
 
         // Generic device functions
         new CommonDeviceService();
@@ -53,5 +53,10 @@ public class Service implements DevicesPlugin {
                 new NooliteRXService();
             }
         }
+    }
+
+    @Override
+    public void stop() {
+        log.info("[Plugin] iris-devices plugin stopped!");
     }
 }

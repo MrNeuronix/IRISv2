@@ -1,15 +1,10 @@
 package ru.iris.record;
 
-import net.xeoh.plugins.base.annotations.PluginImplementation;
-import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ro.fortsoft.pf4j.Plugin;
+import ro.fortsoft.pf4j.PluginWrapper;
 import ru.iris.common.Config;
-
-import javax.jms.JMSException;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.sql.SQLException;
 
 /**
  * IRISv2 Project
@@ -21,14 +16,19 @@ import java.sql.SQLException;
  */
 
 
-@PluginImplementation
-public class Service implements RecordPlugin {
+public class Service extends Plugin {
 
     private Config config = new Config();
     private static Logger log = LogManager.getLogger(Service.class);
 
-    @Init
-    public void init() throws IOException, SQLException, JMSException, URISyntaxException {
+    public Service (PluginWrapper wrapper) {
+        super(wrapper);
+    }
+
+    @Override
+    public void start()
+    {
+        log.info("[Plugin] iris-record plugin started!");
 
         if (config.getConfig().get("recordOnServer").equals("1")) {
             if (config.getConfig().get("recordMethod").equals("internal")) {
@@ -41,5 +41,10 @@ public class Service implements RecordPlugin {
                 log.error("No record method specified!");
             }
         }
+    }
+
+    @Override
+    public void stop() {
+        log.info("[Plugin] iris-record plugin stopped!");
     }
 }

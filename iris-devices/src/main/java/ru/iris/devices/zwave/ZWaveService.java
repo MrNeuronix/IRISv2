@@ -42,7 +42,6 @@ public class ZWaveService implements Runnable {
     private boolean initComplete = false;
     private boolean shutdown = false;
     private JsonMessaging messaging;
-    private ServiceCheckEmitter serviceCheckEmitter;
     private final Gson gson = new GsonBuilder().create();
 
     // Adverstiments
@@ -76,9 +75,6 @@ public class ZWaveService implements Runnable {
 
         messaging = new JsonMessaging(UUID.randomUUID());
         Map<String, String> config = new Config().getConfig();
-
-        serviceCheckEmitter = new ServiceCheckEmitter("Devices-ZWave");
-        serviceCheckEmitter.setState(ServiceStatus.STARTUP);
 
         devices = Ebean.find(Device.class)
                 .where().eq("source", "zwave").findList();
@@ -320,7 +316,7 @@ public class ZWaveService implements Runnable {
                         }
 
                         if (initComplete)
-                                Ebean.update(zrZWaveDevice);
+                                Ebean.update(dv);
 
                         messaging.broadcast("event.devices.zwave.value.removed",
                                 zWaveDeviceValueRemoved.set(
@@ -395,7 +391,7 @@ public class ZWaveService implements Runnable {
 						/////////////////////////////////
 
                         if (initComplete)
-                                Ebean.update(zWaveDevice);
+                                Ebean.update(udv);
 
                         messaging.broadcast("event.devices.zwave.value.changed",
                                 zWaveDeviceValueChanged.set(
@@ -481,8 +477,6 @@ public class ZWaveService implements Runnable {
 
         initComplete = true;
 
-        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
-
         try {
             // Make sure we exit the wait loop if we receive shutdown signal.
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -542,9 +536,6 @@ public class ZWaveService implements Runnable {
                     }
                 }
             }
-
-            // Broadcast that this service is shutdown.
-            serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 
             // Close JSON messaging.
             jsonMessaging.close();

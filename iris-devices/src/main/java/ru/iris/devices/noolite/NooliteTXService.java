@@ -41,7 +41,6 @@ public class NooliteTXService implements Runnable {
     private boolean shutdown = false;
     private JsonMessaging messaging;
     private final Context context = new Context();
-    private ServiceCheckEmitter serviceCheckEmitter;
 
     // Noolite PC USB TX HID
     static final int VENDOR_ID = 5824; //0x16c0;
@@ -58,9 +57,6 @@ public class NooliteTXService implements Runnable {
 
         messaging = new JsonMessaging(UUID.randomUUID());
 
-        serviceCheckEmitter = new ServiceCheckEmitter("Devices-NooliteTX");
-        serviceCheckEmitter.setState(ServiceStatus.STARTUP);
-
         // Initialize the libusb context
         int result = LibUsb.init(context);
         if (result < 0)
@@ -69,8 +65,6 @@ public class NooliteTXService implements Runnable {
             } catch (LibUsbException e) {
                 e.printStackTrace();
             }
-
-        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
         try {
             // Make sure we exit the wait loop if we receive shutdown signal.
@@ -309,7 +303,6 @@ public class NooliteTXService implements Runnable {
             }
 
             // Close JSON messaging.
-            serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
             jsonMessaging.close();
             messaging.close();
             LibUsb.exit(context);

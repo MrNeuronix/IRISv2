@@ -52,16 +52,12 @@ public class CommonDeviceService implements Runnable
 		try
 		{
 
-			final ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("Devices-Common");
-			serviceCheckEmitter.setState(ServiceStatus.STARTUP);
-
 			// Make sure we exit the wait loop if we receive shutdown signal.
 			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
 			{
 				@Override
 				public void run()
 				{
-					serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 					shutdown = true;
 				}
 			}));
@@ -74,8 +70,6 @@ public class CommonDeviceService implements Runnable
 			jsonMessaging.subscribe("event.devices.setzone");
 
 			jsonMessaging.start();
-
-			serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
 			while (!shutdown)
 			{
@@ -245,12 +239,10 @@ public class CommonDeviceService implements Runnable
 			}
 
 			jsonMessaging.close();
-			serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
-
 		}
 		catch (InterruptedException e)
 		{
-			e.printStackTrace();
+			log.error(e.toString());
 		}
 	}
 }

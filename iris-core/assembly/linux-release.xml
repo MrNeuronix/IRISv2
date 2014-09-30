@@ -48,63 +48,63 @@
         <fileSet>
             <outputDirectory>/</outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>*.zip</include>
             </includes>
             <directory>target</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>/extensions</outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>*.zip</include>
             </includes>
             <directory>../iris-devices/target</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>/extensions</outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>*.zip</include>
             </includes>
             <directory>../iris-events/target</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>/extensions</outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>*.zip</include>
             </includes>
             <directory>../iris-record/target</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>/extensions</outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>*.zip</include>
             </includes>
             <directory>../iris-video/target</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>/extensions</outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>*.zip</include>
             </includes>
             <directory>../iris-rest/target</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>/extensions</outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>*.zip</include>
             </includes>
             <directory>../iris-scheduler/target</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>/extensions</outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>*.zip</include>
             </includes>
             <directory>../iris-speak/target</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>/extensions</outputDirectory>
             <includes>
-                <include>*.jar</include>
+                <include>*.zip</include>
             </includes>
             <directory>../iris-ai/target</directory>
         </fileSet>
@@ -125,6 +125,7 @@
                 <exclude>ru.iris:iris-video</exclude>
                 <exclude>ru.iris:iris-speak</exclude>
                 <exclude>ru.iris:iris-ai</exclude>
+                <exclude>ru.iris:iris-rest</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

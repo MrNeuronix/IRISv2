@@ -45,9 +45,6 @@ public class EventsService implements Runnable {
 
         try {
 
-            ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("Events");
-            serviceCheckEmitter.setState(ServiceStatus.STARTUP);
-
             // Make sure we exit the wait loop if we receive shutdown signal.
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
                 @Override
@@ -78,8 +75,6 @@ public class EventsService implements Runnable {
             // subscribe to anything
             jsonMessaging.subscribe("*");
             jsonMessaging.start();
-
-            serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
 			// load events from db
 			List<Event> events = Ebean.find(Event.class).findList();
@@ -138,9 +133,6 @@ public class EventsService implements Runnable {
                     }
                 }
             }
-
-            // Broadcast that this service is shutdown.
-            serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 
             // Close JSON messaging.
             jsonMessaging.close();

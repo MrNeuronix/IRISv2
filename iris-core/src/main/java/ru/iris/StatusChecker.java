@@ -31,8 +31,6 @@ import java.util.UUID;
 public class StatusChecker implements Runnable {
 
     private static Logger log = LogManager.getLogger(StatusChecker.class.getName());
-    private static boolean shutdown = false;
-    private static ServiceAdvertisement advertisement = new ServiceAdvertisement();
 
     public StatusChecker() {
         Thread t = new Thread(this);
@@ -43,94 +41,7 @@ public class StatusChecker implements Runnable {
     @Override
     public synchronized void run() {
 
-        try {
-            // Make sure we exit the wait loop if we receive shutdown signal.
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    shutdown = true;
-                }
-            }));
-
-            final UUID instanceId = UUID.fromString("444b3e75-7c0c-4d6e-a1f3-f373ef7f6501");
-            final JsonMessaging jsonMessagingStatus = new JsonMessaging(instanceId);
-
-            jsonMessagingStatus.subscribe("service.status");
-            jsonMessagingStatus.start();
-
-            // Broadcast that this service has started up.
-            jsonMessagingStatus.broadcast("service.status", advertisement.set(
-                    "Status Checker", instanceId, ServiceStatus.STARTUP));
-
-            long lastStatusBroadcastMillis = System.currentTimeMillis();
-            while (!shutdown) {
-
-                // Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
-                final JsonEnvelope envelope = jsonMessagingStatus.receive(100);
-                if (envelope != null) {
-                    if (envelope.getObject() instanceof ServiceAdvertisement) {
-                        // We know of service advertisement. Lets log it properly.
-                        final ServiceAdvertisement serviceAdvertisement = envelope.getObject();
-
-                        log.debug("Service '" + serviceAdvertisement.getName()
-                                + "', status: '" + serviceAdvertisement.getStatus()
-                                + "', instance: '" + serviceAdvertisement.getInstanceId()
-                                + "'"
-                        );
-
-                        ModuleStatus module = Ebean.find(ModuleStatus.class)
-                                .where().eq("name", serviceAdvertisement.getName()).findUnique();
-
-                        if(module != null) {
-                            module.setState(serviceAdvertisement.getStatus().toString());
-                            module.setLastseen(new Timestamp(new java.util.Date().getTime()));
-                            Ebean.update(module);
-                        }
-                        else {
-                            module = new ModuleStatus();
-                            module.setState(serviceAdvertisement.getStatus().toString());
-                            module.setLastseen(new Timestamp(new java.util.Date().getTime()));
-                            module.setName(serviceAdvertisement.getName());
-                            Ebean.save(module);
-                        }
-
-                    } else if (envelope.getReceiverInstance() == null) {
-                        // We received unknown broadcast message. Lets make generic log entry.
-                        log.debug("Received broadcast "
-                                + " from " + envelope.getSenderInstance()
-                                + " to " + envelope.getReceiverInstance()
-                                + " at '" + envelope.getSubject()
-                                + ": " + envelope.getObject());
-                    } else {
-                        // We received unknown request message. Lets make generic log entry.
-                        log.debug("Received request "
-                                + " from " + envelope.getSenderInstance()
-                                + " to " + envelope.getReceiverInstance()
-                                + " at '" + envelope.getSubject()
-                                + ": " + envelope.getObject());
-                    }
-                }
-
-                // If there is more than 30 seconds from last availability broadcasts then lets redo this.
-                if (30000L < System.currentTimeMillis() - lastStatusBroadcastMillis) {
-                    jsonMessagingStatus.broadcast("service.status", advertisement.set(
-                            "Status Checker", instanceId, ServiceStatus.AVAILABLE));
-                    lastStatusBroadcastMillis = System.currentTimeMillis();
-                }
-
-            }
-
-            // Broadcast that this service is shutdown.
-            jsonMessagingStatus.broadcast("service.status", advertisement.set(
-                    "Status Checker", instanceId, ServiceStatus.SHUTDOWN));
-
-            // Close JSON messaging.
-            jsonMessagingStatus.close();
-
-        } catch (final Throwable t) {
-            t.printStackTrace();
-            log.error("Unexpected exception in Status Checker", t);
-        }
+        //TODO
 
     }
 }

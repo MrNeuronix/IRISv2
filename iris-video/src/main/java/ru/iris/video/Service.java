@@ -10,18 +10,29 @@ package ru.iris.video;
  * License: GPL v3
  */
 
-import net.xeoh.plugins.base.annotations.PluginImplementation;
-import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ro.fortsoft.pf4j.Plugin;
+import ro.fortsoft.pf4j.PluginWrapper;
 
-@PluginImplementation
-public class Service implements VideoPlugin {
+public class Service extends Plugin {
 
     private static Logger log = LogManager.getLogger(Service.class);
 
-    @Init
-    public void init() throws Exception {
+    public Service (PluginWrapper wrapper) {
+        super(wrapper);
+    }
+
+    @Override
+    public void start()
+    {
+        log.info("[Plugin] iris-video plugin started!");
+
         new VideoService();
+    }
+
+    @Override
+    public void stop() {
+        log.info("[Plugin] iris-video plugin stopped!");
     }
 }

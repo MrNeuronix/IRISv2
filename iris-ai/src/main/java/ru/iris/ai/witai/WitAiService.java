@@ -52,9 +52,6 @@ public class WitAiService implements Runnable {
 
     public synchronized void run() {
 
-        ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("AI");
-        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
-
         Config cfg = new Config();
         Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
@@ -139,15 +136,12 @@ public class WitAiService implements Runnable {
                 }
             }
 
-            serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
-
             // Close JSON messaging.
             jsonMessaging.close();
 
         } catch (final Throwable t) {
 
             log.error("Unexpected exception in AI", t);
-            serviceCheckEmitter.setState(ServiceStatus.ERROR);
             t.printStackTrace();
         }
 

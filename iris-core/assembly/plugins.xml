@@ -1,0 +1,19 @@
+<!--
+Describes the plugin archive
+@author Decebal Suiu
+@version 1.0
+-->
+<assembly>
+    <id>plugin</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>false</includeBaseDirectory>
+
+    <fileSets>
+        <fileSet>
+            <directory>target/plugin-classes</directory>
+            <outputDirectory>classes</outputDirectory>
+        </fileSet>
+    </fileSets>
+</assembly>

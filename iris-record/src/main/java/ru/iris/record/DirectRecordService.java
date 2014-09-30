@@ -45,9 +45,6 @@ public class DirectRecordService implements Runnable {
 
         messaging = new JsonMessaging(UUID.randomUUID());
 
-        ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("Record");
-        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
-
         Recognizer rec = new Recognizer("ru");
 
         boolean shutdown = false;
@@ -135,7 +132,6 @@ public class DirectRecordService implements Runnable {
             }
         }
 
-        serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
         messaging.close();
     }
 }

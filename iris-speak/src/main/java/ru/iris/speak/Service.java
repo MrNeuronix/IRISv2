@@ -1,12 +1,15 @@
 package ru.iris.speak;
 
-import net.xeoh.plugins.base.annotations.PluginImplementation;
-import net.xeoh.plugins.base.annotations.events.Init;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ro.fortsoft.pf4j.Plugin;
+import ro.fortsoft.pf4j.PluginWrapper;
 import ru.iris.common.Config;
 import ru.iris.common.Speak;
 import ru.iris.speak.google.GoogleSpeakService;
+
+import javax.jms.JMSException;
+import java.net.URISyntaxException;
 
 /**
  * IRISv2 Project
@@ -17,24 +20,36 @@ import ru.iris.speak.google.GoogleSpeakService;
  * Time: 21:32
  */
 
-@PluginImplementation
-public class Service implements SpeakPlugin {
+public class Service extends Plugin {
 
     private static Logger log = LogManager.getLogger(Service.class);
 
-    @Init
-    public void init() throws Exception {
+    public Service (PluginWrapper wrapper) {
+        super(wrapper);
+    }
+
+    @Override
+    public void start()
+    {
+        log.info("[Plugin] iris-speak plugin started!");
 
         Config cfg = new Config();
         Speak speak = new Speak();
 
-        log.info("Speak service starting");
-
         if (cfg.getConfig().get("ttsEngine").equals("google")) {
             new GoogleSpeakService();
-            speak.say("Модуль синтеза речи Гугл запущен!");
+            try {
+                speak.say("Модуль синтеза речи Гугл запущен!");
+            } catch (JMSException | URISyntaxException e) {
+                log.error(e.toString());
+            }
         } else {
             log.info("No TTS feed specified in config file");
         }
+    }
+
+    @Override
+    public void stop() {
+        log.info("[Plugin] iris-speak plugin stopped!");
     }
 }

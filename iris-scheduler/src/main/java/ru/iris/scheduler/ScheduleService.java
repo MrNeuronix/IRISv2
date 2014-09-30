@@ -15,11 +15,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.database.model.Task;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.command.CommandAdvertisement;
-import ru.iris.common.messaging.model.service.ServiceStatus;
 
-import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -43,9 +40,6 @@ public class ScheduleService implements Runnable {
     }
 
     public synchronized void run() {
-
-        ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("Scheduler");
-        serviceCheckEmitter.setState(ServiceStatus.STARTUP);
 
         // Актуализируем даты запуска всех тасков
         try {
@@ -80,9 +74,6 @@ public class ScheduleService implements Runnable {
             log.info("Error while actualizing task");
             e.printStackTrace();
         }
-
-        // Запускаем выполнение тасков
-        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
         while (true) {
             try {
@@ -127,7 +118,7 @@ public class ScheduleService implements Runnable {
             try {
                 Thread.sleep(1000L);
             } catch (InterruptedException e) {
-                serviceCheckEmitter.setState(ServiceStatus.ERROR);
+                log.error(e.toString());
             }
         }
     }
