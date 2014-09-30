@@ -5,8 +5,7 @@
         xsi:schemaLocation="
     http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2
       http://maven.apache.org/xsd/assembly-1.1.2.xsd
-  "
-        >
+">
     <id>linux-release</id>
     <includeBaseDirectory>false</includeBaseDirectory>
     <formats>
@@ -41,6 +40,10 @@
         <fileSet>
             <outputDirectory>/scripts</outputDirectory>
             <directory>scripts</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>/lib</outputDirectory>
+            <directory>lib</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>/</outputDirectory>

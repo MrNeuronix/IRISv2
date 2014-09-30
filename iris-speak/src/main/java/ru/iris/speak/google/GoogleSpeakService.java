@@ -23,107 +23,121 @@ import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.service.ServiceStatus;
 import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
 
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.Clip;
 import java.util.Map;
 import java.util.UUID;
 
-public class GoogleSpeakService implements Runnable {
+public class GoogleSpeakService implements Runnable
+{
 
-    private Thread t = null;
-    private Logger log = LogManager.getLogger(GoogleSpeakService.class.getName());
-    private boolean shutdown = false;
-    private Config config = new Config();
+	private Thread t = null;
+	private Logger log = LogManager.getLogger(GoogleSpeakService.class.getName());
+	private boolean shutdown = false;
+	private Config config = new Config();
 
-    public GoogleSpeakService() {
-        t = new Thread(this);
-        t.setName("Google Speak Service");
-        t.start();
-    }
+	public GoogleSpeakService()
+	{
+		t = new Thread(this);
+		t.setName("Google Speak Service");
+		t.start();
+	}
 
-    public Thread getThread() {
-        return t;
-    }
+	public Thread getThread()
+	{
+		return t;
+	}
 
-    @Override
-    public synchronized void run() {
-        log.info("Speak service started (TTS: Google)");
+	@Override
+	public synchronized void run()
+	{
+		log.info("Speak service started (TTS: Google)");
 
-        Clip clip = null;
-        AudioInputStream audioIn;
-        Map<String, String> conf = config.getConfig();
-        final Synthesiser synthesiser = new Synthesiser(conf.get("language"));
+		Map<String, String> conf = config.getConfig();
+		final Synthesiser synthesiser = new Synthesiser(conf.get("language"));
 
-        ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("Speak");
-        serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
+		ServiceCheckEmitter serviceCheckEmitter = new ServiceCheckEmitter("Speak");
+		serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
 
-        try {
-            // Make sure we exit the wait loop if we receive shutdown signal.
-            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    shutdown = true;
-                }
-            }));
+		try
+		{
+			// Make sure we exit the wait loop if we receive shutdown signal.
+			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					shutdown = true;
+				}
+			}));
 
-            JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
-            jsonMessaging.subscribe("event.speak");
-            jsonMessaging.start();
+			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
+			jsonMessaging.subscribe("event.speak");
+			jsonMessaging.start();
 
-            while (!shutdown) {
+			while (!shutdown)
+			{
 
-                // Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
-                final JsonEnvelope envelope = jsonMessaging.receive(100);
-                if (envelope != null) {
-                    if (envelope.getObject() instanceof SpeakAdvertisement) {
+				// Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
+				final JsonEnvelope envelope = jsonMessaging.receive(100);
+				if (envelope != null)
+				{
+					if (envelope.getObject() instanceof SpeakAdvertisement)
+					{
 
-                        SpeakAdvertisement advertisement = envelope.getObject();
+						SpeakAdvertisement advertisement = envelope.getObject();
 
-                        Speaks speak = new Speaks();
-                        speak.setText(advertisement.getText());
-                        speak.setConfidence(advertisement.getConfidence());
-                        speak.setDevice(advertisement.getDevice());
-                        speak.setActive(true);
+						Speaks speak = new Speaks();
+						speak.setText(advertisement.getText());
+						speak.setConfidence(advertisement.getConfidence());
+						speak.setDevice(advertisement.getDevice());
+						speak.setActive(true);
 
-                        Ebean.save(speak);
+						Ebean.save(speak);
 
-                        if (conf.get("silence").equals("0")) {
+						if (conf.get("silence").equals("0"))
+						{
 
-                            log.info("Confidence: " + advertisement.getConfidence());
-                            log.info("Text: " + advertisement.getText());
-                            log.info("Device: " + advertisement.getDevice());
+							log.info("Confidence: " + advertisement.getConfidence());
+							log.info("Text: " + advertisement.getText());
+							log.info("Device: " + advertisement.getDevice());
 
-                            if (advertisement.getDevice().equals("all")) {
-                                final Player player = new Player(synthesiser.getMP3Data(advertisement.getText()));
-                                player.play();
-                                player.close();
-                            }
+							if (advertisement.getDevice().equals("all"))
+							{
+								final Player player = new Player(synthesiser.getMP3Data(advertisement.getText()));
+								player.play();
+								player.close();
+							}
 
-                        } else {
-                            log.info("Silence mode enabled. Ignoring speak request.");
-                        }
+						}
+						else
+						{
+							log.info("Silence mode enabled. Ignoring speak request.");
+						}
 
-                    } else {
-                        // We received unknown request message. Lets make generic log entry.
-                        log.info("Received request "
-                                + " from " + envelope.getSenderInstance()
-                                + " to " + envelope.getReceiverInstance()
-                                + " at '" + envelope.getSubject()
-                                + ": " + envelope.getObject());
-                    }
-                }
-            }
+					}
+					else
+					{
+						// We received unknown request message. Lets make generic log entry.
+						log.info("Received request "
+								+ " from " + envelope.getSenderInstance()
+								+ " to " + envelope.getReceiverInstance()
+								+ " at '" + envelope.getSubject()
+								+ ": " + envelope.getObject());
+					}
+				}
+			}
 
-            serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
+			serviceCheckEmitter.setState(ServiceStatus.SHUTDOWN);
 
-            // Close JSON messaging.
-            jsonMessaging.close();
+			// Close JSON messaging.
+			jsonMessaging.close();
 
-        } catch (final Throwable t) {
+		}
+		catch (final Throwable t)
+		{
 
-            log.error("Unexpected exception in Speak", t);
-            serviceCheckEmitter.setState(ServiceStatus.ERROR);
-            t.printStackTrace();
-        }
-    }
+			log.error("Unexpected exception in Speak", t);
+			serviceCheckEmitter.setState(ServiceStatus.ERROR);
+			t.printStackTrace();
+		}
+	}
 }

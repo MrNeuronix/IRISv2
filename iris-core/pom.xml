@@ -46,6 +46,9 @@
                             <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>ru.iris.Core</mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <Class-Path>lib/zwave4j-0.3.jar</Class-Path>
+                        </manifestEntries>
                     </archive>
                     <finalName>iris-core</finalName>
                 </configuration>
