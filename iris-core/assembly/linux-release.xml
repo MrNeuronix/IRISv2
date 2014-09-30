@@ -85,6 +85,13 @@
             <includes>
                 <include>*.jar</include>
             </includes>
+            <directory>../iris-rest/target</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>/extensions</outputDirectory>
+            <includes>
+                <include>*.jar</include>
+            </includes>
             <directory>../iris-scheduler/target</directory>
         </fileSet>
         <fileSet>

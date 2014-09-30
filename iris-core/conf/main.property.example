@@ -85,3 +85,10 @@ nooliteRXPresent=1
 
 witaiEnabled=1
 witaiKey=6AVGJKDP4EEAAS5IKNCxxxxxxxxx
+
+##################################
+# REST API
+##################################
+
+httpHost=localhost
+httpPort=17000
