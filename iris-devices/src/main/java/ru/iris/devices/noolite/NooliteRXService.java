@@ -1,3 +1,19 @@
+/*
+ * Copyright 2012-2014 Nikolay A. Viguro
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.iris.devices.noolite;
 
 import com.avaje.ebean.Ebean;
@@ -13,41 +29,27 @@ import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.devices.noolite.*;
-import ru.iris.common.messaging.model.service.ServiceStatus;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * IRISv2 Project
- * Author: Nikolay A. Viguro
- * WWW: iris.ph-systems.ru
- * E-Mail: nv@ph-systems.ru
- * Date: 05.01.14
- * Time: 13:57
- * License: GPL v3
- */
-
 public class NooliteRXService implements Runnable
 {
 
-	private Logger log = LogManager.getLogger(NooliteRXService.class.getName());
+	private static final long READ_UPDATE_DELAY_MS = 500L;
+	// Noolite PC USB RX HID
+	private static final int VENDOR_ID = 5824; // 0x16c0;
+	private static final int PRODUCT_ID = 1500; // 0x05dc;
+	private final Logger log = LogManager.getLogger(NooliteRXService.class.getName());
+	private final Context context = new Context();
 	private boolean shutdown = false;
 	private JsonMessaging messaging;
 	private List<Device> devices = new ArrayList<>();
-	protected final Context context = new Context();
-	protected DeviceHandle handle;
-	protected boolean pause = false;
-
-	private static final long READ_UPDATE_DELAY_MS = 500L;
-
-	// Noolite PC USB RX HID
-	static final int VENDOR_ID = 5824; // 0x16c0;
-	static final int PRODUCT_ID = 1500; // 0x05dc;
+	private DeviceHandle handle;
+	private boolean pause = false;
 
 	public NooliteRXService()
 	{
@@ -80,6 +82,7 @@ public class NooliteRXService implements Runnable
 		// Initialize the libusb context
 		int result = LibUsb.init(context);
 		if (result < 0)
+		{
 			try
 			{
 				throw new LibUsbException("Unable to initialize libusb", result);
@@ -88,6 +91,7 @@ public class NooliteRXService implements Runnable
 			{
 				e.printStackTrace();
 			}
+		}
 
 		handle = LibUsb.openDeviceWithVidPid(context, VENDOR_ID, PRODUCT_ID);
 
@@ -99,7 +103,9 @@ public class NooliteRXService implements Runnable
 		}
 
 		if (LibUsb.kernelDriverActive(handle, 0) == 1)
+		{
 			LibUsb.detachKernelDriver(handle, 0);
+		}
 
 		int ret = LibUsb.setConfiguration(handle, 1);
 
@@ -108,7 +114,9 @@ public class NooliteRXService implements Runnable
 			log.error("Configuration error");
 			LibUsb.close(handle);
 			if (ret == LibUsb.ERROR_BUSY)
+			{
 				log.error("Device busy");
+			}
 			return;
 		}
 
@@ -126,7 +134,9 @@ public class NooliteRXService implements Runnable
 			ByteBuffer buf = ByteBuffer.allocateDirect(8);
 
 			if (!pause)
+			{
 				LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE | LibUsb.ENDPOINT_IN, 0x9, 0x300, 0, buf, 100);
+			}
 
 			// buf filled by all nulls is correct!
 			if (!buf.equals(tmpBuf) || !initComplete)
@@ -364,14 +374,8 @@ public class NooliteRXService implements Runnable
 
 	private class InternalCommands implements Runnable
 	{
-		private ServiceCheckEmitter serviceCheckEmitter;
-
 		public InternalCommands()
 		{
-
-			serviceCheckEmitter = new ServiceCheckEmitter("Devices-NooliteRX-Internal");
-			serviceCheckEmitter.setState(ServiceStatus.STARTUP);
-
 			Thread t = new Thread(this);
 			t.start();
 		}
@@ -379,9 +383,6 @@ public class NooliteRXService implements Runnable
 		@Override
 		public synchronized void run()
 		{
-
-			serviceCheckEmitter.setState(ServiceStatus.AVAILABLE);
-
 			try
 			{
 				JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());

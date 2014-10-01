@@ -1,3 +1,19 @@
+/*
+ * Copyright 2012-2014 Nikolay A. Viguro
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.iris.speak;
 
 import org.apache.logging.log4j.LogManager;
@@ -8,48 +24,38 @@ import ru.iris.common.Config;
 import ru.iris.common.Speak;
 import ru.iris.speak.google.GoogleSpeakService;
 
-import javax.jms.JMSException;
-import java.net.URISyntaxException;
+public class Service extends Plugin
+{
 
-/**
- * IRISv2 Project
- * Author: Nikolay A. Viguro
- * WWW: iris.ph-systems.ru
- * E-Mail: nv@ph-systems.ru
- * Date: 05.12.12
- * Time: 21:32
- */
+	private static final Logger log = LogManager.getLogger(Service.class);
 
-public class Service extends Plugin {
+	public Service(PluginWrapper wrapper)
+	{
+		super(wrapper);
+	}
 
-    private static Logger log = LogManager.getLogger(Service.class);
+	@Override
+	public void start()
+	{
+		log.info("[Plugin] iris-speak plugin started!");
 
-    public Service (PluginWrapper wrapper) {
-        super(wrapper);
-    }
+		Config cfg = new Config();
+		Speak speak = new Speak();
 
-    @Override
-    public void start()
-    {
-        log.info("[Plugin] iris-speak plugin started!");
+		if (cfg.getConfig().get("ttsEngine").equals("google"))
+		{
+			new GoogleSpeakService();
+			speak.say("Модуль синтеза речи Гугл запущен!");
+		}
+		else
+		{
+			log.info("No TTS feed specified in config file");
+		}
+	}
 
-        Config cfg = new Config();
-        Speak speak = new Speak();
-
-        if (cfg.getConfig().get("ttsEngine").equals("google")) {
-            new GoogleSpeakService();
-            try {
-                speak.say("Модуль синтеза речи Гугл запущен!");
-            } catch (JMSException | URISyntaxException e) {
-                log.error(e.toString());
-            }
-        } else {
-            log.info("No TTS feed specified in config file");
-        }
-    }
-
-    @Override
-    public void stop() {
-        log.info("[Plugin] iris-speak plugin stopped!");
-    }
+	@Override
+	public void stop()
+	{
+		log.info("[Plugin] iris-speak plugin stopped!");
+	}
 }

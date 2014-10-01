@@ -1,14 +1,20 @@
-package ru.iris.restful;
-
-/**
- * IRISv2 Project
- * Author: Nikolay A. Viguro
- * WWW: iris.ph-systems.ru
- * E-Mail: nv@ph-systems.ru
- * Date: 30.09.14
- * Time: 14:06
- * License: GPL v3
+/*
+ * Copyright 2012-2014 Nikolay A. Viguro
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+package ru.iris.restful;
 
 import com.sun.jersey.api.container.httpserver.HttpServerFactory;
 import com.sun.jersey.api.core.PackagesResourceConfig;
@@ -24,14 +30,15 @@ import java.util.Map;
 public class Service extends Plugin
 {
 
-    public Service (PluginWrapper wrapper) {
-        super(wrapper);
-    }
+	public Service(PluginWrapper wrapper)
+	{
+		super(wrapper);
+	}
 
-    @Override
-    public void start()
-    {
-        log.info("[Plugin] iris-rest plugin started!");
+	@Override
+	public void start()
+	{
+		log.info("[Plugin] iris-rest plugin started!");
 
 		Config cfg = new Config();
 		Map<String, String> config = cfg.getConfig();
@@ -50,8 +57,9 @@ public class Service extends Plugin
 		}
 	}
 
-    @Override
-    public void stop() {
-        log.info("[Plugin] iris-rest plugin stopped!");
-    }
+	@Override
+	public void stop()
+	{
+		log.info("[Plugin] iris-rest plugin stopped!");
+	}
 }

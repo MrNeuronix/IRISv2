@@ -1,3 +1,19 @@
+/*
+ * Copyright 2012-2014 Nikolay A. Viguro
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.iris.restful;
 
 import com.google.gson.Gson;
@@ -12,23 +28,12 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.UUID;
 
-/**
- * IRISv2 Project
- * Author: Nikolay A. Viguro
- * WWW: iris.ph-systems.ru
- * E-Mail: nv@ph-systems.ru
- * Date: 30.09.14
- * Time: 14:20
- * License: GPL v3
- */
-
-@Path("/rest/device")
-public class DevicesREST
+@Path("/rest/device") class DevicesREST
 {
-	private static SetDeviceLevelAdvertisement setDeviceLevelAdvertisement = new SetDeviceLevelAdvertisement();
-	private static SetDeviceNameAdvertisement setDeviceNameAdvertisement = new SetDeviceNameAdvertisement();
-	private static SetDeviceZoneAdvertisement setDeviceZoneAdvertisement = new SetDeviceZoneAdvertisement();
-	private static GetInventoryAdvertisement getInventoryAdvertisement = new GetInventoryAdvertisement();
+	private static final SetDeviceLevelAdvertisement setDeviceLevelAdvertisement = new SetDeviceLevelAdvertisement();
+	private static final SetDeviceNameAdvertisement setDeviceNameAdvertisement = new SetDeviceNameAdvertisement();
+	private static final SetDeviceZoneAdvertisement setDeviceZoneAdvertisement = new SetDeviceZoneAdvertisement();
+	private static final GetInventoryAdvertisement getInventoryAdvertisement = new GetInventoryAdvertisement();
 	private static final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
 
 	// Инвентаризация одного устройства по UUID

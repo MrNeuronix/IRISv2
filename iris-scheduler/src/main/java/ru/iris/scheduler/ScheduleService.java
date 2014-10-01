@@ -1,3 +1,19 @@
+/*
+ * Copyright 2012-2014 Nikolay A. Viguro
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.iris.scheduler;
 
 /**
@@ -22,104 +38,137 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public class ScheduleService implements Runnable {
+class ScheduleService implements Runnable
+{
 
-    private Thread t = null;
-    private Logger log = LogManager.getLogger(ScheduleService.class);
-    private JsonMessaging messaging;
-    private static CommandAdvertisement commandAdvertisement = new CommandAdvertisement();
+	private static final CommandAdvertisement commandAdvertisement = new CommandAdvertisement();
+	private final Logger log = LogManager.getLogger(ScheduleService.class);
+	private Thread t = null;
+	private JsonMessaging messaging;
 
-    public ScheduleService() {
-        this.t = new Thread(this);
-        t.setName("Scheduler Service");
-        this.t.start();
-    }
+	public ScheduleService()
+	{
+		this.t = new Thread(this);
+		t.setName("Scheduler Service");
+		this.t.start();
+	}
 
-    public Thread getThread() {
-        return this.t;
-    }
+	public Thread getThread()
+	{
+		return this.t;
+	}
 
-    public synchronized void run() {
+	public synchronized void run()
+	{
 
-        // Актуализируем даты запуска всех тасков
-        try {
+		// Актуализируем даты запуска всех тасков
+		try
+		{
 
-            List<Task> tasks = Ebean.find(Task.class)
-                    .where().and(Expr.lt("taskdate", new Timestamp(System.currentTimeMillis())), Expr.eq("enabled", true)).findList();
+			List<Task> tasks = Ebean.find(Task.class)
+					.where().and(Expr.lt("taskdate", new Timestamp(System.currentTimeMillis())), Expr.eq("enabled", true)).findList();
 
-            messaging = new JsonMessaging(UUID.randomUUID());
+			messaging = new JsonMessaging(UUID.randomUUID());
 
-            for (Task task : tasks)
-            {
+			for (Task task : tasks)
+			{
 
-                if (task.getType() == 1) {
-                    log.info("Actualizing task. Next run: " + task.nextRun());
-                    task.setTaskdate(task.nextRun());
-                    Ebean.update(task);
-                } else if (task.getType() == 3) {
-                    if (task.getValidto().before(task.nextRun())) {
-                        log.info("Actualizing task. Set task to disable");
-                        task.setEnabled(false);
-                    } else {
-                        log.info("Actualizing task. Next run: " + task.nextRun());
-                        task.setTaskdate(task.nextRun());
-                    }
-                    Ebean.update(task);
-                } else {
-                    log.info("Skip task");
-                }
-            }
+				if (task.getType() == 1)
+				{
+					log.info("Actualizing task. Next run: " + task.nextRun());
+					task.setTaskdate(task.nextRun());
+					Ebean.update(task);
+				}
+				else if (task.getType() == 3)
+				{
+					if (task.getValidto().before(task.nextRun()))
+					{
+						log.info("Actualizing task. Set task to disable");
+						task.setEnabled(false);
+					}
+					else
+					{
+						log.info("Actualizing task. Next run: " + task.nextRun());
+						task.setTaskdate(task.nextRun());
+					}
+					Ebean.update(task);
+				}
+				else
+				{
+					log.info("Skip task");
+				}
+			}
 
-        } catch (Exception e) {
-            log.info("Error while actualizing task");
-            e.printStackTrace();
-        }
+		}
+		catch (Exception e)
+		{
+			log.info("Error while actualizing task");
+			e.printStackTrace();
+		}
 
-        while (true) {
-            try {
+		//noinspection InfiniteLoopStatement
+		while (true)
+		{
+			try
+			{
 
-                List<Task> tasks = Ebean.find(Task.class)
-                        .where().eq("enabled", true).findList();
+				List<Task> tasks = Ebean.find(Task.class)
+						.where().eq("enabled", true).findList();
 
-                for (Task task : tasks) {
+				for (Task task : tasks)
+				{
 
-                    if (new Timestamp(new Date().getTime()).equals(task.getTaskdate())) {
-                        log.info("Executing task " + task.getId() + " (class: " + task.getEclass() + ", command: " + task.getCommand() + ")");
+					if (new Timestamp(new Date().getTime()).equals(task.getTaskdate()))
+					{
+						log.info("Executing task " + task.getId() + " (class: " + task.getEclass() + ", command: " + task.getCommand() + ")");
 
-                        messaging.broadcast("event.command", commandAdvertisement.set(task.getEclass(), task.getCommand()));
+						messaging.broadcast("event.command", commandAdvertisement.set(task.getEclass(), task.getCommand()));
 
-                        if (task.getType() == 1) {
-                            log.info("Next run: " + task.nextRun());
-                            task.setTaskdate(task.nextRun());
-                            Ebean.update(task);
-                        } else if (task.getType() == 2) {
-                            log.info("Set task to disable");
-                            task.setEnabled(false);
-                            Ebean.update(task);
-                        } else {
-                            if (task.getValidto().before(task.nextRun())) {
-                                log.info("Set task to disable");
-                                task.setEnabled(false);
-                                Ebean.update(task);
-                            } else {
-                                log.info("Next run: " + task.nextRun());
-                                task.setTaskdate(task.nextRun());
-                                Ebean.update(task);
-                            }
-                        }
-                    }
-                }
+						if (task.getType() == 1)
+						{
+							log.info("Next run: " + task.nextRun());
+							task.setTaskdate(task.nextRun());
+							Ebean.update(task);
+						}
+						else if (task.getType() == 2)
+						{
+							log.info("Set task to disable");
+							task.setEnabled(false);
+							Ebean.update(task);
+						}
+						else
+						{
+							if (task.getValidto().before(task.nextRun()))
+							{
+								log.info("Set task to disable");
+								task.setEnabled(false);
+								Ebean.update(task);
+							}
+							else
+							{
+								log.info("Next run: " + task.nextRun());
+								task.setTaskdate(task.nextRun());
+								Ebean.update(task);
+							}
+						}
+					}
+				}
 
-            } catch (Exception e) {
-                log.info("No scheduled tasks");
-                //e.printStackTrace();
-            }
+			}
+			catch (Exception e)
+			{
+				log.info("No scheduled tasks");
+				//e.printStackTrace();
+			}
 
-            try {
-                Thread.sleep(1000L);
-            } catch (InterruptedException e) {
-                log.error(e.toString());
-            }
-        }
-    }
+			try
+			{
+				Thread.sleep(1000L);
+			}
+			catch (InterruptedException e)
+			{
+				log.error(e.toString());
+			}
+		}
+	}
 }

@@ -1,19 +1,5 @@
-package ru.iris;
-
-import com.avaje.ebean.Ebean;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import ru.iris.common.database.model.ModuleStatus;
-import ru.iris.common.messaging.JsonEnvelope;
-import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.service.ServiceAdvertisement;
-import ru.iris.common.messaging.model.service.ServiceStatus;
-
-import java.sql.Timestamp;
-import java.util.UUID;
-
-/**
- * Copyright 2013 Tommi S.E. Laukkanen, Nikolay A. Viguro
+/*
+ * Copyright 2012-2014 Nikolay A. Viguro
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,20 +14,28 @@ import java.util.UUID;
  * limitations under the License.
  */
 
-public class StatusChecker implements Runnable {
+package ru.iris;
 
-    private static Logger log = LogManager.getLogger(StatusChecker.class.getName());
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-    public StatusChecker() {
-        Thread t = new Thread(this);
-        t.setName("Status Checker Service");
-        t.start();
-    }
+class StatusChecker implements Runnable
+{
 
-    @Override
-    public synchronized void run() {
+	private static Logger log = LogManager.getLogger(StatusChecker.class.getName());
 
-        //TODO
+	public StatusChecker()
+	{
+		Thread t = new Thread(this);
+		t.setName("Status Checker Service");
+		t.start();
+	}
 
-    }
+	@Override
+	public synchronized void run()
+	{
+
+		//TODO
+
+	}
 }

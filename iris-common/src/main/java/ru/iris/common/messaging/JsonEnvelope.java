@@ -23,80 +23,91 @@ import java.util.UUID;
  *
  * @author Tommi S.E. Laukkanen
  */
-public class JsonEnvelope {
-    /**
-     * The sender instance ID.
-     */
-    private UUID senderInstanceId;
-    /**
-     * The receiver instance ID.
-     */
-    private UUID receiverInstanceId;
-    /**
-     * The correlation ID.
-     */
-    private String correlationId;
-    /**
-     * The reply destination.
-     */
-    private Destination replyDestination;
-    /**
-     * The subject.
-     */
-    private String subject;
-    /**
-     * The object.
-     */
-    private Object object;
+public class JsonEnvelope
+{
+	/**
+	 * The subject.
+	 */
+	private final String subject;
+	/**
+	 * The object.
+	 */
+	private final Object object;
+	/**
+	 * The sender instance ID.
+	 */
+	private UUID senderInstanceId;
+	/**
+	 * The receiver instance ID.
+	 */
+	private UUID receiverInstanceId;
+	/**
+	 * The correlation ID.
+	 */
+	private String correlationId;
+	/**
+	 * The reply destination.
+	 */
+	private Destination replyDestination;
 
-    public JsonEnvelope(String subject, Object object) {
-        this.subject = subject;
-        this.object = object;
-    }
+	public JsonEnvelope(String subject, Object object)
+	{
+		this.subject = subject;
+		this.object = object;
+	}
 
-    public JsonEnvelope(UUID senderInstanceId, UUID receiverInstanceId, String correlationId,
-                        Destination replyDestination, String subject, Object object) {
-        this.senderInstanceId = senderInstanceId;
-        this.receiverInstanceId = receiverInstanceId;
-        this.correlationId = correlationId;
-        this.replyDestination = replyDestination;
-        this.subject = subject;
-        this.object = object;
-    }
+	public JsonEnvelope(UUID senderInstanceId, UUID receiverInstanceId, String correlationId,
+			Destination replyDestination, String subject, Object object)
+	{
+		this.senderInstanceId = senderInstanceId;
+		this.receiverInstanceId = receiverInstanceId;
+		this.correlationId = correlationId;
+		this.replyDestination = replyDestination;
+		this.subject = subject;
+		this.object = object;
+	}
 
-    public String getCorrelationId() {
-        return correlationId;
-    }
+	public String getCorrelationId()
+	{
+		return correlationId;
+	}
 
-    public Destination getReplyDestination() {
-        return replyDestination;
-    }
+	public Destination getReplyDestination()
+	{
+		return replyDestination;
+	}
 
-    public String getSubject() {
-        return subject;
-    }
+	public String getSubject()
+	{
+		return subject;
+	}
 
-    public <T> T getObject() {
-        return (T) object;
-    }
+	@SuppressWarnings("unchecked")
+	public <T> T getObject()
+	{
+		return (T) object;
+	}
 
-    public UUID getSenderInstance() {
-        return senderInstanceId;
-    }
+	public UUID getSenderInstance()
+	{
+		return senderInstanceId;
+	}
 
-    public UUID getReceiverInstance() {
-        return receiverInstanceId;
-    }
+	public UUID getReceiverInstance()
+	{
+		return receiverInstanceId;
+	}
 
-    @Override
-    public String toString() {
-        return "Envelope{" +
-                "senderInstanceId=" + senderInstanceId +
-                ", receiverInstanceId=" + receiverInstanceId +
-                ", correlationId='" + correlationId + '\'' +
-                ", replyDestination=" + replyDestination +
-                ", subject='" + subject + '\'' +
-                ", object=" + object +
-                '}';
-    }
+	@Override
+	public String toString()
+	{
+		return "Envelope{" +
+				"senderInstanceId=" + senderInstanceId +
+				", receiverInstanceId=" + receiverInstanceId +
+				", correlationId='" + correlationId + '\'' +
+				", replyDestination=" + replyDestination +
+				", subject='" + subject + '\'' +
+				", object=" + object +
+				'}';
+	}
 }

@@ -1,14 +1,20 @@
-package ru.iris.ai;
-
-/**
- * IRISv2 Project
- * Author: Nikolay A. Viguro
- * WWW: iris.ph-systems.ru
- * E-Mail: nv@ph-systems.ru
- * Date: 05.01.14
- * Time: 19:21
- * License: GPL v3
+/*
+ * Copyright 2012-2014 Nikolay A. Viguro
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+package ru.iris.ai;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,30 +23,37 @@ import ro.fortsoft.pf4j.PluginWrapper;
 import ru.iris.ai.witai.WitAiService;
 import ru.iris.common.Config;
 
-public class Service extends Plugin {
+public class Service extends Plugin
+{
 
-    private static Logger log = LogManager.getLogger(Service.class);
+	private static final Logger log = LogManager.getLogger(Service.class);
 
-    public Service (PluginWrapper wrapper) {
-        super(wrapper);
-    }
+	public Service(PluginWrapper wrapper)
+	{
+		super(wrapper);
+	}
 
-    @Override
-    public void start() {
+	@Override
+	public void start()
+	{
 
-        log.info("[Plugin] iris-ai plugin started!");
+		log.info("[Plugin] iris-ai plugin started!");
 
-        Config cfg = new Config();
+		Config cfg = new Config();
 
-        if (cfg.getConfig().get("witaiEnabled").equals("1")) {
-            new WitAiService();
-        } else {
-            log.info("No AI specified in config file");
-        }
-    }
+		if (cfg.getConfig().get("witaiEnabled").equals("1"))
+		{
+			new WitAiService();
+		}
+		else
+		{
+			log.info("No AI specified in config file");
+		}
+	}
 
-    @Override
-    public void stop() {
-        log.info("[Plugin] iris-ai plugin stopped!");
-    }
+	@Override
+	public void stop()
+	{
+		log.info("[Plugin] iris-ai plugin stopped!");
+	}
 }

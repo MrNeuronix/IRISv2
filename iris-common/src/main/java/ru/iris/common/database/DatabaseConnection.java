@@ -1,3 +1,19 @@
+/*
+ * Copyright 2012-2014 Nikolay A. Viguro
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.iris.common.database;
 
 import com.avaje.ebean.EbeanServer;
@@ -9,59 +25,53 @@ import ru.iris.common.database.model.*;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.database.model.devices.DeviceValue;
 
-/**
- * IRISv2 Project
- * Author: Nikolay A. Viguro
- * WWW: iris.ph-systems.ru
- * E-Mail: nv@ph-systems.ru
- * Date: 10.02.14
- * Time: 15:08
- * License: GPL v3
- */
-public class DatabaseConnection {
+public class DatabaseConnection
+{
 
-    private final Config conf = new Config();
-    private EbeanServer server;
+	private final EbeanServer server;
 
-    public DatabaseConnection() {
-        ServerConfig config = new ServerConfig();
-        config.setName("iris");
+	public DatabaseConnection()
+	{
+		ServerConfig config = new ServerConfig();
+		config.setName("iris");
 
-        // Define DataSource parameters
-        DataSourceConfig db = new DataSourceConfig();
-        db.setDriver("com.mysql.jdbc.Driver");
-        db.setUsername(conf.getConfig().get("dbUsername"));
-        db.setPassword(conf.getConfig().get("dbPassword"));
-        db.setUrl("jdbc:mysql://" + conf.getConfig().get("dbHost") + "/" + conf.getConfig().get("dbName")
-                + "?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8");
-        //db.setHeartbeatSql("select count(*) from log");
+		// Define DataSource parameters
+		DataSourceConfig db = new DataSourceConfig();
+		db.setDriver("com.mysql.jdbc.Driver");
+		Config conf = new Config();
+		db.setUsername(conf.getConfig().get("dbUsername"));
+		db.setPassword(conf.getConfig().get("dbPassword"));
+		db.setUrl("jdbc:mysql://" + conf.getConfig().get("dbHost") + "/" + conf.getConfig().get("dbName")
+				+ "?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8");
+		//db.setHeartbeatSql("select count(*) from log");
 
-        config.setDataSourceConfig(db);
+		config.setDataSourceConfig(db);
 
-        // set DDL options...
-        config.setDdlGenerate(Boolean.valueOf(conf.getConfig().get("ddlGenerate")));
-        config.setDdlRun(Boolean.valueOf(conf.getConfig().get("ddlRun")));
+		// set DDL options...
+		config.setDdlGenerate(Boolean.valueOf(conf.getConfig().get("ddlGenerate")));
+		config.setDdlRun(Boolean.valueOf(conf.getConfig().get("ddlRun")));
 
-        config.setDebugSql(Boolean.valueOf(conf.getConfig().get("sqlDebug")));
-        //config.setLoggingLevel(LogLevel.SQL);
+		config.setDebugSql(Boolean.valueOf(conf.getConfig().get("sqlDebug")));
+		//config.setLoggingLevel(LogLevel.SQL);
 
-        config.setDefaultServer(true);
-        config.setRegister(true);
+		config.setDefaultServer(true);
+		config.setRegister(true);
 
-        // specify entity classes
-        config.addClass(Event.class);
-        config.addClass(Log.class);
-        config.addClass(ModuleStatus.class);
-        config.addClass(Speaks.class);
-        config.addClass(Task.class);
-        config.addClass(Device.class);
-        config.addClass(DeviceValue.class);
+		// specify entity classes
+		config.addClass(Event.class);
+		config.addClass(Log.class);
+		config.addClass(ModuleStatus.class);
+		config.addClass(Speaks.class);
+		config.addClass(Task.class);
+		config.addClass(Device.class);
+		config.addClass(DeviceValue.class);
 
-        // create the EbeanServer instance
-        server = EbeanServerFactory.create(config);
-    }
+		// create the EbeanServer instance
+		server = EbeanServerFactory.create(config);
+	}
 
-    public EbeanServer getServer() {
-        return server;
-    }
+	public EbeanServer getServer()
+	{
+		return server;
+	}
 }

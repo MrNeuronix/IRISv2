@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright 2012-2014 Nikolay A. Viguro
+  ~ <p/>
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~ <p/>
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~ <p/>
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <assembly
-        xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
         xsi:schemaLocation="
     http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2
       http://maven.apache.org/xsd/assembly-1.1.2.xsd
@@ -53,60 +69,53 @@
             <directory>target</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/extensions</outputDirectory>
+            <outputDirectory>/extensions/iris-devices/classes</outputDirectory>
             <includes>
-                <include>*.zip</include>
+                <include>**/*</include>
             </includes>
-            <directory>../iris-devices/target</directory>
+            <directory>../iris-devices/target/plugin-classes</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/extensions</outputDirectory>
+            <outputDirectory>/extensions/iris-events/classes</outputDirectory>
             <includes>
-                <include>*.zip</include>
+                <include>**/*</include>
             </includes>
-            <directory>../iris-events/target</directory>
+            <directory>../iris-events/target/plugin-classes</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/extensions</outputDirectory>
+            <outputDirectory>/extensions/iris-video/classes</outputDirectory>
             <includes>
-                <include>*.zip</include>
+                <include>**/*</include>
             </includes>
-            <directory>../iris-record/target</directory>
+            <directory>../iris-video/target/plugin-classes</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/extensions</outputDirectory>
+            <outputDirectory>/extensions/iris-rest/classes</outputDirectory>
             <includes>
-                <include>*.zip</include>
+                <include>**/*</include>
             </includes>
-            <directory>../iris-video/target</directory>
+            <directory>../iris-rest/target/plugin-classes</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/extensions</outputDirectory>
+            <outputDirectory>/extensions/iris-scheduler/classes</outputDirectory>
             <includes>
-                <include>*.zip</include>
+                <include>**/*</include>
             </includes>
-            <directory>../iris-rest/target</directory>
+            <directory>../iris-scheduler/target/plugin-classes</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/extensions</outputDirectory>
+            <outputDirectory>/extensions/iris-speak/classes</outputDirectory>
             <includes>
-                <include>*.zip</include>
+                <include>**/*</include>
             </includes>
-            <directory>../iris-scheduler/target</directory>
+            <directory>../iris-speak/target/plugin-classes</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/extensions</outputDirectory>
+            <outputDirectory>/extensions/iris-ai/classes</outputDirectory>
             <includes>
-                <include>*.zip</include>
+                <include>**/*</include>
             </includes>
-            <directory>../iris-speak/target</directory>
-        </fileSet>
-        <fileSet>
-            <outputDirectory>/extensions</outputDirectory>
-            <includes>
-                <include>*.zip</include>
-            </includes>
-            <directory>../iris-ai/target</directory>
+            <directory>../iris-ai/target/plugin-classes</directory>
         </fileSet>
     </fileSets>
     <!-- use this section if you want to package dependencies -->

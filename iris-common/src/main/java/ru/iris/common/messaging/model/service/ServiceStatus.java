@@ -22,25 +22,26 @@ import com.google.gson.annotations.Expose;
  *
  * @author Tommi S.E. Laukkanen
  */
-public enum ServiceStatus {
-    /**
-     * Service has been started.
-     */
-    @Expose
-    STARTUP,
-    /**
-     * Service is available.
-     */
-    @Expose
-    AVAILABLE,
-    /**
-     * Service has encountered critical errors.
-     */
-    @Expose
-    ERROR,
-    /**
-     * Service has been shutdown.
-     */
-    @Expose
-    SHUTDOWN
+public enum ServiceStatus
+{
+	/**
+	 * Service has been started.
+	 */
+	@Expose
+	STARTUP,
+	/**
+	 * Service is available.
+	 */
+	@Expose
+	AVAILABLE,
+	/**
+	 * Service has encountered critical errors.
+	 */
+	@Expose
+	ERROR,
+	/**
+	 * Service has been shutdown.
+	 */
+	@Expose
+	SHUTDOWN
 }

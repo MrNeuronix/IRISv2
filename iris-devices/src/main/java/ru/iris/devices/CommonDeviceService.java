@@ -1,39 +1,40 @@
+/*
+ * Copyright 2012-2014 Nikolay A. Viguro
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package ru.iris.devices;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Query;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.common.Config;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.ServiceCheckEmitter;
 import ru.iris.common.messaging.model.devices.*;
 import ru.iris.common.messaging.model.devices.noolite.ResponseNooliteDeviceInventoryAdvertisement;
 import ru.iris.common.messaging.model.devices.zwave.ResponseZWaveDeviceInventoryAdvertisement;
-import ru.iris.common.messaging.model.service.ServiceStatus;
 
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * IRISv2 Project
- * Author: Nikolay A. Viguro
- * WWW: iris.ph-systems.ru
- * E-Mail: nv@ph-systems.ru
- * Date: 05.01.14
- * Time: 13:57
- * License: GPL v3
- */
-
-public class CommonDeviceService implements Runnable
+class CommonDeviceService implements Runnable
 {
 
-	private Logger log = LogManager.getLogger(CommonDeviceService.class.getName());
+	private final Logger log = LogManager.getLogger(CommonDeviceService.class.getName());
 	private boolean shutdown = false;
-	private JsonMessaging messaging;
-	private Map<String, String> config;
 
 	public CommonDeviceService()
 	{
@@ -45,13 +46,8 @@ public class CommonDeviceService implements Runnable
 	@Override
 	public synchronized void run()
 	{
-
-		messaging = new JsonMessaging(UUID.randomUUID());
-		config = new Config().getConfig();
-
 		try
 		{
-
 			// Make sure we exit the wait loop if we receive shutdown signal.
 			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
 			{
