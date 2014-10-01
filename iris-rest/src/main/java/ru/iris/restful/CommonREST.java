@@ -27,8 +27,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.MediaType;
 import java.util.UUID;
 
-@Path("/rest") class CommonREST
+@Path("/rest")
+public class CommonREST
 {
+	public CommonREST()
+	{
+	}
 
 	@GET
 	@Path("/recognized/{device}/{text}")

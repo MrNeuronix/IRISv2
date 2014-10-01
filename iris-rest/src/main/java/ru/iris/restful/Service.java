@@ -16,15 +16,15 @@
 
 package ru.iris.restful;
 
-import com.sun.jersey.api.container.httpserver.HttpServerFactory;
-import com.sun.jersey.api.core.PackagesResourceConfig;
-import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
+import org.jboss.resteasy.plugins.server.sun.http.HttpContextBuilder;
 import ro.fortsoft.pf4j.Plugin;
 import ro.fortsoft.pf4j.PluginWrapper;
 import ru.iris.common.Config;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.Map;
 
 public class Service extends Plugin
@@ -45,10 +45,13 @@ public class Service extends Plugin
 
 		try
 		{
-			ResourceConfig rc = new PackagesResourceConfig("ru.iris.restful");
-			rc.getProperties().put("com.sun.jersey.spi.container.ContainerRequestFilters", "ru.iris.restful.AuthFilter");
-			HttpServer server = HttpServerFactory.create("http://" + config.get("httpHost") + ":" + config.get("httpPort") + "/", rc);
-			server.start();
+			HttpServer httpServer = HttpServer.create(new InetSocketAddress(17000), 10);
+			HttpContextBuilder contextBuilder = new HttpContextBuilder();
+			contextBuilder.getDeployment().getActualResourceClasses().add(DevicesREST.class);
+			contextBuilder.getDeployment().getActualResourceClasses().add(CommonREST.class);
+			contextBuilder.getDeployment().getActualProviderClasses().add(NotFoundExceptionMapper.class);
+			HttpContext context = contextBuilder.bind(httpServer);
+			httpServer.start();
 
 		}
 		catch (IllegalArgumentException | IOException e)

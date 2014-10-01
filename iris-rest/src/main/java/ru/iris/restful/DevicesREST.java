@@ -28,13 +28,18 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.UUID;
 
-@Path("/rest/device") class DevicesREST
+@Path("/rest/device")
+public class DevicesREST
 {
 	private static final SetDeviceLevelAdvertisement setDeviceLevelAdvertisement = new SetDeviceLevelAdvertisement();
 	private static final SetDeviceNameAdvertisement setDeviceNameAdvertisement = new SetDeviceNameAdvertisement();
 	private static final SetDeviceZoneAdvertisement setDeviceZoneAdvertisement = new SetDeviceZoneAdvertisement();
 	private static final GetInventoryAdvertisement getInventoryAdvertisement = new GetInventoryAdvertisement();
 	private static final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().setPrettyPrinting().create();
+
+	public DevicesREST()
+	{
+	}
 
 	// Инвентаризация одного устройства по UUID
 	@GET

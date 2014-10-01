@@ -64,7 +64,7 @@
         <fileSet>
             <outputDirectory>/</outputDirectory>
             <includes>
-                <include>*.zip</include>
+                <include>*.jar</include>
             </includes>
             <directory>target</directory>
         </fileSet>
@@ -129,8 +129,6 @@
             <excludes>
                 <exclude>ru.iris:iris-devices</exclude>
                 <exclude>ru.iris:iris-events</exclude>
-                <exclude>ru.iris:iris-record</exclude>
-                <exclude>ru.iris:iris-scheduler</exclude>
                 <exclude>ru.iris:iris-video</exclude>
                 <exclude>ru.iris:iris-speak</exclude>
                 <exclude>ru.iris:iris-ai</exclude>
