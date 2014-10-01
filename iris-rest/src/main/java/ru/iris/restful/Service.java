@@ -16,7 +16,6 @@
 
 package ru.iris.restful;
 
-import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import org.jboss.resteasy.plugins.server.sun.http.HttpContextBuilder;
 import ro.fortsoft.pf4j.Plugin;
@@ -45,12 +44,13 @@ public class Service extends Plugin
 
 		try
 		{
-			HttpServer httpServer = HttpServer.create(new InetSocketAddress(17000), 10);
+			HttpServer httpServer = HttpServer.create(new InetSocketAddress(Integer.valueOf(config.get("httpPort"))), 10);
+
 			HttpContextBuilder contextBuilder = new HttpContextBuilder();
 			contextBuilder.getDeployment().getActualResourceClasses().add(DevicesREST.class);
 			contextBuilder.getDeployment().getActualResourceClasses().add(CommonREST.class);
 			contextBuilder.getDeployment().getActualProviderClasses().add(NotFoundExceptionMapper.class);
-			HttpContext context = contextBuilder.bind(httpServer);
+			contextBuilder.bind(httpServer);
 			httpServer.start();
 
 		}

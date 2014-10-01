@@ -40,10 +40,21 @@ public class CommonREST
 	public String cmd(@PathParam("device") String device, @PathParam("text") String text)
 	{
 		JsonMessaging messaging = new JsonMessaging(UUID.randomUUID());
-		messaging.broadcast("event.speak.recognized", new SpeakRecognizedAdvertisement().set(text, 100, device));
-		messaging.close();
 
-		return ("{ status: \"sent\" }");
+		try
+		{
+			messaging.broadcast("event.speak.recognized", new SpeakRecognizedAdvertisement().set(text, 100, device));
+			return ("{ status: \"sent\" }");
+		}
+		catch (final Throwable t)
+		{
+			messaging.close();
+			return "{ status: \"error: " + t.toString() + " }";
+		}
+		finally
+		{
+			messaging.close();
+		}
 	}
 
 	@GET
@@ -52,9 +63,20 @@ public class CommonREST
 	public String speak(@PathParam("device") String device, @PathParam("text") String text)
 	{
 		JsonMessaging messaging = new JsonMessaging(UUID.randomUUID());
-		messaging.broadcast("event.speak", new SpeakAdvertisement().set(text, 100, device));
-		messaging.close();
 
-		return ("{ status: \"sent\" }");
+		try
+		{
+			messaging.broadcast("event.speak", new SpeakAdvertisement().set(text, 100, device));
+			return ("{ status: \"sent\" }");
+		}
+		catch (final Throwable t)
+		{
+			messaging.close();
+			return "{ status: \"error: " + t.toString() + " }";
+		}
+		finally
+		{
+			messaging.close();
+		}
 	}
 }

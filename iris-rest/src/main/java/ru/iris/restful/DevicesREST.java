@@ -51,7 +51,6 @@ public class DevicesREST
 
 		try
 		{
-
 			messaging.subscribe("event.devices.responseinventory");
 			messaging.start();
 
@@ -106,8 +105,6 @@ public class DevicesREST
 		try
 		{
 			messaging.broadcast("event.devices.setvalue", setDeviceLevelAdvertisement.set(uuid, label, level));
-			messaging.close();
-
 			return "{ status: \"sent\" }";
 
 		}
@@ -115,6 +112,10 @@ public class DevicesREST
 		{
 			messaging.close();
 			return "{ status: \"error: " + t.toString() + " }";
+		}
+		finally
+		{
+			messaging.close();
 		}
 	}
 
@@ -125,10 +126,21 @@ public class DevicesREST
 	public String devSetName(@PathParam("uuid") String uuid, @PathParam("name") String name)
 	{
 		JsonMessaging messaging = new JsonMessaging(UUID.randomUUID());
-		messaging.broadcast("event.devices.setname", setDeviceNameAdvertisement.set(uuid, name));
-		messaging.close();
 
-		return ("{ status: \"sent\" }");
+		try
+		{
+			messaging.broadcast("event.devices.setname", setDeviceNameAdvertisement.set(uuid, name));
+			return ("{ status: \"sent\" }");
+		}
+		catch (final Throwable t)
+		{
+			messaging.close();
+			return "{ status: \"error: " + t.toString() + " }";
+		}
+		finally
+		{
+			messaging.close();
+		}
 	}
 
 	// Установка зоны
@@ -138,9 +150,20 @@ public class DevicesREST
 	public String devSetZone(@PathParam("uuid") String uuid, @PathParam("zone") int zone)
 	{
 		JsonMessaging messaging = new JsonMessaging(UUID.randomUUID());
-		messaging.broadcast("event.devices.setzone", setDeviceZoneAdvertisement.set(uuid, zone));
-		messaging.close();
 
-		return ("{ status: \"sent\" }");
+		try
+		{
+			messaging.broadcast("event.devices.setzone", setDeviceZoneAdvertisement.set(uuid, zone));
+			return ("{ status: \"sent\" }");
+		}
+		catch (final Throwable t)
+		{
+			messaging.close();
+			return "{ status: \"error: " + t.toString() + " }";
+		}
+		finally
+		{
+			messaging.close();
+		}
 	}
 }

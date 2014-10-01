@@ -110,6 +110,10 @@ public class JsonMessaging
 						+ ":" + config.getConfig().get("AMQPport") + "?jms.prefetchPolicy.all=100");
 			}
 
+			// set max 10 threads
+			connectionFactory.setMaxThreadPoolSize(10);
+			connectionFactory.setAlwaysSessionAsync(false);
+
 			connection = connectionFactory.createTopicConnection();
 			connection.start();
 

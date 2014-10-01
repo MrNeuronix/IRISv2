@@ -103,11 +103,14 @@ public class GoogleSpeakService implements Runnable
 
 							if (advertisement.getDevice().equals("all"))
 							{
-								final Player player = new Player(synthesiser.getMP3Data(advertisement.getText()));
+								Player player = new Player(synthesiser.getMP3Data(advertisement.getText()));
 								player.play();
 								player.close();
-							}
 
+								// force to be null for GC
+								player = null;
+							}
+							// TODO play on other devices
 						}
 						else
 						{
