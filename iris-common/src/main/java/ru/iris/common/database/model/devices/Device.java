@@ -16,6 +16,7 @@
 
 package ru.iris.common.database.model.devices;
 
+import com.avaje.ebean.Ebean;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
@@ -260,6 +261,11 @@ public class Device implements Serializable
 
 		values = zDv;
 		zDv = null;
+	}
+
+	public static Device getDeviceByUUID(String uuid)
+	{
+		return Ebean.find(Device.class).where().eq("uuid", uuid).findUnique();
 	}
 
 	@Override

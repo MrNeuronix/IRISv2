@@ -103,7 +103,6 @@ class EventsService implements Runnable
 
 			while (!shutdown)
 			{
-
 				JsonEnvelope envelope = jsonMessaging.receive(100);
 
 				if (envelope != null)
