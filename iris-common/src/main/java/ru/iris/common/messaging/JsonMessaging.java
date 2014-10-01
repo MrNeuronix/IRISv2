@@ -18,7 +18,6 @@ package ru.iris.common.messaging;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
