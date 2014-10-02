@@ -28,7 +28,6 @@ import java.sql.Timestamp;
 @Table(name = "speaks")
 public class Speaks
 {
-
 	@Id
 	private long id;
 
@@ -47,7 +46,7 @@ public class Speaks
 	private String device;
 
 	@Expose
-	private boolean isActive = false;
+	private long cache;
 
 	// Default
 	public Speaks()
@@ -104,13 +103,13 @@ public class Speaks
 		this.device = device;
 	}
 
-	public boolean isActive()
+	public long getCache()
 	{
-		return isActive;
+		return cache;
 	}
 
-	public void setActive(boolean isActive)
+	public void setCache(long cache)
 	{
-		this.isActive = isActive;
+		this.cache = cache;
 	}
 }

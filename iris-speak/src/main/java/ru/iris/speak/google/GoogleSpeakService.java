@@ -17,6 +17,7 @@
 package ru.iris.speak.google;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Expr;
 import com.darkprograms.speech.synthesiser.Synthesiser;
 import javazoom.jl.player.Player;
 import org.apache.logging.log4j.LogManager;
@@ -27,6 +28,9 @@ import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
 
+import java.io.*;
+import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -74,6 +78,12 @@ public class GoogleSpeakService implements Runnable
 			jsonMessaging.subscribe("event.speak");
 			jsonMessaging.start();
 
+			// fetch all cached speaks for this server
+			List<Speaks> speaksList = Ebean.find(Speaks.class).where().and(Expr.ne("cache", 0), Expr.eq("device", "all")).findList();
+
+			InputStream result;
+			Player player;
+
 			while (!shutdown)
 			{
 
@@ -90,33 +100,71 @@ public class GoogleSpeakService implements Runnable
 						speak.setText(advertisement.getText());
 						speak.setConfidence(advertisement.getConfidence());
 						speak.setDevice(advertisement.getDevice());
-						speak.setActive(true);
-
-						Ebean.save(speak);
 
 						if (conf.get("silence").equals("0"))
 						{
-
-							log.info("Confidence: " + advertisement.getConfidence());
-							log.info("Text: " + advertisement.getText());
-							log.info("Device: " + advertisement.getDevice());
-
+							// Here we speak only if destination - all
 							if (advertisement.getDevice().equals("all"))
 							{
-								Player player = new Player(synthesiser.getMP3Data(advertisement.getText()));
-								player.play();
-								player.close();
+								log.debug("Confidence: " + advertisement.getConfidence());
+								log.debug("Text: " + advertisement.getText());
+								log.debug("Device: " + advertisement.getDevice());
+
+								long cacheId = 0;
+
+								for (Speaks speaks : speaksList)
+								{
+									if (
+											speaks.getText().equals(advertisement.getText())
+													&& speaks.getConfidence().equals(100D)
+											)
+										cacheId = speaks.getCache();
+								}
+
+								// Cache result
+								if (cacheId == 0)
+								{
+									long cacheIdent = new Date().getTime();
+
+									OutputStream outputStream = new FileOutputStream(new File("data/cache-" + cacheIdent + ".mp3"));
+									result = synthesiser.getMP3Data(advertisement.getText());
+
+									int read;
+									byte[] bytes = new byte[1024];
+
+									while ((read = result.read(bytes)) != -1)
+									{
+										outputStream.write(bytes, 0, read);
+									}
+
+									speak.setCache(cacheIdent);
+
+									player = new Player(result);
+									player.play();
+									player.close();
+								}
+								// cache found - play local file
+								else
+								{
+									log.info("Playing local file: " + "data/cache-" + cacheId + ".mp3");
+
+									result = new FileInputStream("data/cache-" + cacheId + ".mp3");
+
+									player = new Player(result);
+									player.play();
+									player.close();
+								}
 
 								// force to be null for GC
 								player = null;
 							}
-							// TODO play on other devices
 						}
 						else
 						{
 							log.info("Silence mode enabled. Ignoring speak request.");
 						}
 
+						Ebean.save(speak);
 					}
 					else
 					{
