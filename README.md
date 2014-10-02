@@ -10,8 +10,8 @@ Please remember that this project is in deep alpha and now is mostly for develop
 
 ## Features
 
-* Strong modular system
-* AMQP messaging protocol inside (ActiveMQ)
+* Extensible plugin system
+* AMQP messaging protocol inside (RabbitMQ)
 * JavaScript based dynamic scripts support for better automation
 * More other stuff :)
 
