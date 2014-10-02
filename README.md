@@ -25,7 +25,7 @@ Please remember that this project is in deep alpha and now is mostly for develop
 **mvn package**
 
 In project root directory you will find assembled **IRISv2-linux-release.zip**. Unpack them.
-Create database for IRISv2 (**conf/iris-db.sql**).
+Database for IRISv2 will be created dynamically.
 
 ## Configuration
 
