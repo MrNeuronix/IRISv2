@@ -142,6 +142,10 @@ public class GoogleSpeakService implements Runnable
 									player = new Player(result);
 									player.play();
 									player.close();
+
+									Ebean.save(speak);
+
+									speaksList.add(speak);
 								}
 								// cache found - play local file
 								else
@@ -153,6 +157,8 @@ public class GoogleSpeakService implements Runnable
 									player = new Player(result);
 									player.play();
 									player.close();
+
+									Ebean.save(speak);
 								}
 
 								// force to be null for GC
@@ -164,7 +170,6 @@ public class GoogleSpeakService implements Runnable
 							log.info("Silence mode enabled. Ignoring speak request.");
 						}
 
-						Ebean.save(speak);
 					}
 					else
 					{
