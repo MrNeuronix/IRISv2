@@ -198,13 +198,23 @@ public class JsonMessaging
 
 		try
 		{
+			String callbackQueueName = channel.queueDeclare().getQueue();
+
 			// Create a message headers
 			Map<String, Object> headers = new HashMap<>();
 			headers.put("sender", instanceId.toString());
 			headers.put("class", className);
 
 			// Publish message to topic
-			channel.basicPublish("iris", subject, new AMQP.BasicProperties.Builder().headers(headers).build(), jsonString.getBytes());
+			channel.basicPublish(
+					"iris",
+					subject,
+					new AMQP.BasicProperties.Builder()
+							.headers(headers)
+							.replyTo(callbackQueueName)
+							.build(),
+					jsonString.getBytes()
+			);
 		}
 		catch (IOException e)
 		{
@@ -275,7 +285,7 @@ public class JsonMessaging
 
 				JsonEnvelope envelope = new JsonEnvelope(
 						UUID.fromString(senderName),
-						replyTo != null ? UUID.fromString(replyTo) : null,
+						replyTo,
 						corrID,
 						subject,
 						object);

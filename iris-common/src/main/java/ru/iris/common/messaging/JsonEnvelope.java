@@ -39,7 +39,7 @@ public class JsonEnvelope
 	/**
 	 * The receiver instance ID.
 	 */
-	private UUID receiverInstanceId;
+	private String receiverInstanceId;
 	/**
 	 * The correlation ID.
 	 */
@@ -53,7 +53,7 @@ public class JsonEnvelope
 
 	public JsonEnvelope(
 			UUID senderInstanceId,
-			UUID receiverInstanceId,
+			String receiverInstanceId,
 			String correlationId,
 			String subject,
 			Object object)
@@ -86,7 +86,7 @@ public class JsonEnvelope
 		return senderInstanceId;
 	}
 
-	public UUID getReceiverInstance()
+	public String getReceiverInstance()
 	{
 		return receiverInstanceId;
 	}
