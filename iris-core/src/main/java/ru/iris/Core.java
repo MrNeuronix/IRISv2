@@ -16,21 +16,17 @@
 
 package ru.iris;
 
-import org.apache.activemq.broker.BrokerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
 import ro.fortsoft.pf4j.DefaultPluginManager;
 import ro.fortsoft.pf4j.PluginManager;
-import ru.iris.common.Config;
 import ru.iris.common.database.DatabaseConnection;
 
 import java.io.File;
-import java.util.Properties;
 
 class Core
 {
-
 	// Specify log4j2 configuration file
 	static
 	{
@@ -38,7 +34,6 @@ class Core
 	}
 
 	private static final Logger log = LogManager.getLogger(Core.class.getName());
-	private static final Config config = new Config();
 
 	public static void main(String[] args) throws Exception
 	{
@@ -47,25 +42,13 @@ class Core
 		log.info("--        IRISv2 is starting          --");
 		log.info("----------------------------------------");
 
-		Properties props = System.getProperties();
-		props.setProperty("org.apache.activemq.UseDedicatedTaskRunner", "false");
-
-		// start AMPQ broker
-		BrokerService broker = new BrokerService();
-
-		// configure the broker
-		broker.setBrokerName("iris");
-		broker.setPersistent(false);
-		broker.addConnector("tcp://" + config.getConfig().get("AMQPhost") + ":" + config.getConfig().get("AMQPport") + "?jms.prefetchPolicy.all=100");
-		broker.start();
-
 		// ORM
 		new DatabaseConnection();
 
 		// Modules poll
 		new StatusChecker();
 
-		// load plugins
+		// Load plugins
 		PluginManager pluginManager = new DefaultPluginManager(new File("extensions"));
 		pluginManager.loadPlugins();
 		pluginManager.startPlugins();

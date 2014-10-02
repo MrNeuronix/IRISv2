@@ -18,16 +18,13 @@ package ru.iris.common.messaging;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.commons.lang.StringUtils;
+import com.rabbitmq.client.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
 
-import javax.jms.*;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -59,23 +56,7 @@ public class JsonMessaging
 	/**
 	 * The AMQ connection.
 	 */
-	private Connection connection;
-	/**
-	 * The message session.
-	 */
-	private Session session;
-	/**
-	 * The reply queue.
-	 */
-	private Queue replyQueue;
-	/**
-	 * The message producer.
-	 */
-	private MessageProducer messageProducer;
-	/**
-	 * The message consumer.
-	 */
-	private MessageConsumer messageConsumer;
+	private com.rabbitmq.client.Connection connection;
 	/**
 	 * Boolean flag reflecting whether threads should be close.
 	 */
@@ -85,54 +66,33 @@ public class JsonMessaging
 	 */
 	private Thread jsonBroadcastListenThread;
 
+	private Channel channel;
+
 	public JsonMessaging(final UUID instanceId)
 	{
-
 		// Create a ConnectionFactory
-		ActiveMQConnectionFactory connectionFactory;
+		ConnectionFactory connectionFactory = new ConnectionFactory();
 
 		this.instanceId = instanceId;
 
 		// Create a Connection
 		try
 		{
-			// Create a ConnectionFactory
 			Config config = new Config();
 
-			if (config.getConfig().get("AMQPuseVMconnection").equals("1"))
-			{
-				connectionFactory = new ActiveMQConnectionFactory("vm://iris?jms.prefetchPolicy.all=100");
-			}
-			else
-			{
-				connectionFactory = new ActiveMQConnectionFactory("tcp://" + config.getConfig().get("AMQPhost")
-						+ ":" + config.getConfig().get("AMQPport") + "?jms.prefetchPolicy.all=100");
-			}
+			// Create a ConnectionFactory
+			connectionFactory.setHost(config.getConfig().get("AMQPhost"));
+			connectionFactory.setPort(Integer.valueOf(config.getConfig().get("AMQPport")));
 
-			// set max 10 threads
-			connectionFactory.setMaxThreadPoolSize(10);
-			connectionFactory.setAlwaysSessionAsync(false);
+			connection = connectionFactory.newConnection();
+			channel = connection.createChannel();
 
-			connection = connectionFactory.createTopicConnection();
-			connection.start();
-
-			// Create a Session
-			session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-
-			// Create the destination (Topic)
-			/*
-	  The message destination.
-     */
-			Destination destination = session.createTopic("iris");
-			replyQueue = session.createTemporaryQueue();
-			messageConsumer = session.createConsumer(destination);
-			messageProducer = session.createProducer(destination);
-			//messageProducer.setDeliveryMode(DeliveryMode.PERSISTENT);
-
+			// Create exchange
+			channel.exchangeDeclare("iris", "topic", true);
 		}
-		catch (JMSException e)
+		catch (IOException e)
 		{
-			LOGGER.error(e.toString());
+			e.printStackTrace();
 		}
 	}
 
@@ -179,11 +139,10 @@ public class JsonMessaging
 	{
 		try
 		{
-			messageConsumer.close();
-			messageProducer.close();
-			session.close();
+			channel.close();
 			connection.close();
 			shutdownThreads = true;
+
 			if (jsonBroadcastListenThread != null)
 			{
 				jsonBroadcastListenThread.interrupt();
@@ -234,26 +193,20 @@ public class JsonMessaging
 	 */
 	public void broadcast(String subject, Object object)
 	{
-
 		String className = object.getClass().getName();
 		String jsonString = gson.toJson(object);
 
 		try
 		{
-			// Create a messages
-			MapMessage message = session.createMapMessage();
-			message.setJMSCorrelationID("ID:" + UUID.randomUUID().toString());
-			message.setJMSReplyTo(replyQueue);
-			message.setStringProperty("sender", instanceId.toString());
-			message.setStringProperty("class", className);
-			message.setStringProperty("subject", subject);
-			message.setStringProperty("json", jsonString);
-			messageProducer.send(message);
+			// Create a message headers
+			Map<String, Object> headers = new HashMap<>();
+			headers.put("sender", instanceId.toString());
+			headers.put("class", className);
 
-			message = null;
-
+			// Publish message to topic
+			channel.basicPublish("iris", subject, new AMQP.BasicProperties.Builder().headers(headers).build(), jsonString.getBytes());
 		}
-		catch (JMSException e)
+		catch (IOException e)
 		{
 			LOGGER.debug("Error sending JSON message: " + object + " to subject: " + subject, e);
 		}
@@ -291,58 +244,57 @@ public class JsonMessaging
 
 	private void listenBroadcasts()
 	{
-
-		while (!shutdownThreads)
+		try
 		{
+			String queueName = channel.queueDeclare().getQueue();
 
-			try
+			for (String subject : jsonSubjects)
 			{
-				MapMessage message = (MapMessage) messageConsumer.receive();
-				if (message == null)
+				channel.queueBind(queueName, "iris", subject);
+			}
+
+			QueueingConsumer consumer = new QueueingConsumer(channel);
+			channel.basicConsume(queueName, true, consumer);
+
+			while (!shutdownThreads)
+			{
+				QueueingConsumer.Delivery delivery = consumer.nextDelivery();
+
+				// Get headers
+				Map<String, Object> headers = delivery.getProperties().getHeaders();
+
+				String message = new String(delivery.getBody());
+				String subject = delivery.getEnvelope().getRoutingKey();
+				String corrID = delivery.getProperties().getCorrelationId();
+				String replyTo = delivery.getProperties().getReplyTo();
+				String className = new String(((LongString) headers.get("class")).getBytes());
+				String senderName = new String(((LongString) headers.get("sender")).getBytes());
+
+				Class<?> clazz = Class.forName(className);
+				Object object = gson.fromJson(message, clazz);
+
+				JsonEnvelope envelope = new JsonEnvelope(
+						UUID.fromString(senderName),
+						replyTo != null ? UUID.fromString(replyTo) : null,
+						corrID,
+						subject,
+						object);
+
+				LOGGER.debug("Received message with ID: " + delivery.getProperties().getMessageId()
+						+ " with correlation ID: " + corrID
+						+ " sender: " + envelope.getSenderInstance()
+						+ " to subject: "
+						+ envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
+
+				jsonReceiveQueue.put(envelope);
+
+				// debug
+				if (jsonReceiveQueue.size() > 10)
 				{
-					continue;
-				}
-				String subject = message.getStringProperty("subject");
-				String jsonString = message.getStringProperty("json");
-				String className = message.getStringProperty("class");
-
-				if (wildCardMatch(jsonSubjects, subject)
-						&& !StringUtils.isEmpty(className)
-						&& !StringUtils.isEmpty(jsonString)
-						|| jsonSubjects.contains(subject)
-						&& !StringUtils.isEmpty(className)
-						&& !StringUtils.isEmpty(jsonString))
-				{
-
-					Class<?> clazz = Class.forName(className);
-					Object object = gson.fromJson(jsonString, clazz);
-
-					JsonEnvelope envelope = new JsonEnvelope(
-							UUID.fromString(message.getStringProperty("sender")),
-							message.getStringProperty("receiver") != null ?
-									UUID.fromString(message.getStringProperty("receiver")) : null,
-							message.getJMSCorrelationID(), message.getJMSReplyTo(), subject, object);
-
-					LOGGER.debug("Received message with ID: " + message.getJMSMessageID()
-							+ " with correlation ID: " + message.getJMSCorrelationID()
-							+ " sender: " + envelope.getSenderInstance()
-							+ " receiver: " + envelope.getReceiverInstance()
-							+ " to subject: "
-							+ envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
-
-					jsonReceiveQueue.put(envelope);
-
-					// debug
-					if (jsonReceiveQueue.size() > 10)
-					{
-						LOGGER.info("Queue is too big! " + jsonReceiveQueue.size());
-					}
+					LOGGER.info("Queue is too big! " + jsonReceiveQueue.size());
 				}
 			}
-			catch (final JMSException e)
-			{
-				LOGGER.debug("Error receiving JSON message.", e);
-			}
+		}
 			catch (final ClassNotFoundException e)
 			{
 				LOGGER.debug("Error deserializing JSON message.", e);
@@ -351,69 +303,9 @@ public class JsonMessaging
 			{
 				LOGGER.debug("Error JSON message.", e);
 			}
-		}
-	}
-
-	/**
-	 * Performs a wildcard matching for the text and pattern
-	 * provided.
-	 *
-	 * @param text     the text to be tested for matches.
-	 * @param patterns the patterns set to be matched for.
-	 *                 This can contain the wildcard character '*' (asterisk).
-	 * @return <tt>true</tt> if a match is found, <tt>false</tt>
-	 * otherwise.
-	 */
-
-	private boolean wildCardMatch(Set<String> patterns, String text)
-	{
-
-		// add sentinel so don't need to worry about *'s at end of pattern
-		for (String pattern : patterns)
-		{
-			text += '\0';
-			pattern += '\0';
-
-			int N = pattern.length();
-
-			boolean[] states = new boolean[N + 1];
-			boolean[] old = new boolean[N + 1];
-			old[0] = true;
-
-			for (int i = 0; i < text.length(); i++)
+		catch (IOException e)
 			{
-				char c = text.charAt(i);
-				states = new boolean[N + 1]; // initialized to false
-				for (int j = 0; j < N; j++)
-				{
-					char p = pattern.charAt(j);
-
-					// hack to handle *'s that match 0 characters
-					if (old[j] && (p == '*'))
-					{
-						old[j + 1] = true;
-					}
-
-					if (old[j] && (p == c))
-					{
-						states[j + 1] = true;
-					}
-					if (old[j] && (p == '*'))
-					{
-						states[j] = true;
-					}
-					if (old[j] && (p == '*'))
-					{
-						states[j + 1] = true;
-					}
-				}
-				old = states;
+				e.printStackTrace();
 			}
-			if (states[N])
-			{
-				return true;
-			}
-		}
-		return false;
 	}
 }

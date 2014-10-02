@@ -15,7 +15,6 @@
  */
 package ru.iris.common.messaging;
 
-import javax.jms.Destination;
 import java.util.UUID;
 
 /**
@@ -45,10 +44,6 @@ public class JsonEnvelope
 	 * The correlation ID.
 	 */
 	private String correlationId;
-	/**
-	 * The reply destination.
-	 */
-	private Destination replyDestination;
 
 	public JsonEnvelope(String subject, Object object)
 	{
@@ -56,13 +51,16 @@ public class JsonEnvelope
 		this.object = object;
 	}
 
-	public JsonEnvelope(UUID senderInstanceId, UUID receiverInstanceId, String correlationId,
-			Destination replyDestination, String subject, Object object)
+	public JsonEnvelope(
+			UUID senderInstanceId,
+			UUID receiverInstanceId,
+			String correlationId,
+			String subject,
+			Object object)
 	{
 		this.senderInstanceId = senderInstanceId;
 		this.receiverInstanceId = receiverInstanceId;
 		this.correlationId = correlationId;
-		this.replyDestination = replyDestination;
 		this.subject = subject;
 		this.object = object;
 	}
@@ -70,11 +68,6 @@ public class JsonEnvelope
 	public String getCorrelationId()
 	{
 		return correlationId;
-	}
-
-	public Destination getReplyDestination()
-	{
-		return replyDestination;
 	}
 
 	public String getSubject()
@@ -105,7 +98,6 @@ public class JsonEnvelope
 				"senderInstanceId=" + senderInstanceId +
 				", receiverInstanceId=" + receiverInstanceId +
 				", correlationId='" + correlationId + '\'' +
-				", replyDestination=" + replyDestination +
 				", subject='" + subject + '\'' +
 				", object=" + object +
 				'}';
