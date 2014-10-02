@@ -17,15 +17,12 @@
 package ru.iris.common.database.model;
 
 import com.google.gson.annotations.Expose;
-import ru.iris.scheduler.CronExpression;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.util.Date;
 
 /**
  * IRIS-X Project
@@ -174,15 +171,5 @@ public class Task
 	public void setIntervalDate(String intervalDate)
 	{
 		this.intervalDate = intervalDate;
-	}
-
-	public Timestamp nextRun() throws ParseException
-	{
-
-		Date now = new Date();
-		CronExpression cron = new CronExpression(intervalDate);
-		Date nextRunDate = cron.getNextValidTimeAfter(now);
-
-		return new Timestamp(nextRunDate.getTime());
 	}
 }

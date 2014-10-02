@@ -17,7 +17,6 @@
 package ru.iris.common.messaging.model.ai;
 
 import com.google.gson.annotations.Expose;
-import ru.iris.common.ai.WitAiResponse;
 import ru.iris.common.messaging.model.Advertisement;
 
 public class AIResponseAdvertisement extends Advertisement

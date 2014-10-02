@@ -34,6 +34,7 @@ import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.command.CommandAdvertisement;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -75,21 +76,21 @@ class ScheduleService implements Runnable
 
 				if (task.getType() == 1)
 				{
-					log.info("Actualizing task. Next run: " + task.nextRun());
-					task.setTaskdate(task.nextRun());
+					log.info("Actualizing task. Next run: " + nextRun(task.getIntervalDate()));
+					task.setTaskdate(nextRun(task.getIntervalDate()));
 					Ebean.update(task);
 				}
 				else if (task.getType() == 3)
 				{
-					if (task.getValidto().before(task.nextRun()))
+					if (task.getValidto().before(nextRun(task.getIntervalDate())))
 					{
 						log.info("Actualizing task. Set task to disable");
 						task.setEnabled(false);
 					}
 					else
 					{
-						log.info("Actualizing task. Next run: " + task.nextRun());
-						task.setTaskdate(task.nextRun());
+						log.info("Actualizing task. Next run: " + nextRun(task.getIntervalDate()));
+						task.setTaskdate(nextRun(task.getIntervalDate()));
 					}
 					Ebean.update(task);
 				}
@@ -126,8 +127,8 @@ class ScheduleService implements Runnable
 
 						if (task.getType() == 1)
 						{
-							log.info("Next run: " + task.nextRun());
-							task.setTaskdate(task.nextRun());
+							log.info("Next run: " + nextRun(task.getIntervalDate()));
+							task.setTaskdate(nextRun(task.getIntervalDate()));
 							Ebean.update(task);
 						}
 						else if (task.getType() == 2)
@@ -138,7 +139,7 @@ class ScheduleService implements Runnable
 						}
 						else
 						{
-							if (task.getValidto().before(task.nextRun()))
+							if (task.getValidto().before(nextRun(task.getIntervalDate())))
 							{
 								log.info("Set task to disable");
 								task.setEnabled(false);
@@ -146,8 +147,8 @@ class ScheduleService implements Runnable
 							}
 							else
 							{
-								log.info("Next run: " + task.nextRun());
-								task.setTaskdate(task.nextRun());
+								log.info("Next run: " + nextRun(task.getIntervalDate()));
+								task.setTaskdate(nextRun(task.getIntervalDate()));
 								Ebean.update(task);
 							}
 						}
@@ -170,5 +171,15 @@ class ScheduleService implements Runnable
 				log.error(e.toString());
 			}
 		}
+	}
+
+	public Timestamp nextRun(String intervalDate) throws ParseException
+	{
+
+		Date now = new Date();
+		CronExpression cron = new CronExpression(intervalDate);
+		Date nextRunDate = cron.getNextValidTimeAfter(now);
+
+		return new Timestamp(nextRunDate.getTime());
 	}
 }

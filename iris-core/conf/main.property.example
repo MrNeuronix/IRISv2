@@ -3,8 +3,7 @@
 #################################
 
 AMQPhost=localhost
-AMQPport=61616
-AMQPuseVMconnection=1
+AMQPport=5672
 
 language=ru
 locale=ru-RU

@@ -90,13 +90,6 @@
             <directory>../iris-video/target/plugin-classes</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/extensions/iris-rest/classes</outputDirectory>
-            <includes>
-                <include>**/*</include>
-            </includes>
-            <directory>../iris-rest/target/plugin-classes</directory>
-        </fileSet>
-        <fileSet>
             <outputDirectory>/extensions/iris-scheduler/classes</outputDirectory>
             <includes>
                 <include>**/*</include>
@@ -132,7 +125,6 @@
                 <exclude>ru.iris:iris-video</exclude>
                 <exclude>ru.iris:iris-speak</exclude>
                 <exclude>ru.iris:iris-ai</exclude>
-                <exclude>ru.iris:iris-rest</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

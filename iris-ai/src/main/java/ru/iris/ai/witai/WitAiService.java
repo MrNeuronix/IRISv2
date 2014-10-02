@@ -27,10 +27,10 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
-import ru.iris.common.ai.WitAiResponse;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.ai.AIResponseAdvertisement;
+import ru.iris.common.messaging.model.ai.WitAiResponse;
 import ru.iris.common.messaging.model.speak.SpeakRecognizedAdvertisement;
 
 import java.io.InputStream;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.iris.common.ai;
+package ru.iris.common.messaging.model.ai;
 
 import com.google.gson.annotations.Expose;
 
