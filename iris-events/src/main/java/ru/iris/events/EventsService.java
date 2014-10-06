@@ -95,7 +95,7 @@ class EventsService implements Runnable
 			};
 
 			// subscribe to anything
-			jsonMessaging.subscribe("*");
+			jsonMessaging.subscribe("#");
 			jsonMessaging.start();
 
 			// load events from db
