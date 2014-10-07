@@ -29,7 +29,6 @@ import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
 import ru.iris.common.messaging.model.devices.noolite.*;
 
 import java.nio.ByteBuffer;
@@ -105,7 +104,7 @@ public class NooliteTXService implements Runnable
 						LOGGER.debug("Get SetDeviceLevel advertisement");
 
 						// We know of service advertisement
-						final SetDeviceLevelAdvertisement advertisement = envelope.getObject();
+						final NooliteDeviceLevelSetAdvertisement advertisement = envelope.getObject();
 						byte level = Byte.valueOf(advertisement.getValue());
 						Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
 						int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
