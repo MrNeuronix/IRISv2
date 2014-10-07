@@ -26,19 +26,19 @@ public class SetDeviceLevelAdvertisement extends Advertisement
 	 * Device UUID
 	 */
 	@Expose
-	private String deviceUUID;
+	protected String deviceUUID;
 
 	/**
 	 * Label, what value we want change.
 	 */
 	@Expose
-	private String label;
+	protected String label;
 
 	/**
 	 * Label value.
 	 */
 	@Expose
-	private String value;
+	protected String value;
 
 	public SetDeviceLevelAdvertisement set(String deviceUUID, String label, String value)
 	{

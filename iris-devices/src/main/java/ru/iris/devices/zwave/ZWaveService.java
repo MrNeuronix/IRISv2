@@ -533,7 +533,7 @@ public class ZWaveService implements Runnable
 				final JsonEnvelope envelope = jsonMessaging.receive(100);
 				if (envelope != null)
 				{
-					if (envelope.getObject() instanceof SetDeviceLevelAdvertisement)
+					if (envelope.getObject() instanceof ZWaveSetDeviceLevelAdvertisement)
 					{
 						// We know of service advertisement
 						final SetDeviceLevelAdvertisement advertisement = envelope.getObject();

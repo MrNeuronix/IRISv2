@@ -63,7 +63,6 @@ public class DatabaseConnection
 		// specify entity classes
 		config.addClass(Event.class);
 		config.addClass(Log.class);
-		config.addClass(ModuleStatus.class);
 		config.addClass(Speaks.class);
 		config.addClass(Task.class);
 		config.addClass(Device.class);

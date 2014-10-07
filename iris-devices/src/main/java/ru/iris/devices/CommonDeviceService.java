@@ -24,8 +24,10 @@ import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.devices.*;
+import ru.iris.common.messaging.model.devices.noolite.NooliteDeviceLevelSetAdvertisement;
 import ru.iris.common.messaging.model.devices.noolite.ResponseNooliteDeviceInventoryAdvertisement;
 import ru.iris.common.messaging.model.devices.zwave.ResponseZWaveDeviceInventoryAdvertisement;
+import ru.iris.common.messaging.model.devices.zwave.ZWaveSetDeviceLevelAdvertisement;
 
 import java.util.Map;
 import java.util.UUID;
@@ -100,11 +102,11 @@ class CommonDeviceService implements Runnable
 
 						if (device.getSource().equals("zwave"))
 						{
-							jsonMessaging.broadcast("event.devices.zwave.setvalue", new SetDeviceLevelAdvertisement().set(uuid, label, level));
+							jsonMessaging.broadcast("event.devices.zwave.setvalue", new ZWaveSetDeviceLevelAdvertisement().set(uuid, label, level));
 						}
 						else if (device.getSource().equals("noolite"))
 						{
-							jsonMessaging.broadcast("event.devices.noolite.setvalue", new SetDeviceLevelAdvertisement().set(uuid, label, level));
+							jsonMessaging.broadcast("event.devices.noolite.setvalue", new NooliteDeviceLevelSetAdvertisement().set(uuid, label, level));
 						}
 
 						////////////////////////////////////////////
