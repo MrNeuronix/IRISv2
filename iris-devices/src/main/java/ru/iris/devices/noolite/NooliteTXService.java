@@ -30,10 +30,7 @@ import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
-import ru.iris.common.messaging.model.devices.noolite.BindRXChannelAdvertisment;
-import ru.iris.common.messaging.model.devices.noolite.BindTXChannelAdvertisment;
-import ru.iris.common.messaging.model.devices.noolite.UnbindRXChannelAdvertisment;
-import ru.iris.common.messaging.model.devices.noolite.UnbindTXChannelAdvertisment;
+import ru.iris.common.messaging.model.devices.noolite.*;
 
 import java.nio.ByteBuffer;
 import java.util.UUID;
@@ -102,7 +99,7 @@ public class NooliteTXService implements Runnable
 				final JsonEnvelope envelope = jsonMessaging.receive(100);
 				if (envelope != null)
 				{
-					if (envelope.getObject() instanceof SetDeviceLevelAdvertisement)
+					if (envelope.getObject() instanceof NooliteDeviceLevelSetAdvertisement)
 					{
 
 						LOGGER.debug("Get SetDeviceLevel advertisement");
