@@ -43,7 +43,7 @@ public class NooliteRXService implements Runnable
 	// Noolite PC USB RX HID
 	private static final int VENDOR_ID = 5824; // 0x16c0;
 	private static final int PRODUCT_ID = 1500; // 0x05dc;
-	private final Logger log = LogManager.getLogger(NooliteRXService.class.getName());
+	private final Logger LOGGER = LogManager.getLogger(NooliteRXService.class.getName());
 	private final Context context = new Context();
 	private boolean shutdown = false;
 	private JsonMessaging messaging;
@@ -97,7 +97,7 @@ public class NooliteRXService implements Runnable
 
 		if (handle == null)
 		{
-			log.error("Noolite RX device not found!");
+			LOGGER.error("Noolite RX device not found!");
 			shutdown = true;
 			return;
 		}
@@ -111,11 +111,11 @@ public class NooliteRXService implements Runnable
 
 		if (ret < 0)
 		{
-			log.error("Configuration error");
+			LOGGER.error("Configuration error");
 			LibUsb.close(handle);
 			if (ret == LibUsb.ERROR_BUSY)
 			{
-				log.error("Device busy");
+				LOGGER.error("Device busy");
 			}
 			return;
 		}
@@ -141,7 +141,7 @@ public class NooliteRXService implements Runnable
 			// buf filled by all nulls is correct!
 			if (!buf.equals(tmpBuf) || !initComplete)
 			{
-				log.debug("RX Buffer: " + buf.get(0) + " " + buf.get(1) + " " + buf.get(2) + " " + buf.get(3) + " " + buf.get(4) + " " + buf.get(5) + " " + buf.get(6)
+				LOGGER.debug("RX Buffer: " + buf.get(0) + " " + buf.get(1) + " " + buf.get(2) + " " + buf.get(3) + " " + buf.get(4) + " " + buf.get(5) + " " + buf.get(6)
 						+ " " + buf.get(7));
 
 				Integer channel = (buf.get(1) + 1);
@@ -173,7 +173,7 @@ public class NooliteRXService implements Runnable
 				if (action == 0)
 				{
 
-					log.info("Channel " + channel + ": Got OFF command");
+					LOGGER.info("Channel " + channel + ": Got OFF command");
 
 					if (dv == null)
 					{
@@ -199,7 +199,7 @@ public class NooliteRXService implements Runnable
 				else if (action == 1)
 				{
 
-					log.info("Channel " + channel + ": Got DIM command");
+					LOGGER.info("Channel " + channel + ": Got DIM command");
 					// we only know, that the user hold OFF button
 
 					if (dv == null)
@@ -226,7 +226,7 @@ public class NooliteRXService implements Runnable
 				else if (action == 2)
 				{
 
-					log.info("Channel " + channel + ": Got ON command");
+					LOGGER.info("Channel " + channel + ": Got ON command");
 
 					if (dv == null)
 					{
@@ -251,7 +251,7 @@ public class NooliteRXService implements Runnable
 				// bright
 				else if (action == 3)
 				{
-					log.info("Channel " + channel + ": Got BRIGHT command");
+					LOGGER.info("Channel " + channel + ": Got BRIGHT command");
 
 					// we only know, that the user hold ON button
 					if (dv == null)
@@ -278,7 +278,7 @@ public class NooliteRXService implements Runnable
 				else if (action == 6)
 				{
 
-					log.info("Channel " + channel + ": Got SETLEVEL command.");
+					LOGGER.info("Channel " + channel + ": Got SETLEVEL command.");
 
 					if (dv == null)
 					{
@@ -303,7 +303,7 @@ public class NooliteRXService implements Runnable
 				// stop dim/bright
 				else if (action == 10)
 				{
-					log.info("Channel " + channel + ": Got STOPDIMBRIGHT command.");
+					LOGGER.info("Channel " + channel + ": Got STOPDIMBRIGHT command.");
 
 					// log change
 					/////////////////////////////////
@@ -316,19 +316,19 @@ public class NooliteRXService implements Runnable
 
 				if (device.getId() == null)
 				{
-					log.info("Save new Noolite device");
+					LOGGER.info("Save new Noolite device");
 					Ebean.save(device);
 				}
 				else
 				{
-					log.info("Update existing Noolite device");
+					LOGGER.info("Update existing Noolite device");
 					Ebean.update(device);
 				}
 
 				// reload from database for avoid Ebean.update() key duplicate error
 				if (!initComplete)
 				{
-					log.info("Reloading noolite devices");
+					LOGGER.info("Reloading noolite devices");
 					devices = Ebean.find(Device.class)
 							.where().eq("source", "noolite").findList();
 
@@ -403,7 +403,7 @@ public class NooliteRXService implements Runnable
 						if (envelope.getObject() instanceof BindRXChannelAdvertisment)
 						{
 
-							log.debug("Get BindRXChannel advertisement");
+							LOGGER.debug("Get BindRXChannel advertisement");
 
 							final BindRXChannelAdvertisment advertisement = envelope.getObject();
 							Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
@@ -421,7 +421,7 @@ public class NooliteRXService implements Runnable
 						else if (envelope.getObject() instanceof UnbindRXChannelAdvertisment)
 						{
 
-							log.debug("Get UnbindRXChannel advertisement");
+							LOGGER.debug("Get UnbindRXChannel advertisement");
 
 							final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
 							Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
@@ -439,7 +439,7 @@ public class NooliteRXService implements Runnable
 						else if (envelope.getObject() instanceof UnbindAllRXChannelAdvertisment)
 						{
 
-							log.debug("Get UnbindAllRXChannel advertisement");
+							LOGGER.debug("Get UnbindAllRXChannel advertisement");
 
 							ByteBuffer buf = ByteBuffer.allocateDirect(8);
 							buf.put((byte) 4);
@@ -452,7 +452,7 @@ public class NooliteRXService implements Runnable
 						else if (envelope.getReceiverInstance() == null)
 						{
 							// We received unknown broadcast message. Lets make generic log entry.
-							log.info("Received broadcast "
+							LOGGER.info("Received broadcast "
 									+ " from " + envelope.getSenderInstance()
 									+ " to " + envelope.getReceiverInstance()
 									+ " at '" + envelope.getSubject()
@@ -461,7 +461,7 @@ public class NooliteRXService implements Runnable
 						else
 						{
 							// We received unknown request message. Lets make generic log entry.
-							log.info("Received request "
+							LOGGER.info("Received request "
 									+ " from " + envelope.getSenderInstance()
 									+ " to " + envelope.getReceiverInstance()
 									+ " at '" + envelope.getSubject()
@@ -478,7 +478,7 @@ public class NooliteRXService implements Runnable
 			catch (final Throwable t)
 			{
 				t.printStackTrace();
-				log.error("Unexpected exception in NooliteRX-Internal", t);
+				LOGGER.error("Unexpected exception in NooliteRX-Internal", t);
 			}
 		}
 	}

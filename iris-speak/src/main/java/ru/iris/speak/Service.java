@@ -27,7 +27,7 @@ import ru.iris.speak.google.GoogleSpeakService;
 public class Service extends Plugin
 {
 
-	private static final Logger log = LogManager.getLogger(Service.class);
+	private static final Logger LOGGER = LogManager.getLogger(Service.class);
 
 	public Service(PluginWrapper wrapper)
 	{
@@ -37,25 +37,25 @@ public class Service extends Plugin
 	@Override
 	public void start()
 	{
-		log.info("[Plugin] iris-speak plugin started!");
+		LOGGER.info("[Plugin] iris-speak plugin started!");
 
-		Config cfg = new Config();
+		Config cfg = Config.getInstance();
 		Speak speak = new Speak();
 
-		if (cfg.getConfig().get("ttsEngine").equals("google"))
+		if (cfg.get("ttsEngine").equals("google"))
 		{
 			new GoogleSpeakService();
 			speak.say("Модуль синтеза речи Гугл запущен!");
 		}
 		else
 		{
-			log.info("No TTS feed specified in config file");
+			LOGGER.info("No TTS feed specified in config file");
 		}
 	}
 
 	@Override
 	public void stop()
 	{
-		log.info("[Plugin] iris-speak plugin stopped!");
+		LOGGER.info("[Plugin] iris-speak plugin stopped!");
 	}
 }

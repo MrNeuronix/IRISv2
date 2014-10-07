@@ -25,12 +25,10 @@ import ru.iris.devices.noolite.NooliteRXService;
 import ru.iris.devices.noolite.NooliteTXService;
 import ru.iris.devices.zwave.ZWaveService;
 
-import java.util.Map;
-
 public class Service extends Plugin
 {
 
-	private static final Logger log = LogManager.getLogger(Service.class);
+	private static final Logger LOGGER = LogManager.getLogger(Service.class);
 
 	public Service(PluginWrapper wrapper)
 	{
@@ -40,29 +38,29 @@ public class Service extends Plugin
 	@Override
 	public void start()
 	{
-		Map<String, String> config = new Config().getConfig();
+		Config config = Config.getInstance();
 
-		log.info("[Plugin] iris-devices plugin started!");
+		LOGGER.info("[Plugin] iris-devices plugin started!");
 
 		// Generic device functions
 		new CommonDeviceService();
 
 		if (config.get("zwaveEnabled").equals("1"))
 		{
-			log.info("ZWave support is enabled. Starting");
+			LOGGER.info("ZWave support is enabled. Starting");
 			new ZWaveService();
 		}
 		if (config.get("nooliteEnabled").equals("1"))
 		{
-			log.info("NooLite support is enabled. Starting");
+			LOGGER.info("NooLite support is enabled. Starting");
 			if (config.get("nooliteTXPresent").equals("1"))
 			{
-				log.info("NooLite TX support is enabled. Starting");
+				LOGGER.info("NooLite TX support is enabled. Starting");
 				new NooliteTXService();
 			}
 			if (config.get("nooliteRXPresent").equals("1"))
 			{
-				log.info("NooLite RX support is enabled. Starting");
+				LOGGER.info("NooLite RX support is enabled. Starting");
 				new NooliteRXService();
 			}
 		}
@@ -71,6 +69,6 @@ public class Service extends Plugin
 	@Override
 	public void stop()
 	{
-		log.info("[Plugin] iris-devices plugin stopped!");
+		LOGGER.info("[Plugin] iris-devices plugin stopped!");
 	}
 }

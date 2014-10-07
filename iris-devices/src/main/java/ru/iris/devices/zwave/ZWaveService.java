@@ -34,13 +34,12 @@ import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
 import ru.iris.common.messaging.model.devices.zwave.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class ZWaveService implements Runnable
 {
 
-	private final Logger log = LogManager.getLogger(ZWaveService.class.getName());
+	private final Logger LOGGER = LogManager.getLogger(ZWaveService.class.getName());
 	private final Gson gson = new GsonBuilder().create();
 	// Adverstiments
 	private final ZWaveDriverReady zWaveDriverReady = new ZWaveDriverReady();
@@ -80,7 +79,7 @@ public class ZWaveService implements Runnable
 	{
 
 		messaging = new JsonMessaging(UUID.randomUUID());
-		Map<String, String> config = new Config().getConfig();
+		Config config = Config.getInstance();
 
 		devices = Ebean.find(Device.class)
 				.where().eq("source", "zwave").findList();
@@ -107,38 +106,38 @@ public class ZWaveService implements Runnable
 				{
 					case DRIVER_READY:
 						homeId = notification.getHomeId();
-						log.info("Driver ready. Home ID: " + homeId);
+						LOGGER.info("Driver ready. Home ID: " + homeId);
 						messaging.broadcast("event.devices.zwave.driver.ready", zWaveDriverReady.set(homeId));
 						break;
 					case DRIVER_FAILED:
-						log.info("Driver failed");
+						LOGGER.info("Driver failed");
 						messaging.broadcast("event.devices.zwave.driver.failed", zWaveDriverFailed);
 						break;
 					case DRIVER_RESET:
-						log.info("Driver reset");
+						LOGGER.info("Driver reset");
 						messaging.broadcast("event.devices.zwave.driver.reset", zWaveDriverReset);
 						break;
 					case AWAKE_NODES_QUERIED:
-						log.info("Awake nodes queried");
+						LOGGER.info("Awake nodes queried");
 						ready = true;
 						messaging.broadcast("event.devices.zwave.awakenodesqueried", zWaveAwakeNodesQueried);
 						break;
 					case ALL_NODES_QUERIED:
-						log.info("All node queried");
+						LOGGER.info("All node queried");
 						manager.writeConfig(homeId);
 						ready = true;
 						messaging.broadcast("event.devices.zwave.allnodesqueried", zWaveAllNodesQueried);
 						break;
 					case ALL_NODES_QUERIED_SOME_DEAD:
-						log.info("All node queried, some dead");
+						LOGGER.info("All node queried, some dead");
 						messaging.broadcast("event.devices.zwave.allnodesqueriedsomedead", zWaveAllNodesQueriedSomeDead);
 						break;
 					case POLLING_ENABLED:
-						log.info("Polling enabled");
+						LOGGER.info("Polling enabled");
 						messaging.broadcast("event.devices.zwave.polling.disabled", zWavePolling.set(getZWaveDeviceByNode(notification.getNodeId()), true));
 						break;
 					case POLLING_DISABLED:
-						log.info("Polling disabled");
+						LOGGER.info("Polling disabled");
 						messaging.broadcast("event.devices.zwave.polling.enabled", zWavePolling.set(getZWaveDeviceByNode(notification.getNodeId()), false));
 						break;
 					case NODE_NEW:
@@ -157,7 +156,7 @@ public class ZWaveService implements Runnable
 						messaging.broadcast("event.devices.zwave.node.queriescomplete", zWaveNodeQueriesComplete);
 						break;
 					case NODE_EVENT:
-						log.info("Update info for node " + node);
+						LOGGER.info("Update info for node " + node);
 						manager.refreshNodeInfo(homeId, node);
 						messaging.broadcast("event.devices.zwave.node.event", zWaveNodeEvent.set(getZWaveDeviceByNode(notification.getNodeId())));
 						break;
@@ -179,7 +178,7 @@ public class ZWaveService implements Runnable
 							// Check for awaked after sleeping nodes
 							if (manager.isNodeAwake(homeId, zcZWaveDevice.getNode()) && zcZWaveDevice.getStatus().equals("sleeping"))
 							{
-								log.info("Setting node " + zcZWaveDevice.getNode() + " to LISTEN state");
+								LOGGER.info("Setting node " + zcZWaveDevice.getNode() + " to LISTEN state");
 								zcZWaveDevice.setStatus("listening");
 							}
 						}
@@ -292,7 +291,7 @@ public class ZWaveService implements Runnable
 							//////////////////////////////////
 
 							default:
-								log.info("Unassigned value for node" +
+								LOGGER.info("Unassigned value for node" +
 												node +
 												" type " +
 												manager.getNodeType(notification.getHomeId(), notification.getNodeId()) +
@@ -318,7 +317,7 @@ public class ZWaveService implements Runnable
 
 						if (zrZWaveDevice == null)
 						{
-							log.info("While save remove value, node " + node + " not found");
+							LOGGER.info("While save remove value, node " + node + " not found");
 							break;
 						}
 
@@ -342,7 +341,7 @@ public class ZWaveService implements Runnable
 
 						if (!manager.getValueLabel(notification.getValueId()).isEmpty())
 						{
-							log.info("Node " + zrZWaveDevice.getNode() + ": Value " + manager.getValueLabel(notification.getValueId()) + " removed");
+							LOGGER.info("Node " + zrZWaveDevice.getNode() + ": Value " + manager.getValueLabel(notification.getValueId()) + " removed");
 						}
 
 						break;
@@ -358,7 +357,7 @@ public class ZWaveService implements Runnable
 						// Check for awaked after sleeping nodes
 						if (manager.isNodeAwake(homeId, zWaveDevice.getNode()) && zWaveDevice.getStatus().equals("Sleeping"))
 						{
-							log.info("Setting node " + zWaveDevice.getNode() + " to LISTEN state");
+							LOGGER.info("Setting node " + zWaveDevice.getNode() + " to LISTEN state");
 							zWaveDevice.setStatus("Listening");
 						}
 
@@ -373,18 +372,18 @@ public class ZWaveService implements Runnable
 						{
 							if (Utils.getValue(valueId) == Utils.getValue(notification.getValueId()))
 							{
-								log.debug("Same value. Breaking");
+								LOGGER.debug("Same value. Breaking");
 								break;
 							}
 						}
 						catch (NullPointerException e)
 						{
-							log.error("Error while change value: " + e.toString());
+							LOGGER.error("Error while change value: " + e.toString());
 							e.printStackTrace();
 							//break;
 						}
 
-						log.info("Node " +
+						LOGGER.info("Node " +
 								zWaveDevice.getNode() + ": " +
 								" Value for label \"" + manager.getValueLabel(notification.getValueId()) + "\" changed  --> " +
 								"\"" + Utils.getValue(notification.getValueId()) + "\"");
@@ -429,7 +428,7 @@ public class ZWaveService implements Runnable
 
 						break;
 					case VALUE_REFRESHED:
-						log.info("Node " + node + ": Value refreshed (" +
+						LOGGER.info("Node " + node + ": Value refreshed (" +
 								" command class: " + notification.getValueId().getCommandClassId() + ", " +
 								" instance: " + notification.getValueId().getInstance() + ", " +
 								" index: " + notification.getValueId().getIndex() + ", " +
@@ -450,7 +449,7 @@ public class ZWaveService implements Runnable
 					case NOTIFICATION:
 						break;
 					default:
-						log.info(notification.getType().name());
+						LOGGER.info(notification.getType().name());
 						break;
 				}
 			}
@@ -459,7 +458,7 @@ public class ZWaveService implements Runnable
 		manager.addWatcher(watcher, null);
 		manager.addDriver(config.get("zwavePort"));
 
-		log.info("Waiting while ZWave finish initialization");
+		LOGGER.info("Waiting while ZWave finish initialization");
 
 		// Ждем окончания инициализации
 		while (!ready)
@@ -467,7 +466,7 @@ public class ZWaveService implements Runnable
 			try
 			{
 				Thread.sleep(1000);
-				log.info("Still waiting");
+				LOGGER.info("Still waiting");
 			}
 			catch (InterruptedException e)
 			{
@@ -475,32 +474,32 @@ public class ZWaveService implements Runnable
 			}
 		}
 
-		log.info("Initialization complete. Found " + devices.size() + " devices");
+		LOGGER.info("Initialization complete. Found " + devices.size() + " devices");
 
 		for (Device ZWaveDevice : devices)
 		{
 			// Check for dead nodes
 			if (Manager.get().isNodeFailed(homeId, ZWaveDevice.getNode()))
 			{
-				log.info("Setting node " + ZWaveDevice.getNode() + " to DEAD state");
+				LOGGER.info("Setting node " + ZWaveDevice.getNode() + " to DEAD state");
 				ZWaveDevice.setStatus("dead");
 			}
 
 			// Check for sleeping nodes
 			if (!Manager.get().isNodeAwake(homeId, ZWaveDevice.getNode()))
 			{
-				log.info("Setting node " + ZWaveDevice.getNode() + " to SLEEP state");
+				LOGGER.info("Setting node " + ZWaveDevice.getNode() + " to SLEEP state");
 				ZWaveDevice.setStatus("sleeping");
 			}
 
 			if (ZWaveDevice.getId() == null)
 			{
-				log.debug("Save new Z-Wave device");
+				LOGGER.debug("Save new Z-Wave device");
 				Ebean.save(ZWaveDevice);
 			}
 			else
 			{
-				log.debug("Update existing Z-Wave device");
+				LOGGER.debug("Update existing Z-Wave device");
 				Ebean.update(ZWaveDevice);
 			}
 		}
@@ -547,7 +546,7 @@ public class ZWaveService implements Runnable
 
 						if (ZWaveDevice == null)
 						{
-							log.info("Cant find device with UUID " + uuid);
+							LOGGER.info("Cant find device with UUID " + uuid);
 							continue;
 						}
 
@@ -555,19 +554,19 @@ public class ZWaveService implements Runnable
 
 						if (!label.isEmpty() && !level.isEmpty() && !ZWaveDevice.getStatus().equals("Dead"))
 						{
-							log.info("Setting value: " + level + " to label \"" + label + "\" on node " + node + " (UUID: " + uuid + ")");
+							LOGGER.info("Setting value: " + level + " to label \"" + label + "\" on node " + node + " (UUID: " + uuid + ")");
 							setValue(uuid, label, level);
 						}
 						else
 						{
-							log.info("Node: " + node + " Cant set empty value or node dead");
+							LOGGER.info("Node: " + node + " Cant set empty value or node dead");
 						}
 
 					}
 					else if (envelope.getReceiverInstance() == null)
 					{
 						// We received unknown broadcast message. Lets make generic log entry.
-						log.info("Received broadcast "
+						LOGGER.info("Received broadcast "
 								+ " from " + envelope.getSenderInstance()
 								+ " to " + envelope.getReceiverInstance()
 								+ " at '" + envelope.getSubject()
@@ -576,7 +575,7 @@ public class ZWaveService implements Runnable
 					else
 					{
 						// We received unknown request message. Lets make generic log entry.
-						log.info("Received request "
+						LOGGER.info("Received request "
 								+ " from " + envelope.getSenderInstance()
 								+ " to " + envelope.getReceiverInstance()
 								+ " at '" + envelope.getSubject()
@@ -593,52 +592,52 @@ public class ZWaveService implements Runnable
 		catch (final Throwable t)
 		{
 			t.printStackTrace();
-			log.error("Unexpected exception in ZWave Devices", t);
+			LOGGER.error("Unexpected exception in ZWave Devices", t);
 		}
 	}
 
 	private void setTypedValue(ValueId valueId, String value)
 	{
 
-		log.debug("Set type " + valueId.getType() + " to label " + Manager.get().getValueLabel(valueId));
+		LOGGER.debug("Set type " + valueId.getType() + " to label " + Manager.get().getValueLabel(valueId));
 
 		switch (valueId.getType())
 		{
 			case BOOL:
-				log.debug("Set value type BOOL to " + value);
+				LOGGER.debug("Set value type BOOL to " + value);
 				Manager.get().setValueAsBool(valueId, Boolean.valueOf(value));
 				break;
 			case BYTE:
-				log.debug("Set value type BYTE to " + value);
+				LOGGER.debug("Set value type BYTE to " + value);
 				Manager.get().setValueAsByte(valueId, Short.valueOf(value));
 				break;
 			case DECIMAL:
-				log.debug("Set value type FLOAT to " + value);
+				LOGGER.debug("Set value type FLOAT to " + value);
 				Manager.get().setValueAsFloat(valueId, Float.valueOf(value));
 				break;
 			case INT:
-				log.debug("Set value type INT to " + value);
+				LOGGER.debug("Set value type INT to " + value);
 				Manager.get().setValueAsInt(valueId, Integer.valueOf(value));
 				break;
 			case LIST:
-				log.debug("Set value type LIST to " + value);
+				LOGGER.debug("Set value type LIST to " + value);
 				break;
 			case SCHEDULE:
-				log.debug("Set value type SCHEDULE to " + value);
+				LOGGER.debug("Set value type SCHEDULE to " + value);
 				break;
 			case SHORT:
-				log.debug("Set value type SHORT to " + value);
+				LOGGER.debug("Set value type SHORT to " + value);
 				Manager.get().setValueAsShort(valueId, Short.valueOf(value));
 				break;
 			case STRING:
-				log.debug("Set value type STRING to " + value);
+				LOGGER.debug("Set value type STRING to " + value);
 				Manager.get().setValueAsString(valueId, value);
 				break;
 			case BUTTON:
-				log.debug("Set value type BUTTON to " + value);
+				LOGGER.debug("Set value type BUTTON to " + value);
 				break;
 			case RAW:
-				log.debug("Set value RAW to " + value);
+				LOGGER.debug("Set value RAW to " + value);
 				break;
 			default:
 				break;
@@ -659,7 +658,7 @@ public class ZWaveService implements Runnable
 				}
 				else
 				{
-					log.info("Value \"" + label + "\" is read-only! Skip.");
+					LOGGER.info("Value \"" + label + "\" is read-only! Skip.");
 				}
 			}
 		}
@@ -750,7 +749,7 @@ public class ZWaveService implements Runnable
 					notification.getValueId(),
 					Manager.get().isValueReadOnly(notification.getValueId())));
 
-			log.info("Adding device " + type + " (node: " + notification.getNodeId() + ") to array");
+			LOGGER.info("Adding device " + type + " (node: " + notification.getNodeId() + ") to array");
 			devices.add(ZWaveDevice);
 		}
 		else
@@ -760,7 +759,7 @@ public class ZWaveService implements Runnable
 			ZWaveDevice.setProductName(productName);
 			ZWaveDevice.setStatus(state);
 
-			log.info("Node " + ZWaveDevice.getNode() + ": Add \"" + label + "\" value \"" + Utils.getValue(notification.getValueId()) + "\"");
+			LOGGER.info("Node " + ZWaveDevice.getNode() + ": Add \"" + label + "\" value \"" + Utils.getValue(notification.getValueId()) + "\"");
 
 			DeviceValue udv = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", ZWaveDevice.getId()), Expr.eq("label", Manager.get().getValueLabel(notification.getValueId()))).findUnique();
 

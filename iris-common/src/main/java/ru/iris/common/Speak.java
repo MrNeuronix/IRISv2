@@ -33,7 +33,7 @@ import java.util.UUID;
 public class Speak
 {
 
-	private static final Logger log = LogManager.getLogger(Speak.class);
+	private static final Logger LOGGER = LogManager.getLogger(Speak.class);
 	private static final SpeakAdvertisement advertisement = new SpeakAdvertisement();
 
 	public void say(String text)
@@ -47,7 +47,7 @@ public class Speak
 		}
 		catch (Exception e)
 		{
-			log.info("Error! Failed to speak: " + text);
+			LOGGER.info("Error! Failed to speak: " + text);
 		}
 	}
 }

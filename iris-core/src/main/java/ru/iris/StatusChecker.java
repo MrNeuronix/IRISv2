@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 class StatusChecker implements Runnable
 {
 
-	private static Logger log = LogManager.getLogger(StatusChecker.class.getName());
+	private static Logger LOGGER = LogManager.getLogger(StatusChecker.class.getName());
 
 	public StatusChecker()
 	{

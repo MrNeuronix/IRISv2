@@ -44,7 +44,7 @@ public class NooliteTXService implements Runnable
 	// Noolite PC USB TX HID
 	private static final int VENDOR_ID = 5824; //0x16c0;
 	private static final int PRODUCT_ID = 1503; //0x05df;
-	private final Logger log = LogManager.getLogger(NooliteTXService.class.getName());
+	private final Logger LOGGER = LogManager.getLogger(NooliteTXService.class.getName());
 	private final Context context = new Context();
 	private boolean shutdown = false;
 
@@ -105,7 +105,7 @@ public class NooliteTXService implements Runnable
 					if (envelope.getObject() instanceof SetDeviceLevelAdvertisement)
 					{
 
-						log.debug("Get SetDeviceLevel advertisement");
+						LOGGER.debug("Get SetDeviceLevel advertisement");
 
 						// We know of service advertisement
 						final SetDeviceLevelAdvertisement advertisement = envelope.getObject();
@@ -129,7 +129,7 @@ public class NooliteTXService implements Runnable
 							if (level > 99 || level == 99)
 							{
 
-								log.info("Turn on device on channel " + channelView);
+								LOGGER.info("Turn on device on channel " + channelView);
 
 								if (dv == null)
 								{
@@ -155,7 +155,7 @@ public class NooliteTXService implements Runnable
 							else if (level < 0)
 							{
 
-								log.info("Turn off device on channel " + channelView);
+								LOGGER.info("Turn off device on channel " + channelView);
 
 								if (dv == null)
 								{
@@ -199,7 +199,7 @@ public class NooliteTXService implements Runnable
 								Ebean.save(logChange);
 								/////////////////////////////////
 
-								log.info("Setting device on channel " + channelView + " to level " + level);
+								LOGGER.info("Setting device on channel " + channelView + " to level " + level);
 							}
 
 							buf.position(5);
@@ -216,7 +216,7 @@ public class NooliteTXService implements Runnable
 							{
 
 								// turn off
-								log.info("Turn off device on channel " + channelView);
+								LOGGER.info("Turn off device on channel " + channelView);
 
 								if (dv == null)
 								{
@@ -243,7 +243,7 @@ public class NooliteTXService implements Runnable
 							{
 
 								// turn on
-								log.info("Turn on device on channel " + channelView);
+								LOGGER.info("Turn on device on channel " + channelView);
 
 								if (dv == null)
 								{
@@ -276,7 +276,7 @@ public class NooliteTXService implements Runnable
 					else if (envelope.getObject() instanceof BindTXChannelAdvertisment)
 					{
 
-						log.debug("Get BindTXChannel advertisement");
+						LOGGER.debug("Get BindTXChannel advertisement");
 
 						final BindRXChannelAdvertisment advertisement = envelope.getObject();
 						Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
@@ -289,7 +289,7 @@ public class NooliteTXService implements Runnable
 						buf.position(4);
 						buf.put((byte) channel);
 
-						log.info("Binding device to channel " + channelView);
+						LOGGER.info("Binding device to channel " + channelView);
 
 						writeToHID(buf);
 
@@ -297,7 +297,7 @@ public class NooliteTXService implements Runnable
 					else if (envelope.getObject() instanceof UnbindTXChannelAdvertisment)
 					{
 
-						log.debug("Get UnbindTXChannel advertisement");
+						LOGGER.debug("Get UnbindTXChannel advertisement");
 
 						final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
 						Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
@@ -310,7 +310,7 @@ public class NooliteTXService implements Runnable
 						buf.position(4);
 						buf.put((byte) channel);
 
-						log.info("Unbinding device from channel " + channelView);
+						LOGGER.info("Unbinding device from channel " + channelView);
 
 						writeToHID(buf);
 
@@ -318,7 +318,7 @@ public class NooliteTXService implements Runnable
 					else if (envelope.getReceiverInstance() == null)
 					{
 						// We received unknown broadcast message. Lets make generic log entry.
-						log.info("Received broadcast "
+						LOGGER.info("Received broadcast "
 								+ " from " + envelope.getSenderInstance()
 								+ " to " + envelope.getReceiverInstance()
 								+ " at '" + envelope.getSubject()
@@ -327,7 +327,7 @@ public class NooliteTXService implements Runnable
 					else
 					{
 						// We received unknown request message. Lets make generic log entry.
-						log.info("Received request "
+						LOGGER.info("Received request "
 								+ " from " + envelope.getSenderInstance()
 								+ " to " + envelope.getReceiverInstance()
 								+ " at '" + envelope.getSubject()
@@ -345,7 +345,7 @@ public class NooliteTXService implements Runnable
 		catch (final Throwable t)
 		{
 			t.printStackTrace();
-			log.error("Unexpected exception in NooliteTX", t);
+			LOGGER.error("Unexpected exception in NooliteTX", t);
 		}
 	}
 
@@ -356,7 +356,7 @@ public class NooliteTXService implements Runnable
 
 		if (handle == null)
 		{
-			log.error("Noolite TX device not found!");
+			LOGGER.error("Noolite TX device not found!");
 			shutdown = true;
 			return;
 		}
@@ -370,18 +370,18 @@ public class NooliteTXService implements Runnable
 
 		if (ret < 0)
 		{
-			log.error("Configuration error");
+			LOGGER.error("Configuration error");
 			LibUsb.close(handle);
 			if (ret == LibUsb.ERROR_BUSY)
 			{
-				log.error("Device busy");
+				LOGGER.error("Device busy");
 			}
 			return;
 		}
 
 		LibUsb.claimInterface(handle, 0);
 
-		log.debug("TX Buffer: " + command.get(0) + " " + command.get(1) + " " + command.get(2) + " " + command.get(3)
+		LOGGER.debug("TX Buffer: " + command.get(0) + " " + command.get(1) + " " + command.get(2) + " " + command.get(3)
 				+ " " + command.get(4) + " " + command.get(5) + " " + command.get(6)
 				+ " " + command.get(7));
 

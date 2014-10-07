@@ -21,7 +21,10 @@ import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebean.config.ServerConfig;
 import ru.iris.common.Config;
-import ru.iris.common.database.model.*;
+import ru.iris.common.database.model.Event;
+import ru.iris.common.database.model.Log;
+import ru.iris.common.database.model.Speaks;
+import ru.iris.common.database.model.Task;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.database.model.devices.DeviceValue;
 
@@ -38,20 +41,20 @@ public class DatabaseConnection
 		// Define DataSource parameters
 		DataSourceConfig db = new DataSourceConfig();
 		db.setDriver("com.mysql.jdbc.Driver");
-		Config conf = new Config();
-		db.setUsername(conf.getConfig().get("dbUsername"));
-		db.setPassword(conf.getConfig().get("dbPassword"));
-		db.setUrl("jdbc:mysql://" + conf.getConfig().get("dbHost") + "/" + conf.getConfig().get("dbName")
+		Config conf = Config.getInstance();
+		db.setUsername(conf.get("dbUsername"));
+		db.setPassword(conf.get("dbPassword"));
+		db.setUrl("jdbc:mysql://" + conf.get("dbHost") + "/" + conf.get("dbName")
 				+ "?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8");
 		//db.setHeartbeatSql("select count(*) from log");
 
 		config.setDataSourceConfig(db);
 
 		// set DDL options...
-		config.setDdlGenerate(Boolean.valueOf(conf.getConfig().get("ddlGenerate")));
-		config.setDdlRun(Boolean.valueOf(conf.getConfig().get("ddlRun")));
+		config.setDdlGenerate(Boolean.valueOf(conf.get("ddlGenerate")));
+		config.setDdlRun(Boolean.valueOf(conf.get("ddlRun")));
 
-		config.setDebugSql(Boolean.valueOf(conf.getConfig().get("sqlDebug")));
+		config.setDebugSql(Boolean.valueOf(conf.get("sqlDebug")));
 		//config.setLoggingLevel(LogLevel.SQL);
 
 		config.setDefaultServer(true);

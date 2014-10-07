@@ -24,7 +24,7 @@ import ro.fortsoft.pf4j.PluginWrapper;
 public class Service extends Plugin
 {
 
-	private static final Logger log = LogManager.getLogger(Service.class);
+	private static final Logger LOGGER = LogManager.getLogger(Service.class);
 
 	public Service(PluginWrapper wrapper)
 	{
@@ -34,7 +34,7 @@ public class Service extends Plugin
 	@Override
 	public void start()
 	{
-		log.info("[Plugin] iris-video plugin started!");
+		LOGGER.info("[Plugin] iris-video plugin started!");
 
 		new VideoService();
 	}
@@ -42,6 +42,6 @@ public class Service extends Plugin
 	@Override
 	public void stop()
 	{
-		log.info("[Plugin] iris-video plugin stopped!");
+		LOGGER.info("[Plugin] iris-video plugin stopped!");
 	}
 }

@@ -40,7 +40,7 @@ import java.util.UUID;
 public class WitAiService implements Runnable
 {
 
-	private final Logger log = LogManager.getLogger(WitAiService.class);
+	private final Logger LOGGER = LogManager.getLogger(WitAiService.class);
 	private final AIResponseAdvertisement aiResponseAdvertisement = new AIResponseAdvertisement();
 	private Thread t = null;
 	private boolean shutdown = false;
@@ -60,7 +60,7 @@ public class WitAiService implements Runnable
 	public synchronized void run()
 	{
 
-		Config cfg = new Config();
+		Config cfg = Config.getInstance();
 		Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
 		try
@@ -95,13 +95,13 @@ public class WitAiService implements Runnable
 
 						String url = "https://api.wit.ai/message?q=" + URLEncoder.encode(advertisement.getText(), "UTF-8");
 
-						log.debug("URL is: " + url);
+						LOGGER.debug("URL is: " + url);
 
 						CloseableHttpClient httpclient = HttpClients.createDefault();
 						HttpGet httpget = new HttpGet(url);
 
 						// auth on wit.ai
-						httpget.addHeader("Authorization", "Bearer " + cfg.getConfig().get("witaiKey"));
+						httpget.addHeader("Authorization", "Bearer " + cfg.get("witaiKey"));
 
 						try (CloseableHttpResponse response = httpclient.execute(httpget))
 						{
@@ -113,13 +113,13 @@ public class WitAiService implements Runnable
 								{
 									String content = IOUtils.toString(instream, "UTF-8");
 
-									log.debug("AI response: " + content);
+									LOGGER.debug("AI response: " + content);
 
 									WitAiResponse json = gson.fromJson(content, WitAiResponse.class);
 
 									Double confidence = json.getOutcome().getConfidence();
 
-									log.debug("Confidence: " + confidence);
+									LOGGER.debug("Confidence: " + confidence);
 
 									if (confidence > 0.65)
 									{
@@ -127,7 +127,7 @@ public class WitAiService implements Runnable
 
 										if (object != null)
 										{
-											log.info("Get response from AI: " + json.getMsg_body() + " to object: " + object);
+											LOGGER.info("Get response from AI: " + json.getMsg_body() + " to object: " + object);
 											jsonMessaging.broadcast("event.ai.response.object." + object, aiResponseAdvertisement.set(json));
 										}
 									}
@@ -141,7 +141,7 @@ public class WitAiService implements Runnable
 					else
 					{
 						// We received unknown request message. Lets make generic log entry.
-						log.info("Received request "
+						LOGGER.info("Received request "
 								+ " from " + envelope.getSenderInstance()
 								+ " to " + envelope.getReceiverInstance()
 								+ " at '" + envelope.getSubject()
@@ -157,7 +157,7 @@ public class WitAiService implements Runnable
 		catch (final Throwable t)
 		{
 
-			log.error("Unexpected exception in AI", t);
+			LOGGER.error("Unexpected exception in AI", t);
 			t.printStackTrace();
 		}
 

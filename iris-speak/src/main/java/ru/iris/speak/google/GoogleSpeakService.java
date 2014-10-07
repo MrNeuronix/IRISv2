@@ -31,14 +31,12 @@ import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
 import java.io.*;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public class GoogleSpeakService implements Runnable
 {
 
-	private final Logger log = LogManager.getLogger(GoogleSpeakService.class.getName());
-	private final Config config = new Config();
+	private final Logger LOGGER = LogManager.getLogger(GoogleSpeakService.class.getName());
 	private Thread t = null;
 	private boolean shutdown = false;
 
@@ -57,9 +55,9 @@ public class GoogleSpeakService implements Runnable
 	@Override
 	public synchronized void run()
 	{
-		log.info("Speak service started (TTS: Google)");
+		LOGGER.info("Speak service started (TTS: Google)");
 
-		Map<String, String> conf = config.getConfig();
+		Config conf = Config.getInstance();
 		final Synthesiser synthesiser = new Synthesiser(conf.get("language"));
 
 		try
@@ -106,9 +104,9 @@ public class GoogleSpeakService implements Runnable
 							// Here we speak only if destination - all
 							if (advertisement.getDevice().equals("all"))
 							{
-								log.debug("Confidence: " + advertisement.getConfidence());
-								log.debug("Text: " + advertisement.getText());
-								log.debug("Device: " + advertisement.getDevice());
+								LOGGER.debug("Confidence: " + advertisement.getConfidence());
+								LOGGER.debug("Text: " + advertisement.getText());
+								LOGGER.debug("Device: " + advertisement.getDevice());
 
 								long cacheId = 0;
 
@@ -150,7 +148,7 @@ public class GoogleSpeakService implements Runnable
 								// cache found - play local file
 								else
 								{
-									log.info("Playing local file: " + "data/cache-" + cacheId + ".mp3");
+									LOGGER.info("Playing local file: " + "data/cache-" + cacheId + ".mp3");
 
 									result = new FileInputStream("data/cache-" + cacheId + ".mp3");
 
@@ -167,14 +165,14 @@ public class GoogleSpeakService implements Runnable
 						}
 						else
 						{
-							log.info("Silence mode enabled. Ignoring speak request.");
+							LOGGER.info("Silence mode enabled. Ignoring speak request.");
 						}
 
 					}
 					else
 					{
 						// We received unknown request message. Lets make generic log entry.
-						log.info("Received request "
+						LOGGER.info("Received request "
 								+ " from " + envelope.getSenderInstance()
 								+ " to " + envelope.getReceiverInstance()
 								+ " at '" + envelope.getSubject()
@@ -189,7 +187,7 @@ public class GoogleSpeakService implements Runnable
 		}
 		catch (final Throwable t)
 		{
-			log.error("Unexpected exception in Speak", t);
+			LOGGER.error("Unexpected exception in Speak", t);
 			t.printStackTrace();
 		}
 	}

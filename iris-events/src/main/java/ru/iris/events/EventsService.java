@@ -46,7 +46,7 @@ import java.util.*;
 class EventsService implements Runnable
 {
 
-	private final Logger log = LogManager.getLogger(EventsService.class.getName());
+	private final Logger LOGGER = LogManager.getLogger(EventsService.class.getName());
 	private boolean shutdown = false;
 
 	public EventsService()
@@ -112,7 +112,7 @@ class EventsService implements Runnable
 					if (envelope.getObject() instanceof CommandAdvertisement)
 					{
 						CommandAdvertisement advertisement = envelope.getObject();
-						log.info("Launch command script: " + advertisement.getScript());
+						LOGGER.info("Launch command script: " + advertisement.getScript());
 
 						File jsFile = new File("./scripts/command/" + advertisement.getScript() + ".js");
 
@@ -123,11 +123,11 @@ class EventsService implements Runnable
 						}
 						catch (FileNotFoundException e)
 						{
-							log.error("Script file scripts/command/" + advertisement.getScript() + ".js not found!");
+							LOGGER.error("Script file scripts/command/" + advertisement.getScript() + ".js not found!");
 						}
 						catch (Exception e)
 						{
-							log.error("Error in script scripts/command/" + advertisement.getScript() + ".js: " + e.toString());
+							LOGGER.error("Error in script scripts/command/" + advertisement.getScript() + ".js: " + e.toString());
 							e.printStackTrace();
 						}
 					}
@@ -144,7 +144,7 @@ class EventsService implements Runnable
 							{
 								File jsFile = new File("./scripts/" + event.getScript());
 
-								log.debug("Launch script: " + event.getScript());
+								LOGGER.debug("Launch script: " + event.getScript());
 
 								try
 								{
@@ -153,11 +153,11 @@ class EventsService implements Runnable
 								}
 								catch (FileNotFoundException e)
 								{
-									log.error("Script file " + jsFile + " not found!");
+									LOGGER.error("Script file " + jsFile + " not found!");
 								}
 								catch (Exception e)
 								{
-									log.error("Error in script " + jsFile + ": " + e.toString());
+									LOGGER.error("Error in script " + jsFile + ": " + e.toString());
 									e.printStackTrace();
 								}
 							}
@@ -173,7 +173,7 @@ class EventsService implements Runnable
 		catch (final Throwable t)
 		{
 			t.printStackTrace();
-			log.error("Unexpected exception in Events", t);
+			LOGGER.error("Unexpected exception in Events", t);
 		}
 
 	}

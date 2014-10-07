@@ -33,14 +33,14 @@ class Core
 		System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, "./conf/log4j2.xml");
 	}
 
-	private static final Logger log = LogManager.getLogger(Core.class.getName());
+	private static final Logger LOGGER = LogManager.getLogger(Core.class.getName());
 
 	public static void main(String[] args) throws Exception
 	{
 
-		log.info("----------------------------------------");
-		log.info("--        IRISv2 is starting          --");
-		log.info("----------------------------------------");
+		LOGGER.info("----------------------------------------");
+		LOGGER.info("--        IRISv2 is starting          --");
+		LOGGER.info("----------------------------------------");
 
 		// ORM
 		new DatabaseConnection();

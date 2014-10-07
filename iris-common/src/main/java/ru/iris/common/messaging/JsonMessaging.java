@@ -78,11 +78,11 @@ public class JsonMessaging
 		// Create a Connection
 		try
 		{
-			Config config = new Config();
+			Config config = Config.getInstance();
 
 			// Create a ConnectionFactory
-			connectionFactory.setHost(config.getConfig().get("AMQPhost"));
-			connectionFactory.setPort(Integer.valueOf(config.getConfig().get("AMQPport")));
+			connectionFactory.setHost(config.get("AMQPhost"));
+			connectionFactory.setPort(Integer.valueOf(config.get("AMQPport")));
 
 			connection = connectionFactory.newConnection();
 			channel = connection.createChannel();
@@ -305,17 +305,17 @@ public class JsonMessaging
 				}
 			}
 		}
-			catch (final ClassNotFoundException e)
-			{
-				LOGGER.debug("Error deserializing JSON message.", e);
-			}
-			catch (InterruptedException e)
-			{
-				LOGGER.debug("Error JSON message.", e);
-			}
+		catch (final ClassNotFoundException e)
+		{
+			LOGGER.debug("Error deserializing JSON message.", e);
+		}
+		catch (InterruptedException e)
+		{
+			LOGGER.debug("Error JSON message.", e);
+		}
 		catch (IOException e)
-			{
-				e.printStackTrace();
-			}
+		{
+			e.printStackTrace();
+		}
 	}
 }

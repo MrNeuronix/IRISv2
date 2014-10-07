@@ -15,26 +15,45 @@
  */
 package ru.iris.common;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * Class for loading configuration from properties files and database.
  */
 public class Config
 {
-
 	/**
 	 * The map of loaded properties.
 	 */
-	private static HashMap<String, String> propertyMap = null;
+	private static final Logger LOGGER = LogManager.getLogger(Config.class);
+	private static Map<String, String> propertyMap = null;
+
+	/**
+	 * Singleton (On Demand Holder)
+	 */
+	public static class SingletonHolder
+	{
+		public static final Config HOLDER_INSTANCE = new Config();
+	}
+
+	public static Config getInstance()
+	{
+		return SingletonHolder.HOLDER_INSTANCE;
+	}
 
 	/**
 	 * Default constructor which loads properties from different storages.
 	 */
-	public Config()
+	private Config()
 	{
 		synchronized (Config.class)
 		{
@@ -117,12 +136,17 @@ public class Config
 	}
 
 	/**
-	 * Returns the configuration properties map containing key value pairs.
 	 *
-	 * @return the configuration properties.
+	 * @return the configuration property value.
 	 */
-	public Map<String, String> getConfig()
+	public String get(String key)
 	{
-		return Collections.unmodifiableMap(propertyMap);
+		if (propertyMap.get(key) != null)
+		{
+			return propertyMap.get(key);
+		}
+
+		LOGGER.error("Configuration key = " + key + " not found!");
+		return null;
 	}
 }

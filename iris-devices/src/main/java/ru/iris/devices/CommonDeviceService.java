@@ -33,7 +33,7 @@ import java.util.UUID;
 class CommonDeviceService implements Runnable
 {
 
-	private final Logger log = LogManager.getLogger(CommonDeviceService.class.getName());
+	private final Logger LOGGER = LogManager.getLogger(CommonDeviceService.class.getName());
 	private boolean shutdown = false;
 
 	public CommonDeviceService()
@@ -94,7 +94,7 @@ class CommonDeviceService implements Runnable
 
 						if (device == null)
 						{
-							log.info("Cant find device with UUID " + uuid);
+							LOGGER.info("Cant find device with UUID " + uuid);
 							continue;
 						}
 
@@ -139,7 +139,7 @@ class CommonDeviceService implements Runnable
 
 							if (device == null)
 							{
-								log.info("Cant find device with UUID " + uuid);
+								LOGGER.info("Cant find device with UUID " + uuid);
 								continue;
 							}
 
@@ -169,11 +169,11 @@ class CommonDeviceService implements Runnable
 
 						if (device == null)
 						{
-							log.info("Cant find device with UUID " + uuid);
+							LOGGER.info("Cant find device with UUID " + uuid);
 							continue;
 						}
 
-						log.info("Setting name \"" + advertisement.getName() + "\" to device " + uuid);
+						LOGGER.info("Setting name \"" + advertisement.getName() + "\" to device " + uuid);
 
 						device.setName(advertisement.getName());
 						Ebean.update(device);
@@ -194,11 +194,11 @@ class CommonDeviceService implements Runnable
 
 						if (device == null)
 						{
-							log.info("Cant find device with UUID " + uuid);
+							LOGGER.info("Cant find device with UUID " + uuid);
 							continue;
 						}
 
-						log.info("Setting zone " + advertisement.getZone() + " to device " + uuid);
+						LOGGER.info("Setting zone " + advertisement.getZone() + " to device " + uuid);
 
 						device.setZone(advertisement.getZone());
 						Ebean.update(device);
@@ -211,7 +211,7 @@ class CommonDeviceService implements Runnable
 					else if (envelope.getReceiverInstance() == null)
 					{
 						// We received unknown broadcast message. Lets make generic log entry.
-						log.info("Received broadcast "
+						LOGGER.info("Received broadcast "
 								+ " from " + envelope.getSenderInstance()
 								+ " to " + envelope.getReceiverInstance()
 								+ " at '" + envelope.getSubject()
@@ -225,7 +225,7 @@ class CommonDeviceService implements Runnable
 					else
 					{
 						// We received unknown request message. Lets make generic log entry.
-						log.info("Received request "
+						LOGGER.info("Received request "
 								+ " from " + envelope.getSenderInstance()
 								+ " to " + envelope.getReceiverInstance()
 								+ " at '" + envelope.getSubject()
@@ -238,7 +238,7 @@ class CommonDeviceService implements Runnable
 		}
 		catch (InterruptedException e)
 		{
-			log.error(e.toString());
+			LOGGER.error(e.toString());
 		}
 	}
 }

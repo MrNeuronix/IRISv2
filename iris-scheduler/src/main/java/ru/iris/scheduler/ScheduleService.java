@@ -43,7 +43,7 @@ class ScheduleService implements Runnable
 {
 
 	private static final CommandAdvertisement commandAdvertisement = new CommandAdvertisement();
-	private final Logger log = LogManager.getLogger(ScheduleService.class);
+	private final Logger LOGGER = LogManager.getLogger(ScheduleService.class);
 	private Thread t = null;
 	private JsonMessaging messaging;
 
@@ -76,7 +76,7 @@ class ScheduleService implements Runnable
 
 				if (task.getType() == 1)
 				{
-					log.info("Actualizing task. Next run: " + nextRun(task.getIntervalDate()));
+					LOGGER.info("Actualizing task. Next run: " + nextRun(task.getIntervalDate()));
 					task.setTaskdate(nextRun(task.getIntervalDate()));
 					Ebean.update(task);
 				}
@@ -84,26 +84,26 @@ class ScheduleService implements Runnable
 				{
 					if (task.getValidto().before(nextRun(task.getIntervalDate())))
 					{
-						log.info("Actualizing task. Set task to disable");
+						LOGGER.info("Actualizing task. Set task to disable");
 						task.setEnabled(false);
 					}
 					else
 					{
-						log.info("Actualizing task. Next run: " + nextRun(task.getIntervalDate()));
+						LOGGER.info("Actualizing task. Next run: " + nextRun(task.getIntervalDate()));
 						task.setTaskdate(nextRun(task.getIntervalDate()));
 					}
 					Ebean.update(task);
 				}
 				else
 				{
-					log.info("Skip task");
+					LOGGER.info("Skip task");
 				}
 			}
 
 		}
 		catch (Exception e)
 		{
-			log.info("Error while actualizing task");
+			LOGGER.info("Error while actualizing task");
 			e.printStackTrace();
 		}
 
@@ -121,19 +121,19 @@ class ScheduleService implements Runnable
 
 					if (new Timestamp(new Date().getTime()).equals(task.getTaskdate()))
 					{
-						log.info("Executing task " + task.getId() + " (class: " + task.getEclass() + ", command: " + task.getCommand() + ")");
+						LOGGER.info("Executing task " + task.getId() + " (class: " + task.getEclass() + ", command: " + task.getCommand() + ")");
 
 						messaging.broadcast("event.command", commandAdvertisement.set(task.getEclass(), task.getCommand()));
 
 						if (task.getType() == 1)
 						{
-							log.info("Next run: " + nextRun(task.getIntervalDate()));
+							LOGGER.info("Next run: " + nextRun(task.getIntervalDate()));
 							task.setTaskdate(nextRun(task.getIntervalDate()));
 							Ebean.update(task);
 						}
 						else if (task.getType() == 2)
 						{
-							log.info("Set task to disable");
+							LOGGER.info("Set task to disable");
 							task.setEnabled(false);
 							Ebean.update(task);
 						}
@@ -141,13 +141,13 @@ class ScheduleService implements Runnable
 						{
 							if (task.getValidto().before(nextRun(task.getIntervalDate())))
 							{
-								log.info("Set task to disable");
+								LOGGER.info("Set task to disable");
 								task.setEnabled(false);
 								Ebean.update(task);
 							}
 							else
 							{
-								log.info("Next run: " + nextRun(task.getIntervalDate()));
+								LOGGER.info("Next run: " + nextRun(task.getIntervalDate()));
 								task.setTaskdate(nextRun(task.getIntervalDate()));
 								Ebean.update(task);
 							}
@@ -158,7 +158,7 @@ class ScheduleService implements Runnable
 			}
 			catch (Exception e)
 			{
-				log.info("No scheduled tasks");
+				LOGGER.info("No scheduled tasks");
 				//e.printStackTrace();
 			}
 
@@ -168,7 +168,7 @@ class ScheduleService implements Runnable
 			}
 			catch (InterruptedException e)
 			{
-				log.error(e.toString());
+				LOGGER.error(e.toString());
 			}
 		}
 	}

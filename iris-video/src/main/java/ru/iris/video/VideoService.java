@@ -23,7 +23,7 @@ class VideoService implements Runnable
 {
 
 	private Thread t = null;
-	private Logger log = LogManager.getLogger(VideoService.class);
+	private Logger LOGGER = LogManager.getLogger(VideoService.class);
 
 	public VideoService()
 	{
