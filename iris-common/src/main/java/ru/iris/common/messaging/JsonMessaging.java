@@ -18,10 +18,12 @@ package ru.iris.common.messaging;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.rabbitmq.client.*;
+import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.LongString;
+import com.rabbitmq.client.QueueingConsumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.common.Config;
 
 import java.io.IOException;
 import java.util.*;
@@ -52,11 +54,6 @@ public class JsonMessaging
 	 */
 	private final BlockingQueue<JsonEnvelope> jsonReceiveQueue = new ArrayBlockingQueue<>(100);
 	private final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-	private UUID sender;
-	/**
-	 * The AMQ connection.
-	 */
-	private com.rabbitmq.client.Connection connection;
 	/**
 	 * Boolean flag reflecting whether threads should be close.
 	 */
@@ -70,30 +67,9 @@ public class JsonMessaging
 
 	public JsonMessaging(final UUID instanceId)
 	{
-		// Create a ConnectionFactory
-		ConnectionFactory connectionFactory = new ConnectionFactory();
-
 		this.instanceId = instanceId;
 
-		// Create a Connection
-		try
-		{
-			Config config = Config.getInstance();
-
-			// Create a ConnectionFactory
-			connectionFactory.setHost(config.get("AMQPhost"));
-			connectionFactory.setPort(Integer.valueOf(config.get("AMQPport")));
-
-			connection = connectionFactory.newConnection();
-			channel = connection.createChannel();
-
-			// Create exchange
-			channel.exchangeDeclare("iris", "topic", true);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
+		channel = JsonConnection.getInstance().getChannel();
 	}
 
 	/**
@@ -139,8 +115,6 @@ public class JsonMessaging
 	{
 		try
 		{
-			channel.close();
-			connection.close();
 			shutdownThreads = true;
 
 			if (jsonBroadcastListenThread != null)
