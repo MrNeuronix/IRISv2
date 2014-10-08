@@ -72,7 +72,7 @@ public class GoogleSpeakService implements Runnable
 				}
 			}));
 
-			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
+			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "speak");
 			jsonMessaging.subscribe("event.speak");
 			jsonMessaging.start();
 

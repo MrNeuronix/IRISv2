@@ -81,22 +81,6 @@ public class JsonConnection
 		}
 	}
 
-	/**
-	 * Closes connection to message broker.
-	 */
-	public void close()
-	{
-		try
-		{
-			channel.close();
-			connection.close();
-		}
-		catch (final Exception e)
-		{
-			LOGGER.error("Error shutting down JsonMessaging.", e);
-		}
-	}
-
 	public Channel getChannel()
 	{
 		return channel;

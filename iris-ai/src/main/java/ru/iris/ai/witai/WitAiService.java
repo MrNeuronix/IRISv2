@@ -75,7 +75,7 @@ public class WitAiService implements Runnable
 				}
 			}));
 
-			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
+			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "witai");
 			jsonMessaging.subscribe("event.speak.recognized");
 			jsonMessaging.start();
 

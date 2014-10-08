@@ -72,7 +72,7 @@ public class NooliteRXService implements Runnable
 			}
 		}));
 
-		messaging = new JsonMessaging(UUID.randomUUID());
+		messaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-rx");
 
 		devices = Ebean.find(Device.class)
 				.where().eq("source", "noolite").findList();
@@ -385,7 +385,7 @@ public class NooliteRXService implements Runnable
 		{
 			try
 			{
-				JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
+				JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-rx-internal");
 
 				jsonMessaging.subscribe("event.devices.noolite.rx.bindchannel");
 				jsonMessaging.subscribe("event.devices.noolite.rx.unbindchannel");

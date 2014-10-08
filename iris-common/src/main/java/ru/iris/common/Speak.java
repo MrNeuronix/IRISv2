@@ -41,9 +41,8 @@ public class Speak
 
 		try
 		{
-			JsonMessaging messaging = new JsonMessaging(UUID.randomUUID());
+			JsonMessaging messaging = new JsonMessaging(UUID.randomUUID(), "speak");
 			messaging.broadcast("event.speak", advertisement.set(text, 100.0));
-			messaging.close();
 		}
 		catch (Exception e)
 		{

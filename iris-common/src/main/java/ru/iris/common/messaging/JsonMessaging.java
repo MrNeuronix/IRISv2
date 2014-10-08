@@ -18,10 +18,7 @@ package ru.iris.common.messaging;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.LongString;
-import com.rabbitmq.client.QueueingConsumer;
+import com.rabbitmq.client.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -63,13 +60,18 @@ public class JsonMessaging
 	 */
 	private Thread jsonBroadcastListenThread;
 
-	private Channel channel;
+	private Channel channel = JsonConnection.getInstance().getChannel();
+	private String queueName = "";
 
 	public JsonMessaging(final UUID instanceId)
 	{
 		this.instanceId = instanceId;
+	}
 
-		channel = JsonConnection.getInstance().getChannel();
+	public JsonMessaging(final UUID instanceId, String queueName)
+	{
+		this.instanceId = instanceId;
+		this.queueName = queueName;
 	}
 
 	/**
@@ -115,6 +117,7 @@ public class JsonMessaging
 	{
 		try
 		{
+			channel.queueDelete(queueName);
 			shutdownThreads = true;
 
 			if (jsonBroadcastListenThread != null)
@@ -172,8 +175,6 @@ public class JsonMessaging
 
 		try
 		{
-			//String callbackQueueName = channel.queueDeclare().getQueue();
-
 			// Create a message headers
 			Map<String, Object> headers = new HashMap<>();
 			headers.put("sender", instanceId.toString());
@@ -185,7 +186,6 @@ public class JsonMessaging
 					subject,
 					new AMQP.BasicProperties.Builder()
 							.headers(headers)
-									//.replyTo(callbackQueueName)
 							.build(),
 					jsonString.getBytes()
 			);
@@ -230,7 +230,7 @@ public class JsonMessaging
 	{
 		try
 		{
-			String queueName = channel.queueDeclare().getQueue();
+			queueName = channel.queueDeclare(queueName, false, false, true, null).getQueue();
 
 			for (String subject : jsonSubjects)
 			{
@@ -286,6 +286,10 @@ public class JsonMessaging
 		catch (InterruptedException e)
 		{
 			LOGGER.debug("Error JSON message.", e);
+		}
+		catch (ConsumerCancelledException e)
+		{
+			LOGGER.debug("Consumer cancelled.", e);
 		}
 		catch (IOException e)
 		{

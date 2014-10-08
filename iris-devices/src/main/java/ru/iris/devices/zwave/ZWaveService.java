@@ -77,9 +77,9 @@ public class ZWaveService implements Runnable
 	@Override
 	public synchronized void run()
 	{
-
-		messaging = new JsonMessaging(UUID.randomUUID());
 		Config config = Config.getInstance();
+
+		messaging = new JsonMessaging(UUID.randomUUID(), "devices-zwave");
 
 		devices = Ebean.find(Device.class)
 				.where().eq("source", "zwave").findList();
@@ -522,15 +522,14 @@ public class ZWaveService implements Runnable
 				}
 			}));
 
-			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
-			jsonMessaging.subscribe("event.devices.zwave.setvalue");
-			jsonMessaging.start();
+			messaging.subscribe("event.devices.zwave.*");
+			messaging.start();
 
 			while (!shutdown)
 			{
 
 				// Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
-				final JsonEnvelope envelope = jsonMessaging.receive(100);
+				final JsonEnvelope envelope = messaging.receive(100);
 				if (envelope != null)
 				{
 					if (envelope.getObject() instanceof ZWaveSetDeviceLevelAdvertisement)
@@ -585,7 +584,6 @@ public class ZWaveService implements Runnable
 			}
 
 			// Close JSON messaging.
-			jsonMessaging.close();
 			messaging.close();
 
 		}

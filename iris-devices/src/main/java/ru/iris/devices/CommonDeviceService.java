@@ -60,7 +60,7 @@ class CommonDeviceService implements Runnable
 				}
 			}));
 
-			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
+			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-common");
 
 			jsonMessaging.subscribe("event.devices.setvalue");
 			jsonMessaging.subscribe("event.devices.getinventory");

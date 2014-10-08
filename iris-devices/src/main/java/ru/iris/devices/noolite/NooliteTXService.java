@@ -54,9 +54,6 @@ public class NooliteTXService implements Runnable
 	@Override
 	public synchronized void run()
 	{
-
-		JsonMessaging messaging = new JsonMessaging(UUID.randomUUID());
-
 		// Initialize the libusb context
 		int result = LibUsb.init(context);
 		if (result < 0)
@@ -83,7 +80,7 @@ public class NooliteTXService implements Runnable
 				}
 			}));
 
-			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
+			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-tx");
 
 			jsonMessaging.subscribe("event.devices.noolite.setvalue");
 			jsonMessaging.subscribe("event.devices.noolite.tx.bindchannel");
@@ -334,7 +331,6 @@ public class NooliteTXService implements Runnable
 
 			// Close JSON messaging.
 			jsonMessaging.close();
-			messaging.close();
 			LibUsb.exit(context);
 
 		}

@@ -69,7 +69,7 @@ class ScheduleService implements Runnable
 			List<Task> tasks = Ebean.find(Task.class)
 					.where().and(Expr.lt("taskdate", new Timestamp(System.currentTimeMillis())), Expr.eq("enabled", true)).findList();
 
-			messaging = new JsonMessaging(UUID.randomUUID());
+			messaging = new JsonMessaging(UUID.randomUUID(), "scheduler");
 
 			for (Task task : tasks)
 			{

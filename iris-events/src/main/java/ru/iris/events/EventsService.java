@@ -73,7 +73,7 @@ class EventsService implements Runnable
 				}
 			}));
 
-			final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID());
+			final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "events");
 
 			// Initialize rhino engine
 			Global global = new Global();
