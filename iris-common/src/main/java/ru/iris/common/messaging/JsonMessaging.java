@@ -172,7 +172,7 @@ public class JsonMessaging
 
 		try
 		{
-			String callbackQueueName = channel.queueDeclare().getQueue();
+			//String callbackQueueName = channel.queueDeclare().getQueue();
 
 			// Create a message headers
 			Map<String, Object> headers = new HashMap<>();
@@ -185,7 +185,7 @@ public class JsonMessaging
 					subject,
 					new AMQP.BasicProperties.Builder()
 							.headers(headers)
-							.replyTo(callbackQueueName)
+									//.replyTo(callbackQueueName)
 							.build(),
 					jsonString.getBytes()
 			);
