@@ -97,12 +97,18 @@ public class NooliteTXService implements Runnable
 				{
 					if (envelope.getObject() instanceof NooliteDeviceLevelSetAdvertisement)
 					{
-
 						LOGGER.debug("Get SetDeviceLevel advertisement");
 
 						// We know of service advertisement
 						final NooliteDeviceLevelSetAdvertisement advertisement = envelope.getObject();
-						byte level = Byte.valueOf(advertisement.getValue());
+
+						byte level;
+
+						if (Integer.parseInt(advertisement.getValue()) == 255)
+							level = 100;
+						else
+							level = Byte.valueOf(advertisement.getValue());
+
 						Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
 						int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
 						int channelView = channel + 1;
