@@ -168,20 +168,12 @@ public class ZWaveService implements Runnable
 						break;
 					case VALUE_ADDED:
 
+						// check empty label
+						if (Manager.get().getValueLabel(notification.getValueId()).isEmpty())
+							break;
+
 						String nodeType = manager.getNodeType(homeId, node);
-						Device zw;
-
-						Device zcZWaveDevice = getZWaveDeviceByNode(node);
-
-						if (zcZWaveDevice != null)
-						{
-							// Check for awaked after sleeping nodes
-							if (manager.isNodeAwake(homeId, zcZWaveDevice.getNode()) && zcZWaveDevice.getStatus().equals("sleeping"))
-							{
-								LOGGER.info("Setting node " + zcZWaveDevice.getNode() + " to LISTEN state");
-								zcZWaveDevice.setStatus("listening");
-							}
-						}
+						Device zw = null;
 
 						switch (nodeType)
 						{
@@ -310,6 +302,32 @@ public class ZWaveService implements Runnable
 								);
 						}
 
+						boolean isNewDeviceValue = false;
+						DeviceValue udv = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", zw.getId()), Expr.eq("label", manager.getValueLabel(notification.getValueId()))).findUnique();
+
+						// new device
+						if (udv == null)
+						{
+							udv = new DeviceValue();
+							isNewDeviceValue = true;
+						}
+
+						udv.setLabel(manager.getValueLabel(notification.getValueId()));
+						udv.setValueType(Utils.getValueType(notification.getValueId()));
+						udv.setValueId(notification.getValueId());
+						udv.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));
+						udv.setValue(String.valueOf(Utils.getValue(notification.getValueId())));
+						udv.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
+						udv.setUuid(zw.getUuid());
+
+						zw.updateValue(udv);
+
+						// Update or save device value
+						if (!isNewDeviceValue)
+							Ebean.update(udv);
+						else
+							Ebean.save(udv);
+
 						break;
 					case VALUE_REMOVED:
 
@@ -330,7 +348,7 @@ public class ZWaveService implements Runnable
 
 						if (initComplete)
 						{
-							Ebean.update(dv);
+							Ebean.update(zrZWaveDevice);
 						}
 
 						messaging.broadcast("event.devices.zwave.value.removed",
@@ -385,29 +403,34 @@ public class ZWaveService implements Runnable
 
 						LOGGER.info("Node " +
 								zWaveDevice.getNode() + ": " +
-								" Value for label \"" + manager.getValueLabel(notification.getValueId()) + "\" changed  --> " +
+								"Value for label \"" + manager.getValueLabel(notification.getValueId()) + "\" changed  --> " +
 								"\"" + Utils.getValue(notification.getValueId()) + "\"");
 
-						DeviceValue udv = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", zWaveDevice.getId()), Expr.eq("label", manager.getValueLabel(notification.getValueId()))).findUnique();
+						boolean isNewDeviceValueChg = false;
+						DeviceValue udvChg = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", zWaveDevice.getId()), Expr.eq("label", manager.getValueLabel(notification.getValueId()))).findUnique();
 
 						// new device
-						if (udv == null)
+						if (udvChg == null)
 						{
-							udv = new DeviceValue();
+							udvChg = new DeviceValue();
+							isNewDeviceValueChg = true;
 						}
 
-						udv.setLabel(manager.getValueLabel(notification.getValueId()));
-						udv.setValueType(Utils.getValueType(notification.getValueId()));
-						udv.setValueId(notification.getValueId());
-						udv.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));
-						udv.setValue(String.valueOf(Utils.getValue(notification.getValueId())));
-						udv.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
-						udv.setUuid(zWaveDevice.getUuid());
+						udvChg.setLabel(manager.getValueLabel(notification.getValueId()));
+						udvChg.setValueType(Utils.getValueType(notification.getValueId()));
+						udvChg.setValueId(notification.getValueId());
+						udvChg.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));
+						udvChg.setValue(String.valueOf(Utils.getValue(notification.getValueId())));
+						udvChg.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
+						udvChg.setUuid(zWaveDevice.getUuid());
 
-						zWaveDevice.updateValue(udv);
+						zWaveDevice.updateValue(udvChg);
 
-						// Update device value
-						Ebean.update(udv);
+						// Update or save device value
+						if (!isNewDeviceValueChg)
+							Ebean.update(udvChg);
+						else
+							Ebean.save(udvChg);
 
 						// log change
 						/////////////////////////////////
@@ -417,7 +440,7 @@ public class ZWaveService implements Runnable
 
 						if (initComplete)
 						{
-							Ebean.update(udv);
+							Ebean.update(udvChg);
 						}
 
 						messaging.broadcast("event.devices.zwave.value.changed",
@@ -491,17 +514,6 @@ public class ZWaveService implements Runnable
 				LOGGER.info("Setting node " + ZWaveDevice.getNode() + " to SLEEP state");
 				ZWaveDevice.setStatus("sleeping");
 			}
-
-			if (ZWaveDevice.getId() == null)
-			{
-				LOGGER.debug("Save new Z-Wave device");
-				Ebean.save(ZWaveDevice);
-			}
-			else
-			{
-				LOGGER.debug("Update existing Z-Wave device");
-				Ebean.update(ZWaveDevice);
-			}
 		}
 
 		// reload from database for avoid Ebean.update() key duplicate error
@@ -561,15 +573,6 @@ public class ZWaveService implements Runnable
 							LOGGER.info("Node: " + node + " Cant set empty value or node dead");
 						}
 
-					}
-					else if (envelope.getReceiverInstance() == null)
-					{
-						// We received unknown broadcast message. Lets make generic log entry.
-						LOGGER.info("Received broadcast "
-								+ " from " + envelope.getSenderInstance()
-								+ " to " + envelope.getReceiverInstance()
-								+ " at '" + envelope.getSubject()
-								+ ": " + envelope.getObject());
 					}
 					else
 					{
@@ -752,10 +755,13 @@ public class ZWaveService implements Runnable
 		}
 		else
 		{
-
 			ZWaveDevice.setManufName(manufName);
 			ZWaveDevice.setProductName(productName);
 			ZWaveDevice.setStatus(state);
+
+			// check empty label
+			if (label.isEmpty())
+				return ZWaveDevice;
 
 			LOGGER.info("Node " + ZWaveDevice.getNode() + ": Add \"" + label + "\" value \"" + Utils.getValue(notification.getValueId()) + "\"");
 

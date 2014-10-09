@@ -220,7 +220,7 @@ public class NooliteRXService implements Runnable
 					Ebean.save(logChange);
 					/////////////////////////////////
 
-					messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelDimAdvertisement().set(device.getUuid()));
+					messaging.broadcast("event.devices.noolite.value.dim", new NooliteDeviceLevelDimAdvertisement().set(device.getUuid()));
 				}
 				// turn on
 				else if (action == 2)
@@ -272,7 +272,7 @@ public class NooliteRXService implements Runnable
 					Ebean.save(logChange);
 					/////////////////////////////////
 
-					messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelBrightAdvertisement().set(device.getUuid()));
+					messaging.broadcast("event.devices.noolite.value.bright", new NooliteDeviceLevelBrightAdvertisement().set(device.getUuid()));
 				}
 				// set level
 				else if (action == 6)
@@ -298,7 +298,7 @@ public class NooliteRXService implements Runnable
 					Ebean.save(logChange);
 					/////////////////////////////////
 
-					messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUuid(), "Level", dimmerValue.toString()));
+					messaging.broadcast("event.devices.noolite.value.setlevel", new NooliteDeviceLevelSetAdvertisement().set(device.getUuid(), "Level", dimmerValue.toString()));
 				}
 				// stop dim/bright
 				else if (action == 10)
@@ -311,7 +311,7 @@ public class NooliteRXService implements Runnable
 					Ebean.save(logChange);
 					/////////////////////////////////
 
-					messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelStopDimBrightAdvertisement().set(device.getUuid()));
+					messaging.broadcast("event.devices.noolite.value.stopdimbright", new NooliteDeviceLevelStopDimBrightAdvertisement().set(device.getUuid()));
 				}
 
 				if (device.getId() == null)
