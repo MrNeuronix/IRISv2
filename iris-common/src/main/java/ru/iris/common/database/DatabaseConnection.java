@@ -21,10 +21,7 @@ import com.avaje.ebean.EbeanServerFactory;
 import com.avaje.ebean.config.DataSourceConfig;
 import com.avaje.ebean.config.ServerConfig;
 import ru.iris.common.Config;
-import ru.iris.common.database.model.Event;
-import ru.iris.common.database.model.Log;
-import ru.iris.common.database.model.Speaks;
-import ru.iris.common.database.model.Task;
+import ru.iris.common.database.model.*;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.database.model.devices.DeviceValue;
 
@@ -67,6 +64,7 @@ public class DatabaseConnection
 		config.addClass(Task.class);
 		config.addClass(Device.class);
 		config.addClass(DeviceValue.class);
+		config.addClass(DataSource.class);
 
 		// create the EbeanServer instance
 		server = EbeanServerFactory.create(config);

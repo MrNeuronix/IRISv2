@@ -24,17 +24,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 
-/**
- * IRIS-X Project
- * Author: Nikolay A. Viguro
- * WWW: smart.ph-systems.ru
- * E-Mail: nv@ph-systems.ru
- * Date: 22.10.12
- * Time: 12:59
- */
-
 @Entity
-@Table(name = "scheduler")
+@Table(name = "calendar")
 public class Task
 {
 
@@ -42,32 +33,53 @@ public class Task
 	@Id
 	private int id;
 
+	// Время начала
 	@Expose
 	@Column(columnDefinition = "timestamp")
-	private Timestamp taskdate;
+	private Timestamp startdate;
 
-	@Expose
-	@Column(name = "class")
-	private String eclass;
-
-	@Expose
-	private String command;
-
-	@Expose
-	private int type;
-
+	// Время конца
 	@Expose
 	@Column(columnDefinition = "timestamp")
-	private Timestamp validto;
+	private Timestamp enddate;
 
+	// Заголовок задачи
 	@Expose
-	private String intervalDate;
+	private String title;
 
+	// Текст задачи
+	@Expose
+	private String text;
+
+	// Тип таска:
+	// 1 - Однократный запуск
+	// 2 - Многократный запуск от и до с интервалом
+	@Expose
+	private String type;
+
+	// Адрес, куда слать (например, event.command)
+	@Expose
+	private String subject;
+
+	// Тут хранится сериализованный в JSON advertisement
+	@Expose
+	private String object;
+
+	// Интервал, с которой будет запускаться задача
+	@Expose
+	private String period;
+
+	// Источник данных
+	@Expose
+	private String source;
+
+	// Показывать ли в календаре?
+	@Expose
+	private boolean showInCalendar;
+
+	// Активна ли?
 	@Expose
 	private boolean enabled;
-
-	@Expose
-	private String lang;
 
 	public Task()
 	{
@@ -83,64 +95,74 @@ public class Task
 		this.id = id;
 	}
 
-	public String getEclass()
+	public Timestamp getStartdate()
 	{
-		return eclass;
+		return startdate;
 	}
 
-	public void setEclass(String eclass)
+	public void setStartdate(Timestamp startdate)
 	{
-		this.eclass = eclass;
+		this.startdate = startdate;
 	}
 
-	public String getCommand()
+	public Timestamp getEnddate()
 	{
-		return command;
+		return enddate;
 	}
 
-	public void setCommand(String command)
+	public void setEnddate(Timestamp enddate)
 	{
-		this.command = command;
+		this.enddate = enddate;
 	}
 
-	public int getType()
+	public String getTitle()
+	{
+		return title;
+	}
+
+	public void setTitle(String title)
+	{
+		this.title = title;
+	}
+
+	public String getText()
+	{
+		return text;
+	}
+
+	public void setText(String text)
+	{
+		this.text = text;
+	}
+
+	public String getType()
 	{
 		return type;
 	}
 
-	public void setType(int type)
+	public void setType(String type)
 	{
 		this.type = type;
 	}
 
-	public Timestamp getValidto()
+	public String getSubject()
 	{
-		return validto;
+		return subject;
 	}
 
-	public void setValidto(Timestamp validto)
+	public void setSubject(String subject)
 	{
-		this.validto = validto;
+		this.subject = subject;
 	}
 
-	public String getInterval()
+	public String getObject()
 	{
-		return intervalDate;
+		return object;
 	}
 
-	public void setInterval(String interval)
+	public void setObject(String object)
 	{
-		this.intervalDate = interval;
-	}
-
-	public String getLang()
-	{
-		return lang;
-	}
-
-	public void setLang(String lang)
-	{
-		this.lang = lang;
+		this.object = object;
 	}
 
 	public boolean isEnabled()
@@ -153,23 +175,33 @@ public class Task
 		this.enabled = enabled;
 	}
 
-	public Timestamp getTaskdate()
+	public String getPeriod()
 	{
-		return taskdate;
+		return period;
 	}
 
-	public void setTaskdate(Timestamp taskdate)
+	public String getSource()
 	{
-		this.taskdate = taskdate;
+		return source;
 	}
 
-	public String getIntervalDate()
+	public void setSource(String source)
 	{
-		return intervalDate;
+		this.source = source;
 	}
 
-	public void setIntervalDate(String intervalDate)
+	public boolean isShowInCalendar()
 	{
-		this.intervalDate = intervalDate;
+		return showInCalendar;
+	}
+
+	public void setShowInCalendar(boolean showInCalendar)
+	{
+		this.showInCalendar = showInCalendar;
+	}
+
+	public void setPeriod(String period)
+	{
+		this.period = period;
 	}
 }

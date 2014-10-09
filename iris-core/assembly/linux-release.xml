@@ -125,6 +125,7 @@
                 <exclude>ru.iris:iris-video</exclude>
                 <exclude>ru.iris:iris-speak</exclude>
                 <exclude>ru.iris:iris-ai</exclude>
+                <exclude>ru.iris:iris-scheduler</exclude>
             </excludes>
         </dependencySet>
     </dependencySets>

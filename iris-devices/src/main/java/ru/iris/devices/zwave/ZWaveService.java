@@ -534,7 +534,7 @@ public class ZWaveService implements Runnable
 				}
 			}));
 
-			messaging.subscribe("event.devices.zwave.*");
+			messaging.subscribe("event.devices.zwave.setvalue");
 			messaging.start();
 
 			while (!shutdown)

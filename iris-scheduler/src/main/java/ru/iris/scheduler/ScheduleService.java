@@ -16,36 +16,31 @@
 
 package ru.iris.scheduler;
 
-/**
- * IRIS-X Project
- * Author: Nikolay A. Viguro
- * WWW: smart.ph-systems.ru
- * E-Mail: nv@ph-systems.ru
- * Date: 10.09.12
- * Time: 13:26
- */
-
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.common.database.model.Task;
-import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.database.model.DataSource;
+import ru.iris.common.datasource.model.GoogleCalendar;
+import ru.iris.common.datasource.model.VKCalendar;
 import ru.iris.common.messaging.model.command.CommandAdvertisement;
+import ru.iris.common.source.vk.VKConnector;
+import ru.iris.common.source.vk.VKConnectorImpl;
+import ru.iris.common.source.vk.VKTokenProvider;
+import ru.iris.common.source.vk.VKTokenProviderImpl;
+import ru.iris.common.source.vk.entities.User;
 
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.util.Date;
+import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 class ScheduleService implements Runnable
 {
 
 	private static final CommandAdvertisement commandAdvertisement = new CommandAdvertisement();
 	private final Logger LOGGER = LogManager.getLogger(ScheduleService.class);
+	private final Gson gson = new GsonBuilder().create();
 	private Thread t = null;
-	private JsonMessaging messaging;
 
 	public ScheduleService()
 	{
@@ -61,125 +56,80 @@ class ScheduleService implements Runnable
 
 	public synchronized void run()
 	{
+		// Подключаем все активные источники данных
+		List<DataSource> sources = Ebean.find(DataSource.class).where().eq("enabled", "1").findList();
 
-		// Актуализируем даты запуска всех тасков
-		try
+		for (DataSource source : sources)
 		{
-
-			List<Task> tasks = Ebean.find(Task.class)
-					.where().and(Expr.lt("taskdate", new Timestamp(System.currentTimeMillis())), Expr.eq("enabled", true)).findList();
-
-			messaging = new JsonMessaging(UUID.randomUUID(), "scheduler");
-
-			for (Task task : tasks)
+			// google calendar
+			if (source.getType().equals("google-cal"))
 			{
-
-				if (task.getType() == 1)
-				{
-					LOGGER.info("Actualizing task. Next run: " + nextRun(task.getIntervalDate()));
-					task.setTaskdate(nextRun(task.getIntervalDate()));
-					Ebean.update(task);
-				}
-				else if (task.getType() == 3)
-				{
-					if (task.getValidto().before(nextRun(task.getIntervalDate())))
-					{
-						LOGGER.info("Actualizing task. Set task to disable");
-						task.setEnabled(false);
-					}
-					else
-					{
-						LOGGER.info("Actualizing task. Next run: " + nextRun(task.getIntervalDate()));
-						task.setTaskdate(nextRun(task.getIntervalDate()));
-					}
-					Ebean.update(task);
-				}
-				else
-				{
-					LOGGER.info("Skip task");
-				}
+				getGoogleCalendar(source.getObj());
 			}
-
-		}
-		catch (Exception e)
-		{
-			LOGGER.info("Error while actualizing task");
-			e.printStackTrace();
-		}
-
-		//noinspection InfiniteLoopStatement
-		while (true)
-		{
-			try
+			// VK.com calendar
+			else if (source.getType().equals("vk-cal"))
 			{
-
-				List<Task> tasks = Ebean.find(Task.class)
-						.where().eq("enabled", true).findList();
-
-				for (Task task : tasks)
-				{
-
-					if (new Timestamp(new Date().getTime()).equals(task.getTaskdate()))
-					{
-						LOGGER.info("Executing task " + task.getId() + " (class: " + task.getEclass() + ", command: " + task.getCommand() + ")");
-
-						messaging.broadcast("event.command", commandAdvertisement.set(task.getEclass(), task.getCommand()));
-
-						if (task.getType() == 1)
-						{
-							LOGGER.info("Next run: " + nextRun(task.getIntervalDate()));
-							task.setTaskdate(nextRun(task.getIntervalDate()));
-							Ebean.update(task);
-						}
-						else if (task.getType() == 2)
-						{
-							LOGGER.info("Set task to disable");
-							task.setEnabled(false);
-							Ebean.update(task);
-						}
-						else
-						{
-							if (task.getValidto().before(nextRun(task.getIntervalDate())))
-							{
-								LOGGER.info("Set task to disable");
-								task.setEnabled(false);
-								Ebean.update(task);
-							}
-							else
-							{
-								LOGGER.info("Next run: " + nextRun(task.getIntervalDate()));
-								task.setTaskdate(nextRun(task.getIntervalDate()));
-								Ebean.update(task);
-							}
-						}
-					}
-				}
-
+				getVKCalendar(source.getObj());
 			}
-			catch (Exception e)
+			else
 			{
-				LOGGER.info("No scheduled tasks");
-				//e.printStackTrace();
-			}
-
-			try
-			{
-				Thread.sleep(1000L);
-			}
-			catch (InterruptedException e)
-			{
-				LOGGER.error(e.toString());
+				LOGGER.info("Unknown data source: " + source.getType() + "!");
 			}
 		}
 	}
 
-	public Timestamp nextRun(String intervalDate) throws ParseException
+	// Google calendar
+	///////////////////////////////////
+
+	private void getGoogleCalendar(String obj)
 	{
+		GoogleCalendar source = gson.fromJson(obj, GoogleCalendar.class);
 
-		Date now = new Date();
-		CronExpression cron = new CronExpression(intervalDate);
-		Date nextRunDate = cron.getNextValidTimeAfter(now);
+		// TODO
+	}
 
-		return new Timestamp(nextRunDate.getTime());
+	// Vkontakte calendar
+	///////////////////////////////////
+
+	private void getVKCalendar(String obj)
+	{
+		try
+		{
+			VKCalendar source = gson.fromJson(obj, VKCalendar.class);
+
+			VKConnector vkConnector = VKConnectorImpl.createInstance();
+
+			// token not found
+			if (source.getAccesstoken().isEmpty())
+			{
+				String accessToken = vkConnector.getToken(source.getClientid(), source.getSecretkey(), source.getUsername(), source.getPassword());
+
+				if (accessToken != null && !accessToken.isEmpty())
+				{
+					source.setAccesstoken(accessToken);
+					Ebean.update(source);
+				}
+				else
+				{
+					LOGGER.error("Cant get accesstoken from VK. Use debug.");
+					return;
+				}
+			}
+
+			VKTokenProvider vkTokenProvider = VKTokenProviderImpl.createInstance(source.getAccesstoken());
+
+			User me = vkConnector.getUsers(null, vkTokenProvider.getToken()).get(0);
+
+			List<User> users = vkConnector.getUsers(null, vkTokenProvider.getToken());
+			for (User user : users)
+			{
+				// TODO
+				LOGGER.info("User: " + user.getFirstName() + " " + user.getLastName());
+			}
+		}
+		catch (IOException e)
+		{
+			LOGGER.error("VK error: ", e);
+		}
 	}
 }
