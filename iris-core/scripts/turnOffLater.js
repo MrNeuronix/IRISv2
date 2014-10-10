@@ -23,8 +23,10 @@
 
 // importing all classes in package (like import ru.iris.common.* in java)
 importPackage(Packages.ru.iris.common);
+importPackage(Packages.ru.iris.common.support);
 importPackage(Packages.ru.iris.common.messaging);
 importPackage(Packages.ru.iris.common.database);
+importPackage(Packages.ru.iris.common.messaging.model);
 importPackage(Packages.ru.iris.common.database.model.devices);
 
 // setTimeout implementation
@@ -62,13 +64,13 @@ if (label == "Level" && value == "255" && device.getInternalName() == "noolite/c
         obj = {
             run: function () {
                 function turnOff() {
-                    LOGGER.info("[turnOffLater] Times up! Release lock and turn off device");
+                    LOGGER.info("[turnOffLater] Times up! Release lock and turn off device " + uuid);
 
                     // release lock
                     Lock.release("toilet-light-on");
 
                     // turn off device
-                    new JsonMessaging().broadcast("event.devices.setvalue", new SetDeviceLevelAdvertisement().set(uuid, "Level", "0"));
+                    new DeviceCtl().off(uuid);
 
                     // lets speak!
                     new Speak().say("Кто-то опять забыл выключить свет! Прошло 10 минут, выключаю сам");

@@ -63,10 +63,6 @@ public class JsonMessaging
 	private Channel channel = JsonConnection.getInstance().getChannel();
 	private String queueName = "";
 
-	public JsonMessaging()
-	{
-	}
-
 	public JsonMessaging(final UUID instanceId)
 	{
 		this.instanceId = instanceId;
@@ -174,6 +170,8 @@ public class JsonMessaging
 	 */
 	public void broadcast(String subject, Object object)
 	{
+		LOGGER.debug("Broadcast to " + subject);
+
 		String className = object.getClass().getName();
 		String jsonString = gson.toJson(object);
 
@@ -196,7 +194,7 @@ public class JsonMessaging
 		}
 		catch (IOException e)
 		{
-			LOGGER.debug("Error sending JSON message: " + object + " to subject: " + subject, e);
+			LOGGER.error("Error sending JSON message: " + object + " to subject: " + subject, e);
 		}
 	}
 
