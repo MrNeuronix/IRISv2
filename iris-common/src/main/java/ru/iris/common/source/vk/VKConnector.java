@@ -18,7 +18,9 @@ public interface VKConnector
 
 	List<Group> searchGroups(String query, int count, String token) throws IOException;
 
-	List<User> getUsers(Collection<Long> userIds, String token) throws IOException;
+	List<User> getUsers(Collection<Long> userIds, String name_case, String token) throws IOException;
+
+	List<Long> getFriends(User user, String token) throws IOException;
 
 	List<Long> getGroupMembers(long groupId, int count, String token) throws IOException;
 

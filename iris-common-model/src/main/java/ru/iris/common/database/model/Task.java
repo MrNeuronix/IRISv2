@@ -63,7 +63,7 @@ public class Task
 
 	// Тут хранится сериализованный в JSON advertisement
 	@Expose
-	private String object;
+	private String obj;
 
 	// Интервал, с которой будет запускаться задача
 	@Expose
@@ -75,6 +75,7 @@ public class Task
 
 	// Показывать ли в календаре?
 	@Expose
+	@Column(name = "showInCalendar")
 	private boolean showInCalendar;
 
 	// Активна ли?
@@ -155,14 +156,14 @@ public class Task
 		this.subject = subject;
 	}
 
-	public String getObject()
+	public String getObj()
 	{
-		return object;
+		return obj;
 	}
 
-	public void setObject(String object)
+	public void setObj(String object)
 	{
-		this.object = object;
+		this.obj = object;
 	}
 
 	public boolean isEnabled()

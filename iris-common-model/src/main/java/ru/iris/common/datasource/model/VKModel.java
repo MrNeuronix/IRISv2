@@ -18,17 +18,41 @@ package ru.iris.common.datasource.model;
 
 import com.google.gson.annotations.Expose;
 
-public class GoogleCalendar
+public class VKModel
 {
+	@Expose
+	private int clientid;
+	@Expose
+	private String secretkey;
 	@Expose
 	private String username;
 	@Expose
 	private String password;
 	@Expose
-	private String feedUrl;
+	private String accesstoken;
 
-	public GoogleCalendar()
+	public VKModel()
 	{
+	}
+
+	public int getClientid()
+	{
+		return clientid;
+	}
+
+	public void setClientid(int clientid)
+	{
+		this.clientid = clientid;
+	}
+
+	public String getSecretkey()
+	{
+		return secretkey;
+	}
+
+	public void setSecretkey(String secretkey)
+	{
+		this.secretkey = secretkey;
 	}
 
 	public String getUsername()
@@ -51,13 +75,13 @@ public class GoogleCalendar
 		this.password = password;
 	}
 
-	public String getFeedUrl()
+	public String getAccesstoken()
 	{
-		return feedUrl;
+		return accesstoken;
 	}
 
-	public void setFeedUrl(String feedUrl)
+	public void setAccesstoken(String accesstoken)
 	{
-		this.feedUrl = feedUrl;
+		this.accesstoken = accesstoken;
 	}
 }

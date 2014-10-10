@@ -41,6 +41,7 @@ public class VKConnectorImpl implements VKConnector
 	private final static String groupsSearchUrl = "https://api.vk.com/method/groups.search?q=%s&offset=%d&count=%d&access_token=%s";
 	private final static String groupMembersSearchUrl = "https://api.vk.com/method/groups.getMembers?group_id=%d&sort=time_desc&offset=%d&count=%d&access_token=%s";
 	private final static String usersGetUrl = "https://api.vk.com/method/users.get";
+	private final static String getFriendsUrl = "https://api.vk.com/method/friends.get?user_id=%d&access_token=%s";
 
 	private final static String joinGroupUrl = "https://api.vk.com/method/groups.join?group_id=%d&access_token=%s";
 	private final static String friendsAddUrl = "https://api.vk.com/method/friends.add";
@@ -94,7 +95,7 @@ public class VKConnectorImpl implements VKConnector
 
 		JsonNode resultTree = objectMapper.readTree(responseBody);
 		ArrayNode arrayNode = (ArrayNode) resultTree.get("response");
-		List<Group> groups = new ArrayList<Group>();
+		List<Group> groups = new ArrayList<>();
 		for (int i = 1; i < arrayNode.size(); i++)
 		{
 			Group group = objectMapper.readValue(arrayNode.get(i).toString(), Group.class);
@@ -104,7 +105,26 @@ public class VKConnectorImpl implements VKConnector
 		return groups;
 	}
 
-	public List<User> getUsers(Collection<Long> userIds, String token) throws IOException
+	public List<Long> getFriends(User user, String token) throws IOException
+	{
+		String request = String.format(getFriendsUrl, user.getId(), token);
+		log.debug(request);
+		HttpGet httpGet = new HttpGet(request);
+		HttpResponse response = client.execute(httpGet);
+		String responseBody = IOUtils.toString(response.getEntity().getContent(), "UTF-8");
+		log.debug(responseBody);
+
+		JsonNode resultTree = objectMapper.readTree(responseBody);
+		List<Long> result = new ArrayList<>();
+		ArrayNode usersJsonNode = (ArrayNode) resultTree.get("response");
+		for (JsonNode userJsonNode : usersJsonNode)
+		{
+			result.add(userJsonNode.asLong());
+		}
+		return result;
+	}
+
+	public List<User> getUsers(Collection<Long> userIds, String name_case, String token) throws IOException
 	{
 		String request = usersGetUrl;
 		log.debug(request);
@@ -127,6 +147,7 @@ public class VKConnectorImpl implements VKConnector
 
 		nameValuePairs.add(new BasicNameValuePair("fields", "bdate,sex,city,online"));
 		nameValuePairs.add(new BasicNameValuePair("access_token", token));
+		nameValuePairs.add(new BasicNameValuePair("name_case", name_case));
 		log.debug(nameValuePairs);
 		httpPost.setEntity(new UrlEncodedFormEntity(nameValuePairs, "UTF-8"));
 		HttpResponse response = client.execute(httpPost);
