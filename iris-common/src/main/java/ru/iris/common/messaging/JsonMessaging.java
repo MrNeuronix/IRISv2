@@ -41,7 +41,7 @@ public class JsonMessaging
 	/**
 	 * The instance ID.
 	 */
-	private final UUID instanceId;
+	private UUID instanceId = null;
 	/**
 	 * The subjects that has been registered to receive JSON encoded messages.
 	 */
@@ -62,6 +62,10 @@ public class JsonMessaging
 
 	private Channel channel = JsonConnection.getInstance().getChannel();
 	private String queueName = "";
+
+	public JsonMessaging()
+	{
+	}
 
 	public JsonMessaging(final UUID instanceId)
 	{

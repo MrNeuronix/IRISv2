@@ -33,7 +33,9 @@ import ru.iris.common.messaging.model.command.CommandAdvertisement;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -74,6 +76,7 @@ class EventsService implements Runnable
 			}));
 
 			final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "events");
+			final Logger scriptLogger = LogManager.getLogger(EventsService.class.getName());
 
 			// Initialize rhino engine
 			Global global = new Global();
@@ -84,6 +87,7 @@ class EventsService implements Runnable
 			// Pass jsonmessaging instance to js engine
 			ScriptableObject.putProperty(scope, "jsonMessaging", Context.javaToJS(jsonMessaging, scope));
 			ScriptableObject.putProperty(scope, "out", Context.javaToJS(System.out, scope));
+			ScriptableObject.putProperty(scope, "LOGGER", Context.javaToJS(scriptLogger, scope));
 
 			// filter js files
 			final FilenameFilter filter = new FilenameFilter()
@@ -107,7 +111,6 @@ class EventsService implements Runnable
 
 				if (envelope != null)
 				{
-
 					// Check command and launch script
 					if (envelope.getObject() instanceof CommandAdvertisement)
 					{
@@ -133,14 +136,9 @@ class EventsService implements Runnable
 					}
 					else
 					{
-
 						for (Event event : events)
 						{
-
-							String[] subjects = event.getSubject().split(",");
-							Set<String> set = new HashSet<>(Arrays.asList(subjects));
-
-							if (wildCardMatch(set, envelope.getSubject()))
+							if (envelope.getSubject().equals(event.getSubject()))
 							{
 								File jsFile = new File("./scripts/" + event.getScript());
 
