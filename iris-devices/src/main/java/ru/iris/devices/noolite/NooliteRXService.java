@@ -246,7 +246,7 @@ public class NooliteRXService implements Runnable
 					Ebean.save(logChange);
 					/////////////////////////////////
 
-					messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUuid(), "Level", "100"));
+					messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUuid(), "Level", "255"));
 				}
 				// bright
 				else if (action == 3)

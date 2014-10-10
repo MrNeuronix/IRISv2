@@ -64,16 +64,20 @@ if (label == "Level" && value == "255" && device.getInternalName() == "noolite/c
         obj = {
             run: function () {
                 function turnOff() {
-                    LOGGER.info("[turnOffLater] Times up! Release lock and turn off device " + uuid);
 
-                    // release lock
-                    Lock.release("toilet-light-on");
+                    if(Lock.isLocked("toilet-light-on")) {
 
-                    // turn off device
-                    new DeviceCtl().off(uuid);
+                        LOGGER.info("[turnOffLater] Times up! Release lock and turn off device " + uuid);
 
-                    // lets speak!
-                    new Speak().say("Кто-то опять забыл выключить свет! Прошло 10 минут, выключаю сам");
+                        // release lock
+                        Lock.release("toilet-light-on");
+
+                        // turn off device
+                        new DeviceCtl().off(uuid);
+
+                        // lets speak!
+                        new Speak().say("Кто-то опять забыл выключить свет! Прошло 10 минут, выключаю сам");
+                    }
                 }
 
                 // turn off past 10 minutes
@@ -82,4 +86,11 @@ if (label == "Level" && value == "255" && device.getInternalName() == "noolite/c
         };
         obj.run();
     }
+}
+
+
+if (label == "Level" && value == "0" && device.getInternalName() == "noolite/channel/4" && Lock.isLocked("toilet-light-on"))
+{
+    // release lock
+    Lock.release("toilet-light-on");
 }
