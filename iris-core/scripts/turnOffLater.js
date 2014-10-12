@@ -76,7 +76,7 @@ if (label == "Level" && value == "255" && device.getInternalName() == "noolite/c
                         new DeviceCtl().off(uuid);
 
                         // lets speak!
-                        new Speak().say("Кто-то опять забыл выключить свет! Прошло 10 минут, выключаю сам");
+                        new Speak().say("Кто-то опять забыл выключить свет! Прошло 20 минут, выключаю сам");
                     }
                 }
 
