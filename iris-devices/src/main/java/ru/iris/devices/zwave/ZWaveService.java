@@ -580,7 +580,15 @@ public class ZWaveService implements Runnable
 					else if (envelope.getObject() instanceof ZWaveAddNodeRequest)
 					{
 						LOGGER.info("Set controller into AddDevice mode");
-						Manager.get().beginControllerCommand(homeId, ControllerCommand.ADD_DEVICE, null, null, true);
+						Manager.get().beginControllerCommand(homeId, ControllerCommand.ADD_DEVICE, new ControllerCallback()
+						{
+							@Override
+							public void onCallback(ControllerState state,
+									ControllerError err, Object context)
+							{
+								LOGGER.info("ZWave Command Add : {} , {}", state, err);
+							}
+						}, null, true);
 					}
 					else if (envelope.getObject() instanceof ZWaveRemoveNodeRequest)
 					{
@@ -588,7 +596,15 @@ public class ZWaveService implements Runnable
 
 						final ZWaveRemoveNodeRequest advertisement = envelope.getObject();
 
-						Manager.get().beginControllerCommand(homeId, ControllerCommand.REMOVE_DEVICE, null, null, true, advertisement.getNode());
+						Manager.get().beginControllerCommand(homeId, ControllerCommand.REMOVE_DEVICE, new ControllerCallback()
+						{
+							@Override
+							public void onCallback(ControllerState state,
+									ControllerError err, Object context)
+							{
+								LOGGER.info("ZWave Command Remove: {} , {}", state, err);
+							}
+						}, null, true, advertisement.getNode());
 
 					}
 					else if (envelope.getObject() instanceof ZWaveCancelCommand)
