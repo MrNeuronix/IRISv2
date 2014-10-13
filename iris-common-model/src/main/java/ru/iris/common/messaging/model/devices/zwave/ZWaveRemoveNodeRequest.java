@@ -19,6 +19,8 @@ package ru.iris.common.messaging.model.devices.zwave;
 public class ZWaveRemoveNodeRequest
 {
 
+	private short node;
+
 	/**
 	 * Default constructor for de-serialisation.
 	 */
@@ -26,9 +28,20 @@ public class ZWaveRemoveNodeRequest
 	{
 	}
 
-	@Override
-	public String toString()
+	public short getNode()
 	{
-		return "ZWaveRemoveNodeRequest{}";
+		return node;
+	}
+
+	public void setNode(short node)
+	{
+		this.node = node;
+	}
+
+	@Override public String toString()
+	{
+		return "ZWaveRemoveNodeRequest{" +
+				"node=" + node +
+				'}';
 	}
 }

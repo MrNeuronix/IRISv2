@@ -537,6 +537,7 @@ public class ZWaveService implements Runnable
 			messaging.subscribe("event.devices.zwave.setvalue");
 			messaging.subscribe("event.devices.zwave.node.add");
 			messaging.subscribe("event.devices.zwave.node.remove");
+			messaging.subscribe("event.devices.zwave.cancel");
 			messaging.start();
 
 			while (!shutdown)
@@ -579,12 +580,15 @@ public class ZWaveService implements Runnable
 					else if (envelope.getObject() instanceof ZWaveAddNodeRequest)
 					{
 						LOGGER.info("Set controller into AddDevice mode");
-						Manager.get().beginControllerCommand(homeId, ControllerCommand.ADD_DEVICE, null, this, true);
+						Manager.get().beginControllerCommand(homeId, ControllerCommand.ADD_DEVICE, null, null, true);
 					}
 					else if (envelope.getObject() instanceof ZWaveRemoveNodeRequest)
 					{
 						LOGGER.info("Set controller into RemoveDevice mode");
-						Manager.get().beginControllerCommand(homeId, ControllerCommand.REMOVE_DEVICE, null, this, true);
+
+						final ZWaveRemoveNodeRequest advertisement = envelope.getObject();
+
+						Manager.get().beginControllerCommand(homeId, ControllerCommand.REMOVE_DEVICE, null, null, true, advertisement.getNode());
 
 					}
 					else if (envelope.getObject() instanceof ZWaveCancelCommand)
