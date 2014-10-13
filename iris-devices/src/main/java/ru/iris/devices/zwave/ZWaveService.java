@@ -535,6 +535,8 @@ public class ZWaveService implements Runnable
 			}));
 
 			messaging.subscribe("event.devices.zwave.setvalue");
+			messaging.subscribe("event.devices.zwave.node.add");
+			messaging.subscribe("event.devices.zwave.node.remove");
 			messaging.start();
 
 			while (!shutdown)
@@ -573,6 +575,22 @@ public class ZWaveService implements Runnable
 							LOGGER.info("Node: " + node + " Cant set empty value or node dead");
 						}
 
+					}
+					else if (envelope.getObject() instanceof ZWaveAddNodeRequest)
+					{
+						LOGGER.info("Set controller into AddDevice mode");
+						Manager.get().beginControllerCommand(homeId, ControllerCommand.ADD_DEVICE, null, this, true);
+					}
+					else if (envelope.getObject() instanceof ZWaveRemoveNodeRequest)
+					{
+						LOGGER.info("Set controller into RemoveDevice mode");
+						Manager.get().beginControllerCommand(homeId, ControllerCommand.REMOVE_DEVICE, null, this, true);
+
+					}
+					else if (envelope.getObject() instanceof ZWaveCancelCommand)
+					{
+						LOGGER.info("Canceling controller command");
+						Manager.get().cancelControllerCommand(homeId);
 					}
 					else
 					{

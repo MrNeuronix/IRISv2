@@ -48,7 +48,7 @@ var uuid = advertisement.getDeviceUUID();
 
 var device = Device.getDeviceByUUID(uuid);
 
-// if device state = ON and device have internalname = noolite/channel/4 (is my toilet)
+// if device state = ON and device have internalname = noolite/channel/4
 if (label == "Level" && value == "255" && device.getInternalName() == "noolite/channel/4") {
     LOGGER.info("[turnOffLater] Device ON!");
 
@@ -65,7 +65,7 @@ if (label == "Level" && value == "255" && device.getInternalName() == "noolite/c
             run: function () {
                 function turnOff() {
 
-                    if(Lock.isLocked("toilet-light-on")) {
+                    if (Lock.isLocked("toilet-light-on")) {
 
                         LOGGER.info("[turnOffLater] Times up! Release lock and turn off device " + uuid);
 
@@ -80,7 +80,7 @@ if (label == "Level" && value == "255" && device.getInternalName() == "noolite/c
                     }
                 }
 
-                // turn off past 10 minutes
+                // turn off past 20 minutes
                 setTimeout(turnOff, 600000);
             }
         };
@@ -89,8 +89,7 @@ if (label == "Level" && value == "255" && device.getInternalName() == "noolite/c
 }
 
 
-if (label == "Level" && value == "0" && device.getInternalName() == "noolite/channel/4" && Lock.isLocked("toilet-light-on"))
-{
+if (label == "Level" && value == "0" && device.getInternalName() == "noolite/channel/4" && Lock.isLocked("toilet-light-on")) {
     // release lock
     Lock.release("toilet-light-on");
 }

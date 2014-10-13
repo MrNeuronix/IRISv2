@@ -33,8 +33,8 @@ import ru.iris.common.messaging.model.command.CommandAdvertisement;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -84,6 +84,22 @@ class EventsService implements Runnable
 			global.init(cx);
 			Scriptable scope = cx.initStandardObjects(global);
 
+			// load events from db
+			List<Event> events = Ebean.find(Event.class).findList();
+
+			// comparator
+			Comparator<String> comparator = new Comparator<String>()
+			{
+				public int compare(String currentItem, String key)
+				{
+					if (currentItem.equals(key))
+					{
+						return 0;
+					}
+					return currentItem.compareTo(key);
+				}
+			};
+
 			// Pass jsonmessaging instance to js engine
 			ScriptableObject.putProperty(scope, "jsonMessaging", Context.javaToJS(jsonMessaging, scope));
 			ScriptableObject.putProperty(scope, "out", Context.javaToJS(System.out, scope));
@@ -101,9 +117,6 @@ class EventsService implements Runnable
 			// subscribe to anything
 			jsonMessaging.subscribe("#");
 			jsonMessaging.start();
-
-			// load events from db
-			List<Event> events = Ebean.find(Event.class).findList();
 
 			while (!shutdown)
 			{
@@ -138,7 +151,7 @@ class EventsService implements Runnable
 					{
 						for (Event event : events)
 						{
-							if (envelope.getSubject().equals(event.getSubject()))
+							if (envelope.getSubject().equals(event.getSubject()) || wildCardMatch(event.getSubject(), envelope.getSubject()))
 							{
 								File jsFile = new File("./scripts/" + event.getScript());
 
@@ -176,54 +189,51 @@ class EventsService implements Runnable
 
 	}
 
-	private boolean wildCardMatch(Set<String> patterns, String text)
+	private boolean wildCardMatch(String pattern, String text)
 	{
 
 		// add sentinel so don't need to worry about *'s at end of pattern
-		for (String pattern : patterns)
+		text += '\0';
+		pattern += '\0';
+
+		int N = pattern.length();
+
+		boolean[] states = new boolean[N + 1];
+		boolean[] old = new boolean[N + 1];
+		old[0] = true;
+
+		for (int i = 0; i < text.length(); i++)
 		{
-			text += '\0';
-			pattern += '\0';
-
-			int N = pattern.length();
-
-			boolean[] states = new boolean[N + 1];
-			boolean[] old = new boolean[N + 1];
-			old[0] = true;
-
-			for (int i = 0; i < text.length(); i++)
+			char c = text.charAt(i);
+			states = new boolean[N + 1]; // initialized to false
+			for (int j = 0; j < N; j++)
 			{
-				char c = text.charAt(i);
-				states = new boolean[N + 1]; // initialized to false
-				for (int j = 0; j < N; j++)
+				char p = pattern.charAt(j);
+
+				// hack to handle *'s that match 0 characters
+				if (old[j] && (p == '*'))
 				{
-					char p = pattern.charAt(j);
-
-					// hack to handle *'s that match 0 characters
-					if (old[j] && (p == '*'))
-					{
-						old[j + 1] = true;
-					}
-
-					if (old[j] && (p == c))
-					{
-						states[j + 1] = true;
-					}
-					if (old[j] && (p == '*'))
-					{
-						states[j] = true;
-					}
-					if (old[j] && (p == '*'))
-					{
-						states[j + 1] = true;
-					}
+					old[j + 1] = true;
 				}
-				old = states;
+
+				if (old[j] && (p == c))
+				{
+					states[j + 1] = true;
+				}
+				if (old[j] && (p == '*'))
+				{
+					states[j] = true;
+				}
+				if (old[j] && (p == '*'))
+				{
+					states[j + 1] = true;
+				}
 			}
-			if (states[N])
-			{
-				return true;
-			}
+			old = states;
+		}
+		if (states[N])
+		{
+			return true;
 		}
 		return false;
 	}

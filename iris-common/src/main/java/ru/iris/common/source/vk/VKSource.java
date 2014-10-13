@@ -119,7 +119,7 @@ public class VKSource
 						Task task = new Task();
 						task.setStartdate(new Timestamp(cal.getTime().getTime()));
 
-						cal.set(Calendar.SECOND, 30);
+						cal.set(Calendar.MINUTE, 1);
 
 						task.setEnddate(new Timestamp(cal.getTime().getTime()));
 						task.setTitle("День рождения " + user.getFirstName() + " " + user.getLastName());
