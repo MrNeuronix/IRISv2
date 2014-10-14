@@ -514,6 +514,8 @@ public class ZWaveService implements Runnable
 				LOGGER.info("Setting node " + ZWaveDevice.getNode() + " to SLEEP state");
 				ZWaveDevice.setStatus("sleeping");
 			}
+
+			Ebean.update(ZWaveDevice);
 		}
 
 		// reload from database for avoid Ebean.update() key duplicate error

@@ -29,6 +29,7 @@ import ru.iris.common.database.model.Event;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.command.CommandAdvertisement;
+import ru.iris.common.messaging.model.events.EventChangesAdvertisement;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -47,9 +48,9 @@ import java.util.UUID;
 
 class EventsService implements Runnable
 {
-
 	private final Logger LOGGER = LogManager.getLogger(EventsService.class.getName());
 	private boolean shutdown = false;
+	private List<Event> events = Ebean.find(Event.class).findList();
 
 	public EventsService()
 	{
@@ -85,7 +86,6 @@ class EventsService implements Runnable
 			Scriptable scope = cx.initStandardObjects(global);
 
 			// load events from db
-			List<Event> events = Ebean.find(Event.class).findList();
 
 			// comparator
 			Comparator<String> comparator = new Comparator<String>()
@@ -146,6 +146,20 @@ class EventsService implements Runnable
 							LOGGER.error("Error in script scripts/command/" + advertisement.getScript() + ".js: " + e.toString());
 							e.printStackTrace();
 						}
+					}
+					else if (envelope.getObject() instanceof EventChangesAdvertisement)
+					{
+						LOGGER.info("Reload events list");
+
+						// take pause to save/remove new entity
+						Thread.sleep(1000);
+
+						// reload events
+						events = null;
+						events = Ebean.find(Event.class).findList();
+
+						LOGGER.info("Loaded " + events.size() + " events.");
+
 					}
 					else
 					{
