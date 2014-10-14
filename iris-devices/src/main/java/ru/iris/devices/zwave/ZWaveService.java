@@ -808,31 +808,16 @@ public class ZWaveService implements Runnable
 
 			LOGGER.info("Node " + ZWaveDevice.getNode() + ": Add \"" + label + "\" value \"" + Utils.getValue(notification.getValueId()) + "\"");
 
-			DeviceValue udv = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", ZWaveDevice.getId()), Expr.eq("label", Manager.get().getValueLabel(notification.getValueId()))).findUnique();
-
-			if (udv != null)
-			{
-				udv.setLabel(label);
-				udv.setUuid(ZWaveDevice.getUuid());
-				udv.setValueType(Utils.getValueType(notification.getValueId()));
-				udv.setValueId(notification.getValueId());
-				udv.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));
-				udv.setValue(String.valueOf(Utils.getValue(notification.getValueId())));
-				udv.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
-
-				ZWaveDevice.updateValue(udv);
-			}
-			else
-			{
-				ZWaveDevice.updateValue(new DeviceValue(
+			ZWaveDevice.updateValue(
+					new DeviceValue(
 						label,
 						ZWaveDevice.getUuid(),
 						String.valueOf(Utils.getValue(notification.getValueId())),
 						Utils.getValueType(notification.getValueId()),
 						Manager.get().getValueUnits(notification.getValueId()),
 						notification.getValueId(),
-						Manager.get().isValueReadOnly(notification.getValueId())));
-			}
+						Manager.get().isValueReadOnly(notification.getValueId()))
+			);
 
 			Ebean.update(ZWaveDevice);
 		}
