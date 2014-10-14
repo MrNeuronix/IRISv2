@@ -17,7 +17,6 @@
 package ru.iris.devices.noolite;
 
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
 import de.ailis.usb4java.libusb.Context;
 import de.ailis.usb4java.libusb.DeviceHandle;
 import de.ailis.usb4java.libusb.LibUsb;
@@ -147,6 +146,7 @@ public class NooliteRXService implements Runnable
 				Integer channel = (buf.get(1) + 1);
 				byte action = buf.get(2);
 				Integer dimmerValue = (int) buf.get(4);
+				boolean isNew = false;
 
 				Device device = loadByChannel(channel);
 
@@ -163,29 +163,16 @@ public class NooliteRXService implements Runnable
 					device.setUuid(UUID.randomUUID().toString());
 					device.updateValue(new DeviceValue("channel", channel.toString(), "", "", device.getUuid(), true));
 					device.updateValue(new DeviceValue("type", "switch", "", "", device.getUuid(), false));
+					device.updateValue(new DeviceValue("Level", "0", "", "", device.getUuid(), true));
 
-					Ebean.save(device);
-
-					devices.add(device);
+					isNew = true;
 				}
-
-				DeviceValue dv = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", device.getId()), Expr.eq("label", "Level")).findUnique();
 
 				// turn off
 				if (action == 0)
 				{
-
 					LOGGER.info("Channel " + channel + ": Got OFF command");
-
-					if (dv == null)
-					{
-						dv = new DeviceValue("Level", "0", "", "", device.getUuid(), false);
-						device.updateValue(dv);
-					}
-					else
-					{
-						dv.setValue("0");
-					}
+					device.updateValue(new DeviceValue("Level", "0", "", "", device.getUuid(), false));
 
 					// log change
 					/////////////////////////////////
@@ -200,17 +187,9 @@ public class NooliteRXService implements Runnable
 				{
 
 					LOGGER.info("Channel " + channel + ": Got DIM command");
-					// we only know, that the user hold OFF button
 
-					if (dv == null)
-					{
-						dv = new DeviceValue("Level", "0", "", "", device.getUuid(), false);
-						device.updateValue(dv);
-					}
-					else
-					{
-						dv.setValue("0");
-					}
+					// we only know, that the user hold OFF button
+					device.updateValue(new DeviceValue("Level", "0", "", "", device.getUuid(), false));
 
 					// log change
 					/////////////////////////////////
@@ -226,15 +205,7 @@ public class NooliteRXService implements Runnable
 
 					LOGGER.info("Channel " + channel + ": Got ON command");
 
-					if (dv == null)
-					{
-						dv = new DeviceValue("Level", "255", "", "", device.getUuid(), false);
-						device.updateValue(dv);
-					}
-					else
-					{
-						dv.setValue("255");
-					}
+					device.updateValue(new DeviceValue("Level", "255", "", "", device.getUuid(), false));
 
 					// log change
 					/////////////////////////////////
@@ -250,15 +221,7 @@ public class NooliteRXService implements Runnable
 					LOGGER.info("Channel " + channel + ": Got BRIGHT command");
 
 					// we only know, that the user hold ON button
-					if (dv == null)
-					{
-						dv = new DeviceValue("Level", "255", "", "", device.getUuid(), false);
-						device.updateValue(dv);
-					}
-					else
-					{
-						dv.setValue("100");
-					}
+					device.updateValue(new DeviceValue("Level", "255", "", "", device.getUuid(), false));
 
 					// log change
 					/////////////////////////////////
@@ -274,15 +237,7 @@ public class NooliteRXService implements Runnable
 
 					LOGGER.info("Channel " + channel + ": Got SETLEVEL command.");
 
-					if (dv == null)
-					{
-						dv = new DeviceValue("Level", dimmerValue.toString(), "", "", device.getUuid(), false);
-						device.updateValue(dv);
-					}
-					else
-					{
-						dv.setValue(dimmerValue.toString());
-					}
+					device.updateValue(new DeviceValue("Level", dimmerValue.toString(), "", "", device.getUuid(), false));
 
 					// log change
 					/////////////////////////////////
@@ -308,9 +263,18 @@ public class NooliteRXService implements Runnable
 
 				LOGGER.info("Update Noolite device (Node: " + device.getId() + ")");
 
-				// reload from DB and update
-				device = Ebean.find(Device.class).where().eq("id", device.getId()).findUnique();
-				Ebean.update(device);
+				// update
+				if (!isNew)
+					Ebean.update(device);
+				else
+				{
+					Ebean.save(device);
+
+					device = Ebean.find(Device.class).where().eq("id", device.getId()).findUnique();
+					devices.add(device);
+
+					isNew = false;
+				}
 
 				// reload from database for avoid Ebean.update() key duplicate error
 				if (!initComplete)
