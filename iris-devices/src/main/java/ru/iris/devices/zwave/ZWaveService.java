@@ -62,7 +62,6 @@ public class ZWaveService implements Runnable
 	private final ZWavePolling zWavePolling = new ZWavePolling();
 	private long homeId;
 	private boolean ready = false;
-	private List<Device> devices;
 	private boolean initComplete = false;
 	private boolean shutdown = false;
 	private JsonMessaging messaging;
@@ -80,9 +79,6 @@ public class ZWaveService implements Runnable
 		Config config = Config.getInstance();
 
 		messaging = new JsonMessaging(UUID.randomUUID(), "devices-zwave");
-
-		devices = Ebean.find(Device.class)
-				.where().eq("source", "zwave").findList();
 
 		NativeLibraryLoader.loadLibrary(ZWave4j.LIBRARY_NAME, ZWave4j.class);
 
@@ -497,7 +493,7 @@ public class ZWaveService implements Runnable
 			}
 		}
 
-		LOGGER.info("Initialization complete. Found " + devices.size() + " devices");
+		List<Device> devices = Ebean.find(Device.class).where().eq("source", "zwave").findList();
 
 		for (Device ZWaveDevice : devices)
 		{
@@ -518,9 +514,7 @@ public class ZWaveService implements Runnable
 			Ebean.update(ZWaveDevice);
 		}
 
-		// reload from database for avoid Ebean.update() key duplicate error
-		devices = Ebean.find(Device.class)
-				.where().eq("source", "zwave").findList();
+		LOGGER.info("Initialization complete. Found " + devices.size() + " devices");
 
 		initComplete = true;
 
@@ -707,10 +701,8 @@ public class ZWaveService implements Runnable
 
 	private Device hasInstance(String key)
 	{
-
-		for (Device device : devices)
+		for (Device device : Ebean.find(Device.class).where().eq("source", "zwave").findList())
 		{
-
 			if (key.equals(device.getInternalName()))
 			{
 				return device;
@@ -723,7 +715,7 @@ public class ZWaveService implements Runnable
 	private Device getZWaveDeviceByUUID(String uuid)
 	{
 
-		for (Device device : devices)
+		for (Device device : Ebean.find(Device.class).where().eq("source", "zwave").findList())
 		{
 
 			if (uuid.equals(device.getUuid()))
@@ -738,7 +730,7 @@ public class ZWaveService implements Runnable
 	private Device getZWaveDeviceByNode(short id)
 	{
 
-		for (Device device : devices)
+		for (Device device : Ebean.find(Device.class).where().eq("source", "zwave").findList())
 		{
 
 			if (device.getNode() == id)
@@ -794,7 +786,6 @@ public class ZWaveService implements Runnable
 			ZWaveDevice = Ebean.find(Device.class).where().eq("id", ZWaveDevice.getId()).findUnique();
 
 			LOGGER.info("Adding device " + type + " (node: " + notification.getNodeId() + ") to array");
-			devices.add(ZWaveDevice);
 		}
 		else
 		{
