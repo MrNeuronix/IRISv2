@@ -788,6 +788,8 @@ public class ZWaveService implements Runnable
 					notification.getValueId(),
 					Manager.get().isValueReadOnly(notification.getValueId())));
 
+			Ebean.save(ZWaveDevice);
+
 			LOGGER.info("Adding device " + type + " (node: " + notification.getNodeId() + ") to array");
 			devices.add(ZWaveDevice);
 		}
@@ -828,6 +830,10 @@ public class ZWaveService implements Runnable
 						notification.getValueId(),
 						Manager.get().isValueReadOnly(notification.getValueId())));
 			}
+
+			// reload from DB and update
+			ZWaveDevice = Ebean.find(Device.class).where().eq("id", ZWaveDevice.getId()).findUnique();
+			Ebean.update(ZWaveDevice);
 		}
 
 		return ZWaveDevice;

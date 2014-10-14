@@ -164,6 +164,8 @@ public class NooliteRXService implements Runnable
 					device.updateValue(new DeviceValue("channel", channel.toString(), "", "", device.getUuid(), true));
 					device.updateValue(new DeviceValue("type", "switch", "", "", device.getUuid(), false));
 
+					Ebean.save(device);
+
 					devices.add(device);
 				}
 
@@ -179,12 +181,10 @@ public class NooliteRXService implements Runnable
 					{
 						dv = new DeviceValue("Level", "0", "", "", device.getUuid(), false);
 						device.updateValue(dv);
-						Ebean.save(dv);
 					}
 					else
 					{
 						dv.setValue("0");
-						Ebean.update(dv);
 					}
 
 					// log change
@@ -206,12 +206,10 @@ public class NooliteRXService implements Runnable
 					{
 						dv = new DeviceValue("Level", "0", "", "", device.getUuid(), false);
 						device.updateValue(dv);
-						Ebean.save(dv);
 					}
 					else
 					{
 						dv.setValue("0");
-						Ebean.update(dv);
 					}
 
 					// log change
@@ -232,12 +230,10 @@ public class NooliteRXService implements Runnable
 					{
 						dv = new DeviceValue("Level", "255", "", "", device.getUuid(), false);
 						device.updateValue(dv);
-						Ebean.save(dv);
 					}
 					else
 					{
 						dv.setValue("255");
-						Ebean.update(dv);
 					}
 
 					// log change
@@ -258,12 +254,10 @@ public class NooliteRXService implements Runnable
 					{
 						dv = new DeviceValue("Level", "255", "", "", device.getUuid(), false);
 						device.updateValue(dv);
-						Ebean.save(dv);
 					}
 					else
 					{
 						dv.setValue("100");
-						Ebean.update(dv);
 					}
 
 					// log change
@@ -284,12 +278,10 @@ public class NooliteRXService implements Runnable
 					{
 						dv = new DeviceValue("Level", dimmerValue.toString(), "", "", device.getUuid(), false);
 						device.updateValue(dv);
-						Ebean.save(dv);
 					}
 					else
 					{
 						dv.setValue(dimmerValue.toString());
-						Ebean.update(dv);
 					}
 
 					// log change
@@ -314,16 +306,11 @@ public class NooliteRXService implements Runnable
 					messaging.broadcast("event.devices.noolite.value.stopdimbright", new NooliteDeviceLevelStopDimBrightAdvertisement().set(device.getUuid()));
 				}
 
-				if (device.getId() == null)
-				{
-					LOGGER.info("Save new Noolite device");
-					Ebean.save(device);
-				}
-				else
-				{
-					LOGGER.info("Update existing Noolite device");
-					Ebean.update(device);
-				}
+				LOGGER.info("Update Noolite device (Node: " + device.getId() + ")");
+
+				// reload from DB and update
+				device = Ebean.find(Device.class).where().eq("id", device.getId()).findUnique();
+				Ebean.update(device);
 
 				// reload from database for avoid Ebean.update() key duplicate error
 				if (!initComplete)
