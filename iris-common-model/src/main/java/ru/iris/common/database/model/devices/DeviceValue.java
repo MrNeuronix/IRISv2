@@ -95,6 +95,15 @@ public class DeviceValue
 		this.uuid = uuid;
 	}
 
+	public DeviceValue(Device device, String label, String uuid, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly)
+	{
+
+		this(label, value, valueType, valueUnits, isReadonly);
+		this.valueId = gson.toJson(valueId);
+		this.uuid = uuid;
+		this.device = device;
+	}
+
 	public Device getDevice()
 	{
 		return device;

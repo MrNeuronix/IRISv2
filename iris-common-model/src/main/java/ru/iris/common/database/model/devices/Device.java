@@ -22,13 +22,12 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "devices")
-public class Device implements Serializable
+public class Device
 {
 
 	@Id
@@ -62,7 +61,7 @@ public class Device implements Serializable
 	private String source = "unknown";
 
 	@Expose
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private List<DeviceValue> values = new ArrayList<>();
 
 	public Device()
@@ -254,6 +253,23 @@ public class Device implements Serializable
 		for (DeviceValue zvalue : new ArrayList<>(values))
 		{
 			if (zvalue.getLabel().equals(value.getLabel()))
+			{
+				zDv.remove(zvalue);
+			}
+		}
+
+		values = zDv;
+		zDv = null;
+	}
+
+	public synchronized void removeValue(String valuelabel)
+	{
+
+		List<DeviceValue> zDv = values;
+
+		for (DeviceValue zvalue : new ArrayList<>(values))
+		{
+			if (zvalue.getLabel().equals(valuelabel))
 			{
 				zDv.remove(zvalue);
 			}
