@@ -298,32 +298,6 @@ public class ZWaveService implements Runnable
 								);
 						}
 
-						boolean isNewDeviceValue = false;
-						DeviceValue udv = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", zw.getId()), Expr.eq("label", manager.getValueLabel(notification.getValueId()))).findUnique();
-
-						// new device
-						if (udv == null)
-						{
-							udv = new DeviceValue();
-							isNewDeviceValue = true;
-						}
-
-						udv.setLabel(manager.getValueLabel(notification.getValueId()));
-						udv.setValueType(Utils.getValueType(notification.getValueId()));
-						udv.setValueId(notification.getValueId());
-						udv.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));
-						udv.setValue(String.valueOf(Utils.getValue(notification.getValueId())));
-						udv.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
-						udv.setUuid(zw.getUuid());
-
-						zw.updateValue(udv);
-
-						// Update or save device value
-						if (!isNewDeviceValue)
-							Ebean.update(udv);
-						else
-							Ebean.save(udv);
-
 						break;
 					case VALUE_REMOVED:
 
@@ -340,6 +314,7 @@ public class ZWaveService implements Runnable
 						if (dv != null)
 						{
 							zrZWaveDevice.removeValue(dv);
+                            Ebean.delete(dv);
 						}
 
 						if (initComplete)
@@ -773,15 +748,17 @@ public class ZWaveService implements Runnable
 			ZWaveDevice.setProductName(productName);
 			ZWaveDevice.setStatus(state);
 
-			ZWaveDevice.updateValue(new DeviceValue(
-					label,
-					uuid,
-					String.valueOf(Utils.getValue(notification.getValueId())),
-					Utils.getValueType(notification.getValueId()),
-					Manager.get().getValueUnits(notification.getValueId()),
-					notification.getValueId(),
-					Manager.get().isValueReadOnly(notification.getValueId())));
+            DeviceValue udv = new DeviceValue(
+                    label,
+                    uuid,
+                    String.valueOf(Utils.getValue(notification.getValueId())),
+                    Utils.getValueType(notification.getValueId()),
+                    Manager.get().getValueUnits(notification.getValueId()),
+                    notification.getValueId(),
+                    Manager.get().isValueReadOnly(notification.getValueId()));
 
+            Ebean.save(udv);
+			ZWaveDevice.updateValue(udv);
 			Ebean.save(ZWaveDevice);
 			ZWaveDevice = Ebean.find(Device.class).where().eq("id", ZWaveDevice.getId()).findUnique();
 
@@ -799,18 +776,36 @@ public class ZWaveService implements Runnable
 
 			LOGGER.info("Node " + ZWaveDevice.getNode() + ": Add \"" + label + "\" value \"" + Utils.getValue(notification.getValueId()) + "\"");
 
-			ZWaveDevice.updateValue(
-					new DeviceValue(
-						label,
-						ZWaveDevice.getUuid(),
-						String.valueOf(Utils.getValue(notification.getValueId())),
-						Utils.getValueType(notification.getValueId()),
-						Manager.get().getValueUnits(notification.getValueId()),
-						notification.getValueId(),
-						Manager.get().isValueReadOnly(notification.getValueId()))
-			);
+            boolean isNewDeviceValue = false;
+            DeviceValue udv = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", ZWaveDevice.getId()), Expr.eq("label", label)).findUnique();
 
-			Ebean.update(ZWaveDevice);
+            // new device
+            if (udv == null)
+            {
+                udv = new DeviceValue();
+                isNewDeviceValue = true;
+            }
+
+            udv.setLabel(label);
+            udv.setDevice(ZWaveDevice);
+            udv.setValueType(Utils.getValueType(notification.getValueId()));
+            udv.setValueId(notification.getValueId());
+            udv.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));
+            udv.setValue(String.valueOf(Utils.getValue(notification.getValueId())));
+            udv.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
+            udv.setUuid(ZWaveDevice.getUuid());
+
+            ZWaveDevice.updateValue(udv);
+
+            // Update or save device value
+            if (!isNewDeviceValue)
+                Ebean.update(udv);
+            else
+                Ebean.save(udv);
+
+			ZWaveDevice.updateValue(udv);
+
+			//Ebean.update(ZWaveDevice);
 		}
 
 		return ZWaveDevice;
