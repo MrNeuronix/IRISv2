@@ -46,7 +46,7 @@ import java.util.UUID;
  * License: GPL v3
  */
 
-class EventsService implements Runnable
+public class EventsService implements Runnable
 {
 	private final Logger LOGGER = LogManager.getLogger(EventsService.class.getName());
 	private boolean shutdown = false;

@@ -132,14 +132,13 @@ public class NooliteTXService implements Runnable
 
 								if (dv == null)
 								{
-									dv = new DeviceValue("Level", "255", "", "", device.getUuid(), false);
-									device.updateValue(dv);
-									Ebean.save(dv);
+									dv = new DeviceValue(device, "noolite", "Level", "255", "", "", device.getUuid(), false);
+									dv.save();
 								}
 								else
 								{
 									dv.setValue("255");
-									Ebean.update(dv);
+									dv.save();
 								}
 
 								// log change
@@ -158,14 +157,13 @@ public class NooliteTXService implements Runnable
 
 								if (dv == null)
 								{
-									dv = new DeviceValue("Level", "0", "", "", device.getUuid(), false);
-									device.updateValue(dv);
-									Ebean.save(dv);
+									dv = new DeviceValue(device, "noolite", "Level", "0", "", "", device.getUuid(), false);
+									dv.save();
 								}
 								else
 								{
 									dv.setValue("0");
-									Ebean.update(dv);
+									dv.save();
 								}
 
 								// log change
@@ -182,14 +180,13 @@ public class NooliteTXService implements Runnable
 
 								if (dv == null)
 								{
-									dv = new DeviceValue("Level", String.valueOf(level), "", "", device.getUuid(), false);
-									device.updateValue(dv);
-									Ebean.save(dv);
+									dv = new DeviceValue(device, "noolite", "Level", String.valueOf(level), "", "", device.getUuid(), false);
+									dv.save();
 								}
 								else
 								{
 									dv.setValue(String.valueOf(level));
-									Ebean.update(dv);
+									dv.save();
 								}
 
 								// log change
@@ -219,14 +216,13 @@ public class NooliteTXService implements Runnable
 
 								if (dv == null)
 								{
-									dv = new DeviceValue("Level", "0", "", "", device.getUuid(), false);
-									device.updateValue(dv);
-									Ebean.save(dv);
+									dv = new DeviceValue(device, "noolite", "Level", "0", "", "", device.getUuid(), false);
+									dv.save();
 								}
 								else
 								{
 									dv.setValue("0");
-									Ebean.update(dv);
+									dv.save();
 								}
 
 								// log change
@@ -246,14 +242,13 @@ public class NooliteTXService implements Runnable
 
 								if (dv == null)
 								{
-									dv = new DeviceValue("Level", "255", "", "", device.getUuid(), false);
-									device.updateValue(dv);
-									Ebean.save(dv);
+									dv = new DeviceValue(device, "noolite", "Level", "255", "", "", device.getUuid(), false);
+									dv.save();
 								}
 								else
 								{
 									dv.setValue("255");
-									Ebean.update(dv);
+									dv.save();
 								}
 
 								// log change

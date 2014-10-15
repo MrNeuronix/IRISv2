@@ -17,12 +17,12 @@
 package ru.iris.common.database.model.devices;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Expr;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -60,9 +60,8 @@ public class Device
 	@Expose
 	private String source = "unknown";
 
-	@Expose
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List<DeviceValue> values = new ArrayList<>();
+	@Transient
+	private transient List<DeviceValue> deviceValues;
 
 	public Device()
 	{
@@ -180,12 +179,7 @@ public class Device
 
 	public List<DeviceValue> getValues()
 	{
-		return values;
-	}
-
-	public void setValues(List<DeviceValue> values)
-	{
-		this.values = values;
+		return Ebean.find(DeviceValue.class).where().eq("uuid", uuid).findList();
 	}
 
 	public String getSource()
@@ -198,90 +192,44 @@ public class Device
 		this.source = source;
 	}
 
-	@Deprecated
-	public List<DeviceValue> getValueIDs()
+	public DeviceValue getValue(String label)
 	{
-		return values;
-	}
-
-	public DeviceValue getValue(String value)
-	{
-
-		for (DeviceValue zvalue : values)
-		{
-			if (zvalue.getLabel().equals(value))
-			{
-				return zvalue;
-			}
-		}
-		return null;
-	}
-
-	public synchronized void updateValue(DeviceValue value)
-	{
-
-		// bi-directional relationship
-		value.setDevice(this);
-
-		List<DeviceValue> zDv = values;
-		boolean flag = false;
-
-		for (DeviceValue zvalue : new ArrayList<>(values))
-		{
-			if (zvalue.getLabel().equals(value.getLabel()))
-			{
-				zDv.remove(zvalue);
-				zDv.add(value);
-				flag = true;
-			}
-		}
-
-		if (!flag)
-		{
-			zDv.add(value);
-		}
-
-		values = zDv;
-		zDv = null;
+		return Ebean.find(DeviceValue.class).where().and(Expr.eq("label", label), Expr.eq("uuid", this.getUuid())).findUnique();
 	}
 
 	public synchronized void removeValue(DeviceValue value)
 	{
-
-		List<DeviceValue> zDv = values;
-
-		for (DeviceValue zvalue : new ArrayList<>(values))
-		{
-			if (zvalue.getLabel().equals(value.getLabel()))
-			{
-				zDv.remove(zvalue);
-			}
-		}
-
-		values = zDv;
-		zDv = null;
+		Ebean.delete(value);
 	}
 
 	public synchronized void removeValue(String valuelabel)
 	{
+		DeviceValue deviceValue = Ebean.find(DeviceValue.class).where().and(Expr.eq("label", valuelabel), Expr.eq("uuid", this.getUuid())).findUnique();
 
-		List<DeviceValue> zDv = values;
-
-		for (DeviceValue zvalue : new ArrayList<>(values))
-		{
-			if (zvalue.getLabel().equals(valuelabel))
-			{
-				zDv.remove(zvalue);
-			}
-		}
-
-		values = zDv;
-		zDv = null;
+		if (deviceValue != null)
+			Ebean.delete(deviceValue);
 	}
 
 	public static Device getDeviceByUUID(String uuid)
 	{
 		return Ebean.find(Device.class).where().eq("uuid", uuid).findUnique();
+	}
+
+	public static Device getDeviceByNode(short node)
+	{
+		return Ebean.find(Device.class).where().eq("node", node).findUnique();
+	}
+
+	public synchronized void save()
+	{
+		if (this.getId() == null)
+		{
+			Ebean.save(this);
+		}
+		else
+		{
+			Ebean.update(this);
+		}
 	}
 
 	@Override

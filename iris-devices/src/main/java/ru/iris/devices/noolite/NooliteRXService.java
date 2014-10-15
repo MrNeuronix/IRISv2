@@ -161,9 +161,12 @@ public class NooliteRXService implements Runnable
 					device.setInternalType("switch");
 					device.setNode((short) (1000 + channel));
 					device.setUuid(UUID.randomUUID().toString());
-					device.updateValue(new DeviceValue("channel", channel.toString(), "", "", device.getUuid(), true));
-					device.updateValue(new DeviceValue("type", "switch", "", "", device.getUuid(), false));
-					device.updateValue(new DeviceValue("Level", "0", "", "", device.getUuid(), true));
+
+					device.save();
+					devices.add(device);
+
+					new DeviceValue(device, "noolite", "channel", channel.toString(), "", "", device.getUuid(), true).save();
+					new DeviceValue(device, "noolite", "type", "switch", "", "", device.getUuid(), false).save();
 
 					isNew = true;
 				}
@@ -172,7 +175,7 @@ public class NooliteRXService implements Runnable
 				if (action == 0)
 				{
 					LOGGER.info("Channel " + channel + ": Got OFF command");
-					device.updateValue(new DeviceValue("Level", "0", "", "", device.getUuid(), false));
+					new DeviceValue(device, "noolite", "Level", "0", "", "", device.getUuid(), false).save();
 
 					// log change
 					/////////////////////////////////
@@ -189,7 +192,7 @@ public class NooliteRXService implements Runnable
 					LOGGER.info("Channel " + channel + ": Got DIM command");
 
 					// we only know, that the user hold OFF button
-					device.updateValue(new DeviceValue("Level", "0", "", "", device.getUuid(), false));
+					new DeviceValue(device, "noolite", "Level", "0", "", "", device.getUuid(), false).save();
 
 					// log change
 					/////////////////////////////////
@@ -205,7 +208,7 @@ public class NooliteRXService implements Runnable
 
 					LOGGER.info("Channel " + channel + ": Got ON command");
 
-					device.updateValue(new DeviceValue("Level", "255", "", "", device.getUuid(), false));
+					new DeviceValue(device, "noolite", "Level", "255", "", "", device.getUuid(), false).save();
 
 					// log change
 					/////////////////////////////////
@@ -221,7 +224,7 @@ public class NooliteRXService implements Runnable
 					LOGGER.info("Channel " + channel + ": Got BRIGHT command");
 
 					// we only know, that the user hold ON button
-					device.updateValue(new DeviceValue("Level", "255", "", "", device.getUuid(), false));
+					new DeviceValue(device, "noolite", "Level", "255", "", "", device.getUuid(), false).save();
 
 					// log change
 					/////////////////////////////////
@@ -237,7 +240,7 @@ public class NooliteRXService implements Runnable
 
 					LOGGER.info("Channel " + channel + ": Got SETLEVEL command.");
 
-					device.updateValue(new DeviceValue("Level", dimmerValue.toString(), "", "", device.getUuid(), false));
+					new DeviceValue(device, "noolite", "Level", dimmerValue.toString(), "", "", device.getUuid(), false).save();
 
 					// log change
 					/////////////////////////////////
@@ -262,19 +265,6 @@ public class NooliteRXService implements Runnable
 				}
 
 				LOGGER.info("Update Noolite device (Node: " + device.getId() + ")");
-
-				// update
-				if (!isNew)
-					Ebean.update(device);
-				else
-				{
-					Ebean.save(device);
-
-					device = Ebean.find(Device.class).where().eq("id", device.getId()).findUnique();
-					devices.add(device);
-
-					isNew = false;
-				}
 
 				// reload from database for avoid Ebean.update() key duplicate error
 				if (!initComplete)

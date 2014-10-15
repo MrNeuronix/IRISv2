@@ -91,18 +91,18 @@
             <artifactId>jsoup</artifactId>
             <version>1.6.0</version>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>com.github.zgmnkv</groupId>
             <artifactId>zwave4j</artifactId>
             <version>0.3</version>
-        </dependency>
-        <!--  <dependency>
+        </dependency> -->
+        <dependency>
             <groupId>com.github.zgmnkv</groupId>
             <artifactId>zwave4j</artifactId>
             <version>0.3</version>
             <scope>system</scope>
             <systemPath>${basedir}/../iris-core/lib/zwave4j-0.3.jar</systemPath>
-        </dependency> -->
+        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-io</artifactId>
@@ -134,9 +134,9 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
-            <groupId>org.avaje</groupId>
-            <artifactId>ebean</artifactId>
-            <version>2.7.1</version>
+            <groupId>org.avaje.ebeanorm</groupId>
+            <artifactId>avaje-ebeanorm</artifactId>
+            <version>4.1.8</version>
         </dependency>
         <dependency>
             <groupId>javazoom</groupId>

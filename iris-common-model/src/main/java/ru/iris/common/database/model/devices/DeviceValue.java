@@ -16,6 +16,7 @@
 
 package ru.iris.common.database.model.devices;
 
+import com.avaje.ebean.Ebean;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
@@ -50,6 +51,9 @@ public class DeviceValue
 	private boolean isReadonly = false;
 	private String valueId = "{ }";
 
+	@Expose
+	private String source = "unknown";
+
 	public DeviceValue()
 	{
 	}
@@ -80,6 +84,18 @@ public class DeviceValue
 		this.uuid = uuid;
 	}
 
+	public DeviceValue(Device device, String source, String label, String value, String valueType, String valueUnits, String uuid, boolean isReadonly)
+	{
+		this.label = label;
+		this.value = value;
+		this.valueType = "";
+		this.valueUnits = valueUnits;
+		this.isReadonly = isReadonly;
+		this.uuid = uuid;
+		this.device = device;
+		this.source = source;
+	}
+
 	public DeviceValue(String label, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly)
 	{
 
@@ -102,6 +118,16 @@ public class DeviceValue
 		this.valueId = gson.toJson(valueId);
 		this.uuid = uuid;
 		this.device = device;
+	}
+
+	public DeviceValue(Device device, String source, String label, String uuid, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly)
+	{
+
+		this(label, value, valueType, valueUnits, isReadonly);
+		this.valueId = gson.toJson(valueId);
+		this.uuid = uuid;
+		this.device = device;
+		this.source = source;
 	}
 
 	public Device getDevice()
@@ -199,20 +225,43 @@ public class DeviceValue
 		this.valueId = gson.toJson(valueId);
 	}
 
+	public String getSource()
+	{
+		return source;
+	}
+
+	public void setSource(String source)
+	{
+		this.source = source;
+	}
+
+	public synchronized void save()
+	{
+		if (this.getId() == null)
+		{
+			Ebean.save(this);
+		}
+		else
+		{
+			Ebean.update(this);
+		}
+	}
+
 	/////////////////////////////////
 
-	@Override
-	public String toString()
+	@Override public String toString()
 	{
 		return "DeviceValue{" +
 				"id=" + id +
 				", device=" + device +
 				", label='" + label + '\'' +
+				", uuid='" + uuid + '\'' +
 				", value='" + value + '\'' +
 				", valueType='" + valueType + '\'' +
 				", valueUnits='" + valueUnits + '\'' +
 				", isReadonly=" + isReadonly +
 				", valueId='" + valueId + '\'' +
+				", source='" + source + '\'' +
 				'}';
 	}
 }

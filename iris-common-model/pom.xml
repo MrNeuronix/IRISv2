@@ -44,7 +44,7 @@
         <dependency>
             <groupId>com.github.zgmnkv</groupId>
             <artifactId>zwave4j</artifactId>
-            <version>0.3</version>
+            <version>0.3-SNAPSHOT</version>
             <scope>system</scope>
             <systemPath>${basedir}/../iris-core/lib/zwave4j-0.3.jar</systemPath>
         </dependency>
