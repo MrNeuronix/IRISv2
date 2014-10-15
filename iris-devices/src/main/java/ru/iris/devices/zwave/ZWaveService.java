@@ -60,7 +60,6 @@ public class ZWaveService implements Runnable
 	private final ZWavePolling zWavePolling = new ZWavePolling();
 	private long homeId;
 	private boolean ready = false;
-	private boolean initComplete = false;
 	private boolean shutdown = false;
 	private JsonMessaging messaging;
 
@@ -309,11 +308,6 @@ public class ZWaveService implements Runnable
 
 						zrZWaveDevice.removeValue(manager.getValueLabel(notification.getValueId()));
 
-						if (initComplete)
-						{
-							Ebean.update(zrZWaveDevice);
-						}
-
 						messaging.broadcast("event.devices.zwave.value.removed",
 								zWaveDeviceValueRemoved.set(
 										zrZWaveDevice,
@@ -442,10 +436,6 @@ public class ZWaveService implements Runnable
 		}
 
 		LOGGER.info("Initialization complete.");
-
-		// TODO re-read devices!
-
-		initComplete = true;
 
 		try
 		{
@@ -661,15 +651,15 @@ public class ZWaveService implements Runnable
 
 			ZWaveDevice.save();
 
-            DeviceValue udv = new DeviceValue(
+			DeviceValue udv = new DeviceValue(
 					ZWaveDevice,
 					"zwave",
 					label,
-                    uuid,
-                    String.valueOf(Utils.getValue(notification.getValueId())),
-                    Utils.getValueType(notification.getValueId()),
-                    Manager.get().getValueUnits(notification.getValueId()),
-                    notification.getValueId(),
+					uuid,
+					String.valueOf(Utils.getValue(notification.getValueId())),
+					Utils.getValueType(notification.getValueId()),
+					Manager.get().getValueUnits(notification.getValueId()),
+					notification.getValueId(),
 					Manager.get().isValueReadOnly(notification.getValueId())
 			);
 
@@ -691,21 +681,21 @@ public class ZWaveService implements Runnable
 
 			DeviceValue udv = ZWaveDevice.getValue(label);
 
-            // new device
-            if (udv == null)
-            {
-                udv = new DeviceValue();
-            }
+			// new device
+			if (udv == null)
+			{
+				udv = new DeviceValue();
+			}
 
 			udv.setSource("zwave");
 			udv.setLabel(label);
-            udv.setDevice(ZWaveDevice);
-            udv.setValueType(Utils.getValueType(notification.getValueId()));
-            udv.setValueId(notification.getValueId());
-            udv.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));
-            udv.setValue(String.valueOf(Utils.getValue(notification.getValueId())));
-            udv.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
-            udv.setUuid(ZWaveDevice.getUuid());
+			udv.setDevice(ZWaveDevice);
+			udv.setValueType(Utils.getValueType(notification.getValueId()));
+			udv.setValueId(notification.getValueId());
+			udv.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));
+			udv.setValue(String.valueOf(Utils.getValue(notification.getValueId())));
+			udv.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
+			udv.setUuid(ZWaveDevice.getUuid());
 
 			udv.save();
 		}
