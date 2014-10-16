@@ -313,7 +313,7 @@ public class NooliteTXService implements Runnable
 			if (ret == LibUsb.ERROR_BUSY)
 			{
 				LOGGER.error("Noolite RX device is busy");
-				LOGGER.error("Noolite RX device is busy");
+				DBLogger.info("Noolite RX device is busy");
 			}
 			return;
 		}

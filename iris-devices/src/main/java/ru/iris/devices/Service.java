@@ -47,20 +47,20 @@ public class Service extends Plugin
 
 		if (config.get("zwaveEnabled").equals("1"))
 		{
-			LOGGER.info("ZWave helpers is enabled. Starting");
+			LOGGER.info("ZWave support enabled. Starting");
 			new ZWaveService();
 		}
 		if (config.get("nooliteEnabled").equals("1"))
 		{
-			LOGGER.info("NooLite helpers is enabled. Starting");
+			LOGGER.info("NooLite support enabled. Starting");
 			if (config.get("nooliteTXPresent").equals("1"))
 			{
-				LOGGER.info("NooLite TX helpers is enabled. Starting");
+				LOGGER.info("NooLite TX support enabled. Starting");
 				new NooliteTXService();
 			}
 			if (config.get("nooliteRXPresent").equals("1"))
 			{
-				LOGGER.info("NooLite RX helpers is enabled. Starting");
+				LOGGER.info("NooLite RX support enabled. Starting");
 				new NooliteRXService();
 			}
 		}

@@ -30,5 +30,5 @@ obj = {
 };
 obj.run();
 
-importClass(Packages.ru.iris.common.Speak);
+importPackage(Packages.ru.iris.common.helpers);
 new Speak().say("Тест пройден");
