@@ -50,8 +50,6 @@ public class DatabaseConnection
 		// set DDL options...
 		config.setDdlGenerate(Boolean.valueOf(conf.get("ddlGenerate")));
 		config.setDdlRun(Boolean.valueOf(conf.get("ddlRun")));
-
-		config.setDebugSql(Boolean.valueOf(conf.get("sqlDebug")));
 		//config.setLoggingLevel(LogLevel.SQL);
 
 		config.setDefaultServer(true);

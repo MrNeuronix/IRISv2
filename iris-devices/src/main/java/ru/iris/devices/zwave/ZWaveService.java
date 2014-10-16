@@ -450,6 +450,8 @@ public class ZWaveService implements Runnable
 
 				Manager.get().refreshNodeInfo(homeId, ZWaveDevice.getNode());
 			}
+
+			ZWaveDevice.save();
 		}
 
 		LOGGER.info("Initialization complete.");

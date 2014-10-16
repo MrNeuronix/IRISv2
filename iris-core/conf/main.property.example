@@ -18,29 +18,6 @@ dbPassword=root
 ddlGenerate=true
 ddlRun=true
 
-# Turn on/off SQL debug
-sqlDebug=true
-
-#################################
-# Audio section
-#################################
-
-# Capture sound on mics, connected to server
-recordOnServer=0
-
-# Capture method. May be internal (pure java) or external (using sox from rec)
-recordMethod=intenal
-
-# Internal method settings
-# Capture levels on mics, connected to server
-# Set logs to debug, to see your levels
-startThreshold=9
-stopThreshold=5
-
-# External method settings
-recordStreams=4
-microphones=1
-
 #################################
 # Voice synth section
 #################################
@@ -84,10 +61,3 @@ nooliteRXPresent=1
 
 witaiEnabled=1
 witaiKey=6AVGJKDP4EEAAS5IKNCxxxxxxxxx
-
-##################################
-# REST API
-##################################
-
-httpHost=localhost
-httpPort=17000
