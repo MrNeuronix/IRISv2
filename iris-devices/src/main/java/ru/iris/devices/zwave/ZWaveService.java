@@ -682,6 +682,19 @@ public class ZWaveService implements Runnable
 
 			udv.save();
 
+			// Check if it is beaming device
+			DeviceValue beaming = new DeviceValue();
+
+			beaming.setSource("zwave");
+			beaming.setLabel("beaming");
+			beaming.setDevice(ZWaveDevice);
+			beaming.setValueId("{ }");
+			beaming.setValue(String.valueOf(Manager.get().isNodeBeamingDevice(homeId, ZWaveDevice.getNode())));
+			beaming.setReadonly(true);
+			beaming.setUuid(ZWaveDevice.getUuid());
+
+			beaming.save();
+
 			LOGGER.info("Adding device " + type + " (node: " + notification.getNodeId() + ") to system");
 		}
 		else
