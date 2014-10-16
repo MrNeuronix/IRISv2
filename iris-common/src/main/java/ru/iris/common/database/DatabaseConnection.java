@@ -56,8 +56,8 @@ public class DatabaseConnection
 		config.setRegister(true);
 
 		// specify entity classes
-		config.addClass(Event.class);
 		config.addClass(Log.class);
+		config.addClass(Event.class);
 		config.addClass(Speaks.class);
 		config.addClass(Task.class);
 		config.addClass(Device.class);

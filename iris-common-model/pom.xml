@@ -42,7 +42,17 @@
             <version>4.1.8</version>
         </dependency>
         <dependency>
-            <groupId>com.github.zgmnkv</groupId>
+            <groupId>org.avaje.ebeanorm</groupId>
+            <artifactId>avaje-ebeanorm-agent</artifactId>
+            <version>4.1.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.avaje</groupId>
+            <artifactId>avaje-agentloader</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+        <groupId>com.github.zgmnkv</groupId>
             <artifactId>zwave4j</artifactId>
             <version>0.3-SNAPSHOT</version>
             <scope>system</scope>

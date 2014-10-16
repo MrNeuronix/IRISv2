@@ -20,7 +20,6 @@ import com.google.gson.annotations.Expose;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 
@@ -28,11 +27,6 @@ import java.sql.Timestamp;
 @Table(name = "calendar")
 public class Task extends DBModel
 {
-
-	@Expose
-	@Id
-	private int id;
-
 	// Время начала
 	@Expose
 	@Column(columnDefinition = "timestamp")

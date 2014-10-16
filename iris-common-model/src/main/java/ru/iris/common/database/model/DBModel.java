@@ -17,6 +17,7 @@
 package ru.iris.common.database.model;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Model;
 import com.google.gson.annotations.Expose;
 
 import javax.persistence.GeneratedValue;
@@ -27,7 +28,7 @@ import javax.persistence.MappedSuperclass;
  * Created by nikolay.viguro on 16.10.2014.
  */
 @MappedSuperclass
-public class DBModel
+public class DBModel extends Model
 {
 	@Id
 	@GeneratedValue
@@ -44,6 +45,7 @@ public class DBModel
 		this.id = id;
 	}
 
+	@Override
 	public synchronized void save()
 	{
 		if (this.getId() == null)
@@ -56,15 +58,13 @@ public class DBModel
 		}
 	}
 
-	public synchronized boolean delete()
+	@Override
+	public synchronized void delete()
 	{
 		if (this.getId() == null)
 		{
 			Ebean.delete(this);
-			return true;
 		}
-
-		return false;
 	}
 
 }

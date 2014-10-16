@@ -18,7 +18,6 @@ package ru.iris.common.database.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 
@@ -29,10 +28,6 @@ import java.sql.Timestamp;
 @Table(name = "scriptlock")
 public class ScriptLock extends DBModel
 {
-
-	@Id
-	private long id;
-
 	// Время начала
 	@Column(columnDefinition = "timestamp")
 	private Timestamp startlock;
