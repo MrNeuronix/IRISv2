@@ -81,7 +81,7 @@ if (label == "Level" && value == "255" && device.getInternalName() == "noolite/c
                 }
 
                 // turn off past 20 minutes
-                setTimeout(turnOff, 600000);
+                setTimeout(turnOff, 1200000);
             }
         };
         obj.run();

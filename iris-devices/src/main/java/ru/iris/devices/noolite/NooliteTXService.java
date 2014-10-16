@@ -110,6 +110,7 @@ public class NooliteTXService implements Runnable
 							level = Byte.valueOf(advertisement.getValue());
 
 						Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
+
 						int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
 						int channelView = channel + 1;
 
