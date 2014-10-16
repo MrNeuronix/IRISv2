@@ -26,7 +26,7 @@ import java.sql.Timestamp;
 
 @Entity
 @Table(name = "calendar")
-public class Task
+public class Task extends DBModel
 {
 
 	@Expose
@@ -84,16 +84,6 @@ public class Task
 
 	public Task()
 	{
-	}
-
-	public int getId()
-	{
-		return id;
-	}
-
-	public void setId(int id)
-	{
-		this.id = id;
 	}
 
 	public Timestamp getStartdate()

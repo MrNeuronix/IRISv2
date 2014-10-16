@@ -27,7 +27,7 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "scriptlock")
-public class ScriptLock
+public class ScriptLock extends DBModel
 {
 
 	@Id
@@ -46,16 +46,6 @@ public class ScriptLock
 
 	public ScriptLock()
 	{
-	}
-
-	public long getId()
-	{
-		return id;
-	}
-
-	public void setId(long id)
-	{
-		this.id = id;
 	}
 
 	public Timestamp getStartlock()

@@ -16,23 +16,21 @@
 
 package ru.iris.common.database.model.devices;
 
-import com.avaje.ebean.Ebean;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import org.zwave4j.ValueId;
+import ru.iris.common.database.model.DBModel;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "devicesvalues")
-public class DeviceValue
+public class DeviceValue extends DBModel
 {
 
 	@Transient
 	private final Gson gson = new GsonBuilder().create();
-	@Id
-	private Long id;
 	@ManyToOne
 	private Device device;
 	@Expose
@@ -140,16 +138,6 @@ public class DeviceValue
 		this.device = device;
 	}
 
-	public Long getId()
-	{
-		return id;
-	}
-
-	public void setId(Long id)
-	{
-		this.id = id;
-	}
-
 	public String getUuid()
 	{
 		return uuid;
@@ -233,18 +221,6 @@ public class DeviceValue
 	public void setSource(String source)
 	{
 		this.source = source;
-	}
-
-	public synchronized void save()
-	{
-		if (this.getId() == null)
-		{
-			Ebean.save(this);
-		}
-		else
-		{
-			Ebean.update(this);
-		}
 	}
 
 	/////////////////////////////////

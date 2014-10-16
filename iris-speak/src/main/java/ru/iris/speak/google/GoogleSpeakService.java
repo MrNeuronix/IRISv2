@@ -141,7 +141,7 @@ public class GoogleSpeakService implements Runnable
 									player.play();
 									player.close();
 
-									Ebean.save(speak);
+									speak.save();
 
 									speaksList.add(speak);
 								}
@@ -156,7 +156,7 @@ public class GoogleSpeakService implements Runnable
 									player.play();
 									player.close();
 
-									Ebean.save(speak);
+									speak.save();
 								}
 
 								// force to be null for GC

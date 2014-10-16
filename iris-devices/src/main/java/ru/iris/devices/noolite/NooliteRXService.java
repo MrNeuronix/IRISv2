@@ -23,16 +23,14 @@ import de.ailis.usb4java.libusb.LibUsb;
 import de.ailis.usb4java.libusb.LibUsbException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.common.database.model.Log;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.database.model.devices.DeviceValue;
+import ru.iris.common.helpers.DBLogger;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.devices.noolite.*;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 public class NooliteRXService implements Runnable
@@ -46,7 +44,6 @@ public class NooliteRXService implements Runnable
 	private final Context context = new Context();
 	private boolean shutdown = false;
 	private JsonMessaging messaging;
-	private List<Device> devices = new ArrayList<>();
 	private DeviceHandle handle;
 	private boolean pause = false;
 
@@ -72,9 +69,6 @@ public class NooliteRXService implements Runnable
 		}));
 
 		messaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-rx");
-
-		devices = Ebean.find(Device.class)
-				.where().eq("source", "noolite").findList();
 
 		///////////////////////////////////////////////////////////////
 
@@ -138,7 +132,7 @@ public class NooliteRXService implements Runnable
 			}
 
 			// buf filled by all nulls is correct!
-			if (!buf.equals(tmpBuf) || !initComplete)
+			if (!buf.equals(tmpBuf))
 			{
 				LOGGER.debug("RX Buffer: " + buf.get(0) + " " + buf.get(1) + " " + buf.get(2) + " " + buf.get(3) + " " + buf.get(4) + " " + buf.get(5) + " " + buf.get(6)
 						+ " " + buf.get(7));
@@ -146,7 +140,6 @@ public class NooliteRXService implements Runnable
 				Integer channel = (buf.get(1) + 1);
 				byte action = buf.get(2);
 				Integer dimmerValue = (int) buf.get(4);
-				boolean isNew = false;
 
 				Device device = loadByChannel(channel);
 
@@ -163,25 +156,17 @@ public class NooliteRXService implements Runnable
 					device.setUuid(UUID.randomUUID().toString());
 
 					device.save();
-					devices.add(device);
 
 					new DeviceValue(device, "noolite", "channel", channel.toString(), "", "", device.getUuid(), true).save();
 					new DeviceValue(device, "noolite", "type", "switch", "", "", device.getUuid(), false).save();
-
-					isNew = true;
 				}
 
 				// turn off
 				if (action == 0)
 				{
 					LOGGER.info("Channel " + channel + ": Got OFF command");
-					new DeviceValue(device, "noolite", "Level", "0", "", "", device.getUuid(), false).save();
-
-					// log change
-					/////////////////////////////////
-					Log logChange = new Log("INFO", "Device is OFF", device.getUuid());
-					Ebean.save(logChange);
-					/////////////////////////////////
+					updateValue(device, "Level", "0");
+					DBLogger.info("Device is OFF", device.getUuid());
 
 					messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUuid(), "Level", "0"));
 				}
@@ -190,31 +175,18 @@ public class NooliteRXService implements Runnable
 				{
 
 					LOGGER.info("Channel " + channel + ": Got DIM command");
-
 					// we only know, that the user hold OFF button
-					new DeviceValue(device, "noolite", "Level", "0", "", "", device.getUuid(), false).save();
-
-					// log change
-					/////////////////////////////////
-					Log logChange = new Log("INFO", "Device is DIM", device.getUuid());
-					Ebean.save(logChange);
-					/////////////////////////////////
+					updateValue(device, "Level", "0");
+					DBLogger.info("Device is DIM", device.getUuid());
 
 					messaging.broadcast("event.devices.noolite.value.dim", new NooliteDeviceLevelDimAdvertisement().set(device.getUuid()));
 				}
 				// turn on
 				else if (action == 2)
 				{
-
 					LOGGER.info("Channel " + channel + ": Got ON command");
-
-					new DeviceValue(device, "noolite", "Level", "255", "", "", device.getUuid(), false).save();
-
-					// log change
-					/////////////////////////////////
-					Log logChange = new Log("INFO", "Device is ON", device.getUuid());
-					Ebean.save(logChange);
-					/////////////////////////////////
+					updateValue(device, "Level", "255");
+					DBLogger.info("Device is ON", device.getUuid());
 
 					messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUuid(), "Level", "255"));
 				}
@@ -222,31 +194,18 @@ public class NooliteRXService implements Runnable
 				else if (action == 3)
 				{
 					LOGGER.info("Channel " + channel + ": Got BRIGHT command");
-
 					// we only know, that the user hold ON button
-					new DeviceValue(device, "noolite", "Level", "255", "", "", device.getUuid(), false).save();
-
-					// log change
-					/////////////////////////////////
-					Log logChange = new Log("INFO", "Device is BRIGHT", device.getUuid());
-					Ebean.save(logChange);
-					/////////////////////////////////
+					updateValue(device, "Level", "255");
+					DBLogger.info("Device is BRIGHT", device.getUuid());
 
 					messaging.broadcast("event.devices.noolite.value.bright", new NooliteDeviceLevelBrightAdvertisement().set(device.getUuid()));
 				}
 				// set level
 				else if (action == 6)
 				{
-
 					LOGGER.info("Channel " + channel + ": Got SETLEVEL command.");
-
-					new DeviceValue(device, "noolite", "Level", dimmerValue.toString(), "", "", device.getUuid(), false).save();
-
-					// log change
-					/////////////////////////////////
-					Log logChange = new Log("INFO", "Device get SETLEVEL: " + dimmerValue.toString(), device.getUuid());
-					Ebean.save(logChange);
-					/////////////////////////////////
+					updateValue(device, "Level", dimmerValue.toString());
+					DBLogger.info("Device get SETLEVEL: " + dimmerValue.toString(), device.getUuid());
 
 					messaging.broadcast("event.devices.noolite.value.setlevel", new NooliteDeviceLevelSetAdvertisement().set(device.getUuid(), "Level", dimmerValue.toString()));
 				}
@@ -254,27 +213,12 @@ public class NooliteRXService implements Runnable
 				else if (action == 10)
 				{
 					LOGGER.info("Channel " + channel + ": Got STOPDIMBRIGHT command.");
-
-					// log change
-					/////////////////////////////////
-					Log logChange = new Log("INFO", "Device is STOPDIMBRIGHT", device.getUuid());
-					Ebean.save(logChange);
-					/////////////////////////////////
+					DBLogger.info("Device is STOPDIMBRIGHT", device.getUuid());
 
 					messaging.broadcast("event.devices.noolite.value.stopdimbright", new NooliteDeviceLevelStopDimBrightAdvertisement().set(device.getUuid()));
 				}
 
 				LOGGER.info("Update Noolite device (Node: " + device.getId() + ")");
-
-				// reload from database for avoid Ebean.update() key duplicate error
-				if (!initComplete)
-				{
-					LOGGER.info("Reloading noolite devices");
-					devices = Ebean.find(Device.class)
-							.where().eq("source", "noolite").findList();
-
-					initComplete = true;
-				}
 
 				tmpBuf = buf;
 			}
@@ -297,7 +241,7 @@ public class NooliteRXService implements Runnable
 
 	private Device loadByChannel(int channel)
 	{
-		for (Device device : devices)
+		for (Device device : Ebean.find(Device.class).where().eq("source", "noolite").findList())
 		{
 			if (device.getInternalName().equals("noolite/channel/" + channel))
 			{
@@ -307,6 +251,27 @@ public class NooliteRXService implements Runnable
 		}
 
 		return null;
+	}
+
+	private void updateValue(Device device, String label, String value)
+	{
+		DeviceValue deviceValue = device.getValue(label);
+
+		if (deviceValue == null)
+		{
+			deviceValue = new DeviceValue();
+
+			deviceValue.setLabel(label);
+			deviceValue.setSource("noolite");
+			deviceValue.setUuid(device.getUuid());
+			deviceValue.setDevice(device);
+			deviceValue.setReadonly(false);
+			deviceValue.setValueId("{ }");
+		}
+
+		deviceValue.setValue(value);
+
+		deviceValue.save();
 	}
 
 	///

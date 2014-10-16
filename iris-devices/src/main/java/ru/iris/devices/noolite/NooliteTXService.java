@@ -24,9 +24,9 @@ import de.ailis.usb4java.libusb.LibUsb;
 import de.ailis.usb4java.libusb.LibUsbException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.iris.common.database.model.Log;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.database.model.devices.DeviceValue;
+import ru.iris.common.helpers.DBLogger;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.devices.noolite.*;
@@ -129,23 +129,8 @@ public class NooliteTXService implements Runnable
 							{
 
 								LOGGER.info("Turn on device on channel " + channelView);
-
-								if (dv == null)
-								{
-									dv = new DeviceValue(device, "noolite", "Level", "255", "", "", device.getUuid(), false);
-									dv.save();
-								}
-								else
-								{
-									dv.setValue("255");
-									dv.save();
-								}
-
-								// log change
-								/////////////////////////////////
-								Log logChange = new Log("INFO", "Device is ON", device.getUuid());
-								Ebean.save(logChange);
-								/////////////////////////////////
+								updateValue(device, "Level", "255");
+								DBLogger.info("Device is ON", device.getUuid());
 
 								level = 100;
 
@@ -154,46 +139,16 @@ public class NooliteTXService implements Runnable
 							{
 
 								LOGGER.info("Turn off device on channel " + channelView);
-
-								if (dv == null)
-								{
-									dv = new DeviceValue(device, "noolite", "Level", "0", "", "", device.getUuid(), false);
-									dv.save();
-								}
-								else
-								{
-									dv.setValue("0");
-									dv.save();
-								}
-
-								// log change
-								/////////////////////////////////
-								Log logChange = new Log("INFO", "Device is OFF", device.getUuid());
-								Ebean.save(logChange);
-								/////////////////////////////////
+								updateValue(device, "Level", "0");
+								DBLogger.info("Device is OFF", device.getUuid());
 
 								level = 0;
 
 							}
 							else
 							{
-
-								if (dv == null)
-								{
-									dv = new DeviceValue(device, "noolite", "Level", String.valueOf(level), "", "", device.getUuid(), false);
-									dv.save();
-								}
-								else
-								{
-									dv.setValue(String.valueOf(level));
-									dv.save();
-								}
-
-								// log change
-								/////////////////////////////////
-								Log logChange = new Log("INFO", "Device level set: " + level, device.getUuid());
-								Ebean.save(logChange);
-								/////////////////////////////////
+								updateValue(device, "Level", String.valueOf(level));
+								DBLogger.info("Device level set: " + level, device.getUuid());
 
 								LOGGER.info("Setting device on channel " + channelView + " to level " + level);
 							}
@@ -210,52 +165,17 @@ public class NooliteTXService implements Runnable
 						{
 							if (level < 0 || level == 0)
 							{
-
-								// turn off
-								LOGGER.info("Turn off device on channel " + channelView);
-
-								if (dv == null)
-								{
-									dv = new DeviceValue(device, "noolite", "Level", "0", "", "", device.getUuid(), false);
-									dv.save();
-								}
-								else
-								{
-									dv.setValue("0");
-									dv.save();
-								}
-
-								// log change
-								/////////////////////////////////
-								Log logChange = new Log("INFO", "Device is OFF", device.getUuid());
-								Ebean.save(logChange);
-								/////////////////////////////////
+								updateValue(device, "Level", "0");
+								DBLogger.info("Device is OFF", device.getUuid());
 
 								buf.put((byte) 0);
-
 							}
 							else
 							{
-
 								// turn on
 								LOGGER.info("Turn on device on channel " + channelView);
-
-								if (dv == null)
-								{
-									dv = new DeviceValue(device, "noolite", "Level", "255", "", "", device.getUuid(), false);
-									dv.save();
-								}
-								else
-								{
-									dv.setValue("255");
-									dv.save();
-								}
-
-								// log change
-								/////////////////////////////////
-								Log logChange = new Log("INFO", "Device is ON", device.getUuid());
-								Ebean.save(logChange);
-								/////////////////////////////////
+								updateValue(device, "Level", "255");
+								DBLogger.info("Device is ON", device.getUuid());
 
 								buf.put((byte) 2);
 							}
@@ -284,6 +204,7 @@ public class NooliteTXService implements Runnable
 						buf.put((byte) channel);
 
 						LOGGER.info("Binding device to channel " + channelView);
+						DBLogger.info("Binding device to channel " + channelView);
 
 						writeToHID(buf);
 
@@ -305,6 +226,7 @@ public class NooliteTXService implements Runnable
 						buf.put((byte) channel);
 
 						LOGGER.info("Unbinding device from channel " + channelView);
+						DBLogger.info("Unbinding device from channel " + channelView);
 
 						writeToHID(buf);
 
@@ -342,6 +264,27 @@ public class NooliteTXService implements Runnable
 		}
 	}
 
+	private void updateValue(Device device, String label, String value)
+	{
+		DeviceValue deviceValue = device.getValue(label);
+
+		if (deviceValue == null)
+		{
+			deviceValue = new DeviceValue();
+
+			deviceValue.setLabel(label);
+			deviceValue.setSource("noolite");
+			deviceValue.setUuid(device.getUuid());
+			deviceValue.setDevice(device);
+			deviceValue.setReadonly(false);
+			deviceValue.setValueId("{ }");
+		}
+
+		deviceValue.setValue(value);
+
+		deviceValue.save();
+	}
+
 	private void writeToHID(ByteBuffer command)
 	{
 
@@ -350,6 +293,7 @@ public class NooliteTXService implements Runnable
 		if (handle == null)
 		{
 			LOGGER.error("Noolite TX device not found!");
+			DBLogger.info("Noolite TX device not found!");
 			shutdown = true;
 			return;
 		}
@@ -363,11 +307,13 @@ public class NooliteTXService implements Runnable
 
 		if (ret < 0)
 		{
-			LOGGER.error("Configuration error");
+			LOGGER.error("Noolite RX device configuration error");
+			DBLogger.info("Noolite RX device configuration error");
 			LibUsb.close(handle);
 			if (ret == LibUsb.ERROR_BUSY)
 			{
-				LOGGER.error("Device busy");
+				LOGGER.error("Noolite RX device is busy");
+				LOGGER.error("Noolite RX device is busy");
 			}
 			return;
 		}

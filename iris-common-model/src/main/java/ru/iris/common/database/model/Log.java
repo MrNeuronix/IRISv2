@@ -18,17 +18,13 @@ package ru.iris.common.database.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 
 @Entity
 @Table(name = "log")
-public class Log
+public class Log extends DBModel
 {
-
-	@Id
-	private long id;
 
 	@Column(columnDefinition = "timestamp")
 	private Timestamp logdate;
@@ -56,16 +52,6 @@ public class Log
 		this.message = message;
 		this.uuid = uuid;
 		this.event = event;
-	}
-
-	public long getId()
-	{
-		return id;
-	}
-
-	public void setId(long id)
-	{
-		this.id = id;
 	}
 
 	public Timestamp getLogdate()

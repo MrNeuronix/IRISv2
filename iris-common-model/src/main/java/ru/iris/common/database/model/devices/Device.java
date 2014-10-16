@@ -21,18 +21,18 @@ import com.avaje.ebean.Expr;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
+import ru.iris.common.database.model.DBModel;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.List;
 
 @Entity
 @Table(name = "devices")
-public class Device
+public class Device extends DBModel
 {
-
-	@Id
-	private Long id;
-
 	@Expose private String name = "not set";
 
 	@Expose private short node = 0;
@@ -65,16 +65,6 @@ public class Device
 
 	public Device()
 	{
-	}
-
-	public Long getId()
-	{
-		return id;
-	}
-
-	public void setId(Long id)
-	{
-		this.id = id;
 	}
 
 	public String getName()
@@ -218,18 +208,6 @@ public class Device
 	public static Device getDeviceByNode(short node)
 	{
 		return Ebean.find(Device.class).where().eq("node", node).findUnique();
-	}
-
-	public synchronized void save()
-	{
-		if (this.getId() == null)
-		{
-			Ebean.save(this);
-		}
-		else
-		{
-			Ebean.update(this);
-		}
 	}
 
 	@Override

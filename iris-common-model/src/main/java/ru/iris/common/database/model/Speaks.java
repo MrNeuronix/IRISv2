@@ -20,17 +20,13 @@ import com.google.gson.annotations.Expose;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 
 @Entity
 @Table(name = "speaks")
-public class Speaks
+public class Speaks extends DBModel
 {
-	@Id
-	private long id;
-
 	@Expose
 	@Column(columnDefinition = "timestamp")
 	private Timestamp speakdate;
@@ -51,16 +47,6 @@ public class Speaks
 	// Default
 	public Speaks()
 	{
-	}
-
-	public long getId()
-	{
-		return id;
-	}
-
-	public void setId(long id)
-	{
-		this.id = id;
 	}
 
 	public Timestamp getSpeakdate()

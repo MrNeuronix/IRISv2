@@ -131,7 +131,7 @@ public class VKSource
 						task.setShowInCalendar(true);
 						task.setEnabled(true);
 
-						Ebean.save(task);
+						task.save();
 					}
 					else
 					{
@@ -139,7 +139,7 @@ public class VKSource
 						cal.set(Calendar.SECOND, 30);
 						saved.setEnddate(new Timestamp(cal.getTime().getTime()));
 
-						Ebean.update(saved);
+						saved.save();
 					}
 				}
 			}

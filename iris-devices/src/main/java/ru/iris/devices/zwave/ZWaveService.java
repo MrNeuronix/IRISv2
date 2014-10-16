@@ -24,9 +24,9 @@ import org.apache.logging.log4j.Logger;
 import org.zwave4j.*;
 import ru.iris.common.Config;
 import ru.iris.common.Utils;
-import ru.iris.common.database.model.Log;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.database.model.devices.DeviceValue;
+import ru.iris.common.helpers.DBLogger;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
@@ -113,6 +113,7 @@ public class ZWaveService implements Runnable
 					case AWAKE_NODES_QUERIED:
 						LOGGER.info("Awake nodes queried");
 						ready = true;
+						manager.writeConfig(homeId);
 						messaging.broadcast("event.devices.zwave.awakenodesqueried", zWaveAwakeNodesQueried);
 						break;
 					case ALL_NODES_QUERIED:
@@ -123,6 +124,7 @@ public class ZWaveService implements Runnable
 						break;
 					case ALL_NODES_QUERIED_SOME_DEAD:
 						LOGGER.info("All node queried, some dead");
+						manager.writeConfig(homeId);
 						messaging.broadcast("event.devices.zwave.allnodesqueriedsomedead", zWaveAllNodesQueriedSomeDead);
 						break;
 					case POLLING_ENABLED:
@@ -375,11 +377,7 @@ public class ZWaveService implements Runnable
 
 						udvChg.save();
 
-						// log change
-						/////////////////////////////////
-						Log logChange = new Log("INFO", "Value " + manager.getValueLabel(notification.getValueId()) + " changed: " + Utils.getValue(notification.getValueId()), zWaveDevice.getUuid());
-						Ebean.save(logChange);
-						/////////////////////////////////
+						DBLogger.info("Value " + manager.getValueLabel(notification.getValueId()) + " changed: " + Utils.getValue(notification.getValueId()), zWaveDevice.getUuid());
 
 						messaging.broadcast("event.devices.zwave.value.changed",
 								zWaveDeviceValueChanged.set(
@@ -432,6 +430,25 @@ public class ZWaveService implements Runnable
 			catch (InterruptedException e)
 			{
 				e.printStackTrace();
+			}
+		}
+
+		for (Device ZWaveDevice : Ebean.find(Device.class).where().eq("source", "zwave").findList())
+		{
+			// Check for dead nodes
+			if (Manager.get().isNodeFailed(homeId, ZWaveDevice.getNode()))
+			{
+				LOGGER.info("Setting node " + ZWaveDevice.getNode() + " to DEAD state");
+				ZWaveDevice.setStatus("dead");
+			}
+
+			// Check for sleeping nodes
+			if (!Manager.get().isNodeAwake(homeId, ZWaveDevice.getNode()))
+			{
+				LOGGER.info("Setting node " + ZWaveDevice.getNode() + " to SLEEP state");
+				ZWaveDevice.setStatus("sleeping");
+
+				Manager.get().refreshNodeInfo(homeId, ZWaveDevice.getNode());
 			}
 		}
 

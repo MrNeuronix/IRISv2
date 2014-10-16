@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package ru.iris.common.support;
+package ru.iris.common.helpers;
 
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.speak.SpeakAdvertisement;

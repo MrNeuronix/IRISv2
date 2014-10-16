@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
 import ro.fortsoft.pf4j.Plugin;
 import ro.fortsoft.pf4j.PluginWrapper;
 import ru.iris.common.Config;
-import ru.iris.common.support.Speak;
+import ru.iris.common.helpers.Speak;
 import ru.iris.speak.google.GoogleSpeakService;
 
 public class Service extends Plugin
