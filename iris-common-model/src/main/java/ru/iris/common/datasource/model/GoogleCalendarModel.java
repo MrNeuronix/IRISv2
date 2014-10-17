@@ -16,15 +16,10 @@
 
 package ru.iris.common.datasource.model;
 
-import com.google.gson.annotations.Expose;
-
 public class GoogleCalendarModel
 {
-	@Expose
 	private String username;
-	@Expose
 	private String password;
-	@Expose
 	private String feedUrl;
 
 	public GoogleCalendarModel()

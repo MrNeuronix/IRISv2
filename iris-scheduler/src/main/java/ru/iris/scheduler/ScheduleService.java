@@ -19,19 +19,37 @@ package ru.iris.scheduler;
 import com.avaje.ebean.Ebean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SchedulerFactory;
+import org.quartz.impl.JobDetailImpl;
+import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
 import ru.iris.common.database.model.DataSource;
-import ru.iris.common.messaging.model.command.CommandAdvertisement;
+import ru.iris.common.database.model.Task;
+import ru.iris.common.messaging.JsonEnvelope;
+import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.model.tasks.TaskChangesAdvertisement;
+import ru.iris.common.messaging.model.tasks.TaskSourcesChangesAdvertisement;
+import ru.iris.common.messaging.model.tasks.TasksStartAdvertisement;
+import ru.iris.common.messaging.model.tasks.TasksStopAdvertisement;
 import ru.iris.common.source.googlecal.GoogleCalendarSource;
 import ru.iris.common.source.vk.VKSource;
+import ru.iris.scheduler.jobs.SendCommandAdvertisementJob;
 
 import java.util.List;
+import java.util.UUID;
 
-class ScheduleService implements Runnable
+public class ScheduleService implements Runnable
 {
-
-	private static final CommandAdvertisement commandAdvertisement = new CommandAdvertisement();
 	private final Logger LOGGER = LogManager.getLogger(ScheduleService.class);
+	private List<Task> events = Ebean.find(Task.class).where().eq("enabled", true).findList();
+	private List<DataSource> sources = Ebean.find(DataSource.class).where().eq("enabled", true).findList();
 	private Thread t = null;
+	// Creating scheduler factory and scheduler
+	private SchedulerFactory factory = new StdSchedulerFactory();
+	private Scheduler scheduler = null;
+	private boolean shutdown = false;
 
 	public ScheduleService()
 	{
@@ -47,9 +65,100 @@ class ScheduleService implements Runnable
 
 	public synchronized void run()
 	{
-		// Подключаем все активные источники данных
-		List<DataSource> sources = Ebean.find(DataSource.class).where().eq("enabled", "1").findList();
+		try
+		{
+			scheduler = factory.getScheduler();
 
+			// run
+			readSources();
+			readAndScheduleTasks();
+
+			final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "events");
+			jsonMessaging.subscribe("event.scheduler.reload.tasks");
+			jsonMessaging.subscribe("event.scheduler.reload.sources");
+			jsonMessaging.subscribe("event.scheduler.stop");
+			jsonMessaging.subscribe("event.scheduler.start");
+			jsonMessaging.start();
+
+			while (!shutdown)
+			{
+				JsonEnvelope envelope = jsonMessaging.receive(100);
+
+				if (envelope != null)
+				{
+					if (envelope.getObject() instanceof TasksStopAdvertisement
+							|| envelope.getObject() instanceof TasksStartAdvertisement)
+					{
+						LOGGER.info("Start/stop scheduler service!");
+
+						// take pause to save/remove new entity
+						Thread.sleep(1000);
+
+						// reload events
+						events = null;
+						events = Ebean.find(Task.class).findList();
+
+						// take pause to save/remove new entity
+						Thread.sleep(1000);
+
+						readAndScheduleTasks();
+
+						LOGGER.info("Loaded " + events.size() + " tasks.");
+					}
+					else if (envelope.getObject() instanceof TaskChangesAdvertisement)
+					{
+						LOGGER.info("Reload tasks list");
+
+						// take pause to save/remove new entity
+						Thread.sleep(1000);
+
+						// reload events
+						events = null;
+						events = Ebean.find(Task.class).findList();
+
+						// take pause to save/remove new entity
+						Thread.sleep(1000);
+
+						readAndScheduleTasks();
+
+						LOGGER.info("Loaded " + events.size() + " tasks.");
+
+					}
+					else if (envelope.getObject() instanceof TaskSourcesChangesAdvertisement)
+					{
+						LOGGER.info("Reload sources list");
+
+						// take pause to save/remove new entity
+						Thread.sleep(1000);
+
+						// reload sources
+						events = null;
+						sources = Ebean.find(DataSource.class).where().eq("enabled", true).findList();
+
+						// take pause to save/remove new entity
+						Thread.sleep(1000);
+
+						readSources();
+
+						LOGGER.info("Loaded " + events.size() + " sources.");
+
+					}
+				}
+			}
+
+			// Close JSON messaging.
+			jsonMessaging.close();
+
+		}
+		catch (final Throwable t)
+		{
+			t.printStackTrace();
+			LOGGER.error("Unexpected exception in Events", t);
+		}
+	}
+
+	private void readSources()
+	{
 		for (DataSource source : sources)
 		{
 			// google calendar
@@ -66,6 +175,52 @@ class ScheduleService implements Runnable
 			{
 				LOGGER.info("Unknown data source: " + source.getType() + "!");
 			}
+		}
+	}
+
+	private void readAndScheduleTasks()
+	{
+		try
+		{
+			//Start scheduler
+			if (!scheduler.isStarted())
+			{
+				LOGGER.info("Scheduling tasks!");
+				scheduler.start();
+			}
+			else
+			{
+				LOGGER.info("Rescheduling tasks!");
+				// restart
+				scheduler.shutdown();
+				scheduler.start();
+			}
+
+			for (Task event : events)
+			{
+				JobDetailImpl jobDetail = new JobDetailImpl();
+				jobDetail.setName("Job with subject " + event.getSubject());
+				jobDetail.setJobClass(SendCommandAdvertisementJob.class);
+
+				jobDetail.getJobDataMap().put("subject", event.getSubject());
+				jobDetail.getJobDataMap().put("obj", event.getObj());
+
+				//Creating schedule time with trigger
+				SimpleTriggerImpl trigger = new SimpleTriggerImpl();
+				trigger.setStartTime(event.getStartdate());
+				trigger.setEndTime(event.getEnddate());
+
+				if (!event.getPeriod().isEmpty())
+					trigger.setRepeatInterval(Integer.valueOf(event.getPeriod()));
+
+				trigger.setName("trigger");
+
+				scheduler.scheduleJob(jobDetail, trigger);
+			}
+		}
+		catch (SchedulerException e)
+		{
+			LOGGER.error("Scheduler error: ", e);
 		}
 	}
 }

@@ -18,7 +18,6 @@ package ru.iris.common.database.model;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Model;
-import com.google.gson.annotations.Expose;
 
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -32,7 +31,6 @@ public class DBModel extends Model
 {
 	@Id
 	@GeneratedValue
-	@Expose
 	public Long id;
 
 	public Long getId()

@@ -16,7 +16,6 @@
 
 package ru.iris.common.messaging.model.devices.noolite;
 
-import com.google.gson.annotations.Expose;
 import ru.iris.common.messaging.model.Advertisement;
 
 public class UnbindRXChannelAdvertisment extends Advertisement
@@ -24,13 +23,13 @@ public class UnbindRXChannelAdvertisment extends Advertisement
 	/**
 	 * Device UUID
 	 */
-	@Expose
+
 	private String deviceUUID;
 
 	/**
 	 * Channel.
 	 */
-	@Expose
+
 	private int channel;
 
 	public UnbindRXChannelAdvertisment set(String deviceUUID, int channel)

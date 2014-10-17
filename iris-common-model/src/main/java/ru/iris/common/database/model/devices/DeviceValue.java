@@ -30,26 +30,27 @@ public class DeviceValue extends DBModel
 {
 
 	@Transient
+	@Expose
 	private final Gson gson = new GsonBuilder().create();
 	@ManyToOne
 	private Device device;
-	@Expose
+
 	private String label = "unknown";
-	@Expose
+
 	private String uuid = "unknown";
-	@Expose
+
 	private String value = "unknown";
-	@Expose
+
 	@Column(name = "type")
 	private String valueType = "unknown";
-	@Expose
+
 	@Column(name = "units")
 	private String valueUnits = "unknown";
-	@Expose
+
 	private boolean isReadonly = false;
+
 	private String valueId = "{ }";
 
-	@Expose
 	private String source = "unknown";
 
 	public DeviceValue()

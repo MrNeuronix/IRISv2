@@ -33,34 +33,34 @@ import java.util.List;
 @Table(name = "devices")
 public class Device extends DBModel
 {
-	@Expose private String name = "not set";
+	private String name = "not set";
 
-	@Expose private short node = 0;
+	private short node = 0;
 
-	@Expose private int zone = 0;
+	private int zone = 0;
 
-	@Expose private String type = "unknown";
+	private String type = "unknown";
 
-	@Expose
-	@Column(name = "internaltype") private String internalType = "unknown";
+	@Column(name = "internaltype")
+	private String internalType = "unknown";
 
-	@Expose
-	@Column(name = "manufname") private String manufName = "unknown";
+	@Column(name = "manufname")
+	private String manufName = "unknown";
 
-	@Expose
-	@Column(name = "productname") private String productName = "unknown";
+	@Column(name = "productname")
+	private String productName = "unknown";
 
-	@Expose private String uuid = "unknown";
+	private String uuid = "unknown";
 
-	@Expose private String status = "unknown";
+	private String status = "unknown";
 
-	@Expose
-	@Column(name = "internalname") private String internalName = "unknown";
+	@Column(name = "internalname")
+	private String internalName = "unknown";
 
-	@Expose
 	private String source = "unknown";
 
 	@Transient
+	@Expose
 	private transient List<DeviceValue> deviceValues;
 
 	public Device()
@@ -213,7 +213,7 @@ public class Device extends DBModel
 	@Override
 	public String toString()
 	{
-		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().create();
+		Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 		return gson.toJson(this);
 	}
 }

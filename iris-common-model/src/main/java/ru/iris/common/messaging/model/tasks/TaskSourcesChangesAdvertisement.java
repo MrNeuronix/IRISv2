@@ -14,36 +14,12 @@
  * limitations under the License.
  */
 
-package ru.iris.common.messaging.model.devices;
+package ru.iris.common.messaging.model.tasks;
 
-import ru.iris.common.messaging.model.Advertisement;
-
-public class GetInventoryAdvertisement extends Advertisement
+public class TaskSourcesChangesAdvertisement
 {
-	/**
-	 * Device UUID
-	 */
-	private String deviceUUID;
-
-	public GetInventoryAdvertisement set(String deviceUUID)
+	public TaskSourcesChangesAdvertisement()
 	{
-		this.deviceUUID = deviceUUID;
-		return this;
 	}
 
-	public String getDeviceUUID()
-	{
-		return deviceUUID;
-	}
-
-	public void setDeviceUUID(String deviceUUID)
-	{
-		this.deviceUUID = deviceUUID;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "GetInventoryAdvertisement { UUID: " + deviceUUID + " }";
-	}
 }

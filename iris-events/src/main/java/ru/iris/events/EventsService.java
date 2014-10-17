@@ -142,6 +142,9 @@ public class EventsService implements Runnable
 						events = null;
 						events = Ebean.find(Event.class).findList();
 
+						// take pause to save/remove new entity
+						Thread.sleep(1000);
+
 						LOGGER.info("Loaded " + events.size() + " events.");
 
 					}

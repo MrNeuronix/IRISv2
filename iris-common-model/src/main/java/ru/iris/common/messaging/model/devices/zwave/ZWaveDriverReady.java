@@ -16,12 +16,9 @@
 
 package ru.iris.common.messaging.model.devices.zwave;
 
-import com.google.gson.annotations.Expose;
-
 public class ZWaveDriverReady
 {
 
-	@Expose
 	private long homeId;
 
 	/**

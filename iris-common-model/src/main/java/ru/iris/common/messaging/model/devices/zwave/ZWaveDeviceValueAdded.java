@@ -16,7 +16,6 @@
 
 package ru.iris.common.messaging.model.devices.zwave;
 
-import com.google.gson.annotations.Expose;
 import ru.iris.common.database.model.devices.Device;
 
 public class ZWaveDeviceValueAdded
@@ -24,13 +23,11 @@ public class ZWaveDeviceValueAdded
 	/**
 	 * Zwave device
 	 */
-	@Expose
+
 	private Device device;
 
-	@Expose
 	private String label;
 
-	@Expose
 	private String value;
 
 	/**

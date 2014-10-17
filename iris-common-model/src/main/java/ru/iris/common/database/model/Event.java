@@ -16,8 +16,6 @@
 
 package ru.iris.common.database.model;
 
-import com.google.gson.annotations.Expose;
-
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -25,13 +23,10 @@ import javax.persistence.Table;
 @Table(name = "events")
 public class Event extends DBModel
 {
-	@Expose
 	private String subject;
 
-	@Expose
 	private String script;
 
-	@Expose
 	private boolean isEnabled;
 
 	// Default

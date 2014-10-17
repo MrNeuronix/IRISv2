@@ -15,8 +15,6 @@
  */
 package ru.iris.common.messaging.model.service;
 
-import com.google.gson.annotations.Expose;
-
 /**
  * Enumeration describing service statuses
  *
@@ -27,21 +25,21 @@ public enum ServiceStatus
 	/**
 	 * Service has been started.
 	 */
-	@Expose
+
 	STARTUP,
 	/**
 	 * Service is available.
 	 */
-	@Expose
+
 	AVAILABLE,
 	/**
 	 * Service has encountered critical errors.
 	 */
-	@Expose
+
 	ERROR,
 	/**
 	 * Service has been shutdown.
 	 */
-	@Expose
+
 	SHUTDOWN
 }

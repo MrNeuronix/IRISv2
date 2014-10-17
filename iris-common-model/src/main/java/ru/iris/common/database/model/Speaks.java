@@ -16,8 +16,6 @@
 
 package ru.iris.common.database.model;
 
-import com.google.gson.annotations.Expose;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -27,21 +25,16 @@ import java.sql.Timestamp;
 @Table(name = "speaks")
 public class Speaks extends DBModel
 {
-	@Expose
 	@Column(columnDefinition = "timestamp")
 	private Timestamp speakdate;
 
-	@Expose
 	@Column(columnDefinition = "TEXT")
 	private String text;
 
-	@Expose
 	private Double confidence;
 
-	@Expose
 	private String device;
 
-	@Expose
 	private long cache;
 
 	// Default

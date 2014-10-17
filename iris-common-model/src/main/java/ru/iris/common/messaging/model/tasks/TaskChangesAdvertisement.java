@@ -14,21 +14,12 @@
  * limitations under the License.
  */
 
-/**
- * @author Nikolay A. Viguro
- * Date: 26.11.13
- * Time: 16:39
- * This is test script for event engine of IRISv2
- */
+package ru.iris.common.messaging.model.tasks;
 
-out.println("TEST OK!");
+public class TaskChangesAdvertisement
+{
+	public TaskChangesAdvertisement()
+	{
+	}
 
-obj = {
-    run: function () {
-        out.println("hi");
-    }
-};
-obj.run();
-
-importPackage(Packages.ru.iris.common.helpers);
-new Speak().say("Тест пройден");
+}

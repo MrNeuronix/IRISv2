@@ -16,8 +16,6 @@
 
 package ru.iris.common.database.model;
 
-import com.google.gson.annotations.Expose;
-
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
@@ -26,18 +24,14 @@ import javax.persistence.Table;
 public class DataSource extends DBModel
 {
 	// type (google-cal, etc)
-	@Expose
 	private String type;
 
-	@Expose
 	private String title;
 
 	// JSON object
-	@Expose
 	private String obj;
 
 	// Активна ли?
-	@Expose
 	private boolean enabled;
 
 	public DataSource()

@@ -16,7 +16,6 @@
 
 package ru.iris.common.messaging.model.devices;
 
-import com.google.gson.annotations.Expose;
 import ru.iris.common.messaging.model.Advertisement;
 
 public class SetDeviceZoneAdvertisement extends Advertisement
@@ -24,12 +23,12 @@ public class SetDeviceZoneAdvertisement extends Advertisement
 	/**
 	 * Device UUID
 	 */
-	@Expose
+
 	private String deviceUUID;
 	/**
 	 * Device name.
 	 */
-	@Expose
+
 	private int zone;
 
 	public SetDeviceZoneAdvertisement set(String deviceUUID, int zone)

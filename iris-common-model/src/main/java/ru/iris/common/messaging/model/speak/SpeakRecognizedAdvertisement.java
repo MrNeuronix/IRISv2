@@ -16,7 +16,6 @@
 
 package ru.iris.common.messaging.model.speak;
 
-import com.google.gson.annotations.Expose;
 import ru.iris.common.messaging.model.Advertisement;
 
 public class SpeakRecognizedAdvertisement extends Advertisement
@@ -24,19 +23,19 @@ public class SpeakRecognizedAdvertisement extends Advertisement
 	/**
 	 * Text to speak
 	 */
-	@Expose
+
 	private String text;
 
 	/**
 	 * Confidence
 	 */
-	@Expose
+
 	private double confidence;
 
 	/**
 	 * Terminal
 	 */
-	@Expose
+
 	private String device;
 
 	public SpeakRecognizedAdvertisement set(String text, double confidence)

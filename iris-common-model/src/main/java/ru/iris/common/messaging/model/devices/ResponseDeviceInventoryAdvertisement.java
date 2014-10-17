@@ -16,7 +16,6 @@
 
 package ru.iris.common.messaging.model.devices;
 
-import com.google.gson.annotations.Expose;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.model.Advertisement;
 
@@ -27,7 +26,6 @@ public class ResponseDeviceInventoryAdvertisement extends Advertisement
 	/**
 	 * Devices Map
 	 */
-	@Expose
 	private Map<?, Device> devices;
 
 	public ResponseDeviceInventoryAdvertisement set(Map<?, Device> devices)

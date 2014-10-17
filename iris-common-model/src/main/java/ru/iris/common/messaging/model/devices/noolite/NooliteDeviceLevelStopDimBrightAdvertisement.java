@@ -16,7 +16,6 @@
 
 package ru.iris.common.messaging.model.devices.noolite;
 
-import com.google.gson.annotations.Expose;
 import ru.iris.common.messaging.model.Advertisement;
 
 public class NooliteDeviceLevelStopDimBrightAdvertisement extends Advertisement
@@ -25,7 +24,7 @@ public class NooliteDeviceLevelStopDimBrightAdvertisement extends Advertisement
 	/**
 	 * Device UUID
 	 */
-	@Expose
+
 	private String deviceUUID;
 
 	public NooliteDeviceLevelStopDimBrightAdvertisement set(String deviceUUID)

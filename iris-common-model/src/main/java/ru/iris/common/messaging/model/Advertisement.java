@@ -16,14 +16,11 @@
 
 package ru.iris.common.messaging.model;
 
-import com.google.gson.annotations.Expose;
-
 public class Advertisement
 {
 	/**
 	 * Internal device identificator (i.e. dimmer/1)
 	 */
-	@Expose
 	private String deviceInternal;
 
 	/**

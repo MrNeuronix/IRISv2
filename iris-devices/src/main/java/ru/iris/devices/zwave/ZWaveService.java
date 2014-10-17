@@ -168,7 +168,7 @@ public class ZWaveService implements Runnable
 							break;
 
 						String nodeType = manager.getNodeType(homeId, node);
-						Device zw = null;
+						Device zw;
 
 						switch (nodeType)
 						{
