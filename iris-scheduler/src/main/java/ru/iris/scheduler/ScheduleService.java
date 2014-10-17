@@ -30,7 +30,6 @@ import ru.iris.common.database.model.DataSource;
 import ru.iris.common.database.model.Task;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.tasks.TaskChangesAdvertisement;
 import ru.iris.common.messaging.model.tasks.TaskSourcesChangesAdvertisement;
 import ru.iris.common.messaging.model.tasks.TasksStartAdvertisement;
 import ru.iris.common.messaging.model.tasks.TasksStopAdvertisement;
@@ -79,6 +78,7 @@ public class ScheduleService implements Runnable
 			jsonMessaging.subscribe("event.scheduler.reload.sources");
 			jsonMessaging.subscribe("event.scheduler.stop");
 			jsonMessaging.subscribe("event.scheduler.start");
+			jsonMessaging.subscribe("event.scheduler.restart");
 			jsonMessaging.start();
 
 			while (!shutdown)
@@ -87,10 +87,9 @@ public class ScheduleService implements Runnable
 
 				if (envelope != null)
 				{
-					if (envelope.getObject() instanceof TasksStopAdvertisement
-							|| envelope.getObject() instanceof TasksStartAdvertisement)
+					if (envelope.getObject() instanceof TasksStartAdvertisement)
 					{
-						LOGGER.info("Start/stop scheduler service!");
+						LOGGER.info("Start/restart scheduler service!");
 
 						// take pause to save/remove new entity
 						Thread.sleep(1000);
@@ -104,21 +103,16 @@ public class ScheduleService implements Runnable
 
 						readAndScheduleTasks();
 					}
-					else if (envelope.getObject() instanceof TaskChangesAdvertisement)
+					else if (envelope.getObject() instanceof TasksStopAdvertisement)
 					{
-						LOGGER.info("Reload tasks list");
+						LOGGER.info("Stop scheduler service");
 
 						// take pause to save/remove new entity
 						Thread.sleep(1000);
 
 						// reload events
+						scheduler.shutdown();
 						events = null;
-						events = Ebean.find(Task.class).findList();
-
-						// take pause to save/remove new entity
-						Thread.sleep(1000);
-
-						readAndScheduleTasks();
 					}
 					else if (envelope.getObject() instanceof TaskSourcesChangesAdvertisement)
 					{
