@@ -157,8 +157,8 @@ public class NooliteRXService implements Runnable
 
 					device.save();
 
-					new DeviceValue(device, "noolite", "channel", channel.toString(), "", "", device.getUuid(), true).save();
-					new DeviceValue(device, "noolite", "type", "switch", "", "", device.getUuid(), false).save();
+					new DeviceValue("channel", channel.toString(), "", "", device.getUuid(), true).save();
+					new DeviceValue("type", "switch", "", "", device.getUuid(), false).save();
 				}
 
 				// turn off
@@ -262,9 +262,7 @@ public class NooliteRXService implements Runnable
 			deviceValue = new DeviceValue();
 
 			deviceValue.setLabel(label);
-			deviceValue.setSource("noolite");
 			deviceValue.setUuid(device.getUuid());
-			deviceValue.setDevice(device);
 			deviceValue.setReadonly(false);
 			deviceValue.setValueId("{ }");
 		}

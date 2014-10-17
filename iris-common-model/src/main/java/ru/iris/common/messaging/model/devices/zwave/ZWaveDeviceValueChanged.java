@@ -24,7 +24,7 @@ public class ZWaveDeviceValueChanged
 	 * Zwave device
 	 */
 
-	private Device device;
+	private transient Device device;
 
 	private String label;
 

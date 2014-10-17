@@ -20,7 +20,6 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.Expose;
 import ru.iris.common.database.model.DBModel;
 
 import javax.persistence.Column;
@@ -60,7 +59,6 @@ public class Device extends DBModel
 	private String source = "unknown";
 
 	@Transient
-	@Expose
 	private transient List<DeviceValue> deviceValues;
 
 	public Device()
@@ -213,7 +211,7 @@ public class Device extends DBModel
 	@Override
 	public String toString()
 	{
-		Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		return gson.toJson(this);
 	}
 }

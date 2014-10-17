@@ -39,7 +39,8 @@ public class ZWaveService implements Runnable
 
 	private final Logger LOGGER = LogManager.getLogger(ZWaveService.class.getName());
 	private final Gson gson = new GsonBuilder().create();
-	// Adverstiments
+
+	// Advertisements
 	private final ZWaveDriverReady zWaveDriverReady = new ZWaveDriverReady();
 	private final ZWaveDriverFailed zWaveDriverFailed = new ZWaveDriverFailed();
 	private final ZWaveDriverReset zWaveDriverReset = new ZWaveDriverReset();
@@ -655,8 +656,6 @@ public class ZWaveService implements Runnable
 			ZWaveDevice.save();
 
 			DeviceValue udv = new DeviceValue(
-					ZWaveDevice,
-					"zwave",
 					label,
 					uuid,
 					String.valueOf(Utils.getValue(notification.getValueId())),
@@ -671,9 +670,7 @@ public class ZWaveService implements Runnable
 			// Check if it is beaming device
 			DeviceValue beaming = new DeviceValue();
 
-			beaming.setSource("zwave");
 			beaming.setLabel("beaming");
-			beaming.setDevice(ZWaveDevice);
 			beaming.setValueId("{ }");
 			beaming.setValue(String.valueOf(Manager.get().isNodeBeamingDevice(homeId, ZWaveDevice.getNode())));
 			beaming.setReadonly(true);
@@ -703,9 +700,7 @@ public class ZWaveService implements Runnable
 				udv = new DeviceValue();
 			}
 
-			udv.setSource("zwave");
 			udv.setLabel(label);
-			udv.setDevice(ZWaveDevice);
 			udv.setValueType(Utils.getValueType(notification.getValueId()));
 			udv.setValueId(notification.getValueId());
 			udv.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));

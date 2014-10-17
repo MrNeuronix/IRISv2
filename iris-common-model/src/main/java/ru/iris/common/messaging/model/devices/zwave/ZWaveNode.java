@@ -20,8 +20,7 @@ import ru.iris.common.database.model.devices.Device;
 
 public class ZWaveNode
 {
-
-	Device device;
+	protected transient Device device;
 
 	public ZWaveNode set(Device device)
 	{

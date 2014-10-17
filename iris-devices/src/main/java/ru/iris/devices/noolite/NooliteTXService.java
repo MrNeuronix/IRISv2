@@ -17,7 +17,6 @@
 package ru.iris.devices.noolite;
 
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
 import de.ailis.usb4java.libusb.Context;
 import de.ailis.usb4java.libusb.DeviceHandle;
 import de.ailis.usb4java.libusb.LibUsb;
@@ -117,8 +116,6 @@ public class NooliteTXService implements Runnable
 						ByteBuffer buf = ByteBuffer.allocateDirect(8);
 						buf.put((byte) 0x30);
 
-						DeviceValue dv = Ebean.find(DeviceValue.class).where().and(Expr.eq("device_id", device.getId()), Expr.eq("label", "Level")).findUnique();
-
 						//if noolite device dimmer (user set)
 						if (device.getValue("type") != null && device.getValue("type").getValue().contains("dimmer"))
 						{
@@ -166,6 +163,7 @@ public class NooliteTXService implements Runnable
 						{
 							if (level < 0 || level == 0)
 							{
+								LOGGER.info("Turn off device on channel " + channelView);
 								updateValue(device, "Level", "0");
 								DBLogger.info("Device is OFF", device.getUuid());
 
@@ -274,9 +272,7 @@ public class NooliteTXService implements Runnable
 			deviceValue = new DeviceValue();
 
 			deviceValue.setLabel(label);
-			deviceValue.setSource("noolite");
 			deviceValue.setUuid(device.getUuid());
-			deviceValue.setDevice(device);
 			deviceValue.setReadonly(false);
 			deviceValue.setValueId("{ }");
 		}

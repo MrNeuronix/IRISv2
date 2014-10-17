@@ -18,22 +18,20 @@ package ru.iris.common.database.model.devices;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.Expose;
 import org.zwave4j.ValueId;
 import ru.iris.common.database.model.DBModel;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "devicesvalues")
 public class DeviceValue extends DBModel
 {
-
 	@Transient
-	@Expose
-	private final Gson gson = new GsonBuilder().create();
-	@ManyToOne
-	private Device device;
+	private transient final Gson gson = new GsonBuilder().create();
 
 	private String label = "unknown";
 
@@ -50,8 +48,6 @@ public class DeviceValue extends DBModel
 	private boolean isReadonly = false;
 
 	private String valueId = "{ }";
-
-	private String source = "unknown";
 
 	public DeviceValue()
 	{
@@ -83,18 +79,6 @@ public class DeviceValue extends DBModel
 		this.uuid = uuid;
 	}
 
-	public DeviceValue(Device device, String source, String label, String value, String valueType, String valueUnits, String uuid, boolean isReadonly)
-	{
-		this.label = label;
-		this.value = value;
-		this.valueType = "";
-		this.valueUnits = valueUnits;
-		this.isReadonly = isReadonly;
-		this.uuid = uuid;
-		this.device = device;
-		this.source = source;
-	}
-
 	public DeviceValue(String label, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly)
 	{
 
@@ -104,39 +88,6 @@ public class DeviceValue extends DBModel
 
 	public DeviceValue(String label, String uuid, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly)
 	{
-
-		this(label, value, valueType, valueUnits, isReadonly);
-		this.valueId = gson.toJson(valueId);
-		this.uuid = uuid;
-	}
-
-	public DeviceValue(Device device, String label, String uuid, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly)
-	{
-
-		this(label, value, valueType, valueUnits, isReadonly);
-		this.valueId = gson.toJson(valueId);
-		this.uuid = uuid;
-		this.device = device;
-	}
-
-	public DeviceValue(Device device, String source, String label, String uuid, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly)
-	{
-
-		this(label, value, valueType, valueUnits, isReadonly);
-		this.valueId = gson.toJson(valueId);
-		this.uuid = uuid;
-		this.device = device;
-		this.source = source;
-	}
-
-	public Device getDevice()
-	{
-		return device;
-	}
-
-	public void setDevice(Device device)
-	{
-		this.device = device;
 	}
 
 	public String getUuid()
@@ -214,23 +165,12 @@ public class DeviceValue extends DBModel
 		this.valueId = gson.toJson(valueId);
 	}
 
-	public String getSource()
-	{
-		return source;
-	}
-
-	public void setSource(String source)
-	{
-		this.source = source;
-	}
-
 	/////////////////////////////////
 
 	@Override public String toString()
 	{
 		return "DeviceValue{" +
 				"id=" + id +
-				", device=" + device +
 				", label='" + label + '\'' +
 				", uuid='" + uuid + '\'' +
 				", value='" + value + '\'' +
@@ -238,7 +178,6 @@ public class DeviceValue extends DBModel
 				", valueUnits='" + valueUnits + '\'' +
 				", isReadonly=" + isReadonly +
 				", valueId='" + valueId + '\'' +
-				", source='" + source + '\'' +
 				'}';
 	}
 }
