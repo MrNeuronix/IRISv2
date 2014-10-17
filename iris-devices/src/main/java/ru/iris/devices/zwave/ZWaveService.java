@@ -736,11 +736,16 @@ public class ZWaveService implements Runnable
 			if (ctl == ControllerCommand.REMOVE_DEVICE && state == ControllerState.COMPLETED)
 			{
 				LOGGER.info("Remove ZWave device from network");
+				Manager.get().softReset(homeId);
+				Manager.get().testNetwork(homeId, 5);
+				Manager.get().healNetwork(homeId, true);
 			}
 
 			if (ctl == ControllerCommand.ADD_DEVICE && state == ControllerState.COMPLETED)
 			{
 				LOGGER.info("Add ZWave device to network");
+				Manager.get().testNetwork(homeId, 5);
+				Manager.get().healNetwork(homeId, true);
 			}
 		}
 	}
