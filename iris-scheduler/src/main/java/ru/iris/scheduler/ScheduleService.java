@@ -24,6 +24,7 @@ import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.quartz.impl.triggers.SimpleTriggerImpl;
 import ru.iris.common.database.model.DataSource;
 import ru.iris.common.database.model.Task;
@@ -102,8 +103,6 @@ public class ScheduleService implements Runnable
 						Thread.sleep(1000);
 
 						readAndScheduleTasks();
-
-						LOGGER.info("Loaded " + events.size() + " tasks.");
 					}
 					else if (envelope.getObject() instanceof TaskChangesAdvertisement)
 					{
@@ -120,9 +119,6 @@ public class ScheduleService implements Runnable
 						Thread.sleep(1000);
 
 						readAndScheduleTasks();
-
-						LOGGER.info("Loaded " + events.size() + " tasks.");
-
 					}
 					else if (envelope.getObject() instanceof TaskSourcesChangesAdvertisement)
 					{
@@ -201,6 +197,7 @@ public class ScheduleService implements Runnable
 				JobDetailImpl jobDetail = new JobDetailImpl();
 				jobDetail.setName("Job with subject " + event.getSubject());
 				jobDetail.setJobClass(SendCommandAdvertisementJob.class);
+				jobDetail.setGroup("scheduler");
 
 				jobDetail.getJobDataMap().put("subject", event.getSubject());
 				jobDetail.getJobDataMap().put("obj", event.getObj());
@@ -217,6 +214,9 @@ public class ScheduleService implements Runnable
 
 				scheduler.scheduleJob(jobDetail, trigger);
 			}
+
+			LOGGER.info("Scheduled " + scheduler.getJobKeys(GroupMatcher.jobGroupEquals("scheduler")).size() + " tasks!");
+
 		}
 		catch (SchedulerException e)
 		{
