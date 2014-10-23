@@ -34,7 +34,6 @@ import ru.iris.common.messaging.model.events.EventChangesAdvertisement;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -46,7 +45,7 @@ import java.util.UUID;
  * License: GPL v3
  */
 
-class EventsService implements Runnable
+public class EventsService implements Runnable
 {
 	private final Logger LOGGER = LogManager.getLogger(EventsService.class.getName());
 	private boolean shutdown = false;
@@ -84,21 +83,6 @@ class EventsService implements Runnable
 			Context cx = ContextFactory.getGlobal().enterContext();
 			global.init(cx);
 			Scriptable scope = cx.initStandardObjects(global);
-
-			// load events from db
-
-			// comparator
-			Comparator<String> comparator = new Comparator<String>()
-			{
-				public int compare(String currentItem, String key)
-				{
-					if (currentItem.equals(key))
-					{
-						return 0;
-					}
-					return currentItem.compareTo(key);
-				}
-			};
 
 			// Pass jsonmessaging instance to js engine
 			ScriptableObject.putProperty(scope, "jsonMessaging", Context.javaToJS(jsonMessaging, scope));
@@ -157,6 +141,9 @@ class EventsService implements Runnable
 						// reload events
 						events = null;
 						events = Ebean.find(Event.class).findList();
+
+						// take pause to save/remove new entity
+						Thread.sleep(1000);
 
 						LOGGER.info("Loaded " + events.size() + " events.");
 

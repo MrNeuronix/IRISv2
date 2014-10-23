@@ -18,7 +18,8 @@ package ru.iris;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.core.config.XMLConfigurationFactory;
+import org.apache.logging.log4j.core.config.ConfigurationFactory;
+import org.avaje.agentloader.AgentLoader;
 import ro.fortsoft.pf4j.DefaultPluginManager;
 import ro.fortsoft.pf4j.PluginManager;
 import ru.iris.common.database.DatabaseConnection;
@@ -30,7 +31,7 @@ class Core
 	// Specify log4j2 configuration file
 	static
 	{
-		System.setProperty(XMLConfigurationFactory.CONFIGURATION_FILE_PROPERTY, "./conf/log4j2.xml");
+		System.setProperty(ConfigurationFactory.CONFIGURATION_FILE_PROPERTY, "./conf/log4j2.xml");
 	}
 
 	private static final Logger LOGGER = LogManager.getLogger(Core.class.getName());
@@ -43,6 +44,7 @@ class Core
 		LOGGER.info("----------------------------------------");
 
 		// ORM
+		AgentLoader.loadAgent("lib/avaje-ebeanorm-agent-4.1.2.jar");
 		new DatabaseConnection();
 
 		// Modules poll

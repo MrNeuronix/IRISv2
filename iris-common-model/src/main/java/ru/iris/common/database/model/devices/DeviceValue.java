@@ -18,36 +18,35 @@ package ru.iris.common.database.model.devices;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.Expose;
 import org.zwave4j.ValueId;
+import ru.iris.common.database.model.DBModel;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "devicesvalues")
-public class DeviceValue
+public class DeviceValue extends DBModel
 {
-
 	@Transient
-	private final Gson gson = new GsonBuilder().create();
-	@Id
-	private Long id;
-	@ManyToOne
-	private Device device;
-	@Expose
+	private transient final Gson gson = new GsonBuilder().create();
+
 	private String label = "unknown";
-	@Expose
+
 	private String uuid = "unknown";
-	@Expose
+
 	private String value = "unknown";
-	@Expose
+
 	@Column(name = "type")
 	private String valueType = "unknown";
-	@Expose
+
 	@Column(name = "units")
 	private String valueUnits = "unknown";
-	@Expose
+
 	private boolean isReadonly = false;
+
 	private String valueId = "{ }";
 
 	public DeviceValue()
@@ -89,39 +88,6 @@ public class DeviceValue
 
 	public DeviceValue(String label, String uuid, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly)
 	{
-
-		this(label, value, valueType, valueUnits, isReadonly);
-		this.valueId = gson.toJson(valueId);
-		this.uuid = uuid;
-	}
-
-	public DeviceValue(Device device, String label, String uuid, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly)
-	{
-
-		this(label, value, valueType, valueUnits, isReadonly);
-		this.valueId = gson.toJson(valueId);
-		this.uuid = uuid;
-		this.device = device;
-	}
-
-	public Device getDevice()
-	{
-		return device;
-	}
-
-	public void setDevice(Device device)
-	{
-		this.device = device;
-	}
-
-	public Long getId()
-	{
-		return id;
-	}
-
-	public void setId(Long id)
-	{
-		this.id = id;
 	}
 
 	public String getUuid()
@@ -201,13 +167,12 @@ public class DeviceValue
 
 	/////////////////////////////////
 
-	@Override
-	public String toString()
+	@Override public String toString()
 	{
 		return "DeviceValue{" +
 				"id=" + id +
-				", device=" + device +
 				", label='" + label + '\'' +
+				", uuid='" + uuid + '\'' +
 				", value='" + value + '\'' +
 				", valueType='" + valueType + '\'' +
 				", valueUnits='" + valueUnits + '\'' +

@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-package ru.iris.common.support;
+package ru.iris.common.messaging.model.tasks;
 
-import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
-
-import java.util.UUID;
-
-public class Speak
+public class TaskChangesAdvertisement
 {
-	private static final SpeakAdvertisement advertisement = new SpeakAdvertisement();
-
-	public void say(String text)
+	public TaskChangesAdvertisement()
 	{
-		JsonMessaging messaging = new JsonMessaging(UUID.randomUUID(), "speak");
-		messaging.broadcast("event.speak", advertisement.set(text, 100.0));
 	}
+
 }

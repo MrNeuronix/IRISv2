@@ -23,13 +23,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.database.model.Task;
 import ru.iris.common.datasource.model.VKModel;
-import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
+import ru.iris.common.messaging.model.command.CommandAdvertisement;
 import ru.iris.common.source.vk.entities.User;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by nikolay.viguro on 10.10.2014.
@@ -121,17 +123,23 @@ public class VKSource
 
 						cal.set(Calendar.MINUTE, 1);
 
+						Map<String, String> map = new HashMap<>();
+						map.put("text", "Сегодня празднует день рождения ваш друг - " + user.getFirstName() + " " + user.getLastName());
+
+						CommandAdvertisement adv = new CommandAdvertisement();
+						adv.setData(map);
+						adv.setScript("vk-birthday-say.js");
+
 						task.setEnddate(new Timestamp(cal.getTime().getTime()));
 						task.setTitle("День рождения " + user.getFirstName() + " " + user.getLastName());
 						task.setText("Сегодня празднует день рождения ваш друг - " + user.getFirstName() + " " + user.getLastName());
-						task.setType("1");
 						task.setSource("vk");
-						task.setObj(gson.toJson(new SpeakAdvertisement().set("Сегодня празднует день рождения ваш друг - " + user.getFirstName() + " " + user.getLastName(), 100D, "all")));
+						task.setObj(gson.toJson(adv));
 						task.setSubject("event.speak");
 						task.setShowInCalendar(true);
 						task.setEnabled(true);
 
-						Ebean.save(task);
+						task.save();
 					}
 					else
 					{
@@ -139,7 +147,7 @@ public class VKSource
 						cal.set(Calendar.SECOND, 30);
 						saved.setEnddate(new Timestamp(cal.getTime().getTime()));
 
-						Ebean.update(saved);
+						saved.save();
 					}
 				}
 			}

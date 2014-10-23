@@ -16,7 +16,6 @@
 
 package ru.iris.common.messaging.model.command;
 
-import com.google.gson.annotations.Expose;
 import ru.iris.common.messaging.model.Advertisement;
 
 public class CommandResult extends Advertisement
@@ -24,9 +23,7 @@ public class CommandResult extends Advertisement
 	/**
 	 * Command
 	 */
-	@Expose
 	private String command;
-	@Expose
 	private Object result;
 
 	public CommandResult set(String command, Object result)

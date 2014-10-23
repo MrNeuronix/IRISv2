@@ -23,6 +23,7 @@
 
 // importing all classes in package (like import ru.iris.common.* in java)
 importPackage(Packages.ru.iris.common);
+importPackage(Packages.ru.iris.common.helpers);
 
 var action = advertisement.getResponse().getOutcome().getEntities().get("action").getValue();
 

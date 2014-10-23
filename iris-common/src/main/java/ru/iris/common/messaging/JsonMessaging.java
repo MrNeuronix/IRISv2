@@ -50,7 +50,7 @@ public class JsonMessaging
 	 * The receive queue for JSON objects.
 	 */
 	private final BlockingQueue<JsonEnvelope> jsonReceiveQueue = new ArrayBlockingQueue<>(100);
-	private final Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+	private final Gson gson = new GsonBuilder().create();
 	/**
 	 * Boolean flag reflecting whether threads should be close.
 	 */

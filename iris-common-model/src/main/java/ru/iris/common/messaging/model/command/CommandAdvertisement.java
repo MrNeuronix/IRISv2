@@ -16,7 +16,6 @@
 
 package ru.iris.common.messaging.model.command;
 
-import com.google.gson.annotations.Expose;
 import ru.iris.common.messaging.model.Advertisement;
 
 import java.util.Map;
@@ -26,10 +25,7 @@ public class CommandAdvertisement extends Advertisement
 	/**
 	 * Command
 	 */
-	@Expose
 	private Map<String, ?> data;
-
-	@Expose
 	private String script;
 
 	public CommandAdvertisement set(String script, Map<String, ?> data)

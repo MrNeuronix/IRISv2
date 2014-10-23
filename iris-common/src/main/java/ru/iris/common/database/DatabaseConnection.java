@@ -50,16 +50,14 @@ public class DatabaseConnection
 		// set DDL options...
 		config.setDdlGenerate(Boolean.valueOf(conf.get("ddlGenerate")));
 		config.setDdlRun(Boolean.valueOf(conf.get("ddlRun")));
-
-		config.setDebugSql(Boolean.valueOf(conf.get("sqlDebug")));
 		//config.setLoggingLevel(LogLevel.SQL);
 
 		config.setDefaultServer(true);
 		config.setRegister(true);
 
 		// specify entity classes
-		config.addClass(Event.class);
 		config.addClass(Log.class);
+		config.addClass(Event.class);
 		config.addClass(Speaks.class);
 		config.addClass(Task.class);
 		config.addClass(Device.class);

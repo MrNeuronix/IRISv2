@@ -16,7 +16,6 @@
 
 package ru.iris.common.messaging.model.devices.noolite;
 
-import com.google.gson.annotations.Expose;
 import ru.iris.common.messaging.model.Advertisement;
 
 public class NooliteDeviceLevelSetAdvertisement extends Advertisement
@@ -25,19 +24,19 @@ public class NooliteDeviceLevelSetAdvertisement extends Advertisement
 	/**
 	 * Device UUID
 	 */
-	@Expose
+
 	private String deviceUUID;
 
 	/**
 	 * Label, what value we want change.
 	 */
-	@Expose
+
 	private String label;
 
 	/**
 	 * Label value.
 	 */
-	@Expose
+
 	private String value;
 
 	public NooliteDeviceLevelSetAdvertisement set(String deviceUUID, String label, String value)

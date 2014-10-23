@@ -16,84 +16,50 @@
 
 package ru.iris.common.database.model;
 
-import com.google.gson.annotations.Expose;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 
 @Entity
 @Table(name = "calendar")
-public class Task
+public class Task extends DBModel
 {
-
-	@Expose
-	@Id
-	private int id;
-
 	// Время начала
-	@Expose
 	@Column(columnDefinition = "timestamp")
 	private Timestamp startdate;
 
 	// Время конца
-	@Expose
 	@Column(columnDefinition = "timestamp")
 	private Timestamp enddate;
 
 	// Заголовок задачи
-	@Expose
 	private String title;
 
 	// Текст задачи
-	@Expose
 	private String text;
 
-	// Тип таска:
-	// 1 - Однократный запуск
-	// 2 - Многократный запуск от и до с интервалом
-	@Expose
-	private String type;
-
 	// Адрес, куда слать (например, event.command)
-	@Expose
 	private String subject;
 
 	// Тут хранится сериализованный в JSON advertisement
-	@Expose
 	private String obj;
 
 	// Интервал, с которой будет запускаться задача
-	@Expose
 	private String period;
 
 	// Источник данных
-	@Expose
 	private String source;
 
 	// Показывать ли в календаре?
-	@Expose
 	@Column(name = "showInCalendar")
 	private boolean showInCalendar;
 
 	// Активна ли?
-	@Expose
 	private boolean enabled;
 
 	public Task()
 	{
-	}
-
-	public int getId()
-	{
-		return id;
-	}
-
-	public void setId(int id)
-	{
-		this.id = id;
 	}
 
 	public Timestamp getStartdate()
@@ -134,16 +100,6 @@ public class Task
 	public void setText(String text)
 	{
 		this.text = text;
-	}
-
-	public String getType()
-	{
-		return type;
-	}
-
-	public void setType(String type)
-	{
-		this.type = type;
 	}
 
 	public String getSubject()

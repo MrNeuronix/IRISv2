@@ -17,65 +17,52 @@
 package ru.iris.common.database.model.devices;
 
 import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Expr;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.Expose;
+import ru.iris.common.database.model.DBModel;
 
-import javax.persistence.*;
-import java.util.ArrayList;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.util.List;
 
 @Entity
 @Table(name = "devices")
-public class Device
+public class Device extends DBModel
 {
+	private String name = "not set";
 
-	@Id
-	private Long id;
+	private short node = 0;
 
-	@Expose private String name = "not set";
+	private int zone = 0;
 
-	@Expose private short node = 0;
+	private String type = "unknown";
 
-	@Expose private int zone = 0;
+	@Column(name = "internaltype")
+	private String internalType = "unknown";
 
-	@Expose private String type = "unknown";
+	@Column(name = "manufname")
+	private String manufName = "unknown";
 
-	@Expose
-	@Column(name = "internaltype") private String internalType = "unknown";
+	@Column(name = "productname")
+	private String productName = "unknown";
 
-	@Expose
-	@Column(name = "manufname") private String manufName = "unknown";
+	private String uuid = "unknown";
 
-	@Expose
-	@Column(name = "productname") private String productName = "unknown";
+	private String status = "unknown";
 
-	@Expose private String uuid = "unknown";
+	@Column(name = "internalname")
+	private String internalName = "unknown";
 
-	@Expose private String status = "unknown";
-
-	@Expose
-	@Column(name = "internalname") private String internalName = "unknown";
-
-	@Expose
 	private String source = "unknown";
 
-	@Expose
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	private List<DeviceValue> values = new ArrayList<>();
+	@Transient
+	private transient List<DeviceValue> deviceValues;
 
 	public Device()
 	{
-	}
-
-	public Long getId()
-	{
-		return id;
-	}
-
-	public void setId(Long id)
-	{
-		this.id = id;
 	}
 
 	public String getName()
@@ -180,12 +167,7 @@ public class Device
 
 	public List<DeviceValue> getValues()
 	{
-		return values;
-	}
-
-	public void setValues(List<DeviceValue> values)
-	{
-		this.values = values;
+		return Ebean.find(DeviceValue.class).where().eq("uuid", uuid).findList();
 	}
 
 	public String getSource()
@@ -198,85 +180,22 @@ public class Device
 		this.source = source;
 	}
 
-	@Deprecated
-	public List<DeviceValue> getValueIDs()
+	public DeviceValue getValue(String label)
 	{
-		return values;
-	}
-
-	public DeviceValue getValue(String value)
-	{
-
-		for (DeviceValue zvalue : values)
-		{
-			if (zvalue.getLabel().equals(value))
-			{
-				return zvalue;
-			}
-		}
-		return null;
-	}
-
-	public synchronized void updateValue(DeviceValue value)
-	{
-
-		// bi-directional relationship
-		value.setDevice(this);
-
-		List<DeviceValue> zDv = values;
-		boolean flag = false;
-
-		for (DeviceValue zvalue : new ArrayList<>(values))
-		{
-			if (zvalue.getLabel().equals(value.getLabel()))
-			{
-				zDv.remove(zvalue);
-				zDv.add(value);
-				flag = true;
-			}
-		}
-
-		if (!flag)
-		{
-			zDv.add(value);
-		}
-
-		values = zDv;
-		zDv = null;
+		return Ebean.find(DeviceValue.class).where().and(Expr.eq("label", label), Expr.eq("uuid", this.getUuid())).findUnique();
 	}
 
 	public synchronized void removeValue(DeviceValue value)
 	{
-
-		List<DeviceValue> zDv = values;
-
-		for (DeviceValue zvalue : new ArrayList<>(values))
-		{
-			if (zvalue.getLabel().equals(value.getLabel()))
-			{
-				zDv.remove(zvalue);
-			}
-		}
-
-		values = zDv;
-		zDv = null;
+		Ebean.delete(value);
 	}
 
 	public synchronized void removeValue(String valuelabel)
 	{
+		DeviceValue deviceValue = Ebean.find(DeviceValue.class).where().and(Expr.eq("label", valuelabel), Expr.eq("uuid", this.getUuid())).findUnique();
 
-		List<DeviceValue> zDv = values;
-
-		for (DeviceValue zvalue : new ArrayList<>(values))
-		{
-			if (zvalue.getLabel().equals(valuelabel))
-			{
-				zDv.remove(zvalue);
-			}
-		}
-
-		values = zDv;
-		zDv = null;
+		if (deviceValue != null)
+			Ebean.delete(deviceValue);
 	}
 
 	public static Device getDeviceByUUID(String uuid)
@@ -284,10 +203,15 @@ public class Device
 		return Ebean.find(Device.class).where().eq("uuid", uuid).findUnique();
 	}
 
+	public static Device getDeviceByNode(short node)
+	{
+		return Ebean.find(Device.class).where().eq("node", node).findUnique();
+	}
+
 	@Override
 	public String toString()
 	{
-		Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().disableHtmlEscaping().create();
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		return gson.toJson(this);
 	}
 }

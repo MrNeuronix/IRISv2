@@ -23,7 +23,7 @@
 
 // importing all classes in package (like import ru.iris.common.* in java)
 importPackage(Packages.ru.iris.common);
-importPackage(Packages.ru.iris.common.support);
+importPackage(Packages.ru.iris.common.helpers);
 importPackage(Packages.ru.iris.common.messaging);
 importPackage(Packages.ru.iris.common.database);
 importPackage(Packages.ru.iris.common.messaging.model);
@@ -82,7 +82,7 @@ if (label == "Level" && value == "255" && device.getInternalName() == "noolite/c
                 }
 
                 // turn off past 20 minutes
-                setTimeout(turnOff, 600000);
+                setTimeout(turnOff, 1200000);
             }
         };
         obj.run();

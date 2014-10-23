@@ -16,48 +16,26 @@
 
 package ru.iris.common.database.model;
 
-import com.google.gson.annotations.Expose;
-
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "datasources")
-public class DataSource
+public class DataSource extends DBModel
 {
-
-	@Expose
-	@Id
-	private int id;
-
 	// type (google-cal, etc)
-	@Expose
 	private String type;
 
-	@Expose
 	private String title;
 
 	// JSON object
-	@Expose
 	private String obj;
 
 	// Активна ли?
-	@Expose
 	private boolean enabled;
 
 	public DataSource()
 	{
-	}
-
-	public int getId()
-	{
-		return id;
-	}
-
-	public void setId(int id)
-	{
-		this.id = id;
 	}
 
 	public String getTitle()

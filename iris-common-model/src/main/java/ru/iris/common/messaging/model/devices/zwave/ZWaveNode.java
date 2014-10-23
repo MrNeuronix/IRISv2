@@ -16,13 +16,11 @@
 
 package ru.iris.common.messaging.model.devices.zwave;
 
-import com.google.gson.annotations.Expose;
 import ru.iris.common.database.model.devices.Device;
 
 public class ZWaveNode
 {
-
-	@Expose Device device;
+	protected transient Device device;
 
 	public ZWaveNode set(Device device)
 	{

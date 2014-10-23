@@ -16,7 +16,6 @@
 
 package ru.iris.common.messaging.model.devices.noolite;
 
-import com.google.gson.annotations.Expose;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.model.Advertisement;
 
@@ -25,7 +24,7 @@ public class ResponseNooliteDeviceInventoryAdvertisement extends Advertisement
 	/**
 	 * Device UUID
 	 */
-	@Expose
+
 	private Device device;
 
 	public ResponseNooliteDeviceInventoryAdvertisement set(Device device)

@@ -16,51 +16,53 @@
 
 package ru.iris.common.database.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import com.avaje.ebean.Ebean;
+import com.avaje.ebean.Model;
 
-@Entity
-@Table(name = "events")
-public class Event extends DBModel
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
+
+/**
+ * Created by nikolay.viguro on 16.10.2014.
+ */
+@MappedSuperclass
+public class DBModel extends Model
 {
-	private String subject;
+	@Id
+	@GeneratedValue
+	public Long id;
 
-	private String script;
-
-	private boolean isEnabled;
-
-	// Default
-	public Event()
+	public Long getId()
 	{
+		return id;
 	}
 
-	public String getSubject()
+	public void setId(Long id)
 	{
-		return subject;
+		this.id = id;
 	}
 
-	public void setSubject(String subject)
+	@Override
+	public synchronized void save()
 	{
-		this.subject = subject;
+		if (this.getId() == null)
+		{
+			Ebean.save(this);
+		}
+		else
+		{
+			Ebean.update(this);
+		}
 	}
 
-	public String getScript()
+	@Override
+	public synchronized void delete()
 	{
-		return script;
+		if (this.getId() == null)
+		{
+			Ebean.delete(this);
+		}
 	}
 
-	public void setScript(String script)
-	{
-		this.script = script;
-	}
-
-	public boolean isEnabled()
-	{
-		return isEnabled;
-	}
-
-	public void setEnabled(boolean isEnabled)
-	{
-		this.isEnabled = isEnabled;
-	}
 }

@@ -14,36 +14,20 @@
  * limitations under the License.
  */
 
-package ru.iris.common.messaging.model.devices;
+package ru.iris.common.helpers;
 
-import ru.iris.common.messaging.model.Advertisement;
+import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
 
-public class GetInventoryAdvertisement extends Advertisement
+import java.util.UUID;
+
+public class Speak
 {
-	/**
-	 * Device UUID
-	 */
-	private String deviceUUID;
+	private static final SpeakAdvertisement advertisement = new SpeakAdvertisement();
 
-	public GetInventoryAdvertisement set(String deviceUUID)
+	public void say(String text)
 	{
-		this.deviceUUID = deviceUUID;
-		return this;
-	}
-
-	public String getDeviceUUID()
-	{
-		return deviceUUID;
-	}
-
-	public void setDeviceUUID(String deviceUUID)
-	{
-		this.deviceUUID = deviceUUID;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "GetInventoryAdvertisement { UUID: " + deviceUUID + " }";
+		JsonMessaging messaging = new JsonMessaging(UUID.randomUUID(), "speak");
+		messaging.broadcast("event.speak", advertisement.set(text, 100.0));
 	}
 }

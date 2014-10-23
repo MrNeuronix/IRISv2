@@ -16,19 +16,12 @@
 
 package ru.iris.common.datasource.model;
 
-import com.google.gson.annotations.Expose;
-
 public class VKModel
 {
-	@Expose
 	private int clientid;
-	@Expose
 	private String secretkey;
-	@Expose
 	private String username;
-	@Expose
 	private String password;
-	@Expose
 	private String accesstoken;
 
 	public VKModel()

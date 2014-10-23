@@ -65,6 +65,6 @@ public class Lock
 		lock.setStartlock(startlock);
 		lock.setEndlock(endlock);
 
-		Ebean.save(lock);
+		lock.save();
 	}
 }

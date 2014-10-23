@@ -14,36 +14,13 @@
  * limitations under the License.
  */
 
-package ru.iris.common.messaging.model.devices;
+/**
+ * @author Nikolay A. Viguro
+ * Date: 26.11.13
+ * Time: 16:39
+ * This is test script for event engine of IRISv2
+ */
 
-import ru.iris.common.messaging.model.Advertisement;
+importPackage(Packages.ru.iris.common.helpers);
 
-public class GetInventoryAdvertisement extends Advertisement
-{
-	/**
-	 * Device UUID
-	 */
-	private String deviceUUID;
-
-	public GetInventoryAdvertisement set(String deviceUUID)
-	{
-		this.deviceUUID = deviceUUID;
-		return this;
-	}
-
-	public String getDeviceUUID()
-	{
-		return deviceUUID;
-	}
-
-	public void setDeviceUUID(String deviceUUID)
-	{
-		this.deviceUUID = deviceUUID;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "GetInventoryAdvertisement { UUID: " + deviceUUID + " }";
-	}
-}
+new Speak().say(advertisement.getData().get("text"));
