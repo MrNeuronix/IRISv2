@@ -58,6 +58,7 @@ if (label == "Level" && value == "255" && device.getInternalName() == "noolite/c
 
         // lock task
         var lock = new Lock("toilet-light-on");
+        var reluuid = uuid;
         lock.lock();
 
         // run in separate thread
@@ -67,13 +68,13 @@ if (label == "Level" && value == "255" && device.getInternalName() == "noolite/c
 
                     if (Lock.isLocked("toilet-light-on")) {
 
-                        LOGGER.info("[turnOffLater] Times up! Release lock and turn off device " + uuid);
+                        LOGGER.info("[turnOffLater] Times up! Release lock and turn off device " + reluuid);
 
                         // release lock
                         Lock.release("toilet-light-on");
 
                         // turn off device
-                        new DeviceCtl().off(uuid);
+                        new DeviceCtl().off(reluuid);
 
                         // lets speak!
                         new Speak().say("Кто-то опять забыл выключить свет! Прошло 20 минут, выключаю сам");
@@ -92,4 +93,5 @@ if (label == "Level" && value == "255" && device.getInternalName() == "noolite/c
 if (label == "Level" && value == "0" && device.getInternalName() == "noolite/channel/4" && Lock.isLocked("toilet-light-on")) {
     // release lock
     Lock.release("toilet-light-on");
+    LOGGER.info("[turnOffLater] Release lock!");
 }
