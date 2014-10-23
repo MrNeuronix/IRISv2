@@ -321,8 +321,9 @@ public class NooliteTXService implements Runnable
 				+ " " + command.get(4) + " " + command.get(5) + " " + command.get(6)
 				+ " " + command.get(7));
 
-		//send
-		LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE, 0x9, 0x300, 0, command, 100);
+		//send 3 times
+		for (int i = 0; i <= 3; i++)
+			LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE, 0x9, 0x300, 0, command, 100);
 
 		LibUsb.attachKernelDriver(handle, 0);
 		LibUsb.close(handle);
