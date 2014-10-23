@@ -114,7 +114,6 @@ public class ZWaveService implements Runnable
 					case AWAKE_NODES_QUERIED:
 						LOGGER.info("Awake nodes queried");
 						ready = true;
-						manager.writeConfig(homeId);
 						messaging.broadcast("event.devices.zwave.awakenodesqueried", zWaveAwakeNodesQueried);
 						break;
 					case ALL_NODES_QUERIED:
