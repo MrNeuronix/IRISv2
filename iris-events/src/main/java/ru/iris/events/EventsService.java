@@ -38,24 +38,22 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Created with IntelliJ IDEA.
  * Author: Nikolay A. Viguro
  * Date: 19.11.13
  * Time: 11:25
- * License: GPL v3
  */
 
 public class EventsService implements Runnable
 {
 	private final Logger LOGGER = LogManager.getLogger(EventsService.class.getName());
 	private boolean shutdown = false;
-	private List<Event> events = Ebean.find(Event.class).findList();
+    private Thread thread;
 
-	public EventsService()
+    public EventsService()
 	{
-		Thread t = new Thread(this);
-		t.setName("Event Service");
-		t.start();
+		thread = new Thread(this);
+        thread.setName("Event Service");
+        thread.start();
 	}
 
 	@Override
@@ -64,6 +62,10 @@ public class EventsService implements Runnable
 
 		try
 		{
+            List<Event> events = Ebean.find(Event.class).findList();
+
+            // take pause to save/remove new entity
+            Thread.sleep(1000);
 
 			// Make sure we exit the wait loop if we receive shutdown signal.
 			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
@@ -98,8 +100,13 @@ public class EventsService implements Runnable
 				}
 			};
 
-			// subscribe to anything
-			jsonMessaging.subscribe("#");
+			// subscribe to events from db
+            for(Event event : events)
+            {
+                jsonMessaging.subscribe(event.getSubject());
+                LOGGER.debug("Subscribe to subject: " + event.getSubject());
+            }
+
 			jsonMessaging.start();
 
 			while (!shutdown)
@@ -108,6 +115,9 @@ public class EventsService implements Runnable
 
 				if (envelope != null)
 				{
+
+                    LOGGER.debug("Got envelope with subject: " + envelope.getSubject());
+
 					// Check command and launch script
 					if (envelope.getObject() instanceof CommandAdvertisement)
 					{
@@ -133,20 +143,11 @@ public class EventsService implements Runnable
 					}
 					else if (envelope.getObject() instanceof EventChangesAdvertisement)
 					{
-						LOGGER.info("Reload events list");
+						LOGGER.info("Restart event service");
 
-						// take pause to save/remove new entity
-						Thread.sleep(1000);
-
-						// reload events
-						events = null;
-						events = Ebean.find(Event.class).findList();
-
-						// take pause to save/remove new entity
-						Thread.sleep(1000);
-
-						LOGGER.info("Loaded " + events.size() + " events.");
-
+						shutdown = true;
+                        new EventsService();
+                        thread.join();
 					}
 					else
 					{
@@ -232,10 +233,6 @@ public class EventsService implements Runnable
 			}
 			old = states;
 		}
-		if (states[N])
-		{
-			return true;
-		}
-		return false;
-	}
+        return states[N];
+    }
 }

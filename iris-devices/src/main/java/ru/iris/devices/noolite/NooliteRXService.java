@@ -119,8 +119,6 @@ public class NooliteRXService implements Runnable
 
 		new InternalCommands();
 
-		boolean initComplete = false;
-
 		while (!shutdown)
 		{
 			// receiving area
@@ -218,7 +216,7 @@ public class NooliteRXService implements Runnable
 					messaging.broadcast("event.devices.noolite.value.stopdimbright", new NooliteDeviceLevelStopDimBrightAdvertisement().set(device.getUuid()));
 				}
 
-				LOGGER.info("Update Noolite device (Node: " + device.getId() + ")");
+				LOGGER.info("Update Noolite device (Node: " + device.getNode() + ")");
 
 				tmpBuf = buf;
 			}

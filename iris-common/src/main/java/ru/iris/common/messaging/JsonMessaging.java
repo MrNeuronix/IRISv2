@@ -61,7 +61,6 @@ public class JsonMessaging
 	private Thread jsonBroadcastListenThread;
 
 	private Channel channel = JsonConnection.getInstance().getChannel();
-	private String queueName = "";
 
 	public JsonMessaging(final UUID instanceId)
 	{
@@ -71,7 +70,6 @@ public class JsonMessaging
 	public JsonMessaging(final UUID instanceId, String queueName)
 	{
 		this.instanceId = instanceId;
-		this.queueName = queueName;
 	}
 
 	/**
@@ -87,7 +85,7 @@ public class JsonMessaging
 			{
 				listenBroadcasts();
 			}
-		}, "json-broascast-listen");
+		}, "json-broadcast-listen");
 		jsonBroadcastListenThread.setName("JSON Messaging Listen Thread");
 		jsonBroadcastListenThread.start();
 
@@ -117,7 +115,6 @@ public class JsonMessaging
 	{
 		try
 		{
-			channel.queueDelete(queueName);
 			shutdownThreads = true;
 
 			if (jsonBroadcastListenThread != null)
@@ -232,7 +229,7 @@ public class JsonMessaging
 	{
 		try
 		{
-			queueName = channel.queueDeclare(queueName, false, false, true, null).getQueue();
+            String queueName = channel.queueDeclare().getQueue();
 
 			for (String subject : jsonSubjects)
 			{
