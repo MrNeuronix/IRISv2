@@ -21,10 +21,12 @@ import ru.iris.common.database.model.devices.Device;
 public class ZWaveNode
 {
 	protected transient Device device;
+	protected String uuid;
 
 	public ZWaveNode set(Device device)
 	{
 		this.device = device;
+		this.uuid = device.getUuid();
 		return this;
 	}
 
@@ -36,6 +38,11 @@ public class ZWaveNode
 	public void setDevice(Device device)
 	{
 		this.device = device;
+	}
+
+	public String getDeviceUUID()
+	{
+		return uuid;
 	}
 
 	@Override

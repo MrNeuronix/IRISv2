@@ -37,6 +37,7 @@ var device = Device.getDeviceByUUID(uuid);
 
 // if flood state = ON and device have internalname = zwave/alarmsensor/2
 if (label == "Flood" && value == "255" && device.getInternalName() == "zwave/alarmsensor/2") {
+
     LOGGER.info("[floodSensor] Flood detected!");
 
     // lets speak!
@@ -45,7 +46,7 @@ if (label == "Flood" && value == "255" && device.getInternalName() == "zwave/ala
 
 
 if (label == "Flood" && value == "0" && device.getInternalName() == "zwave/alarmsensor/2") {
-    // release lock
+
     LOGGER.info("[floodSensor] Flood off!");
 
     // lets speak!

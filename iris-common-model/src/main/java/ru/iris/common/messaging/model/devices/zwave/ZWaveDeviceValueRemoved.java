@@ -18,13 +18,8 @@ package ru.iris.common.messaging.model.devices.zwave;
 
 import ru.iris.common.database.model.devices.Device;
 
-public class ZWaveDeviceValueRemoved
+public class ZWaveDeviceValueRemoved extends ZWaveNode
 {
-	/**
-	 * Zwave device
-	 */
-
-	private transient Device device;
 
 	private String label;
 
@@ -43,16 +38,6 @@ public class ZWaveDeviceValueRemoved
 		this.label = label;
 		this.value = value;
 		return this;
-	}
-
-	public Device getDevice()
-	{
-		return device;
-	}
-
-	public void setDevice(Device device)
-	{
-		this.device = device;
 	}
 
 	public String getLabel()
