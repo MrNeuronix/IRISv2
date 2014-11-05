@@ -44,7 +44,7 @@ if (label == "Flood" && value == "255" && device.getInternalName() == "zwave/ala
 }
 
 
-if (label == "Flood" && value == "255" && device.getInternalName() == "zwave/alarmsensor/2") {
+if (label == "Flood" && value == "0" && device.getInternalName() == "zwave/alarmsensor/2") {
     // release lock
     LOGGER.info("[floodSensor] Flood off!");
 
