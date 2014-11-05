@@ -1,0 +1,45 @@
+#!/bin/bash
+#
+# Run-level Startup script for the IRISv2 Instance
+#
+# chkconfig: 345
+# description: Startup/Shutdown IRISv2 instance
+
+IRIS_HOME="/iris"
+IRIS_OWNR="root"
+
+# if the executables do not exist -- display error
+
+if [ ! -f $IRIS_HOME/iris-core.jar -o ! -d $IRIS_HOME ]
+then
+        echo "IRISv2 startup: cannot start"
+        exit 1
+fi
+
+# depending on parameter -- startup, shutdown, restart
+# of the instance or usage display
+
+case "$1" in
+    start)
+        # IRISv2 instance startup
+        echo -n "Starting IRISv2: "
+        su - $IRIS_OWNR -c "cd $IRIS_HOME; nohup java -jar $IRIS_HOME/iris-core.jar &"
+        touch /var/lock/iris
+        echo "OK"
+        ;;
+    stop)
+        # IRISv2 instance shutdown
+        echo -n "Shutdown IRISv2: "
+        su - $IRIS_OWNR -c "pkill java"
+        rm -f /var/lock/iris
+        echo "OK"
+        ;;
+    reload|restart)
+        $0 stop
+        $0 start
+        ;;
+    *)
+        echo "Usage: $0 start|stop|restart|reload"
+        exit 1
+esac
+exit 0
