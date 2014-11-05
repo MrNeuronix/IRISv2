@@ -31,7 +31,7 @@ import java.util.UUID;
 public class DeviceCtl
 {
 	private static final SetDeviceLevelAdvertisement advertisement = new SetDeviceLevelAdvertisement();
-	private static final JsonMessaging messaging = new JsonMessaging(UUID.randomUUID(), "devices-common");
+	private static final JsonMessaging messaging = new JsonMessaging(UUID.randomUUID());
 
 	public void on(String uuid)
 	{

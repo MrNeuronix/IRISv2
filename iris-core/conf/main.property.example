@@ -4,6 +4,8 @@
 
 AMQPhost=localhost
 AMQPport=5672
+AMQPuser=iris
+AMQPpasswd=test
 
 language=ru
 locale=ru-RU

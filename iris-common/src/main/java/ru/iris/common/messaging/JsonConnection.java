@@ -68,6 +68,8 @@ public class JsonConnection
 			// Create a ConnectionFactory
 			connectionFactory.setHost(config.get("AMQPhost"));
 			connectionFactory.setPort(Integer.valueOf(config.get("AMQPport")));
+			connectionFactory.setUsername(config.get("AMQPuser"));
+			connectionFactory.setPassword(config.get("AMQPpasswd"));
 
 			connection = connectionFactory.newConnection();
 			channel = connection.createChannel();
@@ -77,7 +79,8 @@ public class JsonConnection
 		}
 		catch (IOException e)
 		{
-			LOGGER.error("Error while connection to AMQP broker! " + e);
+			LOGGER.error("Error while connection to AMQP broker: " + e.getMessage());
+			System.exit(1);
 		}
 	}
 
