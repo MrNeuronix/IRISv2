@@ -107,6 +107,9 @@ public class EventsService implements Runnable
                 LOGGER.debug("Subscribe to subject: " + event.getSubject());
             }
 
+			// command launch
+			jsonMessaging.subscribe("event.command");
+
 			jsonMessaging.start();
 
 			while (!shutdown)

@@ -111,7 +111,7 @@ public class VKSource
 					cal.setTime(dateFormat.parse(bdate));
 
 					cal.set(Calendar.YEAR, 2014);
-					cal.set(Calendar.HOUR_OF_DAY, 12);
+					cal.set(Calendar.HOUR_OF_DAY, 10);
 					cal.set(Calendar.MINUTE, 0);
 
 					Task saved = Ebean.find(Task.class).where().eq("title", "День рождения " + user.getFirstName() + " " + user.getLastName()).findUnique();
@@ -121,7 +121,7 @@ public class VKSource
 						Task task = new Task();
 						task.setStartdate(new Timestamp(cal.getTime().getTime()));
 
-						cal.set(Calendar.MINUTE, 1);
+						cal.set(Calendar.HOUR, 10);
 
 						Map<String, String> map = new HashMap<>();
 						map.put("text", "Сегодня празднует день рождения ваш друг - " + user.getFirstName() + " " + user.getLastName());
@@ -135,7 +135,11 @@ public class VKSource
 						task.setText("Сегодня празднует день рождения ваш друг - " + user.getFirstName() + " " + user.getLastName());
 						task.setSource("vk");
 						task.setObj(gson.toJson(adv));
-						task.setSubject("event.speak");
+						task.setSubject("event.command");
+
+						// every hour
+						task.setPeriod("" + 60L * 60L * 1000L);
+
 						task.setShowInCalendar(true);
 						task.setEnabled(true);
 
