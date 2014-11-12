@@ -145,14 +145,6 @@ public class VKSource
 
 						task.save();
 					}
-					else
-					{
-						saved.setStartdate(new Timestamp(cal.getTime().getTime()));
-						cal.set(Calendar.HOUR, 10);
-						saved.setEnddate(new Timestamp(cal.getTime().getTime()));
-
-						saved.save();
-					}
 				}
 			}
 

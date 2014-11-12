@@ -17,7 +17,6 @@
 package ru.iris.scheduler;
 
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.quartz.Scheduler;
@@ -38,6 +37,7 @@ import ru.iris.common.source.googlecal.GoogleCalendarSource;
 import ru.iris.common.source.vk.VKSource;
 import ru.iris.scheduler.jobs.SendCommandAdvertisementJob;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -172,7 +172,15 @@ public class ScheduleService implements Runnable
 
 	private void readAndScheduleTasks()
 	{
-		events = Ebean.find(Task.class).where().and(Expr.eq("enabled", true), Expr.gt("startdate", new Date())).findList();
+		Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.MONTH, 1);
+
+		events = Ebean.find(Task.class)
+				.where()
+				.eq("enabled", true)
+				.gt("startdate", new Date())
+				.gt("startdate", cal.getTime())
+				.findList();
 
 		try
 		{
