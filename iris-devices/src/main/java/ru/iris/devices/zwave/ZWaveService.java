@@ -129,11 +129,11 @@ public class ZWaveService implements Runnable
 						break;
 					case POLLING_ENABLED:
 						LOGGER.info("Polling enabled");
-						messaging.broadcast("event.devices.zwave.polling.disabled", zWavePolling.set(Device.getDeviceByNode(notification.getNodeId()), true));
+						messaging.broadcast("event.devices.zwave.polling.enabled", zWavePolling.set(Device.getDeviceByNode(notification.getNodeId()), true));
 						break;
 					case POLLING_DISABLED:
 						LOGGER.info("Polling disabled");
-						messaging.broadcast("event.devices.zwave.polling.enabled", zWavePolling.set(Device.getDeviceByNode(notification.getNodeId()), false));
+						messaging.broadcast("event.devices.zwave.polling.disabled", zWavePolling.set(Device.getDeviceByNode(notification.getNodeId()), false));
 						break;
 					case NODE_NEW:
 						messaging.broadcast("event.devices.zwave.node.new", zWaveNodeNew.set(Device.getDeviceByNode(notification.getNodeId())));
