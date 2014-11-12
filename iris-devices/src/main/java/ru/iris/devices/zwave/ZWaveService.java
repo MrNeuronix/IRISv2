@@ -350,7 +350,7 @@ public class ZWaveService implements Runnable
 						// break if same value
 						try
 						{
-							if (Utils.getValue(valueId) == Utils.getValue(notification.getValueId()))
+							if (Utils.getValue(valueId).toString().equals(Utils.getValue(notification.getValueId()).toString()))
 							{
 								LOGGER.debug("Same value. Breaking");
 								break;
