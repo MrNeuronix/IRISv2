@@ -358,9 +358,7 @@ public class ZWaveService implements Runnable
 						}
 						catch (NullPointerException e)
 						{
-							LOGGER.error("Error while change value: " + e.toString());
-							e.printStackTrace();
-							//break;
+							break;
 						}
 
 						LOGGER.info("Node " +
