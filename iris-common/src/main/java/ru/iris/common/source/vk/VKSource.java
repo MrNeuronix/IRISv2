@@ -148,7 +148,7 @@ public class VKSource
 					else
 					{
 						saved.setStartdate(new Timestamp(cal.getTime().getTime()));
-						cal.set(Calendar.SECOND, 30);
+						cal.set(Calendar.HOUR, 10);
 						saved.setEnddate(new Timestamp(cal.getTime().getTime()));
 
 						saved.save();

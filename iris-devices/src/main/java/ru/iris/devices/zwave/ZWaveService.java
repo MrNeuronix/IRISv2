@@ -297,6 +297,9 @@ public class ZWaveService implements Runnable
 								);
 						}
 
+						// enable value polling
+						Manager.get().enablePoll(notification.getValueId());
+
 						break;
 					case VALUE_REMOVED:
 
@@ -429,9 +432,13 @@ public class ZWaveService implements Runnable
 			}
 			catch (InterruptedException e)
 			{
+				LOGGER.error("Error while initialize Z-Wave: ", e.getMessage());
 				e.printStackTrace();
 			}
 		}
+
+		// set polling interval 10 sec
+		Manager.get().setPollInterval(10000, true);
 
 		for (Device ZWaveDevice : Ebean.find(Device.class).where().eq("source", "zwave").findList())
 		{
