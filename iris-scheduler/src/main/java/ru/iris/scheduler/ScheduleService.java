@@ -178,8 +178,7 @@ public class ScheduleService implements Runnable
 		events = Ebean.find(Task.class)
 				.where()
 				.eq("enabled", true)
-				.gt("startdate", new Date())
-				.gt("startdate", cal.getTime())
+				.between("startdate", new Date(), cal.getTime())
 				.findList();
 
 		try
