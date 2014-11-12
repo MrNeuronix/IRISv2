@@ -297,8 +297,8 @@ public class ZWaveService implements Runnable
 								);
 						}
 
-						// enable value polling
-						Manager.get().enablePoll(notification.getValueId());
+						// enable value polling TODO
+						//Manager.get().enablePoll(notification.getValueId());
 
 						break;
 					case VALUE_REMOVED:
@@ -341,29 +341,9 @@ public class ZWaveService implements Runnable
 							zWaveDevice.setStatus("Listening");
 						}
 
-						ValueId valueId = gson.fromJson(
-								zWaveDevice.getValue(
-										manager.getValueLabel(notification.getValueId())
-								).getValueId(),
-								ValueId.class);
-
-						// break if same value
-						try
-						{
-							if (Utils.getValue(valueId).toString().equals(Utils.getValue(notification.getValueId()).toString()))
-							{
-								LOGGER.debug("Same value. Breaking");
-								break;
-							}
-						}
-						catch (NullPointerException e)
-						{
-							break;
-						}
-
 						LOGGER.info("Node " +
 								zWaveDevice.getNode() + ": " +
-								"Value for label \"" + manager.getValueLabel(notification.getValueId()) + "\" changed  --> " +
+								"Value for label \"" + manager.getValueLabel(notification.getValueId()) + "\" changed --> " +
 								"\"" + Utils.getValue(notification.getValueId()) + "\"");
 
 						DeviceValue udvChg = zWaveDevice.getValue(manager.getValueLabel(notification.getValueId()));
@@ -435,8 +415,8 @@ public class ZWaveService implements Runnable
 			}
 		}
 
-		// set polling interval 10 sec
-		Manager.get().setPollInterval(10000, true);
+		// set polling interval 60 sec TODO
+		//Manager.get().setPollInterval(60000, true);
 
 		for (Device ZWaveDevice : Ebean.find(Device.class).where().eq("source", "zwave").findList())
 		{

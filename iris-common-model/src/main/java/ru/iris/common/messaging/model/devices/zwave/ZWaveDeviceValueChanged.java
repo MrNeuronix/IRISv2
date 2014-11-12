@@ -21,7 +21,6 @@ import ru.iris.common.database.model.devices.Device;
 public class ZWaveDeviceValueChanged extends ZWaveNode
 {
 	private String label;
-
 	private String value;
 
 	/**
@@ -36,6 +35,7 @@ public class ZWaveDeviceValueChanged extends ZWaveNode
 		this.device = device;
 		this.label = label;
 		this.value = value;
+        this.uuid = device.getUuid();
 		return this;
 	}
 
@@ -58,4 +58,12 @@ public class ZWaveDeviceValueChanged extends ZWaveNode
 	{
 		this.value = value;
 	}
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 }

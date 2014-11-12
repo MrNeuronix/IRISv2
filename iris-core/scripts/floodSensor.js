@@ -29,26 +29,29 @@ importPackage(Packages.ru.iris.common.database);
 importPackage(Packages.ru.iris.common.messaging.model);
 importPackage(Packages.ru.iris.common.database.model.devices);
 
-var label = advertisement.getLabel();
-var value = advertisement.getValue();
-var uuid = advertisement.getDeviceUUID();
+//if(advertisement instanceof Packages.ru.iris.common.database.model.devices.zwave.ZWaveDeviceValueChanged) {
 
-var device = Device.getDeviceByUUID(uuid);
+    var label = advertisement.getLabel();
+    var value = advertisement.getValue();
+    var uuid = advertisement.getDeviceUUID();
+
+    var device = Device.getDeviceByUUID(uuid);
 
 // if flood state = ON and device have internalname = zwave/alarmsensor/2
-if (label == "Flood" && value == "255" && device.getInternalName() == "zwave/alarmsensor/2") {
+    if (label == "Flood" && value == "255" && device.getInternalName() == "zwave/alarmsensor/2") {
 
-    LOGGER.info("[floodSensor] Flood detected!");
+        LOGGER.info("[floodSensor] Flood detected!");
 
-    // lets speak!
-    new Speak().say("Внимание! Обнаружена протечка воды!");
-}
+        // lets speak!
+        new Speak().say("Внимание! Обнаружена протечка воды!");
+    }
 
 
-if (label == "Flood" && value == "0" && device.getInternalName() == "zwave/alarmsensor/2") {
+    if (label == "Flood" && value == "0" && device.getInternalName() == "zwave/alarmsensor/2") {
 
-    LOGGER.info("[floodSensor] Flood off!");
+        LOGGER.info("[floodSensor] Flood off!");
 
-    // lets speak!
-    new Speak().say("Внимание! Протечка воды устранена!");
-}
+        // lets speak!
+        new Speak().say("Внимание! Протечка воды устранена!");
+    }
+//}
