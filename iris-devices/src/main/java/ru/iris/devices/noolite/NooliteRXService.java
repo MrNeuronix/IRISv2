@@ -133,8 +133,11 @@ public class NooliteRXService
 						LOGGER.info("Channel " + channel + ": Got TEMP_HUMI command.");
 						DBLogger.info("Device got TEMP_HUMI", device.getUuid());
 						updateValue(device, "Temperature", String.valueOf(notification.getValue("temp")));
+						DBLogger.info("Temperature is " + notification.getValue("temp"), device.getUuid());
 						updateValue(device, "Humidity", String.valueOf(notification.getValue("humi")));
+						DBLogger.info("Humidity is " + notification.getValue("humi"), device.getUuid());
 						updateValue(device, "Battery", battery.name());
+						DBLogger.info("Battery is " + battery.name(), device.getUuid());
 						messaging.broadcast("event.devices.noolite.value.temphumi", new NooliteDeviceTempHumiAdvertisement().set(device.getUuid()));
 						break;
 
