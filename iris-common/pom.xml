@@ -82,6 +82,13 @@
             <systemPath>${basedir}/../iris-core/lib/zwave4j-0.3.jar</systemPath>
         </dependency>
         <dependency>
+            <groupId>ru.iris</groupId>
+            <artifactId>noolite4j</artifactId>
+            <version>1.2</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/../iris-core/lib/noolite4j-1.2.jar</systemPath>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-io</artifactId>
             <version>1.3.2</version>
@@ -105,11 +112,6 @@
             <groupId>ro.fortsoft.pf4j</groupId>
             <artifactId>pf4j</artifactId>
             <version>0.9.0</version>
-        </dependency>
-        <dependency>
-            <groupId>de.ailis.usb4java</groupId>
-            <artifactId>usb4java</artifactId>
-            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.avaje.ebeanorm</groupId>
@@ -140,6 +142,11 @@
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz-jobs</artifactId>
             <version>2.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.usb4java</groupId>
+            <artifactId>usb4java</artifactId>
+            <version>1.2.0</version>
         </dependency>
     </dependencies>
 

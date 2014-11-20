@@ -17,10 +17,6 @@
 package ru.iris.devices.noolite;
 
 import com.avaje.ebean.Ebean;
-import de.ailis.usb4java.libusb.Context;
-import de.ailis.usb4java.libusb.DeviceHandle;
-import de.ailis.usb4java.libusb.LibUsb;
-import de.ailis.usb4java.libusb.LibUsbException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.database.model.devices.Device;
@@ -29,18 +25,13 @@ import ru.iris.common.helpers.DBLogger;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.devices.noolite.*;
+import ru.iris.noolite4j.sender.PC1132;
 
-import java.nio.ByteBuffer;
 import java.util.UUID;
 
 public class NooliteTXService implements Runnable
 {
-
-	// Noolite PC USB TX HID
-	private static final int VENDOR_ID = 5824; //0x16c0;
-	private static final int PRODUCT_ID = 1503; //0x05df;
 	private final Logger LOGGER = LogManager.getLogger(NooliteTXService.class.getName());
-	private final Context context = new Context();
 	private boolean shutdown = false;
 
 	public NooliteTXService()
@@ -54,18 +45,8 @@ public class NooliteTXService implements Runnable
 	public synchronized void run()
 	{
 		// Initialize the libusb context
-		int result = LibUsb.init(context);
-		if (result < 0)
-		{
-			try
-			{
-				throw new LibUsbException("Unable to initialize libusb", result);
-			}
-			catch (LibUsbException e)
-			{
-				e.printStackTrace();
-			}
-		}
+		PC1132 pc = new PC1132();
+		pc.open();
 
 		try
 		{
@@ -113,16 +94,9 @@ public class NooliteTXService implements Runnable
 						int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
 						int channelView = channel + 1;
 
-						ByteBuffer buf = ByteBuffer.allocateDirect(8);
-						buf.put((byte) 0x30);
-
 						//if noolite device dimmer (user set)
 						if (device.getValue("type") != null && device.getValue("type").getValue().contains("dimmer"))
 						{
-
-							buf.put((byte) 6);
-							buf.put((byte) 1);
-
 							if (level > 99 || level == 99)
 							{
 
@@ -130,7 +104,7 @@ public class NooliteTXService implements Runnable
 								updateValue(device, "Level", "255");
 								DBLogger.info("Device is ON", device.getUuid());
 
-								level = 100;
+								pc.turnOn((byte) channel);
 
 							}
 							else if (level < 0)
@@ -140,8 +114,7 @@ public class NooliteTXService implements Runnable
 								updateValue(device, "Level", "0");
 								DBLogger.info("Device is OFF", device.getUuid());
 
-								level = 0;
-
+								pc.turnOff((byte) channel);
 							}
 							else
 							{
@@ -149,15 +122,9 @@ public class NooliteTXService implements Runnable
 								DBLogger.info("Device level set: " + level, device.getUuid());
 
 								LOGGER.info("Setting device on channel " + channelView + " to level " + level);
+
+								pc.setLevel((byte) channel, level);
 							}
-
-							buf.position(5);
-							buf.put(level);
-
-							buf.position(4);
-							buf.put((byte) channel);
-
-							writeToHID(buf);
 						}
 						else
 						{
@@ -167,7 +134,8 @@ public class NooliteTXService implements Runnable
 								updateValue(device, "Level", "0");
 								DBLogger.info("Device is OFF", device.getUuid());
 
-								buf.put((byte) 0);
+								pc.turnOff((byte) channel);
+								;
 							}
 							else
 							{
@@ -176,13 +144,8 @@ public class NooliteTXService implements Runnable
 								updateValue(device, "Level", "255");
 								DBLogger.info("Device is ON", device.getUuid());
 
-								buf.put((byte) 2);
+								pc.turnOn((byte) channel);
 							}
-
-							buf.position(4);
-							buf.put((byte) channel);
-
-							writeToHID(buf);
 						}
 
 					}
@@ -196,16 +159,10 @@ public class NooliteTXService implements Runnable
 						int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
 						int channelView = channel + 1;
 
-						ByteBuffer buf = ByteBuffer.allocateDirect(8);
-						buf.put((byte) 0x30);
-						buf.put((byte) 15);
-						buf.position(4);
-						buf.put((byte) channel);
-
 						LOGGER.info("Binding device to channel " + channelView);
 						DBLogger.info("Binding device to channel " + channelView);
 
-						writeToHID(buf);
+						pc.bindChannel((byte) channel);
 
 					}
 					else if (envelope.getObject() instanceof UnbindTXChannelAdvertisment)
@@ -218,16 +175,10 @@ public class NooliteTXService implements Runnable
 						int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
 						int channelView = channel + 1;
 
-						ByteBuffer buf = ByteBuffer.allocateDirect(8);
-						buf.put((byte) 0x30);
-						buf.put((byte) 9);
-						buf.position(4);
-						buf.put((byte) channel);
-
 						LOGGER.info("Unbinding device from channel " + channelView);
 						DBLogger.info("Unbinding device from channel " + channelView);
 
-						writeToHID(buf);
+						pc.unbindChannel((byte) channel);
 
 					}
 					else if (envelope.getReceiverInstance() == null)
@@ -253,7 +204,7 @@ public class NooliteTXService implements Runnable
 
 			// Close JSON messaging.
 			jsonMessaging.close();
-			LibUsb.exit(context);
+			pc.close();
 
 		}
 		catch (final Throwable t)
@@ -280,52 +231,5 @@ public class NooliteTXService implements Runnable
 		deviceValue.setValue(value);
 
 		deviceValue.save();
-	}
-
-	private void writeToHID(ByteBuffer command)
-	{
-
-		DeviceHandle handle = LibUsb.openDeviceWithVidPid(context, VENDOR_ID, PRODUCT_ID);
-
-		if (handle == null)
-		{
-			LOGGER.error("Noolite TX device not found!");
-			DBLogger.info("Noolite TX device not found!");
-			shutdown = true;
-			return;
-		}
-
-		if (LibUsb.kernelDriverActive(handle, 0) == 1)
-		{
-			LibUsb.detachKernelDriver(handle, 0);
-		}
-
-		int ret = LibUsb.setConfiguration(handle, 1);
-
-		if (ret < 0)
-		{
-			LOGGER.error("Noolite RX device configuration error");
-			DBLogger.info("Noolite RX device configuration error");
-			LibUsb.close(handle);
-			if (ret == LibUsb.ERROR_BUSY)
-			{
-				LOGGER.error("Noolite RX device is busy");
-				DBLogger.info("Noolite RX device is busy");
-			}
-			return;
-		}
-
-		LibUsb.claimInterface(handle, 0);
-
-		LOGGER.debug("TX Buffer: " + command.get(0) + " " + command.get(1) + " " + command.get(2) + " " + command.get(3)
-				+ " " + command.get(4) + " " + command.get(5) + " " + command.get(6)
-				+ " " + command.get(7));
-
-		//send 3 times
-		for (int i = 0; i <= 3; i++)
-			LibUsb.controlTransfer(handle, LibUsb.REQUEST_TYPE_CLASS | LibUsb.RECIPIENT_INTERFACE, 0x9, 0x300, 0, command, 100);
-
-		LibUsb.attachKernelDriver(handle, 0);
-		LibUsb.close(handle);
 	}
 }
