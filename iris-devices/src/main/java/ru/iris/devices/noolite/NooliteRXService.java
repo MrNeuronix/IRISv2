@@ -26,6 +26,7 @@ import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.devices.noolite.*;
 import ru.iris.noolite4j.receiver.RX2164;
+import ru.iris.noolite4j.watchers.BatteryState;
 import ru.iris.noolite4j.watchers.Notification;
 import ru.iris.noolite4j.watchers.SensorType;
 import ru.iris.noolite4j.watchers.Watcher;
@@ -125,6 +126,16 @@ public class NooliteRXService
 						LOGGER.info("Channel " + channel + ": Got STOPDIMBRIGHT command.");
 						DBLogger.info("Device is STOPDIMBRIGHT", device.getUuid());
 						messaging.broadcast("event.devices.noolite.value.stopdimbright", new NooliteDeviceLevelStopDimBrightAdvertisement().set(device.getUuid()));
+						break;
+
+					case TEMP_HUMI:
+						BatteryState battery = (BatteryState) notification.getValue("battery");
+						LOGGER.info("Channel " + channel + ": Got TEMP_HUMI command.");
+						DBLogger.info("Device got TEMP_HUMI", device.getUuid());
+						updateValue(device, "Temperature", (String) notification.getValue("temp"));
+						updateValue(device, "Humidity", (String) notification.getValue("humi"));
+						updateValue(device, "Battery", battery.name());
+						messaging.broadcast("event.devices.noolite.value.temphumi", new NooliteDeviceTempHumiAdvertisement().set(device.getUuid()));
 						break;
 
 					default:
