@@ -91,8 +91,7 @@ public class NooliteTXService implements Runnable
 
 						Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
 
-						int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
-						int channelView = channel + 1;
+						byte channel = Byte.valueOf(device.getValue("channel").getValue());
 
 						//if noolite device dimmer (user set)
 						if (device.getValue("type") != null && device.getValue("type").getValue().contains("dimmer"))
@@ -100,51 +99,50 @@ public class NooliteTXService implements Runnable
 							if (level > 99 || level == 99)
 							{
 
-								LOGGER.info("Turn on device on channel " + channelView);
+								LOGGER.info("Turn on device on channel " + channel);
 								updateValue(device, "Level", "255");
 								DBLogger.info("Device is ON", device.getUuid());
 
-								pc.turnOn((byte) channel);
+								pc.turnOn(channel);
 
 							}
 							else if (level < 0)
 							{
 
-								LOGGER.info("Turn off device on channel " + channelView);
+								LOGGER.info("Turn off device on channel " + channel);
 								updateValue(device, "Level", "0");
 								DBLogger.info("Device is OFF", device.getUuid());
 
-								pc.turnOff((byte) channel);
+								pc.turnOff(channel);
 							}
 							else
 							{
 								updateValue(device, "Level", String.valueOf(level));
 								DBLogger.info("Device level set: " + level, device.getUuid());
 
-								LOGGER.info("Setting device on channel " + channelView + " to level " + level);
+								LOGGER.info("Setting device on channel " + channel + " to level " + level);
 
-								pc.setLevel((byte) channel, level);
+								pc.setLevel(channel, level);
 							}
 						}
 						else
 						{
 							if (level < 0 || level == 0)
 							{
-								LOGGER.info("Turn off device on channel " + channelView);
+								LOGGER.info("Turn off device on channel " + channel);
 								updateValue(device, "Level", "0");
 								DBLogger.info("Device is OFF", device.getUuid());
 
-								pc.turnOff((byte) channel);
-								;
+								pc.turnOff(channel);
 							}
 							else
 							{
 								// turn on
-								LOGGER.info("Turn on device on channel " + channelView);
+								LOGGER.info("Turn on device on channel " + channel);
 								updateValue(device, "Level", "255");
 								DBLogger.info("Device is ON", device.getUuid());
 
-								pc.turnOn((byte) channel);
+								pc.turnOn(channel);
 							}
 						}
 
@@ -156,13 +154,12 @@ public class NooliteTXService implements Runnable
 
 						final BindRXChannelAdvertisment advertisement = envelope.getObject();
 						Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
-						int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
-						int channelView = channel + 1;
+						byte channel = Byte.valueOf(device.getValue("channel").getValue());
 
-						LOGGER.info("Binding device to channel " + channelView);
-						DBLogger.info("Binding device to channel " + channelView);
+						LOGGER.info("Binding device to channel " + channel);
+						DBLogger.info("Binding device to channel " + channel);
 
-						pc.bindChannel((byte) channel);
+						pc.bindChannel(channel);
 
 					}
 					else if (envelope.getObject() instanceof UnbindTXChannelAdvertisment)
@@ -172,13 +169,12 @@ public class NooliteTXService implements Runnable
 
 						final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
 						Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
-						int channel = Integer.valueOf(device.getValue("channel").getValue()) - 1;
-						int channelView = channel + 1;
+						byte channel = Byte.valueOf(device.getValue("channel").getValue());
 
-						LOGGER.info("Unbinding device from channel " + channelView);
-						DBLogger.info("Unbinding device from channel " + channelView);
+						LOGGER.info("Unbinding device from channel " + channel);
+						DBLogger.info("Unbinding device from channel " + channel);
 
-						pc.unbindChannel((byte) channel);
+						pc.unbindChannel(channel);
 
 					}
 					else if (envelope.getReceiverInstance() == null)

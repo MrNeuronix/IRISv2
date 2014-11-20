@@ -53,7 +53,7 @@ public class NooliteRXService
 			@Override
 			public void onNotification(Notification notification) {
 
-				byte channel = (byte) (notification.getChannel() + 1);
+				byte channel = notification.getChannel();
 				SensorType sensor = (SensorType) notification.getValue("sensortype");
 
 				Device device = loadByChannel(channel);
@@ -132,8 +132,8 @@ public class NooliteRXService
 						BatteryState battery = (BatteryState) notification.getValue("battery");
 						LOGGER.info("Channel " + channel + ": Got TEMP_HUMI command.");
 						DBLogger.info("Device got TEMP_HUMI", device.getUuid());
-						updateValue(device, "Temperature", (String) notification.getValue("temp"));
-						updateValue(device, "Humidity", (String) notification.getValue("humi"));
+						updateValue(device, "Temperature", String.valueOf(notification.getValue("temp")));
+						updateValue(device, "Humidity", String.valueOf(notification.getValue("humi")));
 						updateValue(device, "Battery", battery.name());
 						messaging.broadcast("event.devices.noolite.value.temphumi", new NooliteDeviceTempHumiAdvertisement().set(device.getUuid()));
 						break;
@@ -219,7 +219,7 @@ public class NooliteRXService
 
 							final BindRXChannelAdvertisment advertisement = envelope.getObject();
 							Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
-							byte channel = (byte) (Byte.valueOf(device.getValue("channel").getValue()) + 1);
+							byte channel = Byte.valueOf(device.getValue("channel").getValue());
 
 							rx.bindChannel(channel);
 
@@ -230,7 +230,7 @@ public class NooliteRXService
 
 							final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
 							Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
-							byte channel = (byte) (Byte.valueOf(device.getValue("channel").getValue()) + 1);
+							byte channel = Byte.valueOf(device.getValue("channel").getValue());
 
 							rx.unbindChannel(channel);
 
