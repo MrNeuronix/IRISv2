@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import org.zwave4j.*;
 import ru.iris.common.Config;
 import ru.iris.common.Utils;
+import ru.iris.common.database.model.SensorData;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.helpers.DBLogger;
@@ -359,6 +360,7 @@ public class ZWaveService implements Runnable
 						udvChg.save();
 
 						DBLogger.info("Value " + manager.getValueLabel(notification.getValueId()) + " changed: " + Utils.getValue(notification.getValueId()), zWaveDevice.getUuid());
+						SensorData.log(udvChg.getUuid(), Manager.get().getValueLabel(notification.getValueId()), String.valueOf(Utils.getValue(notification.getValueId())));
 
 						messaging.broadcast("event.devices.zwave.value.changed",
 								zWaveDeviceValueChanged.set(

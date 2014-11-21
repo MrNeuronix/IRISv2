@@ -19,6 +19,7 @@ package ru.iris.devices.noolite;
 import com.avaje.ebean.Ebean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ru.iris.common.database.model.SensorData;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.helpers.DBLogger;
@@ -89,6 +90,7 @@ public class NooliteRXService
 						LOGGER.info("Channel " + channel + ": Got OFF command");
 						updateValue(device, "Level", "0");
 						DBLogger.info("Device is OFF", device.getUuid());
+						SensorData.log(device.getUuid(), "Switch", "OFF");
 						messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUuid(), "Level", "0"));
 						break;
 
@@ -97,6 +99,7 @@ public class NooliteRXService
 						// we only know, that the user hold OFF button
 						updateValue(device, "Level", "0");
 						DBLogger.info("Device is DIM", device.getUuid());
+						SensorData.log(device.getUuid(), "Switch", "DIM");
 						messaging.broadcast("event.devices.noolite.value.dim", new NooliteDeviceLevelDimAdvertisement().set(device.getUuid()));
 						break;
 
@@ -104,6 +107,7 @@ public class NooliteRXService
 						LOGGER.info("Channel " + channel + ": Got ON command");
 						updateValue(device, "Level", "255");
 						DBLogger.info("Device is ON", device.getUuid());
+						SensorData.log(device.getUuid(), "Switch", "ON");
 						messaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement().set(device.getUuid(), "Level", "255"));
 						break;
 
@@ -112,6 +116,7 @@ public class NooliteRXService
 						// we only know, that the user hold ON button
 						updateValue(device, "Level", "255");
 						DBLogger.info("Device is BRIGHT", device.getUuid());
+						SensorData.log(device.getUuid(), "Switch", "BRIGHT");
 						messaging.broadcast("event.devices.noolite.value.bright", new NooliteDeviceLevelBrightAdvertisement().set(device.getUuid()));
 						break;
 
@@ -119,12 +124,14 @@ public class NooliteRXService
 						LOGGER.info("Channel " + channel + ": Got SETLEVEL command.");
 						updateValue(device, "Level", (String) notification.getValue("level"));
 						DBLogger.info("Device get SETLEVEL: " + notification.getValue("level"), device.getUuid());
+						SensorData.log(device.getUuid(), "SetLevel", String.valueOf(notification.getValue("level")));
 						messaging.broadcast("event.devices.noolite.value.setlevel", new NooliteDeviceLevelSetAdvertisement().set(device.getUuid(), "Level", (String) notification.getValue("level")));
 						break;
 
 					case STOP_DIM_BRIGHT:
 						LOGGER.info("Channel " + channel + ": Got STOPDIMBRIGHT command.");
 						DBLogger.info("Device is STOPDIMBRIGHT", device.getUuid());
+						SensorData.log(device.getUuid(), "Switch", "STOPDIMBRIGHT");
 						messaging.broadcast("event.devices.noolite.value.stopdimbright", new NooliteDeviceLevelStopDimBrightAdvertisement().set(device.getUuid()));
 						break;
 
@@ -133,10 +140,13 @@ public class NooliteRXService
 						LOGGER.info("Channel " + channel + ": Got TEMP_HUMI command.");
 						DBLogger.info("Device got TEMP_HUMI", device.getUuid());
 						updateValue(device, "Temperature", String.valueOf(notification.getValue("temp")));
+						SensorData.log(device.getUuid(), "Temperature", String.valueOf(notification.getValue("temp")));
 						DBLogger.info("Temperature is " + notification.getValue("temp"), device.getUuid());
 						updateValue(device, "Humidity", String.valueOf(notification.getValue("humi")));
+						SensorData.log(device.getUuid(), "Humidity", String.valueOf(notification.getValue("humi")));
 						DBLogger.info("Humidity is " + notification.getValue("humi"), device.getUuid());
 						updateValue(device, "Battery", battery.name());
+						SensorData.log(device.getUuid(), "Battery", String.valueOf(notification.getValue("battery")));
 						DBLogger.info("Battery is " + battery.name(), device.getUuid());
 						messaging.broadcast("event.devices.noolite.value.temphumi", new NooliteDeviceTempHumiAdvertisement().set(device.getUuid()));
 						break;
