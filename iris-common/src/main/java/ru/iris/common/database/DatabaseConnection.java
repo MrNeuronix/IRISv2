@@ -64,6 +64,7 @@ public class DatabaseConnection
 		config.addClass(DeviceValue.class);
 		config.addClass(DataSource.class);
 		config.addClass(ScriptLock.class);
+		config.addClass(SensorData.class);
 
 		// create the EbeanServer instance
 		server = EbeanServerFactory.create(config);

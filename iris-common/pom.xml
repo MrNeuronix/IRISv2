@@ -85,8 +85,6 @@
             <groupId>ru.iris</groupId>
             <artifactId>noolite4j</artifactId>
             <version>1.2</version>
-            <scope>system</scope>
-            <systemPath>${basedir}/../iris-core/lib/noolite4j-1.2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
