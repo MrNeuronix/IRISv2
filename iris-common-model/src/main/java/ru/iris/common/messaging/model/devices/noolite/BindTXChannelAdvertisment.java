@@ -21,32 +21,15 @@ import ru.iris.common.messaging.model.Advertisement;
 public class BindTXChannelAdvertisment extends Advertisement
 {
 	/**
-	 * Device UUID
-	 */
-
-	private String deviceUUID;
-
-	/**
 	 * Channel.
 	 */
 
 	private int channel;
 
-	public BindTXChannelAdvertisment set(String deviceUUID, int channel)
+	public BindTXChannelAdvertisment set(int channel)
 	{
 		this.channel = channel;
-		this.deviceUUID = deviceUUID;
 		return this;
-	}
-
-	public String getDeviceUUID()
-	{
-		return deviceUUID;
-	}
-
-	public void setDeviceUUID(String deviceUUID)
-	{
-		this.deviceUUID = deviceUUID;
 	}
 
 	public int getChannel()
@@ -62,6 +45,6 @@ public class BindTXChannelAdvertisment extends Advertisement
 	@Override
 	public String toString()
 	{
-		return "BindRXChannelAdvertisment { UUID: " + deviceUUID + ", channel: " + channel + " }";
+		return "BindRXChannelAdvertisment { channel: " + channel + " }";
 	}
 }

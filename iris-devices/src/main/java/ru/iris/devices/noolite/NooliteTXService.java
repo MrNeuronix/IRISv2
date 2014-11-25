@@ -153,8 +153,7 @@ public class NooliteTXService implements Runnable
 						LOGGER.debug("Get BindTXChannel advertisement");
 
 						final BindRXChannelAdvertisment advertisement = envelope.getObject();
-						Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
-						byte channel = Byte.valueOf(device.getValue("channel").getValue());
+						byte channel = (byte) advertisement.getChannel();
 
 						LOGGER.info("Binding device to channel " + channel);
 						DBLogger.info("Binding device to channel " + channel);
@@ -168,8 +167,7 @@ public class NooliteTXService implements Runnable
 						LOGGER.debug("Get UnbindTXChannel advertisement");
 
 						final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
-						Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
-						byte channel = Byte.valueOf(device.getValue("channel").getValue());
+						byte channel = (byte) advertisement.getChannel();
 
 						LOGGER.info("Unbinding device from channel " + channel);
 						DBLogger.info("Unbinding device from channel " + channel);

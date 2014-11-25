@@ -231,8 +231,7 @@ public class NooliteRXService
 							LOGGER.debug("Get BindRXChannel advertisement");
 
 							final BindRXChannelAdvertisment advertisement = envelope.getObject();
-							Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
-							byte channel = Byte.valueOf(device.getValue("channel").getValue());
+							byte channel = (byte) advertisement.getChannel();
 
 							rx.bindChannel(channel);
 
@@ -242,8 +241,7 @@ public class NooliteRXService
 							LOGGER.debug("Get UnbindRXChannel advertisement");
 
 							final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
-							Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
-							byte channel = Byte.valueOf(device.getValue("channel").getValue());
+							byte channel = (byte) advertisement.getChannel();
 
 							rx.unbindChannel(channel);
 
