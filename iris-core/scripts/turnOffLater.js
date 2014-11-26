@@ -32,13 +32,25 @@ var CollectionsAndFiles = new JavaImporter(
 
 with (CollectionsAndFiles) {
 
+    // setTimeout implementation
+    var Platform = Java.type("javafx.application.Platform");
+    var Timer = Java.type("java.util.Timer");
+
+    function setTimeout(func, milliseconds) {
+        // New timer, run as daemon so the application can quit
+        var timer = new Timer("setTimeout", true);
+        timer.schedule(function () Platform.runLater(func), milliseconds);
+        return timer;
+    }
+
+    // advertisement
     var label = advertisement.getLabel();
     var value = advertisement.getValue();
     var uuid = advertisement.getDeviceUUID();
 
     var device = Device.getDeviceByUUID(uuid);
 
-// if device state = ON and device have internalname = noolite/channel/4
+    // if device state = ON and device have internalname = noolite/channel/4
     if (label == "Level" && value == "255" && device.getInternalName() == "noolite/channel/4") {
         LOGGER.info("[turnOffLater] Device ON!");
 
