@@ -21,6 +21,6 @@
  * This is test script for event engine of IRISv2
  */
 
-importPackage(Packages.ru.iris.common.helpers);
+var Speak = Java.type("ru.iris.common.helpers.Speak");
 
 new Speak().say(advertisement.getData().get("text"));

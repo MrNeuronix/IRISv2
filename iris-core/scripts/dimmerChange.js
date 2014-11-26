@@ -22,12 +22,8 @@
  */
 
 // importing all classes in package (like import ru.iris.common.* in java)
-var CollectionsAndFiles = new JavaImporter(
-    Packages.ru.iris.common,
-    Packages.ru.iris.common.helpers,
-    Packages.ru.iris.common.database.model.devices);
-
-with (CollectionsAndFiles) {
+var Device = Java.type("ru.iris.common.database.model.devices.Device");
+var Speak = Java.type("ru.iris.common.helpers.Speak");
 
     var label = advertisement.getLabel();
     var value = advertisement.getValue();
@@ -39,4 +35,4 @@ with (CollectionsAndFiles) {
         // lets speak!
         new Speak().say("Уровень яркости на устройстве " + device.getName() + " выставлен на " + value + " процентов");
     }
-}
+

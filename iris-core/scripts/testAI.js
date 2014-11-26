@@ -22,11 +22,7 @@
  */
 
 // importing all classes in package (like import ru.iris.common.* in java)
-var CollectionsAndFiles = new JavaImporter(
-    Packages.ru.iris.common,
-    Packages.ru.iris.common.helpers);
-
-with (CollectionsAndFiles) {
+var Speak = Java.type("ru.iris.common.helpers.Speak");
 
     var action = advertisement.getResponse().getOutcome().getEntities().get("action").getValue();
 
@@ -45,5 +41,3 @@ with (CollectionsAndFiles) {
     else {
         new Speak().say("Неизвестная команда!");
     }
-
-}

@@ -21,21 +21,14 @@
  * This is test script for event engine of IRISv2
  */
 
-// importing all classes in package (like import ru.iris.common.* in java)
-var CollectionsAndFiles = new JavaImporter(
-    Packages.ru.iris.common,
-    Packages.ru.iris.common.helpers,
-    Packages.ru.iris.common.messaging,
-    Packages.ru.iris.common.database,
-    Packages.ru.iris.common.messaging.model,
-    Packages.ru.iris.common.database.model.devices);
-
-with (CollectionsAndFiles) {
-
-    // setTimeout implementation
+// imports
     var Platform = Java.type("javafx.application.Platform");
     var Timer = Java.type("java.util.Timer");
+var Device = Java.type("ru.iris.common.database.model.devices.Device");
+var Lock = Java.type("ru.iris.common.database.Lock");
+var Speak = Java.type("ru.iris.common.helpers.Speak");
 
+// setTimeout implementation
     function setTimeout(func, milliseconds) {
         // New timer, run as daemon so the application can quit
         var timer = new Timer("setTimeout", true);
@@ -97,5 +90,3 @@ with (CollectionsAndFiles) {
         Lock.release("toilet-light-on");
         LOGGER.info("[turnOffLater] Release lock!");
     }
-
-}
