@@ -56,8 +56,8 @@ public class EventsService
 			e.printStackTrace();
 		}
 
-			final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "events");
-			final Logger scriptLogger = LogManager.getLogger(EventsService.class.getName());
+		final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "events");
+		final Logger scriptLogger = LogManager.getLogger(EventsService.class.getName());
 		final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
 		// Pass jsonmessaging instance to js engine

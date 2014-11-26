@@ -20,6 +20,12 @@ Please remember that this project is in deep alpha and now is mostly for develop
 * ZWave
 * Noolite
 
+## Requirements
+
+* JDK 8
+* RabbitMQ server
+* Linux OS (work with Windows not tested)
+
 ## Install
 
 **mvn package**
