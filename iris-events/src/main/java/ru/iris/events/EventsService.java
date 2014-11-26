@@ -60,6 +60,11 @@ public class EventsService
 			final Logger scriptLogger = LogManager.getLogger(EventsService.class.getName());
 		final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
+		// Pass jsonmessaging instance to js engine
+		engine.getBindings(ScriptContext.ENGINE_SCOPE).put("jsonMessaging", jsonMessaging);
+		engine.getBindings(ScriptContext.ENGINE_SCOPE).put("out", System.out);
+		engine.getBindings(ScriptContext.ENGINE_SCOPE).put("LOGGER", scriptLogger);
+
 			// subscribe to events from db
             for(Event event : events)
             {
@@ -71,13 +76,9 @@ public class EventsService
 			jsonMessaging.subscribe("event.command");
 
 		jsonMessaging.setNotification(new JsonNotification() {
+
 			@Override
 			public void onNotification(JsonEnvelope envelope) {
-
-					// Pass jsonmessaging instance to js engine
-				engine.getBindings(ScriptContext.ENGINE_SCOPE).put("jsonMessaging", jsonMessaging);
-				engine.getBindings(ScriptContext.ENGINE_SCOPE).put("out", System.out);
-				engine.getBindings(ScriptContext.ENGINE_SCOPE).put("LOGGER", scriptLogger);
 
 					LOGGER.debug("Got envelope with subject: " + envelope.getSubject());
 
