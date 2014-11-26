@@ -50,8 +50,6 @@ public final class GoogleTranslate
 	{
 	}
 
-	;
-
 	/**
 	 * Converts the ISO-639 code into a friendly language code in the user's default language
 	 * For example, if the language is English and the default locale is French, it will return "anglais"
@@ -158,8 +156,7 @@ public final class GoogleTranslate
 			}
 			buf.append((char) ch);
 		}
-		String str = buf.toString();
-		return str;
+		return buf.toString();
 	}
 
 	/**

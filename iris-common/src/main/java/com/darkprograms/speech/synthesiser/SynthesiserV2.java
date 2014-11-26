@@ -160,18 +160,18 @@ public class SynthesiserV2
 		String encoded = URLEncoder.encode(synthText, "UTF-8"); //Encode
 
 		StringBuilder sb = new StringBuilder(GOOGLE_SYNTHESISER_URL);
-		sb.append("&key=" + API_KEY);
-		sb.append("&text=" + encoded);
-		sb.append("&lang=" + languageCode);
+		sb.append("&key=").append(API_KEY);
+		sb.append("&text=").append(encoded);
+		sb.append("&lang=").append(languageCode);
 
 		if (speed >= 0 && speed <= 2.0)
 		{
-			sb.append("&speed=" + speed / 2.0);
+			sb.append("&speed=").append(speed / 2.0);
 		}
 
 		if (pitch >= 0 && pitch <= 2.0)
 		{
-			sb.append("&pitch=" + pitch / 2.0);
+			sb.append("&pitch=").append(pitch / 2.0);
 		}
 
 		URL url = new URL(sb.toString()); //create url

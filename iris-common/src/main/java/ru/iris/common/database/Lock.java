@@ -30,13 +30,13 @@ public class Lock
 	private Timestamp startlock;
 	private Timestamp endlock;
 	private String title;
-	private Calendar calendar = Calendar.getInstance();
 
 	public Lock(String title)
 	{
 		this.title = title;
 
 		// set lock release in year+1 )
+		Calendar calendar = Calendar.getInstance();
 		calendar.set(Calendar.YEAR, (calendar.get(Calendar.YEAR) + 1));
 		this.endlock = new Timestamp(calendar.getTime().getTime());
 	}

@@ -22,8 +22,8 @@
  */
 
 // imports
-    var Platform = Java.type("javafx.application.Platform");
-    var Timer = Java.type("java.util.Timer");
+var Platform = Java.type("javafx.application.Platform");
+var Timer = Java.type("java.util.Timer");
 var Device = Java.type("ru.iris.common.database.model.devices.Device");
 var Lock = Java.type("ru.iris.common.database.Lock");
 var Speak = Java.type("ru.iris.common.helpers.Speak");

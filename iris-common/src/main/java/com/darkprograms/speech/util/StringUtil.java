@@ -13,8 +13,6 @@ public class StringUtil
 	{
 	}
 
-	;//Prevents instantiation
-
 	/**
 	 * Removes quotation marks from beginning and end of string.
 	 *

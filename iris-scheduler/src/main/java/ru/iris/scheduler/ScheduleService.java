@@ -48,12 +48,12 @@ public class ScheduleService
 	private final Logger LOGGER = LogManager.getLogger(ScheduleService.class);
 	private List<Task> events = null;
 	private List<DataSource> sources = null;
-	private SchedulerFactory factory = new StdSchedulerFactory();
 	private Scheduler scheduler = null;
 
 	public ScheduleService()
 	{
 		try {
+			SchedulerFactory factory = new StdSchedulerFactory();
 			scheduler = factory.getScheduler();
 		} catch (SchedulerException e) {
 			LOGGER.error("Error: " + e.getMessage());

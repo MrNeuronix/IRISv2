@@ -121,10 +121,8 @@ public class User
 			return false;
 		if (firstName != null ? !firstName.equals(user.firstName) : user.firstName != null)
 			return false;
-		if (lastName != null ? !lastName.equals(user.lastName) : user.lastName != null)
-			return false;
+		return !(lastName != null ? !lastName.equals(user.lastName) : user.lastName != null);
 
-		return true;
 	}
 
 	@Override

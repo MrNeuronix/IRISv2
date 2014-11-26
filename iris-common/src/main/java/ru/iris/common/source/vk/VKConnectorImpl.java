@@ -136,7 +136,7 @@ public class VKConnectorImpl implements VKConnector
 			String userIdsStr = "";
 			for (Long userId : userIds)
 			{
-				if (userIdsStr != "")
+				if (!userIdsStr.isEmpty())
 				{
 					userIdsStr += ",";
 				}

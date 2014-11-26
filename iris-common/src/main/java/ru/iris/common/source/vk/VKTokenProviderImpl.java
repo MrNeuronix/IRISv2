@@ -40,10 +40,6 @@ public class VKTokenProviderImpl implements VKTokenProvider
 	public boolean switchToken()
 	{
 		index++;
-		if (index >= tokens.size())
-		{
-			return false;
-		}
-		return true;
+		return index < tokens.size();
 	}
 }

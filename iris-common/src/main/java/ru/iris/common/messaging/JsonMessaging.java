@@ -81,14 +81,7 @@ public class JsonMessaging
 	public void start()
 	{
 		// Startup listen thread.
-		jsonBroadcastListenThread = new Thread(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				listenBroadcasts();
-			}
-		}, "json-broadcast-listen");
+		jsonBroadcastListenThread = new Thread(() -> listenBroadcasts(), "json-broadcast-listen");
 		jsonBroadcastListenThread.setName("JSON Messaging Listen Thread");
 		jsonBroadcastListenThread.start();
 
@@ -229,19 +222,14 @@ public class JsonMessaging
 		}
 		catch (final ClassNotFoundException e)
 		{
-			LOGGER.debug("Error deserializing JSON message.", e);
-		}
-		catch (InterruptedException e)
-		{
-			LOGGER.debug("Error JSON message.", e);
+			LOGGER.error("Error deserializing JSON message.", e);
 		}
 		catch (ConsumerCancelledException e)
 		{
-			LOGGER.debug("Consumer cancelled.", e);
-		}
-		catch (IOException e)
+			LOGGER.error("Consumer cancelled.", e);
+		} catch (IOException | InterruptedException e)
 		{
-			e.printStackTrace();
+			LOGGER.debug("Error JSON message.", e);
 		}
 	}
 }

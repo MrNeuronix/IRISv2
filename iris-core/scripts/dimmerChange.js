@@ -22,6 +22,7 @@
  */
 
 // importing all classes in package (like import ru.iris.common.* in java)
+
 var Device = Java.type("ru.iris.common.database.model.devices.Device");
 var Speak = Java.type("ru.iris.common.helpers.Speak");
 

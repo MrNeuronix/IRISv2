@@ -36,10 +36,6 @@ public class JsonConnection
 
 	private static final Logger LOGGER = LogManager.getLogger(JsonConnection.class);
 
-	/**
-	 * The AMQ connection.
-	 */
-	private Connection connection;
 	private Channel channel;
 
 	/**
@@ -71,7 +67,10 @@ public class JsonConnection
 			connectionFactory.setUsername(config.get("AMQPuser"));
 			connectionFactory.setPassword(config.get("AMQPpasswd"));
 
-			connection = connectionFactory.newConnection();
+			/*
+	  		The AMQ connection.
+	 		*/
+			Connection connection = connectionFactory.newConnection();
 			channel = connection.createChannel();
 
 			// Create exchange
