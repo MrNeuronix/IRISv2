@@ -22,23 +22,28 @@
  */
 
 // importing all classes in package (like import ru.iris.common.* in java)
-importPackage(Packages.ru.iris.common);
-importPackage(Packages.ru.iris.common.helpers);
+var CollectionsAndFiles = new JavaImporter(
+    Packages.ru.iris.common,
+    Packages.ru.iris.common.helpers);
 
-var action = advertisement.getResponse().getOutcome().getEntities().get("action").getValue();
+with (CollectionsAndFiles) {
 
-if (action == "on") {
-    new Speak().say("Включаю свет!");
-}
-else if (action == "off") {
-    new Speak().say("Выключаю свет!");
-}
-else if (action == "dim") {
-    new Speak().say("Приглушаю свет!");
-}
-else if (action == "bright") {
-    new Speak().say("Делаю ярче свет!");
-}
-else {
-    new Speak().say("Неизвестная команда!");
+    var action = advertisement.getResponse().getOutcome().getEntities().get("action").getValue();
+
+    if (action == "on") {
+        new Speak().say("Включаю свет!");
+    }
+    else if (action == "off") {
+        new Speak().say("Выключаю свет!");
+    }
+    else if (action == "dim") {
+        new Speak().say("Приглушаю свет!");
+    }
+    else if (action == "bright") {
+        new Speak().say("Делаю ярче свет!");
+    }
+    else {
+        new Speak().say("Неизвестная команда!");
+    }
+
 }

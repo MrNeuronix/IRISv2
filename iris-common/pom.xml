@@ -85,6 +85,12 @@
             <groupId>ru.iris</groupId>
             <artifactId>noolite4j</artifactId>
             <version>1.2.1</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-simple</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -102,11 +108,6 @@
             <version>4.3.1</version>
         </dependency>
         <dependency>
-            <groupId>ro.isdc.wro4j</groupId>
-            <artifactId>rhino</artifactId>
-            <version>1.7R5-20130223-1</version>
-        </dependency>
-        <dependency>
             <groupId>ro.fortsoft.pf4j</groupId>
             <artifactId>pf4j</artifactId>
             <version>0.9.0</version>
@@ -114,7 +115,17 @@
         <dependency>
             <groupId>org.avaje.ebeanorm</groupId>
             <artifactId>avaje-ebeanorm</artifactId>
-            <version>4.1.8</version>
+            <version>4.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.avaje.ebeanorm</groupId>
+            <artifactId>avaje-ebeanorm-agent</artifactId>
+            <version>4.1.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.avaje</groupId>
+            <artifactId>avaje-agentloader</artifactId>
+            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>javazoom</groupId>
@@ -140,11 +151,6 @@
             <groupId>org.quartz-scheduler</groupId>
             <artifactId>quartz-jobs</artifactId>
             <version>2.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.usb4java</groupId>
-            <artifactId>usb4java</artifactId>
-            <version>1.2.0</version>
         </dependency>
     </dependencies>
 

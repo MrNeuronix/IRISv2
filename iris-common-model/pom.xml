@@ -39,17 +39,7 @@
         <dependency>
             <groupId>org.avaje.ebeanorm</groupId>
             <artifactId>avaje-ebeanorm</artifactId>
-            <version>4.1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.avaje.ebeanorm</groupId>
-            <artifactId>avaje-ebeanorm-agent</artifactId>
-            <version>4.1.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.avaje</groupId>
-            <artifactId>avaje-agentloader</artifactId>
-            <version>1.1.1</version>
+            <version>4.2.0</version>
         </dependency>
         <!-- <dependency>
             <groupId>com.github.zgmnkv</groupId>

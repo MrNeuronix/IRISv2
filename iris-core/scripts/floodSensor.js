@@ -22,14 +22,15 @@
  */
 
 // importing all classes in package (like import ru.iris.common.* in java)
-importPackage(Packages.ru.iris.common);
-importPackage(Packages.ru.iris.common.helpers);
-importPackage(Packages.ru.iris.common.messaging);
-importPackage(Packages.ru.iris.common.database);
-importPackage(Packages.ru.iris.common.messaging.model);
-importPackage(Packages.ru.iris.common.database.model.devices);
+var CollectionsAndFiles = new JavaImporter(
+    Packages.ru.iris.common,
+    Packages.ru.iris.common.helpers,
+    Packages.ru.iris.common.messaging,
+    Packages.ru.iris.common.database,
+    Packages.ru.iris.common.messaging.model,
+    Packages.ru.iris.common.database.model.devices);
 
-//if(advertisement instanceof Packages.ru.iris.common.database.model.devices.zwave.ZWaveDeviceValueChanged) {
+with (CollectionsAndFiles) {
 
     var label = advertisement.getLabel();
     var value = advertisement.getValue();
@@ -54,4 +55,5 @@ importPackage(Packages.ru.iris.common.database.model.devices);
         // lets speak!
         new Speak().say("Внимание! Протечка воды устранена!");
     }
-//}
+
+}

@@ -44,7 +44,7 @@ class Core
 		LOGGER.info("----------------------------------------");
 
 		// ORM
-		AgentLoader.loadAgent("lib/avaje-ebeanorm-agent-4.1.2.jar");
+		AgentLoader.loadAgent("lib/avaje-ebeanorm-agent-4.1.9.jar");
 		new DatabaseConnection();
 
 		// Load plugins

@@ -22,17 +22,21 @@
  */
 
 // importing all classes in package (like import ru.iris.common.* in java)
-importPackage(Packages.ru.iris.common);
-importPackage(Packages.ru.iris.common.helpers);
-importPackage(Packages.ru.iris.common.database.model.devices);
+var CollectionsAndFiles = new JavaImporter(
+    Packages.ru.iris.common,
+    Packages.ru.iris.common.helpers,
+    Packages.ru.iris.common.database.model.devices);
 
-var label = advertisement.getLabel();
-var value = advertisement.getValue();
-var uuid = advertisement.getDeviceUUID();
+with (CollectionsAndFiles) {
 
-var device = Device.getDeviceByUUID(uuid);
+    var label = advertisement.getLabel();
+    var value = advertisement.getValue();
+    var uuid = advertisement.getDeviceUUID();
 
-if (label == "Level") {
-    // lets speak!
-    new Speak().say("Уровень яркости на устройстве " + device.getName() + " выставлен на " + value + " процентов");
+    var device = Device.getDeviceByUUID(uuid);
+
+    if (label == "Level") {
+        // lets speak!
+        new Speak().say("Уровень яркости на устройстве " + device.getName() + " выставлен на " + value + " процентов");
+    }
 }

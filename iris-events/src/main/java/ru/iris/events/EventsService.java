@@ -20,10 +20,6 @@ import com.avaje.ebean.Ebean;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ImporterTopLevel;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
 import ru.iris.common.database.model.Event;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
@@ -31,6 +27,9 @@ import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.command.CommandAdvertisement;
 import ru.iris.common.messaging.model.events.EventChangesAdvertisement;
 
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
@@ -59,6 +58,7 @@ public class EventsService
 
 			final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "events");
 			final Logger scriptLogger = LogManager.getLogger(EventsService.class.getName());
+		final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
 
 			// subscribe to events from db
             for(Event event : events)
@@ -74,15 +74,10 @@ public class EventsService
 			@Override
 			public void onNotification(JsonEnvelope envelope) {
 
-				try {
-
-					Context cx = Context.enter();
-					Scriptable scope = new ImporterTopLevel(cx);
-
 					// Pass jsonmessaging instance to js engine
-					ScriptableObject.putProperty(scope, "jsonMessaging", Context.javaToJS(jsonMessaging, scope));
-					ScriptableObject.putProperty(scope, "out", Context.javaToJS(System.out, scope));
-					ScriptableObject.putProperty(scope, "LOGGER", Context.javaToJS(scriptLogger, scope));
+				engine.getBindings(ScriptContext.ENGINE_SCOPE).put("jsonMessaging", jsonMessaging);
+				engine.getBindings(ScriptContext.ENGINE_SCOPE).put("out", System.out);
+				engine.getBindings(ScriptContext.ENGINE_SCOPE).put("LOGGER", scriptLogger);
 
 					LOGGER.debug("Got envelope with subject: " + envelope.getSubject());
 
@@ -94,8 +89,8 @@ public class EventsService
 						File jsFile = new File("./scripts/command/" + advertisement.getScript() + ".js");
 
 						try {
-							ScriptableObject.putProperty(scope, "commandParams", Context.javaToJS(advertisement.getData(), scope));
-							cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
+							engine.getBindings(ScriptContext.ENGINE_SCOPE).put("commandParams", advertisement.getData());
+							engine.eval(FileUtils.readFileToString(jsFile));
 						} catch (FileNotFoundException e) {
 							LOGGER.error("Script file scripts/command/" + advertisement.getScript() + ".js not found!");
 						} catch (Exception e) {
@@ -115,8 +110,8 @@ public class EventsService
 								LOGGER.debug("Launch script: " + event.getScript());
 
 								try {
-									ScriptableObject.putProperty(scope, "advertisement", Context.javaToJS(envelope.getObject(), scope));
-									cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
+									engine.getBindings(ScriptContext.ENGINE_SCOPE).put("advertisement", envelope.getObject());
+									engine.eval(FileUtils.readFileToString(jsFile));
 								} catch (FileNotFoundException e) {
 									LOGGER.error("Script file " + jsFile + " not found!");
 								} catch (Exception e) {
@@ -126,10 +121,6 @@ public class EventsService
 							}
 						}
 					}
-
-				} finally {
-					Context.exit();
-				}
 				}
 		});
 

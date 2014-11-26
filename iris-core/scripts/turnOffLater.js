@@ -22,76 +22,68 @@
  */
 
 // importing all classes in package (like import ru.iris.common.* in java)
-importPackage(Packages.ru.iris.common);
-importPackage(Packages.ru.iris.common.helpers);
-importPackage(Packages.ru.iris.common.messaging);
-importPackage(Packages.ru.iris.common.database);
-importPackage(Packages.ru.iris.common.messaging.model);
-importPackage(Packages.ru.iris.common.database.model.devices);
+var CollectionsAndFiles = new JavaImporter(
+    Packages.ru.iris.common,
+    Packages.ru.iris.common.helpers,
+    Packages.ru.iris.common.messaging,
+    Packages.ru.iris.common.database,
+    Packages.ru.iris.common.messaging.model,
+    Packages.ru.iris.common.database.model.devices);
 
-// setTimeout implementation
-var executor = new java.util.concurrent.Executors.newScheduledThreadPool(1);
-var counter = 1;
-var ids = {};
+with (CollectionsAndFiles) {
 
-var setTimeout = function (fn, delay) {
-    var id = counter++;
-    var runnable = new JavaAdapter(java.lang.Runnable, {run: fn});
-    ids[id] = executor.schedule(runnable, delay,
-        java.util.concurrent.TimeUnit.MILLISECONDS);
-    return id;
-};
+    var label = advertisement.getLabel();
+    var value = advertisement.getValue();
+    var uuid = advertisement.getDeviceUUID();
 
-var label = advertisement.getLabel();
-var value = advertisement.getValue();
-var uuid = advertisement.getDeviceUUID();
-
-var device = Device.getDeviceByUUID(uuid);
+    var device = Device.getDeviceByUUID(uuid);
 
 // if device state = ON and device have internalname = noolite/channel/4
-if (label == "Level" && value == "255" && device.getInternalName() == "noolite/channel/4") {
-    LOGGER.info("[turnOffLater] Device ON!");
+    if (label == "Level" && value == "255" && device.getInternalName() == "noolite/channel/4") {
+        LOGGER.info("[turnOffLater] Device ON!");
 
-    // lock not set
-    if (!Lock.isLocked("toilet-light-on")) {
-        LOGGER.info("[turnOffLater] Lock not set. Run timer");
+        // lock not set
+        if (!Lock.isLocked("toilet-light-on")) {
+            LOGGER.info("[turnOffLater] Lock not set. Run timer");
 
-        // lock task
-        var lock = new Lock("toilet-light-on");
-        var reluuid = uuid;
-        lock.lock();
+            // lock task
+            var lock = new Lock("toilet-light-on");
+            var reluuid = uuid;
+            lock.lock();
 
-        // run in separate thread
-        obj = {
-            run: function () {
-                function turnOff() {
+            // run in separate thread
+            obj = {
+                run: function () {
+                    function turnOff() {
 
-                    if (Lock.isLocked("toilet-light-on")) {
+                        if (Lock.isLocked("toilet-light-on")) {
 
-                        LOGGER.info("[turnOffLater] Times up! Release lock and turn off device " + reluuid);
+                            LOGGER.info("[turnOffLater] Times up! Release lock and turn off device " + reluuid);
 
-                        // release lock
-                        Lock.release("toilet-light-on");
+                            // release lock
+                            Lock.release("toilet-light-on");
 
-                        // turn off device
-                        new DeviceCtl().off(reluuid);
+                            // turn off device
+                            new DeviceCtl().off(reluuid);
 
-                        // lets speak!
-                        new Speak().say("Кто-то опять забыл выключить свет! Прошло 20 минут, выключаю сам");
+                            // lets speak!
+                            new Speak().say("Кто-то опять забыл выключить свет! Прошло 20 минут, выключаю сам");
+                        }
                     }
+
+                    // turn off past 20 minutes
+                    setTimeout(turnOff, 1200000);
                 }
-
-                // turn off past 20 minutes
-                setTimeout(turnOff, 1200000);
-            }
-        };
-        obj.run();
+            };
+            obj.run();
+        }
     }
-}
 
 
-if (label == "Level" && value == "0" && device.getInternalName() == "noolite/channel/4" && Lock.isLocked("toilet-light-on")) {
-    // release lock
-    Lock.release("toilet-light-on");
-    LOGGER.info("[turnOffLater] Release lock!");
+    if (label == "Level" && value == "0" && device.getInternalName() == "noolite/channel/4" && Lock.isLocked("toilet-light-on")) {
+        // release lock
+        Lock.release("toilet-light-on");
+        LOGGER.info("[turnOffLater] Release lock!");
+    }
+
 }

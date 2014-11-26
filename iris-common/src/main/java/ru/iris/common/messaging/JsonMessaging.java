@@ -223,6 +223,8 @@ public class JsonMessaging
 						+ envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
 
 				notification.onNotification(envelope);
+
+				headers.clear();
 			}
 		}
 		catch (final ClassNotFoundException e)
