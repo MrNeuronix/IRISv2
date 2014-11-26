@@ -30,14 +30,14 @@ import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.helpers.DBLogger;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
 import ru.iris.common.messaging.model.devices.zwave.*;
 
 import java.util.UUID;
 
-public class ZWaveService implements Runnable
+public class ZWaveService
 {
-
 	private final Logger LOGGER = LogManager.getLogger(ZWaveService.class.getName());
 	private final Gson gson = new GsonBuilder().create();
 
@@ -66,14 +66,6 @@ public class ZWaveService implements Runnable
 	private JsonMessaging messaging;
 
 	public ZWaveService()
-	{
-		Thread t = new Thread(this);
-		t.setName("ZWave Service");
-		t.start();
-	}
-
-	@Override
-	public synchronized void run()
 	{
 		Config config = Config.getInstance();
 
@@ -443,31 +435,17 @@ public class ZWaveService implements Runnable
 
 		LOGGER.info("Initialization complete.");
 
-		try
-		{
-			// Make sure we exit the wait loop if we receive shutdown signal.
-			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					shutdown = true;
-				}
-			}));
-
 			messaging.subscribe("event.devices.zwave.setvalue");
 			messaging.subscribe("event.devices.zwave.node.add");
 			messaging.subscribe("event.devices.zwave.node.remove");
 			messaging.subscribe("event.devices.zwave.cancel");
 			messaging.start();
 
-			while (!shutdown)
-			{
+		messaging.setNotification(new JsonNotification() {
 
-				// Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
-				final JsonEnvelope envelope = messaging.receive(100);
-				if (envelope != null)
-				{
+			@Override
+			public void onNotification(JsonEnvelope envelope) {
+
 					if (envelope.getObject() instanceof ZWaveSetDeviceLevelAdvertisement)
 					{
 						// We know of service advertisement
@@ -482,7 +460,7 @@ public class ZWaveService implements Runnable
 						if (ZWaveDevice == null)
 						{
 							LOGGER.info("Cant find device with UUID " + uuid);
-							continue;
+							return;
 						}
 
 						int node = ZWaveDevice.getNode();
@@ -526,18 +504,12 @@ public class ZWaveService implements Runnable
 								+ " at '" + envelope.getSubject()
 								+ ": " + envelope.getObject());
 					}
+
 				}
-			}
+		});
 
 			// Close JSON messaging.
-			messaging.close();
-
-		}
-		catch (final Throwable t)
-		{
-			t.printStackTrace();
-			LOGGER.error("Unexpected exception in ZWave Devices", t);
-		}
+		messaging.start();
 	}
 
 	private void setTypedValue(ValueId valueId, String value)

@@ -24,57 +24,33 @@ import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.helpers.DBLogger;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.devices.noolite.*;
 import ru.iris.noolite4j.sender.PC1132;
 
 import java.util.UUID;
 
-public class NooliteTXService implements Runnable
+public class NooliteTXService
 {
 	private final Logger LOGGER = LogManager.getLogger(NooliteTXService.class.getName());
-	private boolean shutdown = false;
 
 	public NooliteTXService()
 	{
-		Thread t = new Thread(this);
-		t.setName("Noolite TX Service");
-		t.start();
-	}
-
-	@Override
-	public synchronized void run()
-	{
 		// Initialize the libusb context
-		PC1132 pc = new PC1132();
+		final PC1132 pc = new PC1132();
 		pc.open();
 
-		try
-		{
-			// Make sure we exit the wait loop if we receive shutdown signal.
-			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					shutdown = true;
-				}
-			}));
-
-			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-tx");
+		final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-tx");
 
 			jsonMessaging.subscribe("event.devices.noolite.setvalue");
 			jsonMessaging.subscribe("event.devices.noolite.tx.bindchannel");
 			jsonMessaging.subscribe("event.devices.noolite.tx.unbindchannel");
 
-			jsonMessaging.start();
+		jsonMessaging.setNotification(new JsonNotification() {
 
-			while (!shutdown)
-			{
+			@Override
+			public void onNotification(JsonEnvelope envelope) {
 
-				// Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
-				final JsonEnvelope envelope = jsonMessaging.receive(100);
-				if (envelope != null)
-				{
 					if (envelope.getObject() instanceof NooliteDeviceLevelSetAdvertisement)
 					{
 						LOGGER.debug("Get SetDeviceLevel advertisement");
@@ -193,19 +169,11 @@ public class NooliteTXService implements Runnable
 								+ " at '" + envelope.getSubject()
 								+ ": " + envelope.getObject());
 					}
+
 				}
-			}
+		});
 
-			// Close JSON messaging.
-			jsonMessaging.close();
-			pc.close();
-
-		}
-		catch (final Throwable t)
-		{
-			t.printStackTrace();
-			LOGGER.error("Unexpected exception in NooliteTX", t);
-		}
+		jsonMessaging.start();
 	}
 
 	private void updateValue(Device device, String label, String value)

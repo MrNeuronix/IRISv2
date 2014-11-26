@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.devices.*;
 import ru.iris.common.messaging.model.devices.noolite.NooliteDeviceLevelSetAdvertisement;
 import ru.iris.common.messaging.model.devices.noolite.ResponseNooliteDeviceInventoryAdvertisement;
@@ -32,50 +33,22 @@ import ru.iris.common.messaging.model.devices.zwave.ZWaveSetDeviceLevelAdvertise
 import java.util.Map;
 import java.util.UUID;
 
-class CommonDeviceService implements Runnable
+class CommonDeviceService
 {
-
 	private final Logger LOGGER = LogManager.getLogger(CommonDeviceService.class.getName());
-	private boolean shutdown = false;
 
 	public CommonDeviceService()
 	{
-		Thread t = new Thread(this);
-		t.setName("Common Device Service");
-		t.start();
-	}
-
-	@Override
-	public synchronized void run()
-	{
-		try
-		{
-			// Make sure we exit the wait loop if we receive shutdown signal.
-			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					shutdown = true;
-				}
-			}));
-
-			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-common");
+		final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-common");
 
 			jsonMessaging.subscribe("event.devices.setvalue");
 			jsonMessaging.subscribe("event.devices.getinventory");
 			jsonMessaging.subscribe("event.devices.setname");
 			jsonMessaging.subscribe("event.devices.setzone");
 
-			jsonMessaging.start();
-
-			while (!shutdown)
-			{
-
-				// Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
-				final JsonEnvelope envelope = jsonMessaging.receive(100);
-				if (envelope != null)
-				{
+		jsonMessaging.setNotification(new JsonNotification() {
+			@Override
+			public void onNotification(JsonEnvelope envelope) {
 
 					////////////////////////////////////////////
 					//// Setting level to device            ////
@@ -97,7 +70,7 @@ class CommonDeviceService implements Runnable
 						if (device == null)
 						{
 							LOGGER.info("Cant find device with UUID " + uuid);
-							continue;
+							return;
 						}
 
 						if (device.getSource().equals("zwave"))
@@ -142,7 +115,7 @@ class CommonDeviceService implements Runnable
 							if (device == null)
 							{
 								LOGGER.info("Cant find device with UUID " + uuid);
-								continue;
+								return;
 							}
 
 							if (device.getSource().equals("zwave"))
@@ -172,7 +145,7 @@ class CommonDeviceService implements Runnable
 						if (device == null)
 						{
 							LOGGER.info("Cant find device with UUID " + uuid);
-							continue;
+							return;
 						}
 
 						LOGGER.info("Setting name \"" + advertisement.getName() + "\" to device " + uuid);
@@ -197,7 +170,7 @@ class CommonDeviceService implements Runnable
 						if (device == null)
 						{
 							LOGGER.info("Cant find device with UUID " + uuid);
-							continue;
+							return;
 						}
 
 						LOGGER.info("Setting zone " + advertisement.getZone() + " to device " + uuid);
@@ -233,14 +206,10 @@ class CommonDeviceService implements Runnable
 								+ " at '" + envelope.getSubject()
 								+ ": " + envelope.getObject());
 					}
-				}
-			}
 
-			jsonMessaging.close();
-		}
-		catch (InterruptedException e)
-		{
-			LOGGER.error(e.toString());
-		}
+				}
+		});
+
+		jsonMessaging.start();
 	}
 }

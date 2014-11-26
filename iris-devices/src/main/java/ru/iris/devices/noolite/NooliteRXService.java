@@ -25,6 +25,7 @@ import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.helpers.DBLogger;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.devices.noolite.*;
 import ru.iris.noolite4j.receiver.RX2164;
 import ru.iris.noolite4j.watchers.BatteryState;
@@ -37,8 +38,7 @@ import java.util.UUID;
 public class NooliteRXService
 {
 	private final Logger LOGGER = LogManager.getLogger(NooliteRXService.class.getName());
-	private JsonMessaging messaging;
-	private boolean shutdown = false;
+	private final JsonMessaging messaging;
 	private RX2164 rx;
 
 	public NooliteRXService()
@@ -198,34 +198,20 @@ public class NooliteRXService
 	///  For intenal commands
 	///
 
-	private class InternalCommands implements Runnable
+	private class InternalCommands
 	{
 		public InternalCommands()
 		{
-			Thread t = new Thread(this);
-			t.start();
-		}
-
-		@Override
-		public synchronized void run()
-		{
-			try
-			{
-				JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-rx-internal");
+			final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-rx-internal");
 
 				jsonMessaging.subscribe("event.devices.noolite.rx.bindchannel");
 				jsonMessaging.subscribe("event.devices.noolite.rx.unbindchannel");
 				jsonMessaging.subscribe("event.devices.noolite.rx.unbindallchannel");
 
-				jsonMessaging.start();
+			jsonMessaging.setNotification(new JsonNotification() {
+				@Override
+				public void onNotification(JsonEnvelope envelope) {
 
-				while (!shutdown)
-				{
-
-					// Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
-					final JsonEnvelope envelope = jsonMessaging.receive(100);
-					if (envelope != null)
-					{
 						if (envelope.getObject() instanceof BindRXChannelAdvertisment)
 						{
 							LOGGER.debug("Get BindRXChannel advertisement");
@@ -272,18 +258,9 @@ public class NooliteRXService
 									+ ": " + envelope.getObject());
 						}
 					}
-				}
+			});
 
-				// Close JSON messaging.
-				jsonMessaging.close();
-				messaging.close();
-
-			}
-			catch (final Throwable t)
-			{
-				t.printStackTrace();
-				LOGGER.error("Unexpected exception in NooliteRX-Internal", t);
-			}
+			jsonMessaging.start();
 		}
 	}
 }

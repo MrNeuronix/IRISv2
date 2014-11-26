@@ -14,28 +14,9 @@
  * limitations under the License.
  */
 
-package ru.iris;
+package ru.iris.common.messaging;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+public interface JsonNotification {
 
-class StatusChecker implements Runnable
-{
-
-	private static Logger LOGGER = LogManager.getLogger(StatusChecker.class.getName());
-
-	public StatusChecker()
-	{
-		Thread t = new Thread(this);
-		t.setName("Status Checker Service");
-		t.start();
-	}
-
-	@Override
-	public synchronized void run()
-	{
-
-		//TODO
-
-	}
+    public void onNotification(JsonEnvelope envelope);
 }

@@ -47,9 +47,6 @@ class Core
 		AgentLoader.loadAgent("lib/avaje-ebeanorm-agent-4.1.2.jar");
 		new DatabaseConnection();
 
-		// Modules poll
-		new StatusChecker();
-
 		// Load plugins
 		PluginManager pluginManager = new DefaultPluginManager(new File("extensions"));
 		pluginManager.loadPlugins();

@@ -29,110 +29,76 @@ import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.ai.AIResponseAdvertisement;
 import ru.iris.common.messaging.model.ai.WitAiResponse;
 import ru.iris.common.messaging.model.speak.SpeakRecognizedAdvertisement;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.UUID;
 
-public class WitAiService implements Runnable
+public class WitAiService
 {
-
 	private final Logger LOGGER = LogManager.getLogger(WitAiService.class);
 	private final AIResponseAdvertisement aiResponseAdvertisement = new AIResponseAdvertisement();
-	private Thread t = null;
-	private boolean shutdown = false;
 
 	public WitAiService()
 	{
-		this.t = new Thread(this);
-		t.setName("WitAI Service");
-		this.t.start();
-	}
-
-	public Thread getThread()
-	{
-		return this.t;
-	}
-
-	public synchronized void run()
-	{
-
-		Config cfg = Config.getInstance();
-		Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+		final Config cfg = Config.getInstance();
+		final Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
 
 		try
 		{
-			// Make sure we exit the wait loop if we receive shutdown signal.
-			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					shutdown = true;
-				}
-			}));
-
-			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "witai");
+			final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "witai");
 			jsonMessaging.subscribe("event.speak.recognized");
-			jsonMessaging.start();
+			jsonMessaging.setNotification(new JsonNotification() {
 
-			while (!shutdown)
-			{
+				@Override
+				public void onNotification(JsonEnvelope envelope) {
 
-				// Lets wait for 100 ms on json messages and if nothing comes then proceed to carry out other tasks.
-				final JsonEnvelope envelope = jsonMessaging.receive(100);
-				if (envelope != null)
-				{
 					if (envelope.getObject() instanceof SpeakRecognizedAdvertisement)
 					{
+						try {
+							SpeakRecognizedAdvertisement advertisement = envelope.getObject();
+							String url = "https://api.wit.ai/message?q=" + URLEncoder.encode(advertisement.getText(), "UTF-8");
 
-						SpeakRecognizedAdvertisement advertisement = envelope.getObject();
+							LOGGER.debug("URL is: " + url);
 
-						/////////////////////////////////////////////////////////////////
+							CloseableHttpClient httpclient = HttpClients.createDefault();
+							HttpGet httpget = new HttpGet(url);
 
-						String url = "https://api.wit.ai/message?q=" + URLEncoder.encode(advertisement.getText(), "UTF-8");
+							// auth on wit.ai
+							httpget.addHeader("Authorization", "Bearer " + cfg.get("witaiKey"));
 
-						LOGGER.debug("URL is: " + url);
-
-						CloseableHttpClient httpclient = HttpClients.createDefault();
-						HttpGet httpget = new HttpGet(url);
-
-						// auth on wit.ai
-						httpget.addHeader("Authorization", "Bearer " + cfg.get("witaiKey"));
-
-						try (CloseableHttpResponse response = httpclient.execute(httpget))
-						{
+							CloseableHttpResponse response = httpclient.execute(httpget);
 							HttpEntity entity = response.getEntity();
 							if (entity != null)
-							{
-
-								try (InputStream instream = entity.getContent())
 								{
+									InputStream instream = entity.getContent();
 									String content = IOUtils.toString(instream, "UTF-8");
 
 									LOGGER.debug("AI response: " + content);
 
 									WitAiResponse json = gson.fromJson(content, WitAiResponse.class);
-
 									Double confidence = json.getOutcome().getConfidence();
 
 									LOGGER.debug("Confidence: " + confidence);
 
 									if (confidence > 0.65)
-									{
-										String object = json.getOutcome().getEntities().get("object").getValue();
-
-										if (object != null)
 										{
-											LOGGER.info("Get response from AI: " + json.getMsg_body() + " to object: " + object);
-											jsonMessaging.broadcast("event.ai.response.object." + object, aiResponseAdvertisement.set(json));
+											String object = json.getOutcome().getEntities().get("object").getValue();
+
+											if (object != null) {
+												LOGGER.info("Get response from AI: " + json.getMsg_body() + " to object: " + object);
+												jsonMessaging.broadcast("event.ai.response.object." + object, aiResponseAdvertisement.set(json));
+											}
 										}
-									}
 								}
-							}
+						} catch (IOException e) {
+							LOGGER.error("Error: ", e.getMessage());
+							e.printStackTrace();
 						}
 
 						/////////////////////////////////////////////////////////////////
@@ -148,11 +114,9 @@ public class WitAiService implements Runnable
 								+ ": " + envelope.getObject());
 					}
 				}
-			}
+			});
 
-			// Close JSON messaging.
-			jsonMessaging.close();
-
+			jsonMessaging.start();
 		}
 		catch (final Throwable t)
 		{
@@ -160,6 +124,5 @@ public class WitAiService implements Runnable
 			LOGGER.error("Unexpected exception in AI", t);
 			t.printStackTrace();
 		}
-
 	}
 }

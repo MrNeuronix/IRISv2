@@ -30,6 +30,7 @@ import ru.iris.common.database.model.DataSource;
 import ru.iris.common.database.model.Task;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.tasks.TaskSourcesChangesAdvertisement;
 import ru.iris.common.messaging.model.tasks.TasksStartAdvertisement;
 import ru.iris.common.messaging.model.tasks.TasksStopAdvertisement;
@@ -42,33 +43,21 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public class ScheduleService implements Runnable
+public class ScheduleService
 {
 	private final Logger LOGGER = LogManager.getLogger(ScheduleService.class);
 	private List<Task> events = null;
 	private List<DataSource> sources = null;
-	private Thread t = null;
 	private SchedulerFactory factory = new StdSchedulerFactory();
 	private Scheduler scheduler = null;
-	private boolean shutdown = false;
 
 	public ScheduleService()
 	{
-		this.t = new Thread(this);
-		t.setName("Scheduler Service");
-		this.t.start();
-	}
-
-	public Thread getThread()
-	{
-		return this.t;
-	}
-
-	public synchronized void run()
-	{
-		try
-		{
+		try {
 			scheduler = factory.getScheduler();
+		} catch (SchedulerException e) {
+			LOGGER.error("Error: " + e.getMessage());
+		}
 
 			// run
 			readSources();
@@ -80,16 +69,14 @@ public class ScheduleService implements Runnable
 			jsonMessaging.subscribe("event.scheduler.stop");
 			jsonMessaging.subscribe("event.scheduler.start");
 			jsonMessaging.subscribe("event.scheduler.restart");
-			jsonMessaging.start();
 
-			while (!shutdown)
-			{
-				JsonEnvelope envelope = jsonMessaging.receive(100);
+		jsonMessaging.setNotification(new JsonNotification() {
+			@Override
+			public void onNotification(JsonEnvelope envelope) {
 
-				if (envelope != null)
-				{
-					if (envelope.getObject() instanceof TasksStartAdvertisement)
-					{
+				try {
+
+					if (envelope.getObject() instanceof TasksStartAdvertisement) {
 						LOGGER.info("Start/restart scheduler service!");
 
 						// take pause to save/remove new entity
@@ -103,9 +90,7 @@ public class ScheduleService implements Runnable
 						Thread.sleep(1000);
 
 						readAndScheduleTasks();
-					}
-					else if (envelope.getObject() instanceof TasksStopAdvertisement)
-					{
+					} else if (envelope.getObject() instanceof TasksStopAdvertisement) {
 						LOGGER.info("Stop scheduler service");
 
 						// take pause to save/remove new entity
@@ -114,9 +99,7 @@ public class ScheduleService implements Runnable
 						// reload events
 						scheduler.shutdown();
 						events = null;
-					}
-					else if (envelope.getObject() instanceof TaskSourcesChangesAdvertisement)
-					{
+					} else if (envelope.getObject() instanceof TaskSourcesChangesAdvertisement) {
 						LOGGER.info("Reload sources list");
 
 						// take pause to save/remove new entity
@@ -132,20 +115,15 @@ public class ScheduleService implements Runnable
 						readSources();
 
 						LOGGER.info("Loaded " + sources.size() + " sources.");
-
 					}
+
+					} catch (Exception e) {
+					LOGGER.error("Error: " + e.getMessage());
 				}
-			}
+				}
+		});
 
-			// Close JSON messaging.
-			jsonMessaging.close();
-
-		}
-		catch (final Throwable t)
-		{
-			t.printStackTrace();
-			LOGGER.error("Unexpected exception in Events: ", t.getMessage());
-		}
+		jsonMessaging.start();
 	}
 
 	private void readSources()

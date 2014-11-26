@@ -24,12 +24,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
- * Prototype for JSON message broadcasting.
+ * JSON messaging
  *
  * @author Nikolay A. Viguro, Tommi S.E. Laukkanen
  */
@@ -46,10 +43,8 @@ public class JsonMessaging
 	 * The subjects that has been registered to receive JSON encoded messages.
 	 */
 	private final Set<String> jsonSubjects = Collections.synchronizedSet(new HashSet<String>());
-	/**
-	 * The receive queue for JSON objects.
-	 */
-	private final BlockingQueue<JsonEnvelope> jsonReceiveQueue = new ArrayBlockingQueue<>(100);
+
+	private JsonNotification notification = null;
 	private final Gson gson = new GsonBuilder().create();
 	/**
 	 * Boolean flag reflecting whether threads should be close.
@@ -70,6 +65,14 @@ public class JsonMessaging
 	public JsonMessaging(final UUID instanceId, String queueName)
 	{
 		this.instanceId = instanceId;
+	}
+
+	public JsonNotification getNotification() {
+		return notification;
+	}
+
+	public void setNotification(JsonNotification notification) {
+		this.notification = notification;
 	}
 
 	/**
@@ -130,36 +133,6 @@ public class JsonMessaging
 	}
 
 	/**
-	 * Gets the JSON message received to subject or null if nothing has been received
-	 *
-	 * @return the JSON message or null
-	 */
-	public JsonEnvelope getJsonObject()
-	{
-		synchronized (jsonReceiveQueue)
-		{
-			if (jsonReceiveQueue.size() > 0)
-			{
-				return jsonReceiveQueue.poll();
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Checks whether JSON message has been received.
-	 *
-	 * @return true if JSON message is available
-	 */
-	public int hasJsonObject()
-	{
-		synchronized (jsonReceiveQueue)
-		{
-			return jsonReceiveQueue.size();
-		}
-	}
-
-	/**
 	 * Sends object as JSON encoded message with given subject.
 	 *
 	 * @param subject the subject
@@ -193,26 +166,6 @@ public class JsonMessaging
 		{
 			LOGGER.error("Error sending JSON message: " + object + " to subject: " + subject, e);
 		}
-	}
-
-	/**
-	 * Blocking receive to listen for JOSN messages arriving to given topic.
-	 *
-	 * @return the JSON message
-	 */
-	public JsonEnvelope receive() throws InterruptedException
-	{
-		return jsonReceiveQueue.take();
-	}
-
-	/**
-	 * Blocking receive to listen for JOSN messages arriving to given topic.
-	 *
-	 * @return the JSON message
-	 */
-	public JsonEnvelope receive(final int timeoutMillis) throws InterruptedException
-	{
-		return jsonReceiveQueue.poll(timeoutMillis, TimeUnit.MILLISECONDS);
 	}
 
 	/**
@@ -269,13 +222,7 @@ public class JsonMessaging
 						+ " to subject: "
 						+ envelope.getSubject() + " (" + envelope.getClass().getSimpleName() + ")");
 
-				jsonReceiveQueue.put(envelope);
-
-				// debug
-				if (jsonReceiveQueue.size() > 10)
-				{
-					LOGGER.info("Queue is too big! " + jsonReceiveQueue.size());
-				}
+				notification.onNotification(envelope);
 			}
 		}
 		catch (final ClassNotFoundException e)

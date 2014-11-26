@@ -21,19 +21,18 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
+import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
-import org.mozilla.javascript.tools.shell.Global;
 import ru.iris.common.database.model.Event;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.command.CommandAdvertisement;
 import ru.iris.common.messaging.model.events.EventChangesAdvertisement;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,62 +42,23 @@ import java.util.UUID;
  * Time: 11:25
  */
 
-public class EventsService implements Runnable
+public class EventsService
 {
 	private final Logger LOGGER = LogManager.getLogger(EventsService.class.getName());
-	private boolean shutdown = false;
-    private Thread thread;
 
     public EventsService()
 	{
-		thread = new Thread(this);
-        thread.setName("Event Service");
-        thread.start();
-	}
-
-	@Override
-	public synchronized void run()
-	{
-
-		try
-		{
-            List<Event> events = Ebean.find(Event.class).findList();
+		final List<Event> events = Ebean.find(Event.class).findList();
 
             // take pause to save/remove new entity
-            Thread.sleep(1000);
-
-			// Make sure we exit the wait loop if we receive shutdown signal.
-			Runtime.getRuntime().addShutdownHook(new Thread(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					shutdown = true;
-				}
-			}));
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 			final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "events");
 			final Logger scriptLogger = LogManager.getLogger(EventsService.class.getName());
-
-			// Initialize rhino engine
-			Global global = new Global();
-			Context cx = ContextFactory.getGlobal().enterContext();
-			global.init(cx);
-			Scriptable scope = cx.initStandardObjects(global);
-
-			// Pass jsonmessaging instance to js engine
-			ScriptableObject.putProperty(scope, "jsonMessaging", Context.javaToJS(jsonMessaging, scope));
-			ScriptableObject.putProperty(scope, "out", Context.javaToJS(System.out, scope));
-			ScriptableObject.putProperty(scope, "LOGGER", Context.javaToJS(scriptLogger, scope));
-
-			// filter js files
-			final FilenameFilter filter = new FilenameFilter()
-			{
-				public boolean accept(File dir, String name)
-				{
-					return name.endsWith(".js");
-				}
-			};
 
 			// subscribe to events from db
             for(Event event : events)
@@ -110,88 +70,70 @@ public class EventsService implements Runnable
 			// command launch
 			jsonMessaging.subscribe("event.command");
 
-			jsonMessaging.start();
+		jsonMessaging.setNotification(new JsonNotification() {
+			@Override
+			public void onNotification(JsonEnvelope envelope) {
 
-			while (!shutdown)
-			{
-				JsonEnvelope envelope = jsonMessaging.receive(100);
+				try {
 
-				if (envelope != null)
-				{
+					Context cx = Context.enter();
+					Scriptable scope = new ImporterTopLevel(cx);
 
-                    LOGGER.debug("Got envelope with subject: " + envelope.getSubject());
+					// Pass jsonmessaging instance to js engine
+					ScriptableObject.putProperty(scope, "jsonMessaging", Context.javaToJS(jsonMessaging, scope));
+					ScriptableObject.putProperty(scope, "out", Context.javaToJS(System.out, scope));
+					ScriptableObject.putProperty(scope, "LOGGER", Context.javaToJS(scriptLogger, scope));
+
+					LOGGER.debug("Got envelope with subject: " + envelope.getSubject());
 
 					// Check command and launch script
-					if (envelope.getObject() instanceof CommandAdvertisement)
-					{
+					if (envelope.getObject() instanceof CommandAdvertisement) {
 						CommandAdvertisement advertisement = envelope.getObject();
 						LOGGER.info("Launch command script: " + advertisement.getScript());
 
 						File jsFile = new File("./scripts/command/" + advertisement.getScript() + ".js");
 
-						try
-						{
+						try {
 							ScriptableObject.putProperty(scope, "commandParams", Context.javaToJS(advertisement.getData(), scope));
 							cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
-						}
-						catch (FileNotFoundException e)
-						{
+						} catch (FileNotFoundException e) {
 							LOGGER.error("Script file scripts/command/" + advertisement.getScript() + ".js not found!");
-						}
-						catch (Exception e)
-						{
+						} catch (Exception e) {
 							LOGGER.error("Error in script scripts/command/" + advertisement.getScript() + ".js: " + e.toString());
 							e.printStackTrace();
 						}
-					}
-					else if (envelope.getObject() instanceof EventChangesAdvertisement)
-					{
+					} else if (envelope.getObject() instanceof EventChangesAdvertisement) {
 						LOGGER.info("Restart event service");
 
-						shutdown = true;
-                        new EventsService();
-                        thread.join();
-					}
-					else
-					{
-						for (Event event : events)
-						{
-							if (envelope.getSubject().equals(event.getSubject()) || wildCardMatch(event.getSubject(), envelope.getSubject()))
-							{
+						jsonMessaging.close();
+						new EventsService();
+					} else {
+						for (Event event : events) {
+							if (envelope.getSubject().equals(event.getSubject()) || wildCardMatch(event.getSubject(), envelope.getSubject())) {
 								File jsFile = new File("./scripts/" + event.getScript());
 
 								LOGGER.debug("Launch script: " + event.getScript());
 
-								try
-								{
+								try {
 									ScriptableObject.putProperty(scope, "advertisement", Context.javaToJS(envelope.getObject(), scope));
 									cx.evaluateString(scope, FileUtils.readFileToString(jsFile), jsFile.toString(), 1, null);
-								}
-								catch (FileNotFoundException e)
-								{
+								} catch (FileNotFoundException e) {
 									LOGGER.error("Script file " + jsFile + " not found!");
-								}
-								catch (Exception e)
-								{
+								} catch (Exception e) {
 									LOGGER.error("Error in script " + jsFile + ": " + e.toString());
 									e.printStackTrace();
 								}
 							}
 						}
 					}
+
+				} finally {
+					Context.exit();
 				}
-			}
+				}
+		});
 
-			// Close JSON messaging.
-			jsonMessaging.close();
-
-		}
-		catch (final Throwable t)
-		{
-			t.printStackTrace();
-			LOGGER.error("Unexpected exception in Events", t);
-		}
-
+		jsonMessaging.start();
 	}
 
 	private boolean wildCardMatch(String pattern, String text)

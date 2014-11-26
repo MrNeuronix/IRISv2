@@ -19,25 +19,11 @@ package ru.iris.video;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class VideoService implements Runnable
+class VideoService
 {
-
-	private Thread t = null;
 	private Logger LOGGER = LogManager.getLogger(VideoService.class);
 
 	public VideoService()
-	{
-		this.t = new Thread(this);
-		t.setName("Video Service");
-		this.t.start();
-	}
-
-	public Thread getThread()
-	{
-		return this.t;
-	}
-
-	public synchronized void run()
 	{
 
 	}
