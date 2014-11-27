@@ -31,9 +31,20 @@ var Speak = Java.type("ru.iris.common.helpers.Speak");
     var uuid = advertisement.getDeviceUUID();
 
     var device = Device.getDeviceByUUID(uuid);
+    var phrase;
 
     if (label == "Level") {
+
+        if(value == "0")
+        {
+            phrase = "выключено";
+        }
+        else
+        {
+            phrase = "включено";
+        }
+
         // lets speak!
-        Speak.say("Уровень яркости на устройстве " + device.getName() + " выставлен на " + value + " процентов");
+        Speak.say("Устройство " + device.getName() + " " + phrase);
     }
 
