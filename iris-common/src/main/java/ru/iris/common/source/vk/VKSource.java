@@ -28,6 +28,7 @@ import ru.iris.common.source.vk.entities.User;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -110,9 +111,9 @@ public class VKSource
 					dateFormat.setLenient(true);
 					cal.setTime(dateFormat.parse(bdate));
 
-					cal.set(Calendar.YEAR, 2014);
+					cal.set(Calendar.YEAR, LocalDateTime.now().getYear());
 					cal.set(Calendar.HOUR_OF_DAY, 10);
-					cal.set(Calendar.MINUTE, 0);
+					cal.set(Calendar.MINUTE, 10);
 
 					Task saved = Ebean.find(Task.class).where().eq("title", "День рождения " + user.getFirstName() + " " + user.getLastName()).findUnique();
 
@@ -121,7 +122,7 @@ public class VKSource
 						Task task = new Task();
 						task.setStartdate(new Timestamp(cal.getTime().getTime()));
 
-						cal.set(Calendar.HOUR, 10);
+						cal.add(Calendar.HOUR_OF_DAY, 10);
 
 						Map<String, String> map = new HashMap<>();
 						map.put("text", "Сегодня празднует день рождения ваш друг - " + user.getFirstName() + " " + user.getLastName());

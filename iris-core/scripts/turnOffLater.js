@@ -25,49 +25,24 @@
 var Device = Java.type("ru.iris.common.database.model.devices.Device");
 var Lock = Java.type("ru.iris.common.database.Lock");
 var Speak = Java.type("ru.iris.common.helpers.Speak");
-var Timer = Java.type('java.util.Timer');
-var Phaser = Java.type('java.util.concurrent.Phaser');
+var Executors = Java.type('java.util.concurrent.Executors');
+var Runnable = Java.type('java.lang.Runnable');
+var TimeUnit = Java.type('java.util.concurrent.TimeUnit');
 
 // setTimeout implementation
 //////////////////////////////////////////////////////
 
-var canceled = false;
+// setTimeout implementation
+var executor = Executors.newScheduledThreadPool(1);
+var counter = 1;
+var ids = {};
 
-var onTaskFinished = function () {
-    phaser.arriveAndDeregister();
+var setTimeout = function (fn, delay) {
+    var id = counter++;
+    var runnable = Java.extend(Runnable, {run: fn});
+    ids[id] = executor.schedule(runnable, delay, TimeUnit.MILLISECONDS);
+    return id;
 };
-
-function setTimeout(fn, millis /* [, args...] */) {
-
-    var timer = new Timer('jsEventLoop', false);
-    var phaser = new Phaser();
-    var args = [].slice.call(arguments, 2, arguments.length);
-    var phase = phaser.register();
-
-    timer.schedule(function () {
-        if (canceled) {
-            return;
-        }
-
-        try {
-            fn.apply(args);
-        } catch (e) {
-            print(e);
-        } finally {
-            onTaskFinished();
-        }
-    }, millis);
-
-    return function () {
-        onTaskFinished();
-        canceled = true;
-    };
-    }
-
-function clearTimeout(cancel) {
-    onTaskFinished();
-    canceled = true;
-}
 
 //////////////////////////////////////////////////////
 
