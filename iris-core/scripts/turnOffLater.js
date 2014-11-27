@@ -25,24 +25,8 @@
 var Device = Java.type("ru.iris.common.database.model.devices.Device");
 var Lock = Java.type("ru.iris.common.database.Lock");
 var Speak = Java.type("ru.iris.common.helpers.Speak");
-var Executors = Java.type('java.util.concurrent.Executors');
-var Runnable = Java.type('java.lang.Runnable');
-var TimeUnit = Java.type('java.util.concurrent.TimeUnit');
-
-// setTimeout implementation
-//////////////////////////////////////////////////////
-
-// setTimeout implementation
-var executor = Executors.newScheduledThreadPool(1);
-var counter = 1;
-var ids = {};
-
-var setTimeout = function (fn, delay) {
-    var id = counter++;
-    var runnable = Java.extend(Runnable, {run: fn});
-    ids[id] = executor.schedule(runnable, delay, TimeUnit.MILLISECONDS);
-    return id;
-};
+var DeviceCtl = Java.type("ru.iris.common.helpers.DeviceCtl");
+var Timer = Java.type("java.util.Timer");
 
 //////////////////////////////////////////////////////
 
@@ -66,34 +50,28 @@ var setTimeout = function (fn, delay) {
             var reluuid = uuid;
             lock.lock();
 
-            // run in separate thread
-            obj = {
-                run: function () {
-                    function turnOff() {
+            var timer = new Timer("turnOffLaterTimer", true);
 
-                        if (Lock.isLocked("toilet-light-on")) {
+            // turn off past 20 minutes
+            timer.schedule(function()
+            {
+                if (Lock.isLocked("toilet-light-on")) {
 
-                            LOGGER.info("[turnOffLater] Times up! Release lock and turn off device " + reluuid);
+                    LOGGER.info("[turnOffLater] Times up! Release lock and turn off device " + reluuid);
 
-                            // release lock
-                            Lock.release("toilet-light-on");
+                    // release lock
+                    Lock.release("toilet-light-on");
 
-                            // turn off device
-                            new DeviceCtl().off(reluuid);
+                    // turn off device
+                    DeviceCtl.off(reluuid);
 
-                            // lets speak!
-                            Speak.say("Кто-то опять забыл выключить свет! Прошло 20 минут, выключаю сам");
-                        }
-                    }
-
-                    // turn off past 20 minutes
-                    setTimeout(turnOff, 1200000);
+                    // lets speak!
+                    Speak.say("Кто-то опять забыл выключить свет! Прошло 20 минут, выключаю сам");
                 }
-            };
-            obj.run();
+            }, 1200000);
+
         }
     }
-
 
     if (label == "Level" && value == "0" && device.getInternalName() == "noolite/channel/4" && Lock.isLocked("toilet-light-on")) {
         // release lock
