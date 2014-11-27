@@ -23,4 +23,7 @@
 
 var Speak = Java.type("ru.iris.common.helpers.Speak");
 
-Speak.say(advertisement.getData().get("text"));
+var date = new Date;
+var hour = date.getHours();
+
+Speak.say("Сейчас ровно " + hour + " часов");

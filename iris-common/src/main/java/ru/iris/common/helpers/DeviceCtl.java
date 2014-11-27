@@ -33,12 +33,12 @@ public class DeviceCtl
 	private static final SetDeviceLevelAdvertisement advertisement = new SetDeviceLevelAdvertisement();
 	private static final JsonMessaging messaging = new JsonMessaging(UUID.randomUUID());
 
-	public void on(String uuid)
+	public static void on(String uuid)
 	{
 		messaging.broadcast("event.devices.setvalue", advertisement.set(uuid, "Level", "255"));
 	}
 
-	public void off(String uuid)
+	public static void off(String uuid)
 	{
 		messaging.broadcast("event.devices.setvalue", advertisement.set(uuid, "Level", "0"));
 	}

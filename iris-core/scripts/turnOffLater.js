@@ -82,7 +82,7 @@ var setTimeout = function (fn, delay) {
                             new DeviceCtl().off(reluuid);
 
                             // lets speak!
-                            new Speak().say("Кто-то опять забыл выключить свет! Прошло 20 минут, выключаю сам");
+                            Speak.say("Кто-то опять забыл выключить свет! Прошло 20 минут, выключаю сам");
                         }
                     }
 

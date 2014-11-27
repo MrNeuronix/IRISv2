@@ -37,7 +37,7 @@ var Speak = Java.type("ru.iris.common.helpers.Speak");
         LOGGER.info("[floodSensor] Flood detected!");
 
         // lets speak!
-        new Speak().say("Внимание! Обнаружена протечка воды!");
+        Speak.say("Внимание! Обнаружена протечка воды!");
     }
 
 
@@ -46,5 +46,5 @@ var Speak = Java.type("ru.iris.common.helpers.Speak");
         LOGGER.info("[floodSensor] Flood off!");
 
         // lets speak!
-        new Speak().say("Внимание! Протечка воды устранена!");
+        Speak.say("Внимание! Протечка воды устранена!");
     }

@@ -34,6 +34,6 @@ var Speak = Java.type("ru.iris.common.helpers.Speak");
 
     if (label == "Level") {
         // lets speak!
-        new Speak().say("Уровень яркости на устройстве " + device.getName() + " выставлен на " + value + " процентов");
+        Speak.say("Уровень яркости на устройстве " + device.getName() + " выставлен на " + value + " процентов");
     }
 

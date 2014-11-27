@@ -40,12 +40,11 @@ public class Service extends Plugin
 		LOGGER.info("[Plugin] iris-speak plugin started!");
 
 		Config cfg = Config.getInstance();
-		Speak speak = new Speak();
 
 		if (cfg.get("ttsEngine").equals("google"))
 		{
 			new GoogleSpeakService();
-			speak.say("Модуль синтеза речи Гугл запущен!");
+			Speak.say("Модуль синтеза речи Гугл запущен!");
 		}
 		else
 		{
