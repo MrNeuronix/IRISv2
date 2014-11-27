@@ -20,6 +20,7 @@ import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.darkprograms.speech.synthesiser.Synthesiser;
 import javazoom.jl.player.Player;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
@@ -93,20 +94,27 @@ public class GoogleSpeakService
 										OutputStream outputStream = new FileOutputStream(new File("data/cache-" + cacheIdent + ".mp3"));
 										result = synthesiser.getMP3Data(advertisement.getText());
 
-										InputStream play = result;
-										player = new Player(play);
+										byte[] byteArray = IOUtils.toByteArray(result);
+										InputStream resultForPlay = new ByteArrayInputStream(byteArray);
+										InputStream resultForWrite = new ByteArrayInputStream(byteArray);
+
+										player = new Player(resultForPlay);
 										player.play();
 										player.close();
 
 										int read;
 										byte[] bytes = new byte[1024];
 
-										while ((read = result.read(bytes)) != -1) {
+										while ((read = resultForWrite.read(bytes)) != -1) {
 											outputStream.write(bytes, 0, read);
 										}
 
 										speak.setCache(cacheIdent);
 										speak.save();
+
+										resultForPlay.close();
+										resultForWrite.close();
+										result.close();
 
 										speaksList.add(speak);
 									}
