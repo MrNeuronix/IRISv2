@@ -31,8 +31,6 @@ var Phaser = Java.type('java.util.concurrent.Phaser');
 // setTimeout implementation
 //////////////////////////////////////////////////////
 
-var timer = new Timer('jsEventLoop', false);
-var phaser = new Phaser();
 var canceled = false;
 
 var onTaskFinished = function () {
@@ -41,6 +39,8 @@ var onTaskFinished = function () {
 
 function setTimeout(fn, millis /* [, args...] */) {
 
+    var timer = new Timer('jsEventLoop', false);
+    var phaser = new Phaser();
     var args = [].slice.call(arguments, 2, arguments.length);
     var phase = phaser.register();
 
