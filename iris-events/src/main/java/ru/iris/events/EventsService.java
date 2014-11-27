@@ -27,12 +27,12 @@ import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.command.CommandAdvertisement;
 import ru.iris.common.messaging.model.events.EventChangesAdvertisement;
 
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import javax.script.*;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -44,8 +44,9 @@ import java.util.UUID;
 public class EventsService
 {
 	private final Logger LOGGER = LogManager.getLogger(EventsService.class.getName());
+	private final Compilable engine = (Compilable) new ScriptEngineManager().getEngineByName("nashorn");
 
-    public EventsService()
+	public EventsService()
 	{
 		final List<Event> events = Ebean.find(Event.class).findList();
 
@@ -56,24 +57,27 @@ public class EventsService
 			e.printStackTrace();
 		}
 
+		// load all scripts, compile and put into map
+		Map<String, CompiledScript> compiledScriptMap = loadAndCompile(events);
+
 		final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "events");
 		final Logger scriptLogger = LogManager.getLogger(EventsService.class.getName());
-		final ScriptEngine engine = new ScriptEngineManager().getEngineByName("nashorn");
+		Map<String, CompiledScript> compiledCommandScriptMap = new HashMap<>();
 
 		// Pass jsonmessaging instance to js engine
-		engine.getBindings(ScriptContext.ENGINE_SCOPE).put("jsonMessaging", jsonMessaging);
-		engine.getBindings(ScriptContext.ENGINE_SCOPE).put("out", System.out);
-		engine.getBindings(ScriptContext.ENGINE_SCOPE).put("LOGGER", scriptLogger);
+		Bindings bindings = new SimpleBindings();
+		bindings.put("jsonMessaging", jsonMessaging);
+		bindings.put("out", System.out);
+		bindings.put("LOGGER", scriptLogger);
 
-			// subscribe to events from db
-            for(Event event : events)
-            {
-                jsonMessaging.subscribe(event.getSubject());
-                LOGGER.debug("Subscribe to subject: " + event.getSubject());
-            }
+		// subscribe to events from db
+		for (Event event : events) {
+			jsonMessaging.subscribe(event.getSubject());
+			LOGGER.debug("Subscribe to subject: " + event.getSubject());
+		}
 
-			// command launch
-			jsonMessaging.subscribe("event.command");
+		// command launch
+		jsonMessaging.subscribe("event.command");
 
 		jsonMessaging.setNotification(new JsonNotification() {
 
@@ -84,39 +88,52 @@ public class EventsService
 
 					// Check command and launch script
 					if (envelope.getObject() instanceof CommandAdvertisement) {
-						CommandAdvertisement advertisement = envelope.getObject();
-						LOGGER.info("Launch command script: " + advertisement.getScript());
 
-						File jsFile = new File("./scripts/command/" + advertisement.getScript() + ".js");
+						CommandAdvertisement advertisement = envelope.getObject();
+						bindings.put("commandParams", advertisement.getData());
 
 						try {
-							engine.getBindings(ScriptContext.ENGINE_SCOPE).put("commandParams", advertisement.getData());
-							engine.eval(FileUtils.readFileToString(jsFile));
-						} catch (FileNotFoundException e) {
-							LOGGER.error("Script file scripts/command/" + advertisement.getScript() + ".js not found!");
-						} catch (Exception e) {
+
+							if (compiledCommandScriptMap.get(advertisement.getScript()) == null) {
+
+								LOGGER.debug("Compile command script: " + advertisement.getScript());
+
+								File jsFile = new File("./scripts/command/" + advertisement.getScript());
+								CompiledScript compile = engine.compile(FileUtils.readFileToString(jsFile));
+								compiledCommandScriptMap.put(advertisement.getScript(), compile);
+
+								LOGGER.debug("Launch compiled command script: " + advertisement.getScript());
+								compile.eval(bindings);
+							} else {
+								LOGGER.info("Launch compiled command script: " + advertisement.getScript());
+								compiledCommandScriptMap.get(advertisement.getScript()).eval(bindings);
+							}
+
+						} catch (ScriptException | IOException e) {
 							LOGGER.error("Error in script scripts/command/" + advertisement.getScript() + ".js: " + e.toString());
 							e.printStackTrace();
 						}
 					} else if (envelope.getObject() instanceof EventChangesAdvertisement) {
 						LOGGER.info("Restart event service");
-
 						jsonMessaging.close();
 						new EventsService();
 					} else {
 						for (Event event : events) {
 							if (envelope.getSubject().equals(event.getSubject()) || wildCardMatch(event.getSubject(), envelope.getSubject())) {
-								File jsFile = new File("./scripts/" + event.getScript());
 
-								LOGGER.debug("Launch script: " + event.getScript());
+								LOGGER.debug("Run compiled script: " + event.getScript());
 
 								try {
-									engine.getBindings(ScriptContext.ENGINE_SCOPE).put("advertisement", envelope.getObject());
-									engine.eval(FileUtils.readFileToString(jsFile));
-								} catch (FileNotFoundException e) {
-									LOGGER.error("Script file " + jsFile + " not found!");
-								} catch (Exception e) {
-									LOGGER.error("Error in script " + jsFile + ": " + e.toString());
+									bindings.put("advertisement", envelope.getObject());
+									CompiledScript script = compiledScriptMap.get(event.getScript());
+
+									if (script != null)
+										script.eval(bindings);
+									else
+										LOGGER.error("Error! Script " + event.getScript() + " is NULL!");
+
+								} catch (ScriptException e) {
+									LOGGER.error("Error in script scripts/command/" + event.getScript() + ".js: " + e.toString());
 									e.printStackTrace();
 								}
 							}
@@ -126,6 +143,25 @@ public class EventsService
 		});
 
 		jsonMessaging.start();
+	}
+
+	private Map<String, CompiledScript> loadAndCompile(List<Event> events) {
+		Map<String, CompiledScript> compiledScriptMap = new HashMap<>();
+
+		for (Event event : events) {
+			File jsFile = new File("./scripts/" + event.getScript());
+			CompiledScript compile = null;
+
+			try {
+				compile = engine.compile(FileUtils.readFileToString(jsFile));
+			} catch (ScriptException | IOException e) {
+				LOGGER.error("Compile error: " + e.getMessage());
+			}
+
+			compiledScriptMap.put(event.getScript(), compile);
+		}
+
+		return compiledScriptMap;
 	}
 
 	private boolean wildCardMatch(String pattern, String text)

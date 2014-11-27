@@ -22,19 +22,54 @@
  */
 
 // imports
-var Platform = Java.type("javafx.application.Platform");
-var Timer = Java.type("java.util.Timer");
 var Device = Java.type("ru.iris.common.database.model.devices.Device");
 var Lock = Java.type("ru.iris.common.database.Lock");
 var Speak = Java.type("ru.iris.common.helpers.Speak");
+var Timer = Java.type('java.util.Timer');
+var Phaser = Java.type('java.util.concurrent.Phaser');
 
 // setTimeout implementation
-    function setTimeout(func, milliseconds) {
-        // New timer, run as daemon so the application can quit
-        var timer = new Timer("setTimeout", true);
-        timer.schedule(function () Platform.runLater(func), milliseconds);
-        return timer;
+//////////////////////////////////////////////////////
+
+var timer = new Timer('jsEventLoop', false);
+var phaser = new Phaser();
+var canceled = false;
+
+var onTaskFinished = function () {
+    phaser.arriveAndDeregister();
+};
+
+function setTimeout(fn, millis /* [, args...] */) {
+
+    var args = [].slice.call(arguments, 2, arguments.length);
+    var phase = phaser.register();
+
+    timer.schedule(function () {
+        if (canceled) {
+            return;
+        }
+
+        try {
+            fn.apply(args);
+        } catch (e) {
+            print(e);
+        } finally {
+            onTaskFinished();
+        }
+    }, millis);
+
+    return function () {
+        onTaskFinished();
+        canceled = true;
+    };
     }
+
+function clearTimeout(cancel) {
+    onTaskFinished();
+    canceled = true;
+}
+
+//////////////////////////////////////////////////////
 
     // advertisement
     var label = advertisement.getLabel();
