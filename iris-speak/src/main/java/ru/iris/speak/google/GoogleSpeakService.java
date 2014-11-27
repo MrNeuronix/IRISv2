@@ -93,6 +93,11 @@ public class GoogleSpeakService
 										OutputStream outputStream = new FileOutputStream(new File("data/cache-" + cacheIdent + ".mp3"));
 										result = synthesiser.getMP3Data(advertisement.getText());
 
+										InputStream play = result;
+										player = new Player(play);
+										player.play();
+										player.close();
+
 										int read;
 										byte[] bytes = new byte[1024];
 
@@ -101,11 +106,6 @@ public class GoogleSpeakService
 										}
 
 										speak.setCache(cacheIdent);
-
-										player = new Player(result);
-										player.play();
-										player.close();
-
 										speak.save();
 
 										speaksList.add(speak);
@@ -122,9 +122,6 @@ public class GoogleSpeakService
 
 										speak.save();
 									}
-
-									// force to be null for GC
-									player = null;
 								}
 							} else {
 								LOGGER.info("Silence mode enabled. Ignoring speak request.");
