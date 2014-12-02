@@ -126,7 +126,19 @@ public class EventsService
 					}
 					// List available scripts
 					else if (envelope.getObject() instanceof EventListScriptsAdvertisement) {
-						//TODO
+
+						EventListScriptsAdvertisement advertisement = envelope.getObject();
+						File jsFile;
+
+						if (advertisement.isCommand())
+							jsFile = new File("./scripts/command/");
+						else
+							jsFile = new File("./scripts/");
+
+						EventResponseListScriptsAdvertisement response = new EventResponseListScriptsAdvertisement();
+						response.setScripts((List<File>) FileUtils.listFiles(jsFile, new String[]{"js"}, false));
+
+						jsonMessaging.response(envelope, response);
 					}
 					// Check command and launch script
 					else if (envelope.getObject() instanceof CommandAdvertisement) {

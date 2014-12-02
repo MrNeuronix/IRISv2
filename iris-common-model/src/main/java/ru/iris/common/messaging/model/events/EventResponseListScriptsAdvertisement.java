@@ -16,6 +16,7 @@
 
 package ru.iris.common.messaging.model.events;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,16 +24,17 @@ import java.util.List;
  * Created by nikolay.viguro on 14.10.2014.
  */
 public class EventResponseListScriptsAdvertisement {
-    private List<String> scripts = new ArrayList<>();
+
+    private List<File> scripts = new ArrayList<File>();
 
     public EventResponseListScriptsAdvertisement() {
     }
 
-    public List<String> getScripts() {
+    public List<File> getScripts() {
         return scripts;
     }
 
-    public void setScripts(List<String> scripts) {
+    public void setScripts(List<File> scripts) {
         this.scripts = scripts;
     }
 

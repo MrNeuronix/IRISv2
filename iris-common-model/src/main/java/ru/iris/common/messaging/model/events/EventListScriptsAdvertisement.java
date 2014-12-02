@@ -20,11 +20,24 @@ package ru.iris.common.messaging.model.events;
  * Created by nikolay.viguro on 14.10.2014.
  */
 public class EventListScriptsAdvertisement {
+
+    private boolean isCommand = false;
+
     public EventListScriptsAdvertisement() {
+    }
+
+    public boolean isCommand() {
+        return isCommand;
+    }
+
+    public void setCommand(boolean isCommand) {
+        this.isCommand = isCommand;
     }
 
     @Override
     public String toString() {
-        return "EventListScriptsAdvertisement{}";
+        return "EventListScriptsAdvertisement{" +
+                "isCommand=" + isCommand +
+                '}';
     }
 }
