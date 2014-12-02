@@ -42,7 +42,7 @@ public class JsonMessaging
 	/**
 	 * The subjects that has been registered to receive JSON encoded messages.
 	 */
-	private final Set<String> jsonSubjects = Collections.synchronizedSet(new HashSet<String>());
+	private final Set<String> jsonSubjects = Collections.synchronizedSet(new HashSet<>());
 
 	private JsonNotification notification = null;
 	private final Gson gson = new GsonBuilder().create();
@@ -150,6 +150,7 @@ public class JsonMessaging
 					"iris",
 					subject,
 					new AMQP.BasicProperties.Builder()
+							.correlationId(instanceId.toString())
 							.headers(headers)
 							.build(),
 					jsonString.getBytes()
@@ -159,6 +160,110 @@ public class JsonMessaging
 		{
 			LOGGER.error("Error sending JSON message: " + object + " to subject: " + subject, e);
 		}
+	}
+
+	public void response(JsonEnvelope envelope, Object object) {
+		LOGGER.debug("Response to " + envelope.getReceiverInstance() + ", corrId is " + envelope.getCorrelationId());
+
+		String className = object.getClass().getName();
+		String jsonString = gson.toJson(object);
+
+		try {
+			// Create a message headers
+			Map<String, Object> headers = new HashMap<>();
+			headers.put("sender", instanceId.toString());
+			headers.put("class", className);
+
+			// Publish message to topic
+			channel.basicPublish(
+					"iris",
+					envelope.getReceiverInstance(),
+					new AMQP.BasicProperties.Builder()
+							.correlationId(envelope.getCorrelationId())
+							.headers(headers)
+							.build(),
+					jsonString.getBytes()
+			);
+		} catch (IOException e) {
+			LOGGER.error("Error sending reply JSON message: " + object + " to queue: " + envelope.getReceiverInstance(), e);
+		}
+	}
+
+	/**
+	 * Sends object as JSON encoded message with given subject.
+	 *
+	 * @param subject the subject
+	 * @param object  the object
+	 */
+	public JsonEnvelope request(String subject, Object object) {
+		String className = object.getClass().getName();
+		String jsonString = gson.toJson(object);
+		JsonEnvelope envelope = null;
+
+		try {
+			String replyQueue = channel.queueDeclare().getQueue();
+			channel.queueBind(replyQueue, "iris", replyQueue);
+
+			QueueingConsumer consumer = new QueueingConsumer(channel);
+			channel.basicConsume(replyQueue, true, consumer);
+			String corrId = java.util.UUID.randomUUID().toString();
+
+			// Create a message headers
+			Map<String, Object> sendheaders = new HashMap<>();
+			sendheaders.put("sender", instanceId.toString());
+			sendheaders.put("class", className);
+
+			LOGGER.debug("Request to " + subject + ", corrId is " + corrId);
+
+			// Publish message to topic
+			channel.basicPublish(
+					"iris",
+					subject,
+					new AMQP.BasicProperties.Builder()
+							.replyTo(replyQueue)
+							.correlationId(corrId)
+							.headers(sendheaders)
+							.build(),
+					jsonString.getBytes()
+			);
+
+			LOGGER.debug("Waiting for answer");
+
+			while (true) {
+				QueueingConsumer.Delivery delivery = consumer.nextDelivery(5000);
+
+				if (delivery.getProperties().getCorrelationId().equals(corrId)) {
+					LOGGER.debug("Got answer for " + corrId);
+
+					// Get headers
+					Map<String, Object> headers = delivery.getProperties().getHeaders();
+
+					String message = new String(delivery.getBody());
+					String subj = delivery.getEnvelope().getRoutingKey();
+					String corrID = delivery.getProperties().getCorrelationId();
+					String replyTo = delivery.getProperties().getReplyTo();
+					String classNam = new String(((LongString) headers.get("class")).getBytes());
+					String senderName = new String(((LongString) headers.get("sender")).getBytes());
+
+					Class<?> clazz = Class.forName(classNam);
+					Object obj = gson.fromJson(message, clazz);
+
+					envelope = new JsonEnvelope(
+							UUID.fromString(senderName),
+							replyTo,
+							corrID,
+							subj,
+							obj);
+					break;
+				}
+
+				LOGGER.debug("Skip envelope with corrId: " + delivery.getProperties().getCorrelationId());
+			}
+		} catch (IOException | InterruptedException | ClassNotFoundException e) {
+			LOGGER.error("Error sending JSON message: " + object + " to subject: " + subject, e);
+		}
+
+		return envelope;
 	}
 
 	/**
