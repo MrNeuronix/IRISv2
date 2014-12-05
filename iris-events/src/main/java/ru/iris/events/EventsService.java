@@ -144,7 +144,7 @@ public class EventsService
 					else if (envelope.getObject() instanceof CommandAdvertisement) {
 
 						CommandAdvertisement advertisement = envelope.getObject();
-						bindings.put("commandParams", advertisement.getData());
+						bindings.put("advertisement", envelope.getObject());
 
 							if (compiledCommandScriptMap.get(advertisement.getScript()) == null) {
 
