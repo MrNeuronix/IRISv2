@@ -276,6 +276,10 @@ public class JsonMessaging
 		jsonSubjects.add(subject);
 	}
 
+	public void unsubscribe(String subject) {
+		jsonSubjects.remove(subject);
+	}
+
 	private void listenBroadcasts()
 	{
 		try

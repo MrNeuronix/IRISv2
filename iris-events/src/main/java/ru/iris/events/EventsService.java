@@ -45,12 +45,17 @@ public class EventsService
 {
 	private final Logger LOGGER = LogManager.getLogger(EventsService.class.getName());
 	private final Compilable engine = (Compilable) new ScriptEngineManager().getEngineByName("nashorn");
+	private Map<String, CompiledScript> compiledScriptMap;
+	private Map<String, CompiledScript> compiledCommandScriptMap = new HashMap<>();
+	private final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "events");
+	private final Logger scriptLogger = LogManager.getLogger(EventsService.class.getName());
+	private List<Event> events;
 
 	public EventsService()
 	{
-		final List<Event> events = Ebean.find(Event.class).findList();
+		events = Ebean.find(Event.class).findList();
 
-            // take pause to save/remove new entity
+		// take pause to save/remove new entity
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
@@ -58,11 +63,7 @@ public class EventsService
 		}
 
 		// load all scripts, compile and put into map
-		Map<String, CompiledScript> compiledScriptMap = loadAndCompile(events);
-
-		final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "events");
-		final Logger scriptLogger = LogManager.getLogger(EventsService.class.getName());
-		Map<String, CompiledScript> compiledCommandScriptMap = new HashMap<>();
+		compiledScriptMap = loadAndCompile(events);
 
 		// Pass jsonmessaging instance to js engine
 		Bindings bindings = new SimpleBindings();
@@ -82,7 +83,9 @@ public class EventsService
 		// scripts
 		jsonMessaging.subscribe("event.script.get");
 		jsonMessaging.subscribe("event.script.save");
+		jsonMessaging.subscribe("event.script.delete");
 		jsonMessaging.subscribe("event.script.list");
+		jsonMessaging.subscribe("event.reload");
 
 		jsonMessaging.setNotification(new JsonNotification() {
 
@@ -121,8 +124,23 @@ public class EventsService
 
 						FileUtils.writeStringToFile(jsFile, advertisement.getBody());
 						LOGGER.info("Restart event service (reason: script change)");
-						jsonMessaging.close();
-						new EventsService();
+						reloadService();
+					}
+					// Remove script
+					else if (envelope.getObject() instanceof EventRemoveScriptAdvertisement) {
+
+						EventRemoveScriptAdvertisement advertisement = envelope.getObject();
+						LOGGER.debug("Request to remove script: " + advertisement.getName());
+						File jsFile;
+
+						if (advertisement.isCommand())
+							jsFile = new File("./scripts/command/" + advertisement.getName());
+						else
+							jsFile = new File("./scripts/" + advertisement.getName());
+
+						FileUtils.forceDelete(jsFile);
+						LOGGER.info("Restart event service (reason: script removed)");
+						reloadService();
 					}
 					// List available scripts
 					else if (envelope.getObject() instanceof EventListScriptsAdvertisement) {
@@ -161,9 +179,7 @@ public class EventsService
 								compiledCommandScriptMap.get(advertisement.getScript()).eval(bindings);
 							}
 					} else if (envelope.getObject() instanceof EventChangesAdvertisement) {
-						LOGGER.info("Restart event service");
-						jsonMessaging.close();
-						new EventsService();
+						reloadService();
 					} else {
 						for (Event event : events) {
 							if (envelope.getSubject().equals(event.getSubject()) || wildCardMatch(event.getSubject(), envelope.getSubject())) {
@@ -194,6 +210,36 @@ public class EventsService
 		});
 
 		jsonMessaging.start();
+	}
+
+	private void reloadService() {
+		LOGGER.info("Reload event service");
+
+		// unsubscribe current events
+		for (Event event : events) {
+			jsonMessaging.unsubscribe(event.getSubject());
+			LOGGER.debug("Unsubscribe from subject: " + event.getSubject());
+		}
+
+		events = Ebean.find(Event.class).findList();
+
+		// subscribe to events from db
+		for (Event event : events) {
+			jsonMessaging.subscribe(event.getSubject());
+			LOGGER.debug("Subscribe from subject: " + event.getSubject());
+		}
+
+		// take pause to save/remove new entity
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		// load all scripts, compile and put into map
+		compiledScriptMap = loadAndCompile(events);
+
+		LOGGER.info("Reload event service done");
 	}
 
 	private Map<String, CompiledScript> loadAndCompile(List<Event> events) {
