@@ -19,6 +19,7 @@ package ru.iris.scheduler;
 import com.avaje.ebean.Ebean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.quartz.JobKey;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SchedulerFactory;
@@ -31,6 +32,7 @@ import ru.iris.common.database.model.Task;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.JsonNotification;
+import ru.iris.common.messaging.model.tasks.TaskChangesAdvertisement;
 import ru.iris.common.messaging.model.tasks.TaskSourcesChangesAdvertisement;
 import ru.iris.common.messaging.model.tasks.TasksStartAdvertisement;
 import ru.iris.common.messaging.model.tasks.TasksStopAdvertisement;
@@ -78,43 +80,29 @@ public class ScheduleService
 
 					if (envelope.getObject() instanceof TasksStartAdvertisement) {
 						LOGGER.info("Start/restart scheduler service!");
-
-						// take pause to save/remove new entity
-						Thread.sleep(1000);
-
 						// reload events
 						events = null;
-						events = Ebean.find(Task.class).findList();
-
-						// take pause to save/remove new entity
-						Thread.sleep(1000);
-
 						readAndScheduleTasks();
 					} else if (envelope.getObject() instanceof TasksStopAdvertisement) {
 						LOGGER.info("Stop scheduler service");
-
-						// take pause to save/remove new entity
-						Thread.sleep(1000);
-
 						// reload events
 						scheduler.shutdown();
 						events = null;
 					} else if (envelope.getObject() instanceof TaskSourcesChangesAdvertisement) {
 						LOGGER.info("Reload sources list");
 
-						// take pause to save/remove new entity
-						Thread.sleep(1000);
-
 						// reload sources
 						sources = null;
 						sources = Ebean.find(DataSource.class).where().eq("enabled", true).findList();
 
 						// take pause to save/remove new entity
-						Thread.sleep(1000);
-
+						Thread.sleep(500);
 						readSources();
 
 						LOGGER.info("Loaded " + sources.size() + " sources.");
+					} else if (envelope.getObject() instanceof TaskChangesAdvertisement) {
+						LOGGER.info("Reload tasks list");
+						readAndScheduleTasks();
 					}
 
 					} catch (Exception e) {
@@ -153,11 +141,20 @@ public class ScheduleService
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.MONTH, 1);
 
+		events = null;
+
 		events = Ebean.find(Task.class)
 				.where()
 				.eq("enabled", true)
 				.between("startdate", new Date(), cal.getTime())
 				.findList();
+
+		// take pause to save/remove new entity
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 		try
 		{
@@ -170,9 +167,14 @@ public class ScheduleService
 			else
 			{
 				LOGGER.info("Rescheduling tasks!");
-				// restart
-				scheduler.shutdown();
-				scheduler.start();
+
+				// cancel all jobs
+				for (JobKey job : scheduler.getJobKeys(GroupMatcher.jobGroupEquals("scheduler"))) {
+					LOGGER.debug("Interrupt and delete task: " + job.getName());
+					scheduler.interrupt(job);
+					scheduler.deleteJob(job);
+				}
+
 			}
 
 			for (Task event : events)

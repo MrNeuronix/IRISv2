@@ -130,6 +130,8 @@ public class GoogleSpeakService
 
 										speak.save();
 									}
+								} else {
+									LOGGER.info("Ignored. Request to play on device: " + advertisement.getDevice());
 								}
 							} else {
 								LOGGER.info("Silence mode enabled. Ignoring speak request.");
