@@ -45,6 +45,7 @@ public class ScheduleService
 {
 	private final Logger LOGGER = LogManager.getLogger(ScheduleService.class);
 	private List<Task> events = null;
+	private List<Task> cronevents = null;
 	private List<DataSource> sources = null;
 	private Scheduler scheduler = null;
 
@@ -76,14 +77,13 @@ public class ScheduleService
 
 					if (envelope.getObject() instanceof TasksStartAdvertisement) {
 						LOGGER.info("Start/restart scheduler service!");
-						// reload events
-						events = null;
 						readAndScheduleTasks();
 					} else if (envelope.getObject() instanceof TasksStopAdvertisement) {
 						LOGGER.info("Stop scheduler service");
 						// reload events
 						scheduler.shutdown();
 						events = null;
+						cronevents = null;
 					} else if (envelope.getObject() instanceof TaskSourcesChangesAdvertisement) {
 						LOGGER.info("Reload sources list");
 
@@ -135,14 +135,22 @@ public class ScheduleService
 	private void readAndScheduleTasks()
 	{
 		Calendar cal = Calendar.getInstance();
-		cal.add(Calendar.MONTH, 1);
+		cal.add(Calendar.YEAR, 1);
 
 		events = null;
+		cronevents = null;
 
 		events = Ebean.find(Task.class)
 				.where()
 				.eq("enabled", true)
-				.gt("startdate", new Date())
+				.between("startdate", new Date(), cal.getTime())
+				.eq("showInCalendar", true)
+				.findList();
+
+		cronevents = Ebean.find(Task.class)
+				.where()
+				.eq("enabled", true)
+				.eq("showInCalendar", false)
 				.findList();
 
 		// take pause to save/remove new entity
@@ -182,8 +190,7 @@ public class ScheduleService
 				jobDetail.getJobDataMap().put("subject", event.getSubject());
 				jobDetail.getJobDataMap().put("obj", event.getObj());
 
-				if (event.isShowInCalendar()) {
-					jobDetail.setGroup("scheduler");
+				jobDetail.setGroup("scheduler");
 
 					//Creating schedule time with trigger
 					SimpleTriggerImpl trigger = new SimpleTriggerImpl();
@@ -195,23 +202,38 @@ public class ScheduleService
 						trigger.setRepeatInterval(Long.valueOf(event.getPeriod()));
 
 					trigger.setName("trigger-" + event.getTitle());
-					scheduler.scheduleJob(jobDetail, trigger);
-				} else {
-					jobDetail.setGroup("scheduler-cron");
 
-					CronTrigger trigger = TriggerBuilder.newTrigger()
-							.withIdentity("trigger-cron-" + event.getTitle())
-							.withSchedule(CronScheduleBuilder.cronSchedule(event.getPeriod()))
-							.build();
+					LOGGER.debug("Schedule job: " + jobDetail.getName());
 
 					scheduler.scheduleJob(jobDetail, trigger);
 				}
 
 
-			}
+				LOGGER.info("Scheduled " + scheduler.getJobKeys(GroupMatcher.jobGroupEquals("scheduler")).size() + " jobs!");
 
-			LOGGER.info("Scheduled " + scheduler.getJobKeys(GroupMatcher.jobGroupEquals("scheduler")).size() + " tasks!");
-			LOGGER.info("Scheduled " + scheduler.getJobKeys(GroupMatcher.jobGroupEquals("scheduler-cron")).size() + " cron tasks!");
+				for (Task event : cronevents)
+				{
+					JobDetailImpl jobDetail = new JobDetailImpl();
+					jobDetail.setName(event.getTitle());
+					jobDetail.setJobClass((Class<? extends Job>) Class.forName(event.getClazz()));
+
+					jobDetail.getJobDataMap().put("subject", event.getSubject());
+					jobDetail.getJobDataMap().put("obj", event.getObj());
+
+					jobDetail.setGroup("scheduler-cron");
+
+					CronTrigger trigger = TriggerBuilder.newTrigger()
+							.withIdentity("trigger-cron-" + event.getTitle())
+							.withSchedule(CronScheduleBuilder.cronSchedule(event.getPeriod()))
+							.startNow()
+							.build();
+
+					LOGGER.debug("Schedule cron job: " + jobDetail.getName());
+
+					scheduler.scheduleJob(jobDetail, trigger);
+				}
+
+				LOGGER.info("Scheduled " + scheduler.getJobKeys(GroupMatcher.jobGroupEquals("scheduler-cron")).size() + " cron jobs!");
 
 		}
 		catch (SchedulerException e)
