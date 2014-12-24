@@ -19,10 +19,7 @@ package ru.iris.scheduler;
 import com.avaje.ebean.Ebean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.quartz.JobKey;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SchedulerFactory;
+import org.quartz.*;
 import org.quartz.impl.JobDetailImpl;
 import org.quartz.impl.StdSchedulerFactory;
 import org.quartz.impl.matchers.GroupMatcher;
@@ -38,7 +35,6 @@ import ru.iris.common.messaging.model.tasks.TasksStartAdvertisement;
 import ru.iris.common.messaging.model.tasks.TasksStopAdvertisement;
 import ru.iris.common.source.googlecal.GoogleCalendarSource;
 import ru.iris.common.source.vk.VKSource;
-import ru.iris.scheduler.jobs.SendCommandAdvertisementJob;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -146,7 +142,7 @@ public class ScheduleService
 		events = Ebean.find(Task.class)
 				.where()
 				.eq("enabled", true)
-				.between("startdate", new Date(), cal.getTime())
+				.gt("startdate", new Date())
 				.findList();
 
 		// take pause to save/remove new entity
@@ -181,32 +177,48 @@ public class ScheduleService
 			{
 				JobDetailImpl jobDetail = new JobDetailImpl();
 				jobDetail.setName(event.getTitle());
-				jobDetail.setJobClass(SendCommandAdvertisementJob.class);
-				jobDetail.setGroup("scheduler");
+				jobDetail.setJobClass((Class<? extends Job>) Class.forName(event.getClazz()));
 
 				jobDetail.getJobDataMap().put("subject", event.getSubject());
 				jobDetail.getJobDataMap().put("obj", event.getObj());
 
-				//Creating schedule time with trigger
-				SimpleTriggerImpl trigger = new SimpleTriggerImpl();
+				if (event.isShowInCalendar()) {
+					jobDetail.setGroup("scheduler");
 
-				trigger.setStartTime(event.getStartdate());
-				trigger.setEndTime(event.getEnddate());
+					//Creating schedule time with trigger
+					SimpleTriggerImpl trigger = new SimpleTriggerImpl();
 
-				if (event.getPeriod() != null && !event.getPeriod().isEmpty())
-					trigger.setRepeatInterval(Long.valueOf(event.getPeriod()));
+					trigger.setStartTime(event.getStartdate());
+					trigger.setEndTime(event.getEnddate());
 
-				trigger.setName("trigger-" + event.getTitle());
+					if (event.getPeriod() != null && !event.getPeriod().isEmpty())
+						trigger.setRepeatInterval(Long.valueOf(event.getPeriod()));
 
-				scheduler.scheduleJob(jobDetail, trigger);
+					trigger.setName("trigger-" + event.getTitle());
+					scheduler.scheduleJob(jobDetail, trigger);
+				} else {
+					jobDetail.setGroup("scheduler-cron");
+
+					CronTrigger trigger = TriggerBuilder.newTrigger()
+							.withIdentity("trigger-cron-" + event.getTitle())
+							.withSchedule(CronScheduleBuilder.cronSchedule(event.getPeriod()))
+							.build();
+
+					scheduler.scheduleJob(jobDetail, trigger);
+				}
+
+
 			}
 
 			LOGGER.info("Scheduled " + scheduler.getJobKeys(GroupMatcher.jobGroupEquals("scheduler")).size() + " tasks!");
+			LOGGER.info("Scheduled " + scheduler.getJobKeys(GroupMatcher.jobGroupEquals("scheduler-cron")).size() + " cron tasks!");
 
 		}
 		catch (SchedulerException e)
 		{
 			LOGGER.error("Scheduler error: ", e);
+		} catch (ClassNotFoundException e) {
+			LOGGER.error("Scheduler job class error: ", e);
 		}
 	}
 }

@@ -39,6 +39,9 @@ public class Task extends DBModel
 	// Текст задачи
 	private String text;
 
+	// Запускаемый скрипт
+	public String script;
+
 	// Адрес, куда слать (например, event.command)
 	private String subject;
 
@@ -50,6 +53,9 @@ public class Task extends DBModel
 
 	// Источник данных
 	private String source;
+
+	// Класс
+	private String clazz;
 
 	// Показывать ли в календаре?
 	@Column(name = "showInCalendar")
@@ -90,6 +96,14 @@ public class Task extends DBModel
 	public void setTitle(String title)
 	{
 		this.title = title;
+	}
+
+	public String getScript() {
+		return script;
+	}
+
+	public void setScript(String script) {
+		this.script = script;
 	}
 
 	public String getText()
@@ -145,6 +159,14 @@ public class Task extends DBModel
 	public void setSource(String source)
 	{
 		this.source = source;
+	}
+
+	public String getClazz() {
+		return clazz;
+	}
+
+	public void setClazz(String clazz) {
+		this.clazz = clazz;
 	}
 
 	public boolean isShowInCalendar()

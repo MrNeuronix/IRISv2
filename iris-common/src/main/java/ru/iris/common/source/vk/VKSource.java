@@ -137,6 +137,8 @@ public class VKSource
 						task.setSource("vk");
 						task.setObj(gson.toJson(adv));
 						task.setSubject("event.command");
+						task.setScript("vk-birthday-say.js");
+						task.setClazz("ru.iris.scheduler.jobs.SendCommandAdvertisementJob");
 
 						// every hour
 						task.setPeriod("" + 60L * 60L * 1000L);
