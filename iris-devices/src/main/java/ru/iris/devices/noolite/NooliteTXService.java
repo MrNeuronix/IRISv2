@@ -128,7 +128,7 @@ public class NooliteTXService
 
 						LOGGER.debug("Get BindTXChannel advertisement");
 
-						final BindRXChannelAdvertisment advertisement = envelope.getObject();
+						final BindTXChannelAdvertisment advertisement = envelope.getObject();
 						byte channel = (byte) advertisement.getChannel();
 
 						LOGGER.info("Binding device to channel " + channel);
@@ -142,7 +142,7 @@ public class NooliteTXService
 
 						LOGGER.debug("Get UnbindTXChannel advertisement");
 
-						final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
+						final UnbindTXChannelAdvertisment advertisement = envelope.getObject();
 						byte channel = (byte) advertisement.getChannel();
 
 						LOGGER.info("Unbinding device from channel " + channel);
