@@ -172,9 +172,16 @@ public class ScheduleService
 			{
 				LOGGER.info("Rescheduling tasks!");
 
-				// cancel all jobs
+				// cancel calendar jobs
 				for (JobKey job : scheduler.getJobKeys(GroupMatcher.jobGroupEquals("scheduler"))) {
 					LOGGER.debug("Interrupt and delete task: " + job.getName());
+					scheduler.interrupt(job);
+					scheduler.deleteJob(job);
+				}
+
+				// cancel cron jobs
+				for (JobKey job : scheduler.getJobKeys(GroupMatcher.jobGroupEquals("scheduler-cron"))) {
+					LOGGER.debug("Interrupt and delete cron task: " + job.getName());
 					scheduler.interrupt(job);
 					scheduler.deleteJob(job);
 				}
