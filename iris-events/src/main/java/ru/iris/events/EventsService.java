@@ -26,6 +26,7 @@ import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.command.CommandAdvertisement;
 import ru.iris.common.messaging.model.events.*;
+import ru.iris.common.modulestatus.Status;
 
 import javax.script.*;
 import java.io.File;
@@ -53,116 +54,126 @@ public class EventsService
 
 	public EventsService()
 	{
-		events = Ebean.find(Event.class).findList();
+		Status status = new Status("Events");
 
-		// take pause to save/remove new entity
+		if (status.checkExist()) {
+			status.running();
+		} else {
+			status.addIntoDB("Events", "Service that listen for events and exec scripts as needed");
+		}
+
 		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 
-		// load all scripts, compile and put into map
-		compiledScriptMap = loadAndCompile(events);
+			events = Ebean.find(Event.class).findList();
 
-		// Pass jsonmessaging instance to js engine
-		Bindings bindings = new SimpleBindings();
-		bindings.put("jsonMessaging", jsonMessaging);
-		bindings.put("out", System.out);
-		bindings.put("LOGGER", scriptLogger);
+			// take pause to save/remove new entity
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 
-		// subscribe to events from db
-		for (Event event : events) {
-			jsonMessaging.subscribe(event.getSubject());
-			LOGGER.debug("Subscribe to subject: " + event.getSubject());
-		}
+			// load all scripts, compile and put into map
+			compiledScriptMap = loadAndCompile(events);
 
-		// command launch
-		jsonMessaging.subscribe("event.command");
+			// Pass jsonmessaging instance to js engine
+			Bindings bindings = new SimpleBindings();
+			bindings.put("jsonMessaging", jsonMessaging);
+			bindings.put("out", System.out);
+			bindings.put("LOGGER", scriptLogger);
 
-		// scripts
-		jsonMessaging.subscribe("event.script.get");
-		jsonMessaging.subscribe("event.script.save");
-		jsonMessaging.subscribe("event.script.delete");
-		jsonMessaging.subscribe("event.script.list");
-		jsonMessaging.subscribe("event.reload");
+			// subscribe to events from db
+			for (Event event : events) {
+				jsonMessaging.subscribe(event.getSubject());
+				LOGGER.debug("Subscribe to subject: " + event.getSubject());
+			}
 
-		jsonMessaging.setNotification(new JsonNotification() {
+			// command launch
+			jsonMessaging.subscribe("event.command");
 
-			@Override
-			public void onNotification(JsonEnvelope envelope) {
+			// scripts
+			jsonMessaging.subscribe("event.script.get");
+			jsonMessaging.subscribe("event.script.save");
+			jsonMessaging.subscribe("event.script.delete");
+			jsonMessaging.subscribe("event.script.list");
+			jsonMessaging.subscribe("event.reload");
 
-				LOGGER.debug("Got envelope with subject: " + envelope.getSubject());
+			jsonMessaging.setNotification(new JsonNotification() {
 
-				try {
+				@Override
+				public void onNotification(JsonEnvelope envelope) {
 
-					// Get script content
-					if (envelope.getObject() instanceof EventGetScriptAdvertisement) {
-						LOGGER.debug("Return JS script to: " + envelope.getReceiverInstance());
-						EventGetScriptAdvertisement advertisement = envelope.getObject();
-						File jsFile;
+					LOGGER.debug("Got envelope with subject: " + envelope.getSubject());
 
-						if (advertisement.isCommand())
-							jsFile = new File("./scripts/command/" + advertisement.getName());
-						else
-							jsFile = new File("./scripts/" + advertisement.getName());
+					try {
 
-						jsonMessaging.response(envelope, new EventResponseGetScriptAdvertisement(FileUtils.readFileToString(jsFile)));
+						// Get script content
+						if (envelope.getObject() instanceof EventGetScriptAdvertisement) {
+							LOGGER.debug("Return JS script to: " + envelope.getReceiverInstance());
+							EventGetScriptAdvertisement advertisement = envelope.getObject();
+							File jsFile;
 
-					}
-					// Save new/existing script
-					else if (envelope.getObject() instanceof EventResponseSaveScriptAdvertisement) {
+							if (advertisement.isCommand())
+								jsFile = new File("./scripts/command/" + advertisement.getName());
+							else
+								jsFile = new File("./scripts/" + advertisement.getName());
 
-						EventResponseSaveScriptAdvertisement advertisement = envelope.getObject();
-						LOGGER.debug("Request to save changes: " + advertisement.getName());
-						File jsFile;
+							jsonMessaging.response(envelope, new EventResponseGetScriptAdvertisement(FileUtils.readFileToString(jsFile)));
 
-						if (advertisement.isCommand())
-							jsFile = new File("./scripts/command/" + advertisement.getName());
-						else
-							jsFile = new File("./scripts/" + advertisement.getName());
+						}
+						// Save new/existing script
+						else if (envelope.getObject() instanceof EventResponseSaveScriptAdvertisement) {
 
-						FileUtils.writeStringToFile(jsFile, advertisement.getBody());
-						LOGGER.info("Restart event service (reason: script change)");
-						reloadService();
-					}
-					// Remove script
-					else if (envelope.getObject() instanceof EventRemoveScriptAdvertisement) {
+							EventResponseSaveScriptAdvertisement advertisement = envelope.getObject();
+							LOGGER.debug("Request to save changes: " + advertisement.getName());
+							File jsFile;
 
-						EventRemoveScriptAdvertisement advertisement = envelope.getObject();
-						LOGGER.debug("Request to remove script: " + advertisement.getName());
-						File jsFile;
+							if (advertisement.isCommand())
+								jsFile = new File("./scripts/command/" + advertisement.getName());
+							else
+								jsFile = new File("./scripts/" + advertisement.getName());
 
-						if (advertisement.isCommand())
-							jsFile = new File("./scripts/command/" + advertisement.getName());
-						else
-							jsFile = new File("./scripts/" + advertisement.getName());
+							FileUtils.writeStringToFile(jsFile, advertisement.getBody());
+							LOGGER.info("Restart event service (reason: script change)");
+							reloadService();
+						}
+						// Remove script
+						else if (envelope.getObject() instanceof EventRemoveScriptAdvertisement) {
 
-						FileUtils.forceDelete(jsFile);
-						LOGGER.info("Restart event service (reason: script removed)");
-						reloadService();
-					}
-					// List available scripts
-					else if (envelope.getObject() instanceof EventListScriptsAdvertisement) {
+							EventRemoveScriptAdvertisement advertisement = envelope.getObject();
+							LOGGER.debug("Request to remove script: " + advertisement.getName());
+							File jsFile;
 
-						EventListScriptsAdvertisement advertisement = envelope.getObject();
-						File jsFile;
+							if (advertisement.isCommand())
+								jsFile = new File("./scripts/command/" + advertisement.getName());
+							else
+								jsFile = new File("./scripts/" + advertisement.getName());
 
-						if (advertisement.isCommand())
-							jsFile = new File("./scripts/command/");
-						else
-							jsFile = new File("./scripts/");
+							FileUtils.forceDelete(jsFile);
+							LOGGER.info("Restart event service (reason: script removed)");
+							reloadService();
+						}
+						// List available scripts
+						else if (envelope.getObject() instanceof EventListScriptsAdvertisement) {
 
-						EventResponseListScriptsAdvertisement response = new EventResponseListScriptsAdvertisement();
-						response.setScripts((List<File>) FileUtils.listFiles(jsFile, new String[]{"js"}, false));
+							EventListScriptsAdvertisement advertisement = envelope.getObject();
+							File jsFile;
 
-						jsonMessaging.response(envelope, response);
-					}
-					// Check command and launch script
-					else if (envelope.getObject() instanceof CommandAdvertisement) {
+							if (advertisement.isCommand())
+								jsFile = new File("./scripts/command/");
+							else
+								jsFile = new File("./scripts/");
 
-						CommandAdvertisement advertisement = envelope.getObject();
-						bindings.put("advertisement", envelope.getObject());
+							EventResponseListScriptsAdvertisement response = new EventResponseListScriptsAdvertisement();
+							response.setScripts((List<File>) FileUtils.listFiles(jsFile, new String[]{"js"}, false));
+
+							jsonMessaging.response(envelope, response);
+						}
+						// Check command and launch script
+						else if (envelope.getObject() instanceof CommandAdvertisement) {
+
+							CommandAdvertisement advertisement = envelope.getObject();
+							bindings.put("advertisement", envelope.getObject());
 
 							if (compiledCommandScriptMap.get(advertisement.getScript()) == null) {
 
@@ -178,41 +189,46 @@ public class EventsService
 								LOGGER.info("Launch compiled command script: " + advertisement.getScript());
 								compiledCommandScriptMap.get(advertisement.getScript()).eval(bindings);
 							}
-					} else if (envelope.getObject() instanceof EventChangesAdvertisement) {
-						reloadService();
-					} else {
-						for (Event event : events) {
-							if (envelope.getSubject().equals(event.getSubject()) || wildCardMatch(event.getSubject(), envelope.getSubject())) {
+						} else if (envelope.getObject() instanceof EventChangesAdvertisement) {
+							reloadService();
+						} else {
+							for (Event event : events) {
+								if (envelope.getSubject().equals(event.getSubject()) || wildCardMatch(event.getSubject(), envelope.getSubject())) {
 
-								LOGGER.debug("Run compiled script: " + event.getScript());
+									LOGGER.debug("Run compiled script: " + event.getScript());
 
-								try {
-									bindings.put("advertisement", envelope.getObject());
-									CompiledScript script = compiledScriptMap.get(event.getScript());
+									try {
+										bindings.put("advertisement", envelope.getObject());
+										CompiledScript script = compiledScriptMap.get(event.getScript());
 
-									if (script != null)
-										script.eval(bindings);
-									else
-										LOGGER.error("Error! Script " + event.getScript() + " is NULL!");
+										if (script != null)
+											script.eval(bindings);
+										else
+											LOGGER.error("Error! Script " + event.getScript() + " is NULL!");
 
-								} catch (ScriptException e) {
-									LOGGER.error("Error in script scripts/command/" + event.getScript() + ".js: " + e.toString());
-									e.printStackTrace();
+									} catch (ScriptException e) {
+										LOGGER.error("Error in script scripts/command/" + event.getScript() + ".js: " + e.toString());
+										e.printStackTrace();
+									}
 								}
 							}
 						}
+					} catch (ScriptException | IOException e) {
+						LOGGER.error("Error in script: " + e.toString());
+						e.printStackTrace();
 					}
-				} catch (ScriptException | IOException e) {
-					LOGGER.error("Error in script: " + e.toString());
-					e.printStackTrace();
 				}
-			}
-		});
+			});
 
-		jsonMessaging.start();
+			jsonMessaging.start();
+		} catch (final RuntimeException t) {
+			LOGGER.error("Error in Events!");
+			status.crashed();
+			t.printStackTrace();
+		}
 	}
 
-	private void reloadService() {
+	private void reloadService() throws RuntimeException {
 		LOGGER.info("Reload event service");
 
 		// unsubscribe current events
@@ -242,7 +258,7 @@ public class EventsService
 		LOGGER.info("Reload event service done");
 	}
 
-	private Map<String, CompiledScript> loadAndCompile(List<Event> events) {
+	private Map<String, CompiledScript> loadAndCompile(List<Event> events) throws RuntimeException {
 		Map<String, CompiledScript> compiledScriptMap = new HashMap<>();
 
 		for (Event event : events) {
@@ -261,7 +277,7 @@ public class EventsService
 		return compiledScriptMap;
 	}
 
-	private boolean wildCardMatch(String pattern, String text)
+	private boolean wildCardMatch(String pattern, String text) throws RuntimeException
 	{
 
 		// add sentinel so don't need to worry about *'s at end of pattern

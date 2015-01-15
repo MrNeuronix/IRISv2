@@ -16,7 +16,12 @@
 
 package ru.iris.common.messaging;
 
+import javazoom.jl.decoder.JavaLayerException;
+import org.quartz.SchedulerException;
+
+import java.io.IOException;
+
 public interface JsonNotification {
 
-    public void onNotification(JsonEnvelope envelope);
+    public void onNotification(JsonEnvelope envelope) throws SchedulerException, InterruptedException, ClassNotFoundException, IOException, JavaLayerException;
 }

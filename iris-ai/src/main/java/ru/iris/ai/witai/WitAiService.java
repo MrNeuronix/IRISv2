@@ -33,6 +33,7 @@ import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.ai.AIResponseAdvertisement;
 import ru.iris.common.messaging.model.ai.WitAiResponse;
 import ru.iris.common.messaging.model.speak.SpeakRecognizedAdvertisement;
+import ru.iris.common.modulestatus.Status;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,6 +48,14 @@ public class WitAiService
 	{
 		final Config cfg = Config.getInstance();
 		final Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+
+		Status status = new Status("AI");
+
+		if (status.checkExist()) {
+			status.running();
+		} else {
+			status.addIntoDB("AI", "Wit.AI service recognition");
+		}
 
 		try
 		{
@@ -119,8 +128,8 @@ public class WitAiService
 		}
 		catch (final Throwable t)
 		{
-
 			LOGGER.error("Unexpected exception in AI", t);
+			status.crashed();
 			t.printStackTrace();
 		}
 	}

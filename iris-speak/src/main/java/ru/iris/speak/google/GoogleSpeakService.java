@@ -19,6 +19,7 @@ package ru.iris.speak.google;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import com.darkprograms.speech.synthesiser.Synthesiser;
+import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
@@ -29,6 +30,7 @@ import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
+import ru.iris.common.modulestatus.Status;
 
 import java.io.*;
 import java.util.Date;
@@ -41,23 +43,31 @@ public class GoogleSpeakService
 
 	public GoogleSpeakService()
 	{
-		LOGGER.info("Speak service started (TTS: Google)");
+		Status status = new Status("Speak");
 
-		final Config conf = Config.getInstance();
-		final Synthesiser synthesiser = new Synthesiser(conf.get("language"));
+		if (status.checkExist()) {
+			status.running();
+		} else {
+			status.addIntoDB("Speak", "Service that synthesize text to speak");
+		}
+
+		try {
+
+			LOGGER.info("Speak service started (TTS: Google)");
+
+			final Config conf = Config.getInstance();
+			final Synthesiser synthesiser = new Synthesiser(conf.get("language"));
 
 			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "speak");
 			jsonMessaging.subscribe("event.speak");
 
 			// fetch all cached speaks for this server
-		final List<Speaks> speaksList = Ebean.find(Speaks.class).where().and(Expr.ne("cache", 0), Expr.eq("device", "all")).findList();
+			final List<Speaks> speaksList = Ebean.find(Speaks.class).where().and(Expr.ne("cache", 0), Expr.eq("device", "all")).findList();
 
-		jsonMessaging.setNotification(new JsonNotification() {
-			@Override
-			public void onNotification(JsonEnvelope envelope) {
+			jsonMessaging.setNotification(new JsonNotification() {
+				@Override
+				public void onNotification(JsonEnvelope envelope) throws IOException, JavaLayerException {
 
-				try
-					{
 						InputStream result;
 						Player player;
 
@@ -69,8 +79,7 @@ public class GoogleSpeakService
 							speak.setConfidence(advertisement.getConfidence());
 							speak.setDevice(advertisement.getDevice());
 
-							if (conf.get("silence").equals("0"))
-							{
+							if (conf.get("silence").equals("0")) {
 								// Here we speak only if destination - all
 								if (advertisement.getDevice().equals("all")) {
 									LOGGER.debug("Confidence: " + advertisement.getConfidence());
@@ -137,9 +146,7 @@ public class GoogleSpeakService
 								LOGGER.info("Silence mode enabled. Ignoring speak request.");
 							}
 
-						}
-						else
-						{
+						} else {
 							// We received unknown request message. Lets make generic log entry.
 							LOGGER.info("Received request "
 									+ " from " + envelope.getSenderInstance()
@@ -147,15 +154,14 @@ public class GoogleSpeakService
 									+ " at '" + envelope.getSubject()
 									+ ": " + envelope.getObject());
 						}
-
-					} catch (final Throwable t)
-					{
-						LOGGER.error("Unexpected exception in Speak", t);
-						t.printStackTrace();
-					}
 				}
-		});
+			});
 
-		jsonMessaging.start();
+			jsonMessaging.start();
+		} catch (final Throwable t) {
+			LOGGER.error("Error in Speak!");
+			status.crashed();
+			t.printStackTrace();
+		}
 	}
 }

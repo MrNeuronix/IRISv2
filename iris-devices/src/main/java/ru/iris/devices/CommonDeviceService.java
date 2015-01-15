@@ -29,6 +29,7 @@ import ru.iris.common.messaging.model.devices.noolite.NooliteDeviceLevelSetAdver
 import ru.iris.common.messaging.model.devices.noolite.ResponseNooliteDeviceInventoryAdvertisement;
 import ru.iris.common.messaging.model.devices.zwave.ResponseZWaveDeviceInventoryAdvertisement;
 import ru.iris.common.messaging.model.devices.zwave.ZWaveSetDeviceLevelAdvertisement;
+import ru.iris.common.modulestatus.Status;
 
 import java.util.Map;
 import java.util.UUID;
@@ -37,25 +38,33 @@ class CommonDeviceService
 {
 	private final Logger LOGGER = LogManager.getLogger(CommonDeviceService.class.getName());
 
-	public CommonDeviceService()
-	{
-		final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-common");
+	public CommonDeviceService() {
+		Status status = new Status("Common-Device");
+
+		if (status.checkExist()) {
+			status.running();
+		} else {
+			status.addIntoDB("Common Devices", "Service that check incoming requests to operate with all devices and translate it to necessary service");
+		}
+
+		try {
+
+			final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-common");
 
 			jsonMessaging.subscribe("event.devices.setvalue");
 			jsonMessaging.subscribe("event.devices.getinventory");
 			jsonMessaging.subscribe("event.devices.setname");
 			jsonMessaging.subscribe("event.devices.setzone");
 
-		jsonMessaging.setNotification(new JsonNotification() {
-			@Override
-			public void onNotification(JsonEnvelope envelope) {
+			jsonMessaging.setNotification(new JsonNotification() {
+				@Override
+				public void onNotification(JsonEnvelope envelope) {
 
 					////////////////////////////////////////////
 					//// Setting level to device            ////
 					////////////////////////////////////////////
 
-					if (envelope.getObject() instanceof SetDeviceLevelAdvertisement)
-					{
+					if (envelope.getObject() instanceof SetDeviceLevelAdvertisement) {
 
 						// We know of service advertisement
 						final SetDeviceLevelAdvertisement advertisement = envelope.getObject();
@@ -67,18 +76,14 @@ class CommonDeviceService
 						Device device = Ebean.find(Device.class)
 								.where().eq("uuid", uuid).findUnique();
 
-						if (device == null)
-						{
+						if (device == null) {
 							LOGGER.info("Cant find device with UUID " + uuid);
 							return;
 						}
 
-						if (device.getSource().equals("zwave"))
-						{
+						if (device.getSource().equals("zwave")) {
 							jsonMessaging.broadcast("event.devices.zwave.setvalue", new ZWaveSetDeviceLevelAdvertisement(uuid, label, level));
-						}
-						else if (device.getSource().equals("noolite"))
-						{
+						} else if (device.getSource().equals("noolite")) {
 							jsonMessaging.broadcast("event.devices.noolite.setvalue", new NooliteDeviceLevelSetAdvertisement(uuid, label, level));
 						}
 
@@ -86,17 +91,14 @@ class CommonDeviceService
 						//// Get inventory                      ////
 						////////////////////////////////////////////
 
-					}
-					else if (envelope.getObject() instanceof GetInventoryAdvertisement)
-					{
+					} else if (envelope.getObject() instanceof GetInventoryAdvertisement) {
 
 						final GetInventoryAdvertisement advertisement = envelope.getObject();
 
 						String uuid = advertisement.getDeviceUUID();
 
 						// let send all devices (full inventory)
-						if (uuid.equals("all"))
-						{
+						if (uuid.equals("all")) {
 
 							Query<Device> query = Ebean.createQuery(Device.class);
 							query.setMapKey("internalname");
@@ -105,25 +107,19 @@ class CommonDeviceService
 							jsonMessaging.broadcast("event.devices.responseinventory", new ResponseDeviceInventoryAdvertisement(devices));
 
 							// send one device specified by UUID
-						}
-						else
-						{
+						} else {
 
 							Device device = Ebean.find(Device.class)
 									.where().eq("uuid", uuid).findUnique();
 
-							if (device == null)
-							{
+							if (device == null) {
 								LOGGER.info("Cant find device with UUID " + uuid);
 								return;
 							}
 
-							if (device.getSource().equals("zwave"))
-							{
+							if (device.getSource().equals("zwave")) {
 								jsonMessaging.broadcast("event.devices.responseinventory", new ResponseZWaveDeviceInventoryAdvertisement(device));
-							}
-							else if (device.getSource().equals("noolite"))
-							{
+							} else if (device.getSource().equals("noolite")) {
 								jsonMessaging.broadcast("event.devices.responseinventory", new ResponseNooliteDeviceInventoryAdvertisement(device));
 							}
 						}
@@ -132,9 +128,7 @@ class CommonDeviceService
 						//// Set device name                    ////
 						////////////////////////////////////////////
 
-					}
-					else if (envelope.getObject() instanceof SetDeviceNameAdvertisement)
-					{
+					} else if (envelope.getObject() instanceof SetDeviceNameAdvertisement) {
 
 						SetDeviceNameAdvertisement advertisement = envelope.getObject();
 
@@ -142,8 +136,7 @@ class CommonDeviceService
 						Device device = Ebean.find(Device.class)
 								.where().eq("uuid", uuid).findUnique();
 
-						if (device == null)
-						{
+						if (device == null) {
 							LOGGER.info("Cant find device with UUID " + uuid);
 							return;
 						}
@@ -157,9 +150,7 @@ class CommonDeviceService
 						//// Set device zone                    ////
 						////////////////////////////////////////////
 
-					}
-					else if (envelope.getObject() instanceof SetDeviceZoneAdvertisement)
-					{
+					} else if (envelope.getObject() instanceof SetDeviceZoneAdvertisement) {
 
 						SetDeviceZoneAdvertisement advertisement = envelope.getObject();
 
@@ -167,8 +158,7 @@ class CommonDeviceService
 						Device device = Ebean.find(Device.class)
 								.where().eq("uuid", uuid).findUnique();
 
-						if (device == null)
-						{
+						if (device == null) {
 							LOGGER.info("Cant find device with UUID " + uuid);
 							return;
 						}
@@ -182,9 +172,7 @@ class CommonDeviceService
 						//// Unknown broadcast                  ////
 						////////////////////////////////////////////
 
-					}
-					else if (envelope.getReceiverInstance() == null)
-					{
+					} else if (envelope.getReceiverInstance() == null) {
 						// We received unknown broadcast message. Lets make generic log entry.
 						LOGGER.info("Received broadcast "
 								+ " from " + envelope.getSenderInstance()
@@ -196,9 +184,7 @@ class CommonDeviceService
 						//// Unknown request                    ////
 						////////////////////////////////////////////
 
-					}
-					else
-					{
+					} else {
 						// We received unknown request message. Lets make generic log entry.
 						LOGGER.info("Received request "
 								+ " from " + envelope.getSenderInstance()
@@ -208,8 +194,13 @@ class CommonDeviceService
 					}
 
 				}
-		});
+			});
 
-		jsonMessaging.start();
+			jsonMessaging.start();
+		} catch (final Throwable t) {
+			LOGGER.error("Error in Common-Devices!");
+			status.crashed();
+			t.printStackTrace();
+		}
 	}
 }

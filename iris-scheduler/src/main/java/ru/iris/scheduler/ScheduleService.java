@@ -33,6 +33,7 @@ import ru.iris.common.messaging.model.tasks.TaskChangesAdvertisement;
 import ru.iris.common.messaging.model.tasks.TaskSourcesChangesAdvertisement;
 import ru.iris.common.messaging.model.tasks.TasksStartAdvertisement;
 import ru.iris.common.messaging.model.tasks.TasksStopAdvertisement;
+import ru.iris.common.modulestatus.Status;
 import ru.iris.common.source.googlecal.GoogleCalendarSource;
 import ru.iris.common.source.vk.VKSource;
 
@@ -51,12 +52,17 @@ public class ScheduleService
 
 	public ScheduleService()
 	{
+		Status status = new Status("Scheduler");
+
+		if (status.checkExist()) {
+			status.running();
+		} else {
+			status.addIntoDB("Scheduler", "Service that schedule and execute jobs");
+		}
+
 		try {
 			SchedulerFactory factory = new StdSchedulerFactory();
 			scheduler = factory.getScheduler();
-		} catch (SchedulerException e) {
-			LOGGER.error("Error: " + e.getMessage());
-		}
 
 			// run
 			readSources();
@@ -69,11 +75,9 @@ public class ScheduleService
 			jsonMessaging.subscribe("event.scheduler.start");
 			jsonMessaging.subscribe("event.scheduler.restart");
 
-		jsonMessaging.setNotification(new JsonNotification() {
-			@Override
-			public void onNotification(JsonEnvelope envelope) {
-
-				try {
+			jsonMessaging.setNotification(new JsonNotification() {
+				@Override
+				public void onNotification(JsonEnvelope envelope) throws RuntimeException, SchedulerException, InterruptedException, ClassNotFoundException {
 
 					if (envelope.getObject() instanceof TasksStartAdvertisement) {
 						LOGGER.info("Start/restart scheduler service!");
@@ -100,17 +104,18 @@ public class ScheduleService
 						LOGGER.info("Reload tasks list");
 						readAndScheduleTasks();
 					}
-
-					} catch (Exception e) {
-					LOGGER.error("Error: " + e.getMessage());
 				}
-				}
-		});
+			});
 
-		jsonMessaging.start();
+			jsonMessaging.start();
+		} catch (final Throwable t) {
+			LOGGER.error("Error in Scheduler!");
+			status.crashed();
+			t.printStackTrace();
+		}
 	}
 
-	private void readSources()
+	private void readSources() throws RuntimeException
 	{
 		sources = Ebean.find(DataSource.class).where().eq("enabled", true).findList();
 
@@ -132,8 +137,7 @@ public class ScheduleService
 		}
 	}
 
-	private void readAndScheduleTasks()
-	{
+	private void readAndScheduleTasks() throws RuntimeException, SchedulerException, InterruptedException, ClassNotFoundException {
 		Calendar cal = Calendar.getInstance();
 		cal.add(Calendar.YEAR, 1);
 
@@ -154,14 +158,8 @@ public class ScheduleService
 				.findList();
 
 		// take pause to save/remove new entity
-		try {
 			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 
-		try
-		{
 			//Start scheduler
 			if (!scheduler.isStarted())
 			{
@@ -241,13 +239,5 @@ public class ScheduleService
 				}
 
 				LOGGER.info("Scheduled " + scheduler.getJobKeys(GroupMatcher.jobGroupEquals("scheduler-cron")).size() + " cron jobs!");
-
 		}
-		catch (SchedulerException e)
-		{
-			LOGGER.error("Scheduler error: ", e);
-		} catch (ClassNotFoundException e) {
-			LOGGER.error("Scheduler job class error: ", e);
-		}
-	}
 }

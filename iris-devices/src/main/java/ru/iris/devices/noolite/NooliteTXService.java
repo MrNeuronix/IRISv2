@@ -25,7 +25,10 @@ import ru.iris.common.helpers.DBLogger;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.JsonNotification;
-import ru.iris.common.messaging.model.devices.noolite.*;
+import ru.iris.common.messaging.model.devices.noolite.BindTXChannelAdvertisment;
+import ru.iris.common.messaging.model.devices.noolite.NooliteDeviceLevelSetAdvertisement;
+import ru.iris.common.messaging.model.devices.noolite.UnbindTXChannelAdvertisment;
+import ru.iris.common.modulestatus.Status;
 import ru.iris.noolite4j.sender.PC1132;
 
 import java.util.UUID;
@@ -36,23 +39,32 @@ public class NooliteTXService
 
 	public NooliteTXService()
 	{
-		// Initialize the libusb context
-		final PC1132 pc = new PC1132();
-		pc.open();
+		Status status = new Status("Noolite-TX");
 
-		final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-tx");
+		if (status.checkExist()) {
+			status.running();
+		} else {
+			status.addIntoDB("Noolite TX", "Service that produce Noolite commands");
+		}
+
+		try {
+
+			// Initialize the libusb context
+			final PC1132 pc = new PC1132();
+			pc.open();
+
+			final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-tx");
 
 			jsonMessaging.subscribe("event.devices.noolite.setvalue");
 			jsonMessaging.subscribe("event.devices.noolite.tx.bindchannel");
 			jsonMessaging.subscribe("event.devices.noolite.tx.unbindchannel");
 
-		jsonMessaging.setNotification(new JsonNotification() {
+			jsonMessaging.setNotification(new JsonNotification() {
 
-			@Override
-			public void onNotification(JsonEnvelope envelope) {
+				@Override
+				public void onNotification(JsonEnvelope envelope) {
 
-					if (envelope.getObject() instanceof NooliteDeviceLevelSetAdvertisement)
-					{
+					if (envelope.getObject() instanceof NooliteDeviceLevelSetAdvertisement) {
 						LOGGER.debug("Get SetDeviceLevel advertisement");
 
 						// We know of service advertisement
@@ -70,10 +82,8 @@ public class NooliteTXService
 						byte channel = Byte.valueOf(device.getValue("channel").getValue());
 
 						//if noolite device dimmer (user set)
-						if (device.getValue("type") != null && device.getValue("type").getValue().contains("dimmer"))
-						{
-							if (level > 99 || level == 99)
-							{
+						if (device.getValue("type") != null && device.getValue("type").getValue().contains("dimmer")) {
+							if (level > 99 || level == 99) {
 
 								LOGGER.info("Turn on device on channel " + channel);
 								updateValue(device, "Level", "255");
@@ -81,18 +91,14 @@ public class NooliteTXService
 
 								pc.turnOn(channel);
 
-							}
-							else if (level < 0)
-							{
+							} else if (level < 0) {
 
 								LOGGER.info("Turn off device on channel " + channel);
 								updateValue(device, "Level", "0");
 								DBLogger.info("Device is OFF", device.getUuid());
 
 								pc.turnOff(channel);
-							}
-							else
-							{
+							} else {
 								updateValue(device, "Level", String.valueOf(level));
 								DBLogger.info("Device level set: " + level, device.getUuid());
 
@@ -100,19 +106,14 @@ public class NooliteTXService
 
 								pc.setLevel(channel, level);
 							}
-						}
-						else
-						{
-							if (level < 0 || level == 0)
-							{
+						} else {
+							if (level < 0 || level == 0) {
 								LOGGER.info("Turn off device on channel " + channel);
 								updateValue(device, "Level", "0");
 								DBLogger.info("Device is OFF", device.getUuid());
 
 								pc.turnOff(channel);
-							}
-							else
-							{
+							} else {
 								// turn on
 								LOGGER.info("Turn on device on channel " + channel);
 								updateValue(device, "Level", "255");
@@ -122,9 +123,7 @@ public class NooliteTXService
 							}
 						}
 
-					}
-					else if (envelope.getObject() instanceof BindTXChannelAdvertisment)
-					{
+					} else if (envelope.getObject() instanceof BindTXChannelAdvertisment) {
 
 						LOGGER.debug("Get BindTXChannel advertisement");
 
@@ -136,9 +135,7 @@ public class NooliteTXService
 
 						pc.bindChannel(channel);
 
-					}
-					else if (envelope.getObject() instanceof UnbindTXChannelAdvertisment)
-					{
+					} else if (envelope.getObject() instanceof UnbindTXChannelAdvertisment) {
 
 						LOGGER.debug("Get UnbindTXChannel advertisement");
 
@@ -150,18 +147,14 @@ public class NooliteTXService
 
 						pc.unbindChannel(channel);
 
-					}
-					else if (envelope.getReceiverInstance() == null)
-					{
+					} else if (envelope.getReceiverInstance() == null) {
 						// We received unknown broadcast message. Lets make generic log entry.
 						LOGGER.info("Received broadcast "
 								+ " from " + envelope.getSenderInstance()
 								+ " to " + envelope.getReceiverInstance()
 								+ " at '" + envelope.getSubject()
 								+ ": " + envelope.getObject());
-					}
-					else
-					{
+					} else {
 						// We received unknown request message. Lets make generic log entry.
 						LOGGER.info("Received request "
 								+ " from " + envelope.getSenderInstance()
@@ -171,9 +164,14 @@ public class NooliteTXService
 					}
 
 				}
-		});
+			});
 
-		jsonMessaging.start();
+			jsonMessaging.start();
+		} catch (final Throwable t) {
+			LOGGER.error("Error in Noolite-TX!");
+			status.crashed();
+			t.printStackTrace();
+		}
 	}
 
 	private void updateValue(Device device, String label, String value)
