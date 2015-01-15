@@ -75,11 +75,11 @@ class CommonDeviceService
 
 						if (device.getSource().equals("zwave"))
 						{
-							jsonMessaging.broadcast("event.devices.zwave.setvalue", new ZWaveSetDeviceLevelAdvertisement().set(uuid, label, level));
+							jsonMessaging.broadcast("event.devices.zwave.setvalue", new ZWaveSetDeviceLevelAdvertisement(uuid, label, level));
 						}
 						else if (device.getSource().equals("noolite"))
 						{
-							jsonMessaging.broadcast("event.devices.noolite.setvalue", new NooliteDeviceLevelSetAdvertisement().set(uuid, label, level));
+							jsonMessaging.broadcast("event.devices.noolite.setvalue", new NooliteDeviceLevelSetAdvertisement(uuid, label, level));
 						}
 
 						////////////////////////////////////////////
@@ -102,7 +102,7 @@ class CommonDeviceService
 							query.setMapKey("internalname");
 							Map<?, Device> devices = query.findMap();
 
-							jsonMessaging.broadcast("event.devices.responseinventory", new ResponseDeviceInventoryAdvertisement().set(devices));
+							jsonMessaging.broadcast("event.devices.responseinventory", new ResponseDeviceInventoryAdvertisement(devices));
 
 							// send one device specified by UUID
 						}
@@ -120,11 +120,11 @@ class CommonDeviceService
 
 							if (device.getSource().equals("zwave"))
 							{
-								jsonMessaging.broadcast("event.devices.responseinventory", new ResponseZWaveDeviceInventoryAdvertisement().set(device));
+								jsonMessaging.broadcast("event.devices.responseinventory", new ResponseZWaveDeviceInventoryAdvertisement(device));
 							}
 							else if (device.getSource().equals("noolite"))
 							{
-								jsonMessaging.broadcast("event.devices.responseinventory", new ResponseNooliteDeviceInventoryAdvertisement().set(device));
+								jsonMessaging.broadcast("event.devices.responseinventory", new ResponseNooliteDeviceInventoryAdvertisement(device));
 							}
 						}
 

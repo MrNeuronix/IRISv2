@@ -31,12 +31,11 @@ public class ZWaveDeviceValueAdded extends ZWaveNode
 	{
 	}
 
-	public ZWaveDeviceValueAdded set(Device device, String label, String value)
+	public ZWaveDeviceValueAdded(Device device, String label, String value)
 	{
 		this.device = device;
 		this.label = label;
 		this.value = value;
-		return this;
 	}
 
 	public String getLabel()

@@ -28,11 +28,13 @@ public class CommandAdvertisement extends Advertisement
 	private Map<String, ?> data;
 	private String script;
 
-	public CommandAdvertisement set(String script, Map<String, ?> data)
+	public CommandAdvertisement() {
+	}
+
+	public CommandAdvertisement(String script, Map<String, ?> data)
 	{
 		this.data = data;
 		this.script = script;
-		return this;
 	}
 
 	public Map<String, ?> getData()

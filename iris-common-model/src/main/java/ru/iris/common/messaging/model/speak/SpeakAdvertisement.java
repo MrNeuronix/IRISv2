@@ -38,20 +38,21 @@ public class SpeakAdvertisement extends Advertisement
 
 	private String device;
 
-	public SpeakAdvertisement set(String text, double confidence)
+	public SpeakAdvertisement() {
+	}
+
+	public SpeakAdvertisement(String text, double confidence)
 	{
 		this.text = text;
 		this.confidence = confidence;
 		this.device = "all";
-		return this;
 	}
 
-	public SpeakAdvertisement set(String text, double confidence, String device)
+	public SpeakAdvertisement(String text, double confidence, String device)
 	{
 		this.text = text;
 		this.confidence = confidence;
 		this.device = device;
-		return this;
 	}
 
 	public String getText()

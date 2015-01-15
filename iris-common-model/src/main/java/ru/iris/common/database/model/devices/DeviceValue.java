@@ -16,6 +16,7 @@
 
 package ru.iris.common.database.model.devices;
 
+import com.avaje.ebean.annotation.Expose;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.zwave4j.ValueId;
@@ -31,7 +32,8 @@ import javax.persistence.Transient;
 public class DeviceValue extends DBModel
 {
 	@Transient
-	private transient final Gson gson = new GsonBuilder().create();
+	@Expose(serialize = false)
+	private transient final static Gson gson = new GsonBuilder().create();
 
 	private String label = "unknown";
 

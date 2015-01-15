@@ -25,7 +25,6 @@ import ru.iris.common.database.model.DBModel;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import java.util.List;
 
 @Entity
@@ -57,9 +56,6 @@ public class Device extends DBModel
 	private String internalName = "unknown";
 
 	private String source = "unknown";
-
-	@Transient
-	private transient List<DeviceValue> deviceValues;
 
 	public Device()
 	{

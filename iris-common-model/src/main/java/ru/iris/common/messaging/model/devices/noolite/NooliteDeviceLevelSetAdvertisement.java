@@ -39,12 +39,14 @@ public class NooliteDeviceLevelSetAdvertisement extends Advertisement
 
 	private String value;
 
-	public NooliteDeviceLevelSetAdvertisement set(String deviceUUID, String label, String value)
+	public NooliteDeviceLevelSetAdvertisement() {
+	}
+
+	public NooliteDeviceLevelSetAdvertisement(String deviceUUID, String label, String value)
 	{
 		this.label = label;
 		this.value = value;
 		this.deviceUUID = deviceUUID;
-		return this;
 	}
 
 	public String getLabel()

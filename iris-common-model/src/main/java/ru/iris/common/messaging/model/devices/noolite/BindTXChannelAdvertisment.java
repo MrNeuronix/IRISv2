@@ -26,10 +26,12 @@ public class BindTXChannelAdvertisment extends Advertisement
 
 	private int channel;
 
-	public BindTXChannelAdvertisment set(int channel)
+	public BindTXChannelAdvertisment() {
+	}
+
+	public BindTXChannelAdvertisment(int channel)
 	{
 		this.channel = channel;
-		return this;
 	}
 
 	public int getChannel()

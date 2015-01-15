@@ -27,10 +27,12 @@ public class ResponseZWaveDeviceInventoryAdvertisement extends Advertisement
 
 	private Device device;
 
-	public ResponseZWaveDeviceInventoryAdvertisement set(Device device)
+	public ResponseZWaveDeviceInventoryAdvertisement() {
+	}
+
+	public ResponseZWaveDeviceInventoryAdvertisement(Device device)
 	{
 		this.device = device;
-		return this;
 	}
 
 	public Device getDevice()

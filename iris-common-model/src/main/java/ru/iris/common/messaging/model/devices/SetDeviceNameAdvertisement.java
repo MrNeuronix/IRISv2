@@ -31,11 +31,13 @@ public class SetDeviceNameAdvertisement extends Advertisement
 
 	private String name;
 
-	public SetDeviceNameAdvertisement set(String deviceUUID, String name)
+	public SetDeviceNameAdvertisement() {
+	}
+
+	public SetDeviceNameAdvertisement(String deviceUUID, String name)
 	{
 		this.name = name;
 		this.deviceUUID = deviceUUID;
-		return this;
 	}
 
 	public String getDeviceUUID()

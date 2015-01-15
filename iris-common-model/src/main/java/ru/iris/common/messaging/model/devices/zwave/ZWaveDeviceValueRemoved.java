@@ -32,12 +32,11 @@ public class ZWaveDeviceValueRemoved extends ZWaveNode
 	{
 	}
 
-	public ZWaveDeviceValueRemoved set(Device device, String label, String value)
+	public ZWaveDeviceValueRemoved(Device device, String label, String value)
 	{
 		this.device = device;
 		this.label = label;
 		this.value = value;
-		return this;
 	}
 
 	public String getLabel()

@@ -42,7 +42,6 @@ import java.util.UUID;
 public class WitAiService
 {
 	private final Logger LOGGER = LogManager.getLogger(WitAiService.class);
-	private final AIResponseAdvertisement aiResponseAdvertisement = new AIResponseAdvertisement();
 
 	public WitAiService()
 	{
@@ -92,7 +91,7 @@ public class WitAiService
 
 											if (object != null) {
 												LOGGER.info("Get response from AI: " + json.getMsg_body() + " to object: " + object);
-												jsonMessaging.broadcast("event.ai.response.object." + object, aiResponseAdvertisement.set(json));
+												jsonMessaging.broadcast("event.ai.response.object." + object, new AIResponseAdvertisement(json));
 											}
 										}
 								}

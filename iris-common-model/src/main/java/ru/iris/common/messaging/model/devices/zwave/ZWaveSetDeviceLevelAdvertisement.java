@@ -20,6 +20,13 @@ import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
 
 public class ZWaveSetDeviceLevelAdvertisement extends SetDeviceLevelAdvertisement
 {
+	public ZWaveSetDeviceLevelAdvertisement() {
+	}
+
+	public ZWaveSetDeviceLevelAdvertisement(String deviceUUID, String label, String value) {
+		super(deviceUUID, label, value);
+	}
+
 	@Override
 	public String toString()
 	{

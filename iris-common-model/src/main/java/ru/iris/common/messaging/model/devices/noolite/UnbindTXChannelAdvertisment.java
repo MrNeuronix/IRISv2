@@ -26,10 +26,12 @@ public class UnbindTXChannelAdvertisment extends Advertisement
 
 	private int channel;
 
-	public UnbindTXChannelAdvertisment set(int channel)
+	public UnbindTXChannelAdvertisment() {
+	}
+
+	public UnbindTXChannelAdvertisment(int channel)
 	{
 		this.channel = channel;
-		return this;
 	}
 
 	public int getChannel()

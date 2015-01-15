@@ -27,10 +27,12 @@ public class ResponseNooliteDeviceInventoryAdvertisement extends Advertisement
 
 	private Device device;
 
-	public ResponseNooliteDeviceInventoryAdvertisement set(Device device)
+	public ResponseNooliteDeviceInventoryAdvertisement() {
+	}
+
+	public ResponseNooliteDeviceInventoryAdvertisement(Device device)
 	{
 		this.device = device;
-		return this;
 	}
 
 	public Device getDevice()

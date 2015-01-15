@@ -31,11 +31,13 @@ public class SetDeviceZoneAdvertisement extends Advertisement
 
 	private int zone;
 
-	public SetDeviceZoneAdvertisement set(String deviceUUID, int zone)
+	public SetDeviceZoneAdvertisement() {
+	}
+
+	public SetDeviceZoneAdvertisement(String deviceUUID, int zone)
 	{
 		this.zone = zone;
 		this.deviceUUID = deviceUUID;
-		return this;
 	}
 
 	public String getDeviceUUID()

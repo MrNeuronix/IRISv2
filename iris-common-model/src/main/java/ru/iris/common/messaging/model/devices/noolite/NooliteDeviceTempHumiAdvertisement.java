@@ -26,9 +26,11 @@ public class NooliteDeviceTempHumiAdvertisement extends Advertisement {
 
     private String deviceUUID;
 
-    public NooliteDeviceTempHumiAdvertisement set(String deviceUUID) {
+    public NooliteDeviceTempHumiAdvertisement() {
+    }
+
+    public NooliteDeviceTempHumiAdvertisement(String deviceUUID) {
         this.deviceUUID = deviceUUID;
-        return this;
     }
 
     public String getDeviceUUID() {

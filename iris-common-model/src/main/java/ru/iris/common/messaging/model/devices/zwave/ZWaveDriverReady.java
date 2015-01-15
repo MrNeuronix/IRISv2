@@ -24,10 +24,12 @@ public class ZWaveDriverReady
 	/**
 	 * Default constructor for de-serialisation.
 	 */
-	public ZWaveDriverReady set(long homeId)
+	public ZWaveDriverReady() {
+	}
+
+	public ZWaveDriverReady(long homeId)
 	{
 		this.homeId = homeId;
-		return this;
 	}
 
 	public long getHomeId()

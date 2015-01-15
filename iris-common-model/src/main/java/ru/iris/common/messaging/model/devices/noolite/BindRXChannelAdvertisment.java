@@ -31,11 +31,13 @@ public class BindRXChannelAdvertisment extends Advertisement
 
 	private int channel;
 
-	public BindRXChannelAdvertisment set(String deviceUUID, int channel)
+	public BindRXChannelAdvertisment() {
+	}
+
+	public BindRXChannelAdvertisment(String deviceUUID, int channel)
 	{
 		this.channel = channel;
 		this.deviceUUID = deviceUUID;
-		return this;
 	}
 
 	public String getDeviceUUID()

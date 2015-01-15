@@ -22,24 +22,21 @@ import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
 import java.util.UUID;
 
 /**
- * Created with IntelliJ IDEA.
  * User: nikolay.viguro
  * Date: 10.09.13
  * Time: 10:49
- * To change this template use File | Settings | File Templates.
  */
 public class DeviceCtl
 {
-	private static final SetDeviceLevelAdvertisement advertisement = new SetDeviceLevelAdvertisement();
 	private static final JsonMessaging messaging = new JsonMessaging(UUID.randomUUID());
 
 	public static void on(String uuid)
 	{
-		messaging.broadcast("event.devices.setvalue", advertisement.set(uuid, "Level", "255"));
+		messaging.broadcast("event.devices.setvalue", new SetDeviceLevelAdvertisement(uuid, "Level", "255"));
 	}
 
 	public static void off(String uuid)
 	{
-		messaging.broadcast("event.devices.setvalue", advertisement.set(uuid, "Level", "0"));
+		messaging.broadcast("event.devices.setvalue", new SetDeviceLevelAdvertisement(uuid, "Level", "0"));
 	}
 }

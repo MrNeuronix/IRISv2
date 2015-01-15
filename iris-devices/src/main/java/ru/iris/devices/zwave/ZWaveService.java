@@ -40,29 +40,8 @@ public class ZWaveService
 {
 	private final Logger LOGGER = LogManager.getLogger(ZWaveService.class.getName());
 	private final Gson gson = new GsonBuilder().create();
-
-	// Advertisements
-	private final ZWaveDriverReady zWaveDriverReady = new ZWaveDriverReady();
-	private final ZWaveDriverFailed zWaveDriverFailed = new ZWaveDriverFailed();
-	private final ZWaveDriverReset zWaveDriverReset = new ZWaveDriverReset();
-	private final ZWaveNodeNaming zWaveNodeNaming = new ZWaveNodeNaming();
-	private final ZWaveNodeAdded zWaveNodeAdded = new ZWaveNodeAdded();
-	private final ZWaveNodeEvent zWaveNodeEvent = new ZWaveNodeEvent();
-	private final ZWaveNodeNew zWaveNodeNew = new ZWaveNodeNew();
-	private final ZWaveNodeProtocolInfo zWaveNodeProtocolInfo = new ZWaveNodeProtocolInfo();
-	private final ZWaveNodeQueriesComplete zWaveNodeQueriesComplete = new ZWaveNodeQueriesComplete();
-	private final ZWaveNodeRemoved zWaveNodeRemoved = new ZWaveNodeRemoved();
-	private final ZWaveAwakeNodesQueried zWaveAwakeNodesQueried = new ZWaveAwakeNodesQueried();
-	private final ZWaveAllNodesQueried zWaveAllNodesQueried = new ZWaveAllNodesQueried();
-	private final ZWaveAllNodesQueriedSomeDead zWaveAllNodesQueriedSomeDead = new ZWaveAllNodesQueriedSomeDead();
-	private final ZWaveDeviceValueAdded zWaveDeviceValueAdded = new ZWaveDeviceValueAdded();
-	private final ZWaveDeviceValueChanged zWaveDeviceValueChanged = new ZWaveDeviceValueChanged();
-	private final ZWaveDeviceValueRemoved zWaveDeviceValueRemoved = new ZWaveDeviceValueRemoved();
-	private final ZWaveEssentialNodeQueriesComplete zWaveEssentialNodeQueriesComplete = new ZWaveEssentialNodeQueriesComplete();
-	private final ZWavePolling zWavePolling = new ZWavePolling();
 	private long homeId;
 	private boolean ready = false;
-	private boolean shutdown = false;
 	private JsonMessaging messaging;
 
 	public ZWaveService()
@@ -94,65 +73,65 @@ public class ZWaveService
 					case DRIVER_READY:
 						homeId = notification.getHomeId();
 						LOGGER.info("Driver ready. Home ID: " + homeId);
-						messaging.broadcast("event.devices.zwave.driver.ready", zWaveDriverReady.set(homeId));
+						messaging.broadcast("event.devices.zwave.driver.ready", new ZWaveDriverReady(homeId));
 						break;
 					case DRIVER_FAILED:
 						LOGGER.info("Driver failed");
-						messaging.broadcast("event.devices.zwave.driver.failed", zWaveDriverFailed);
+						messaging.broadcast("event.devices.zwave.driver.failed", new ZWaveDriverFailed());
 						break;
 					case DRIVER_RESET:
 						LOGGER.info("Driver reset");
-						messaging.broadcast("event.devices.zwave.driver.reset", zWaveDriverReset);
+						messaging.broadcast("event.devices.zwave.driver.reset", new ZWaveDriverReset());
 						break;
 					case AWAKE_NODES_QUERIED:
 						LOGGER.info("Awake nodes queried");
 						ready = true;
-						messaging.broadcast("event.devices.zwave.awakenodesqueried", zWaveAwakeNodesQueried);
+						messaging.broadcast("event.devices.zwave.awakenodesqueried", new ZWaveAwakeNodesQueried());
 						break;
 					case ALL_NODES_QUERIED:
 						LOGGER.info("All node queried");
 						manager.writeConfig(homeId);
 						ready = true;
-						messaging.broadcast("event.devices.zwave.allnodesqueried", zWaveAllNodesQueried);
+						messaging.broadcast("event.devices.zwave.allnodesqueried", new ZWaveAllNodesQueried());
 						break;
 					case ALL_NODES_QUERIED_SOME_DEAD:
 						LOGGER.info("All node queried, some dead");
 						manager.writeConfig(homeId);
-						messaging.broadcast("event.devices.zwave.allnodesqueriedsomedead", zWaveAllNodesQueriedSomeDead);
+						messaging.broadcast("event.devices.zwave.allnodesqueriedsomedead", new ZWaveAllNodesQueriedSomeDead());
 						break;
 					case POLLING_ENABLED:
 						LOGGER.info("Polling enabled");
-						messaging.broadcast("event.devices.zwave.polling.enabled", zWavePolling.set(Device.getDeviceByNode(notification.getNodeId()), true));
+						messaging.broadcast("event.devices.zwave.polling.enabled", new ZWavePolling(Device.getDeviceByNode(notification.getNodeId()), true));
 						break;
 					case POLLING_DISABLED:
 						LOGGER.info("Polling disabled");
-						messaging.broadcast("event.devices.zwave.polling.disabled", zWavePolling.set(Device.getDeviceByNode(notification.getNodeId()), false));
+						messaging.broadcast("event.devices.zwave.polling.disabled", new ZWavePolling(Device.getDeviceByNode(notification.getNodeId()), false));
 						break;
 					case NODE_NEW:
-						messaging.broadcast("event.devices.zwave.node.new", zWaveNodeNew.set(Device.getDeviceByNode(notification.getNodeId())));
+						messaging.broadcast("event.devices.zwave.node.new", new ZWaveNodeNew(Device.getDeviceByNode(notification.getNodeId())));
 						break;
 					case NODE_ADDED:
-						messaging.broadcast("event.devices.zwave.node.added", zWaveNodeAdded.set(Device.getDeviceByNode(notification.getNodeId())));
+						messaging.broadcast("event.devices.zwave.node.added", new ZWaveNodeAdded(Device.getDeviceByNode(notification.getNodeId())));
 						break;
 					case NODE_REMOVED:
-						messaging.broadcast("event.devices.zwave.node.removed", zWaveNodeRemoved.set(Device.getDeviceByNode(notification.getNodeId())));
+						messaging.broadcast("event.devices.zwave.node.removed", new ZWaveNodeRemoved(Device.getDeviceByNode(notification.getNodeId())));
 						break;
 					case ESSENTIAL_NODE_QUERIES_COMPLETE:
-						messaging.broadcast("event.devices.zwave.essentialnodequeriscomplete", zWaveEssentialNodeQueriesComplete);
+						messaging.broadcast("event.devices.zwave.essentialnodequeriscomplete", new ZWaveEssentialNodeQueriesComplete());
 						break;
 					case NODE_QUERIES_COMPLETE:
-						messaging.broadcast("event.devices.zwave.node.queriescomplete", zWaveNodeQueriesComplete);
+						messaging.broadcast("event.devices.zwave.node.queriescomplete", new ZWaveNodeQueriesComplete());
 						break;
 					case NODE_EVENT:
 						LOGGER.info("Update info for node " + node);
 						manager.refreshNodeInfo(homeId, node);
-						messaging.broadcast("event.devices.zwave.node.event", zWaveNodeEvent.set(Device.getDeviceByNode(notification.getNodeId())));
+						messaging.broadcast("event.devices.zwave.node.event", new ZWaveNodeEvent(Device.getDeviceByNode(notification.getNodeId())));
 						break;
 					case NODE_NAMING:
-						messaging.broadcast("event.devices.zwave.node.naming", zWaveNodeNaming.set(Device.getDeviceByNode(notification.getNodeId())));
+						messaging.broadcast("event.devices.zwave.node.naming", new ZWaveNodeNaming(Device.getDeviceByNode(notification.getNodeId())));
 						break;
 					case NODE_PROTOCOL_INFO:
-						messaging.broadcast("event.devices.zwave.node.protocolinfo", zWaveNodeProtocolInfo.set(Device.getDeviceByNode(notification.getNodeId())));
+						messaging.broadcast("event.devices.zwave.node.protocolinfo", new ZWaveNodeProtocolInfo(Device.getDeviceByNode(notification.getNodeId())));
 						break;
 					case VALUE_ADDED:
 
@@ -169,7 +148,7 @@ public class ZWaveService
 
 								zw = addZWaveDeviceOrValue("controller", notification);
 								messaging.broadcast("event.devices.zwave.value.added",
-										zWaveDeviceValueAdded.set(
+										new ZWaveDeviceValueAdded(
 												zw,
 												Manager.get().getValueLabel(notification.getValueId()),
 												String.valueOf(Utils.getValue(notification.getValueId()))));
@@ -181,7 +160,7 @@ public class ZWaveService
 
 								zw = addZWaveDeviceOrValue("dimmer", notification);
 								messaging.broadcast("event.devices.zwave.value.added",
-										zWaveDeviceValueAdded.set(
+										new ZWaveDeviceValueAdded(
 												zw,
 												Manager.get().getValueLabel(notification.getValueId()),
 												String.valueOf(Utils.getValue(notification.getValueId()))));
@@ -193,7 +172,7 @@ public class ZWaveService
 
 								zw = addZWaveDeviceOrValue("alarmsensor", notification);
 								messaging.broadcast("event.devices.zwave.value.added",
-										zWaveDeviceValueAdded.set(
+										new ZWaveDeviceValueAdded(
 												zw,
 												Manager.get().getValueLabel(notification.getValueId()),
 												String.valueOf(Utils.getValue(notification.getValueId()))));
@@ -203,7 +182,7 @@ public class ZWaveService
 
 								zw = addZWaveDeviceOrValue("switch", notification);
 								messaging.broadcast("event.devices.zwave.value.added",
-										zWaveDeviceValueAdded.set(
+										new ZWaveDeviceValueAdded(
 												zw,
 												Manager.get().getValueLabel(notification.getValueId()),
 												String.valueOf(Utils.getValue(notification.getValueId()))));
@@ -213,7 +192,7 @@ public class ZWaveService
 
 								zw = addZWaveDeviceOrValue("binarysensor", notification);
 								messaging.broadcast("event.devices.zwave.value.added",
-										zWaveDeviceValueAdded.set(
+										new ZWaveDeviceValueAdded(
 												zw,
 												Manager.get().getValueLabel(notification.getValueId()),
 												String.valueOf(Utils.getValue(notification.getValueId()))));
@@ -225,7 +204,7 @@ public class ZWaveService
 
 								zw = addZWaveDeviceOrValue("multilevelsensor", notification);
 								messaging.broadcast("event.devices.zwave.value.added",
-										zWaveDeviceValueAdded.set(
+										new ZWaveDeviceValueAdded(
 												zw,
 												Manager.get().getValueLabel(notification.getValueId()),
 												String.valueOf(Utils.getValue(notification.getValueId()))));
@@ -237,7 +216,7 @@ public class ZWaveService
 
 								zw = addZWaveDeviceOrValue("metersensor", notification);
 								messaging.broadcast("event.devices.zwave.value.added",
-										zWaveDeviceValueAdded.set(
+										new ZWaveDeviceValueAdded(
 												zw,
 												Manager.get().getValueLabel(notification.getValueId()),
 												String.valueOf(Utils.getValue(notification.getValueId()))));
@@ -249,7 +228,7 @@ public class ZWaveService
 
 								zw = addZWaveDeviceOrValue("drapes", notification);
 								messaging.broadcast("event.devices.zwave.value.added",
-										zWaveDeviceValueAdded.set(
+										new ZWaveDeviceValueAdded(
 												zw,
 												Manager.get().getValueLabel(notification.getValueId()),
 												String.valueOf(Utils.getValue(notification.getValueId()))));
@@ -261,7 +240,7 @@ public class ZWaveService
 
 								zw = addZWaveDeviceOrValue("thermostat", notification);
 								messaging.broadcast("event.devices.zwave.value.added",
-										zWaveDeviceValueAdded.set(
+										new ZWaveDeviceValueAdded(
 												zw,
 												Manager.get().getValueLabel(notification.getValueId()),
 												String.valueOf(Utils.getValue(notification.getValueId()))));
@@ -307,7 +286,7 @@ public class ZWaveService
 						zrZWaveDevice.removeValue(manager.getValueLabel(notification.getValueId()));
 
 						messaging.broadcast("event.devices.zwave.value.removed",
-								zWaveDeviceValueRemoved.set(
+								new ZWaveDeviceValueRemoved(
 										zrZWaveDevice,
 										Manager.get().getValueLabel(notification.getValueId()),
 										String.valueOf(Utils.getValue(notification.getValueId()))));
@@ -355,7 +334,7 @@ public class ZWaveService
 						SensorData.log(udvChg.getUuid(), Manager.get().getValueLabel(notification.getValueId()), String.valueOf(Utils.getValue(notification.getValueId())));
 
 						messaging.broadcast("event.devices.zwave.value.changed",
-								zWaveDeviceValueChanged.set(
+								new ZWaveDeviceValueChanged(
 										zWaveDevice,
 										Manager.get().getValueLabel(notification.getValueId()),
 										String.valueOf(Utils.getValue(notification.getValueId()))));

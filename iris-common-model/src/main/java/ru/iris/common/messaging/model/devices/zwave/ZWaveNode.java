@@ -23,11 +23,13 @@ public class ZWaveNode
 	protected transient Device device;
 	protected String uuid;
 
-	public ZWaveNode set(Device device)
+	public ZWaveNode() {
+	}
+
+	public ZWaveNode(Device device)
 	{
 		this.device = device;
 		this.uuid = device.getUuid();
-		return this;
 	}
 
 	public Device getDevice()

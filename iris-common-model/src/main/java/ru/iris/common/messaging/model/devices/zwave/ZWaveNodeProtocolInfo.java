@@ -20,11 +20,12 @@ import ru.iris.common.database.model.devices.Device;
 
 public class ZWaveNodeProtocolInfo extends ZWaveNode
 {
+	public ZWaveNodeProtocolInfo() {
+	}
 
-	public ZWaveNodeProtocolInfo set(Device device)
+	public ZWaveNodeProtocolInfo(Device device)
 	{
 		super.device = device;
-		return this;
 	}
 
 	@Override

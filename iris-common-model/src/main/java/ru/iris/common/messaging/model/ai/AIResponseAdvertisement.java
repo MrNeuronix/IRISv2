@@ -25,10 +25,12 @@ public class AIResponseAdvertisement extends Advertisement
 	 */
 	private WitAiResponse response;
 
-	public AIResponseAdvertisement set(WitAiResponse response)
+	public AIResponseAdvertisement() {
+	}
+
+	public AIResponseAdvertisement(WitAiResponse response)
 	{
 		this.response = response;
-		return this;
 	}
 
 	public WitAiResponse getResponse()

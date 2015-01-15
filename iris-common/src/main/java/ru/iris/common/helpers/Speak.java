@@ -23,16 +23,14 @@ import java.util.UUID;
 
 public class Speak
 {
-	private static final SpeakAdvertisement advertisement = new SpeakAdvertisement();
-
 	public static void say(String text)
 	{
 		JsonMessaging messaging = new JsonMessaging(UUID.randomUUID(), "speak");
-		messaging.broadcast("event.speak", advertisement.set(text, 100.0));
+		messaging.broadcast("event.speak", new SpeakAdvertisement(text, 100.0));
 	}
 
 	public static void say(String text, String device) {
 		JsonMessaging messaging = new JsonMessaging(UUID.randomUUID(), "speak");
-		messaging.broadcast("event.speak", advertisement.set(text, 100.0, device));
+		messaging.broadcast("event.speak", new SpeakAdvertisement(text, 100.0, device));
 	}
 }

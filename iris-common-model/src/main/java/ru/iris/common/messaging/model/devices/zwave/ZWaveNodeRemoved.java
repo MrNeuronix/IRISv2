@@ -20,11 +20,12 @@ import ru.iris.common.database.model.devices.Device;
 
 public class ZWaveNodeRemoved extends ZWaveNode
 {
+	public ZWaveNodeRemoved() {
+	}
 
-	public ZWaveNodeRemoved set(Device device)
+	public ZWaveNodeRemoved(Device device)
 	{
 		super.device = device;
-		return this;
 	}
 
 	@Override

@@ -28,10 +28,12 @@ public class ResponseDeviceInventoryAdvertisement extends Advertisement
 	 */
 	private Map<?, Device> devices;
 
-	public ResponseDeviceInventoryAdvertisement set(Map<?, Device> devices)
+	public ResponseDeviceInventoryAdvertisement() {
+	}
+
+	public ResponseDeviceInventoryAdvertisement(Map<?, Device> devices)
 	{
 		this.devices = devices;
-		return this;
 	}
 
 	public Map<?, Device> getDevices()

@@ -32,11 +32,13 @@ public class UnbindRXChannelAdvertisment extends Advertisement
 
 	private int channel;
 
-	public UnbindRXChannelAdvertisment set(String deviceUUID, int channel)
+	public UnbindRXChannelAdvertisment() {
+	}
+
+	public UnbindRXChannelAdvertisment(String deviceUUID, int channel)
 	{
 		this.channel = channel;
 		this.deviceUUID = deviceUUID;
-		return this;
 	}
 
 	public String getDeviceUUID()

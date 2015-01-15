@@ -27,10 +27,12 @@ public class NooliteDeviceLevelDimAdvertisement extends Advertisement
 
 	private String deviceUUID;
 
-	public NooliteDeviceLevelDimAdvertisement set(String deviceUUID)
+	public NooliteDeviceLevelDimAdvertisement() {
+	}
+
+	public NooliteDeviceLevelDimAdvertisement(String deviceUUID)
 	{
 		this.deviceUUID = deviceUUID;
-		return this;
 	}
 
 	public String getDeviceUUID()

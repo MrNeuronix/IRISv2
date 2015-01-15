@@ -38,20 +38,18 @@ public class SpeakRecognizedAdvertisement extends Advertisement
 
 	private String device;
 
-	public SpeakRecognizedAdvertisement set(String text, double confidence)
+	public SpeakRecognizedAdvertisement(String text, double confidence)
 	{
 		this.text = text;
 		this.confidence = confidence;
 		this.device = "all";
-		return this;
 	}
 
-	public SpeakRecognizedAdvertisement set(String text, double confidence, String device)
+	public SpeakRecognizedAdvertisement(String text, double confidence, String device)
 	{
 		this.text = text;
 		this.confidence = confidence;
 		this.device = device;
-		return this;
 	}
 
 	public String getText()

@@ -20,11 +20,12 @@ import ru.iris.common.database.model.devices.Device;
 
 public class ZWaveNodeEvent extends ZWaveNode
 {
+	public ZWaveNodeEvent() {
+	}
 
-	public ZWaveNodeEvent set(Device device)
+	public ZWaveNodeEvent(Device device)
 	{
 		super.device = device;
-		return this;
 	}
 
 	@Override

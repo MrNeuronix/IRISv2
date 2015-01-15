@@ -26,11 +26,13 @@ public class CommandResult extends Advertisement
 	private String command;
 	private Object result;
 
-	public CommandResult set(String command, Object result)
+	public CommandResult() {
+	}
+
+	public CommandResult(String command, Object result)
 	{
 		this.command = command;
 		this.result = result;
-		return this;
 	}
 
 	public String getCommand()

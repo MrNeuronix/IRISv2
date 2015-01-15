@@ -36,12 +36,14 @@ public class SetDeviceLevelAdvertisement extends Advertisement
 	 */
 	protected String value;
 
-	public SetDeviceLevelAdvertisement set(String deviceUUID, String label, String value)
+	public SetDeviceLevelAdvertisement() {
+	}
+
+	public SetDeviceLevelAdvertisement(String deviceUUID, String label, String value)
 	{
 		this.label = label;
 		this.value = value;
 		this.deviceUUID = deviceUUID;
-		return this;
 	}
 
 	public String getLabel()

@@ -25,10 +25,12 @@ public class GetInventoryAdvertisement extends Advertisement
 	 */
 	private String deviceUUID;
 
-	public GetInventoryAdvertisement set(String deviceUUID)
+	public GetInventoryAdvertisement() {
+	}
+
+	public GetInventoryAdvertisement(String deviceUUID)
 	{
 		this.deviceUUID = deviceUUID;
-		return this;
 	}
 
 	public String getDeviceUUID()

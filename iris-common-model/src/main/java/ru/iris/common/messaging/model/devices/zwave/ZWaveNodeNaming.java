@@ -20,11 +20,12 @@ import ru.iris.common.database.model.devices.Device;
 
 public class ZWaveNodeNaming extends ZWaveNode
 {
+	public ZWaveNodeNaming() {
+	}
 
-	public ZWaveNodeNaming set(Device device)
+	public ZWaveNodeNaming(Device device)
 	{
 		super.device = device;
-		return this;
 	}
 
 	@Override
