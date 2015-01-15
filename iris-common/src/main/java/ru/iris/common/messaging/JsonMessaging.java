@@ -19,8 +19,10 @@ package ru.iris.common.messaging;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.rabbitmq.client.*;
+import javazoom.jl.decoder.JavaLayerException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.quartz.SchedulerException;
 
 import java.io.IOException;
 import java.util.*;
@@ -339,6 +341,8 @@ public class JsonMessaging
 		} catch (IOException | InterruptedException e)
 		{
 			LOGGER.debug("Error JSON message.", e);
+		} catch (SchedulerException | JavaLayerException e) {
+			e.printStackTrace();
 		}
 	}
 }
