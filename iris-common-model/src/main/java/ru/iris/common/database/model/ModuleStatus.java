@@ -24,6 +24,8 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "modulestatus")
 public class ModuleStatus extends DBModel {
+
+    @Column(name = "internalName")
     private String internalName;
     private String name;
     private String description;
