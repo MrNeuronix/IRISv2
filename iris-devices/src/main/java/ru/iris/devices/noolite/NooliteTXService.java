@@ -64,6 +64,9 @@ public class NooliteTXService
 				@Override
 				public void onNotification(JsonEnvelope envelope) throws InterruptedException {
 
+					// pause for next cmd
+					Thread.sleep(500);
+
 					if (envelope.getObject() instanceof NooliteDeviceLevelSetAdvertisement) {
 						LOGGER.debug("Get SetDeviceLevel advertisement");
 
@@ -162,9 +165,6 @@ public class NooliteTXService
 								+ " at '" + envelope.getSubject()
 								+ ": " + envelope.getObject());
 					}
-
-					// pause for next cmd
-					Thread.sleep(500);
 				}
 			});
 
