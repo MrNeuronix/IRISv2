@@ -147,6 +147,15 @@ public class VKSource
 						task.setEnabled(true);
 
 						task.save();
+					} else {
+						if (!saved.getStartdate().equals(new Timestamp(cal.getTime().getTime()))) {
+							LOGGER.debug("Update startdate for " + saved.getTitle());
+
+							saved.setStartdate(new Timestamp(cal.getTime().getTime()));
+							cal.add(Calendar.HOUR_OF_DAY, 10);
+							saved.setEnddate(new Timestamp(cal.getTime().getTime()));
+							saved.save();
+						}
 					}
 				}
 			}

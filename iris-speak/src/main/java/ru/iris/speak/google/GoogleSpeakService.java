@@ -36,10 +36,13 @@ import java.io.*;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class GoogleSpeakService
 {
 	private final Logger LOGGER = LogManager.getLogger(GoogleSpeakService.class.getName());
+	private final ArrayBlockingQueue<Speaks> speakqueue = new ArrayBlockingQueue<>(50);
 
 	public GoogleSpeakService()
 	{
@@ -68,10 +71,7 @@ public class GoogleSpeakService
 				@Override
 				public void onNotification(JsonEnvelope envelope) throws IOException, JavaLayerException {
 
-						InputStream result;
-						Player player;
-
-						if (envelope.getObject() instanceof SpeakAdvertisement) {
+					if (envelope.getObject() instanceof SpeakAdvertisement) {
 							SpeakAdvertisement advertisement = envelope.getObject();
 
 							Speaks speak = new Speaks();
@@ -79,18 +79,50 @@ public class GoogleSpeakService
 							speak.setConfidence(advertisement.getConfidence());
 							speak.setDevice(advertisement.getDevice());
 
+						// push to speak queue
+						speakqueue.add(speak);
+
+					} else {
+						// We received unknown request message. Lets make generic log entry.
+						LOGGER.info("Received request "
+								+ " from " + envelope.getSenderInstance()
+								+ " to " + envelope.getReceiverInstance()
+								+ " at '" + envelope.getSubject()
+								+ ": " + envelope.getObject());
+					}
+				}
+			});
+
+			jsonMessaging.start();
+
+			// check speak queue and play if needed
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+
+					InputStream result;
+					Player player;
+					Speaks speak;
+
+					try {
+						while (true) {
+							speak = speakqueue.poll(1000, TimeUnit.MILLISECONDS);
+
+							if (speak == null)
+								continue;
+
 							if (conf.get("silence").equals("0")) {
 								// Here we speak only if destination - all
-								if (advertisement.getDevice().equals("all")) {
-									LOGGER.debug("Confidence: " + advertisement.getConfidence());
-									LOGGER.debug("Text: " + advertisement.getText());
-									LOGGER.debug("Device: " + advertisement.getDevice());
+								if (speak.getDevice().equals("all")) {
+									LOGGER.debug("Confidence: " + speak.getConfidence());
+									LOGGER.debug("Text: " + speak.getText());
+									LOGGER.debug("Device: " + speak.getDevice());
 
 									long cacheId = 0;
 
 									for (Speaks speaks : speaksList) {
 										if (
-												speaks.getText().equals(advertisement.getText())
+												speaks.getText().equals(speak.getText())
 														&& speaks.getConfidence().equals(100D)
 												)
 											cacheId = speaks.getCache();
@@ -101,7 +133,7 @@ public class GoogleSpeakService
 										long cacheIdent = new Date().getTime();
 
 										OutputStream outputStream = new FileOutputStream(new File("data/cache-" + cacheIdent + ".mp3"));
-										result = synthesiser.getMP3Data(advertisement.getText());
+										result = synthesiser.getMP3Data(speak.getText());
 
 										byte[] byteArray = IOUtils.toByteArray(result);
 										InputStream resultForPlay = new ByteArrayInputStream(byteArray);
@@ -132,34 +164,31 @@ public class GoogleSpeakService
 										LOGGER.info("Playing local file: " + "data/cache-" + cacheId + ".mp3");
 
 										result = new FileInputStream("data/cache-" + cacheId + ".mp3");
-
 										player = new Player(result);
 										player.play();
 										player.close();
-
 										speak.save();
 									}
+
+									// sleep a little
+									Thread.sleep(1000);
+
 								} else {
-									LOGGER.info("Ignored. Request to play on device: " + advertisement.getDevice());
+									LOGGER.info("Ignored. Request to play on device: " + speak.getDevice());
 								}
 							} else {
 								LOGGER.info("Silence mode enabled. Ignoring speak request.");
 							}
-
-						} else {
-							// We received unknown request message. Lets make generic log entry.
-							LOGGER.info("Received request "
-									+ " from " + envelope.getSenderInstance()
-									+ " to " + envelope.getReceiverInstance()
-									+ " at '" + envelope.getSubject()
-									+ ": " + envelope.getObject());
 						}
+					} catch (final Throwable t) {
+						LOGGER.error("Error in Speak: " + t);
+						status.crashed();
+						t.printStackTrace();
+					}
 				}
-			});
-
-			jsonMessaging.start();
+			}).start();
 		} catch (final Throwable t) {
-			LOGGER.error("Error in Speak!");
+			LOGGER.error("Error in Speak: " + t);
 			status.crashed();
 			t.printStackTrace();
 		}

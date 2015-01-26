@@ -83,7 +83,7 @@ public class JsonMessaging
 	public void start()
 	{
 		// Startup listen thread.
-		jsonBroadcastListenThread = new Thread(() -> listenBroadcasts(), "json-broadcast-listen");
+		jsonBroadcastListenThread = new Thread(this::listenBroadcasts, "json-broadcast-listen");
 		jsonBroadcastListenThread.setName("JSON Messaging Listen Thread");
 		jsonBroadcastListenThread.start();
 
