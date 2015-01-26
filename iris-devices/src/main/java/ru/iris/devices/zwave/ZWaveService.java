@@ -468,9 +468,8 @@ public class ZWaveService
 			// Close JSON messaging.
 			messaging.start();
 		} catch (final Throwable t) {
-			LOGGER.error("Error in ZWave!");
+			LOGGER.error("Error in ZWave: " + t);
 			status.crashed();
-			t.printStackTrace();
 		}
 	}
 

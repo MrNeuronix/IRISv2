@@ -18,8 +18,6 @@ package ru.iris.common.database.model.devices;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import ru.iris.common.database.model.DBModel;
 
 import javax.persistence.Column;
@@ -205,9 +203,19 @@ public class Device extends DBModel
 	}
 
 	@Override
-	public String toString()
-	{
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		return gson.toJson(this);
+	public String toString() {
+		return "Device{" +
+				"name='" + name + '\'' +
+				", node=" + node +
+				", zone=" + zone +
+				", type='" + type + '\'' +
+				", internalType='" + internalType + '\'' +
+				", manufName='" + manufName + '\'' +
+				", productName='" + productName + '\'' +
+				", uuid='" + uuid + '\'' +
+				", status='" + status + '\'' +
+				", internalName='" + internalName + '\'' +
+				", source='" + source + '\'' +
+				'}';
 	}
 }

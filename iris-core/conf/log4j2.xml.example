@@ -1,24 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration>
     <Appenders>
+
         <Console name="STDOUT" target="SYSTEM_OUT">
             <PatternLayout pattern="%highlight{%d{DATE} %-5p %c{2} (%F:%L) - %m%n}"/>
         </Console>
-        <File name="ALL" fileName="logs/all.log">
-        <PatternLayout>
+
+        <RollingFile name="ALL" fileName="logs/all.log" filePattern="logs/$${date:yyyy-MM}/all-%d{MM-yyyy}-%i.log.gz">
+            <PatternLayout>
                 <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
-        </PatternLayout>
-        </File>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+        <RollingFile name="INFO" fileName="logs/info.log" filePattern="logs/$${date:yyyy-MM}/info-%d{MM-yyyy}-%i.log.gz">
+            <PatternLayout>
+                 <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+        <RollingFile name="WARN" fileName="logs/warn.log" filePattern="logs/$${date:yyyy-MM}/warn-%d{MM-yyyy}-%i.log.gz">
+            <PatternLayout>
+                 <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+        <RollingFile name="ERROR" fileName="logs/error.log" filePattern="logs/$${date:yyyy-MM}/error-%d{MM-yyyy}-%i.log.gz">
+            <PatternLayout>
+                 <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+        <RollingFile name="DEBUG" fileName="logs/debug.log" filePattern="logs/$${date:yyyy-MM}/debug-%d{MM-yyyy}-%i.log.gz">
+            <PatternLayout>
+                 <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+        <RollingFile name="TRACE" fileName="logs/trace.log" filePattern="logs/$${date:yyyy-MM}/trace-%d{MM-yyyy}-%i.log.gz">
+            <PatternLayout>
+                 <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy />
+                <SizeBasedTriggeringPolicy size="250 MB"/>
+            </Policies>
+            <DefaultRolloverStrategy max="20"/>
+        </RollingFile>
+
         <Async name="Async-ALL">
                 <AppenderRef ref="ALL"/>
         </Async>
+        <Async name="Async-INFO">
+                <AppenderRef ref="INFO"/>
+        </Async>
+        <Async name="Async-WARN">
+                <AppenderRef ref="WARN"/>
+        </Async>
+        <Async name="Async-ERROR">
+                <AppenderRef ref="ERROR"/>
+        </Async>
+        <Async name="Async-DEBUG">
+                <AppenderRef ref="DEBUG"/>
+        </Async>
+        <Async name="Async-TRACE">
+                <AppenderRef ref="TRACE"/>
+        </Async>
     </Appenders>
+
     <Loggers>
-        <Logger name="org.apache.log4j.xml" level="info"/>
-        <Logger name="ru.iris.devices" level="debug"/>
-        <Root level="info">
-            <AppenderRef ref="STDOUT"/>
-            <AppenderRef ref="Async-ALL"/>
+        <Logger name="org.apache.log4j.xml" level="info" />
+
+        <Root level="trace">
+            <AppenderRef ref="Async-TRACE" level="trace" />
+            <AppenderRef ref="Async-DEBUG" level="debug" />
+            <AppenderRef ref="Async-WARN" level="warn" />
+            <AppenderRef ref="Async-ERROR" level="error" />
+            <AppenderRef ref="Async-INFO" level="info" />
+            <AppenderRef ref="STDOUT" level="info" />
+            <AppenderRef ref="Async-ALL" />
         </Root>
     </Loggers>
+
 </Configuration>
