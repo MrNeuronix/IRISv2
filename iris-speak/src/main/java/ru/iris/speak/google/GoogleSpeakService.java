@@ -29,6 +29,7 @@ import ru.iris.common.database.model.Speaks;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.JsonNotification;
+import ru.iris.common.messaging.model.speak.ChangeVolumeAdvertisement;
 import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
 import ru.iris.common.modulestatus.Status;
 
@@ -63,24 +64,46 @@ public class GoogleSpeakService
 
 			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "speak");
 			jsonMessaging.subscribe("event.speak");
+			jsonMessaging.subscribe("event.speak.volume.set");
 
 			// fetch all cached speaks for this server
-			final List<Speaks> speaksList = Ebean.find(Speaks.class).where().and(Expr.ne("cache", 0), Expr.eq("device", "all")).findList();
+			final List<Speaks> speaksList = Ebean.find(Speaks.class)
+					.where()
+					.and(Expr.ne("cache", 0),
+							Expr.or(
+									Expr.eq("device", "all"),
+									Expr.eq("device", "server")
+							)
+					).findList();
 
 			jsonMessaging.setNotification(new JsonNotification() {
 				@Override
 				public void onNotification(JsonEnvelope envelope) throws IOException, JavaLayerException {
 
 					if (envelope.getObject() instanceof SpeakAdvertisement) {
-							SpeakAdvertisement advertisement = envelope.getObject();
+						SpeakAdvertisement advertisement = envelope.getObject();
 
-							Speaks speak = new Speaks();
-							speak.setText(advertisement.getText());
-							speak.setConfidence(advertisement.getConfidence());
-							speak.setDevice(advertisement.getDevice());
+						Speaks speak = new Speaks();
+						speak.setText(advertisement.getText());
+						speak.setConfidence(advertisement.getConfidence());
+						speak.setDevice(advertisement.getDevice());
 
 						// push to speak queue
 						speakqueue.add(speak);
+
+					} else if (envelope.getObject() instanceof ChangeVolumeAdvertisement) {
+						ChangeVolumeAdvertisement advertisement = envelope.getObject();
+
+						if (advertisement.getDevice().equals("server") || advertisement.getDevice().equals("all")) {
+
+							LOGGER.info("Setting sound volume level to " + advertisement.getLevel());
+
+							if (advertisement.getLevel() == 0) {
+								conf.set("silence", "1");
+							} else {
+								conf.set("silence", "0");
+							}
+						}
 
 					} else {
 						// We received unknown request message. Lets make generic log entry.
@@ -113,7 +136,7 @@ public class GoogleSpeakService
 
 							if (conf.get("silence").equals("0")) {
 								// Here we speak only if destination - all
-								if (speak.getDevice().equals("all")) {
+								if (speak.getDevice().equals("all") || speak.getDevice().equals("server")) {
 									LOGGER.debug("Confidence: " + speak.getConfidence());
 									LOGGER.debug("Text: " + speak.getText());
 									LOGGER.debug("Device: " + speak.getDevice());

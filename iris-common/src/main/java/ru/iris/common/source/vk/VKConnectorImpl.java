@@ -155,7 +155,14 @@ public class VKConnectorImpl implements VKConnector
 		log.debug(responseBody);
 
 		JsonNode resultTree = objectMapper.readTree(responseBody);
+
+		if (resultTree == null)
+			return null;
+
 		ArrayNode responseJsonNode = (ArrayNode) resultTree.get("response");
+
+		if (responseJsonNode == null)
+			return null;
 
 		List<User> result = new ArrayList<User>();
 		for (JsonNode userJsonNode : responseJsonNode)

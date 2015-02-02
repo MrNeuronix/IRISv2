@@ -18,54 +18,10 @@ package ru.iris.common.datasource.model;
 
 public class VKModel
 {
-	private int clientid;
-	private String secretkey;
-	private String username;
-	private String password;
 	private String accesstoken;
 
 	public VKModel()
 	{
-	}
-
-	public int getClientid()
-	{
-		return clientid;
-	}
-
-	public void setClientid(int clientid)
-	{
-		this.clientid = clientid;
-	}
-
-	public String getSecretkey()
-	{
-		return secretkey;
-	}
-
-	public void setSecretkey(String secretkey)
-	{
-		this.secretkey = secretkey;
-	}
-
-	public String getUsername()
-	{
-		return username;
-	}
-
-	public void setUsername(String username)
-	{
-		this.username = username;
-	}
-
-	public String getPassword()
-	{
-		return password;
-	}
-
-	public void setPassword(String password)
-	{
-		this.password = password;
 	}
 
 	public String getAccesstoken()

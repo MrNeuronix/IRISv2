@@ -405,7 +405,7 @@ public class ZWaveService
 
 			LOGGER.info("Initialization complete.");
 
-			messaging.subscribe("event.devices.zwave.setvalue");
+			messaging.subscribe("event.devices.zwave.value.set");
 			messaging.subscribe("event.devices.zwave.node.add");
 			messaging.subscribe("event.devices.zwave.node.remove");
 			messaging.subscribe("event.devices.zwave.cancel");

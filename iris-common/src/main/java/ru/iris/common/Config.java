@@ -22,9 +22,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Class for loading configuration from properties files and database.
@@ -35,7 +34,7 @@ public class Config
 	 * The map of loaded properties.
 	 */
 	private static final Logger LOGGER = LogManager.getLogger(Config.class);
-	private static Map<String, String> propertyMap = null;
+	private static ConcurrentHashMap<String, String> propertyMap = null;
 
 	/**
 	 * Singleton (On Demand Holder)
@@ -62,7 +61,7 @@ public class Config
 			{
 				return;
 			}
-			propertyMap = new HashMap<>();
+			propertyMap = new ConcurrentHashMap<>();
 			loadPropertiesFromClassPath("/conf/iris-default.properties");
 			if (!loadPropertiesFromClassPath("/conf/iris-extended.properties"))
 			{
@@ -148,5 +147,10 @@ public class Config
 
 		LOGGER.error("Configuration key = " + key + " not found!");
 		return null;
+	}
+
+	public void set(String key, String value) {
+		propertyMap.put(key, value);
+		LOGGER.debug("Configuration key " + key + " = " + value);
 	}
 }

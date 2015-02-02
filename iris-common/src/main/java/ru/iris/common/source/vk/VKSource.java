@@ -68,29 +68,16 @@ public class VKSource
 			Calendar cal = Calendar.getInstance();
 
 			VKModel source = gson.fromJson(obj, VKModel.class);
-
 			VKConnector vkConnector = VKConnectorImpl.createInstance();
+			VKTokenProvider vkTokenProvider = VKTokenProviderImpl.createInstance(source.getAccesstoken());
+			List<User> usersvk = vkConnector.getUsers(null, "nom", vkTokenProvider.getToken());
 
-			// token not found
-			if (source.getAccesstoken().isEmpty())
-			{
-				String accessToken = vkConnector.getToken(source.getClientid(), source.getSecretkey(), source.getUsername(), source.getPassword());
-
-				if (accessToken != null && !accessToken.isEmpty())
-				{
-					source.setAccesstoken(accessToken);
-					Ebean.update(source);
-				}
-				else
-				{
-					LOGGER.error("Cant get accesstoken from VK. Use debug.");
-					return;
-				}
+			if (usersvk == null) {
+				LOGGER.error("Error while getting list of VK users!");
+				return;
 			}
 
-			VKTokenProvider vkTokenProvider = VKTokenProviderImpl.createInstance(source.getAccesstoken());
-
-			User me = vkConnector.getUsers(null, "nom", vkTokenProvider.getToken()).get(0);
+			User me = usersvk.get(0);
 
 			List<User> users = vkConnector.getUsers(vkConnector.getFriends(me, vkTokenProvider.getToken()), "nom", vkTokenProvider.getToken());
 			for (User user : users)

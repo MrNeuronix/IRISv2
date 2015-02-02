@@ -19,6 +19,7 @@ package ru.iris.common.database.model.devices;
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
 import ru.iris.common.database.model.DBModel;
+import ru.iris.common.database.model.SensorData;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -200,6 +201,10 @@ public class Device extends DBModel
 	public static Device getDeviceByNode(short node)
 	{
 		return Ebean.find(Device.class).where().eq("node", node).findUnique();
+	}
+
+	public List<SensorData> getLogs() {
+		return Ebean.find(SensorData.class).where().eq("uuid", this.uuid).order().desc("logdate").findList();
 	}
 
 	@Override

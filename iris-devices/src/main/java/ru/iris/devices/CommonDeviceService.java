@@ -82,9 +82,9 @@ class CommonDeviceService
 						}
 
 						if (device.getSource().equals("zwave")) {
-							jsonMessaging.broadcast("event.devices.zwave.setvalue", new ZWaveSetDeviceLevelAdvertisement(uuid, label, level));
+							jsonMessaging.broadcast("event.devices.zwave.value.set", new ZWaveSetDeviceLevelAdvertisement(uuid, label, level));
 						} else if (device.getSource().equals("noolite")) {
-							jsonMessaging.broadcast("event.devices.noolite.setvalue", new NooliteDeviceLevelSetAdvertisement(uuid, label, level));
+							jsonMessaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement(uuid, label, level));
 						}
 
 						////////////////////////////////////////////
