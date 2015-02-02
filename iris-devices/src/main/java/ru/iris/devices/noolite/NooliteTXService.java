@@ -55,7 +55,7 @@ public class NooliteTXService
 
 			final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-tx");
 
-			jsonMessaging.subscribe("event.devices.noolite.setvalue");
+			jsonMessaging.subscribe("event.devices.noolite.value.set");
 			jsonMessaging.subscribe("event.devices.noolite.tx.bindchannel");
 			jsonMessaging.subscribe("event.devices.noolite.tx.unbindchannel");
 
