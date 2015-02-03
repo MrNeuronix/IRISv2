@@ -98,7 +98,7 @@ public class GoogleSpeakService
 
 							LOGGER.info("Setting sound volume level to " + advertisement.getLevel());
 
-							if (advertisement.getLevel() == 0) {
+							if (advertisement.getLevel() == 0.0) {
 								conf.set("silence", "1");
 							} else {
 								conf.set("silence", "0");
