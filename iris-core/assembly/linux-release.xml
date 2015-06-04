@@ -76,6 +76,20 @@
             <directory>../iris-devices/target/plugin-classes</directory>
         </fileSet>
         <fileSet>
+            <outputDirectory>/extensions/iris-devices-noolite/classes</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <directory>../iris-devices-noolite/target/plugin-classes</directory>
+        </fileSet>
+        <fileSet>
+            <outputDirectory>/extensions/iris-devices-zwave/classes</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <directory>../iris-devices-zwave/target/plugin-classes</directory>
+        </fileSet>
+        <fileSet>
             <outputDirectory>/extensions/iris-events/classes</outputDirectory>
             <includes>
                 <include>**/*</include>
@@ -121,6 +135,8 @@
             <scope>runtime</scope>
             <excludes>
                 <exclude>ru.iris:iris-devices</exclude>
+                <exclude>ru.iris:iris-devices-noolite</exclude>
+                <exclude>ru.iris:iris-devices-zwave</exclude>
                 <exclude>ru.iris:iris-events</exclude>
                 <exclude>ru.iris:iris-video</exclude>
                 <exclude>ru.iris:iris-speak</exclude>

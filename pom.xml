@@ -88,6 +88,8 @@
         <module>iris-common</module>
         <module>iris-core</module>
         <module>iris-devices</module>
+        <module>iris-devices-noolite</module>
+        <module>iris-devices-zwave</module>
         <module>iris-events</module>
         <module>iris-scheduler</module>
         <module>iris-speak</module>

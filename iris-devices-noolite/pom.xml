@@ -18,10 +18,10 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>iris-devices</artifactId>
+    <artifactId>iris-devices-noolite</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>iris-devices</name>
+    <name>iris-devices-noolite</name>
 
     <parent>
         <groupId>ru.iris</groupId>
@@ -31,7 +31,7 @@
     </parent>
 
     <properties>
-        <plugin.id>iris-devices</plugin.id>
+        <plugin.id>iris-devices-noolite</plugin.id>
         <plugin.class>ru.iris.devices.noolite.Service</plugin.class>
         <plugin.version>0.0.1</plugin.version>
         <plugin.provider>Nikolay Viguro</plugin.provider>
