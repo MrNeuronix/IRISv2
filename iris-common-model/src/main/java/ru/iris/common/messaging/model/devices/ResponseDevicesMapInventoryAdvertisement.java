@@ -14,40 +14,32 @@
  * limitations under the License.
  */
 
-package ru.iris.common.messaging.model.devices.noolite;
+package ru.iris.common.messaging.model.devices;
 
+import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.model.Advertisement;
 
-public class NooliteDeviceLevelBrightAdvertisement extends Advertisement
+import java.util.Map;
+
+public class ResponseDevicesMapInventoryAdvertisement extends Advertisement
 {
-
 	/**
-	 * Device UUID
-	 */
+     * Devices Map
+     */
+    private Map<?, Device> devices;
 
-	private String deviceUUID;
+    public ResponseDevicesMapInventoryAdvertisement() {
+    }
 
-	public NooliteDeviceLevelBrightAdvertisement() {
-	}
+    public ResponseDevicesMapInventoryAdvertisement(Map<?, Device> devices) {
+        this.devices = devices;
+    }
 
-	public NooliteDeviceLevelBrightAdvertisement(String deviceUUID)
-	{
-		this.deviceUUID = deviceUUID;
-	}
+    public Map<?, Device> getDevices() {
+        return devices;
+    }
 
-	public String getDeviceUUID()
-	{
-		return deviceUUID;
-	}
-
-	public void setDeviceUUID(String deviceUUID)
-	{
-		this.deviceUUID = deviceUUID;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "NooliteDeviceLevelBrightAdvertisement { UUID: " + deviceUUID + " }";
-	}
+    public void setDevices(Map<String, Device> devices) {
+        this.devices = devices;
+    }
 }

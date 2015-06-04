@@ -19,30 +19,36 @@ package ru.iris.common.messaging.model.devices;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.model.Advertisement;
 
-import java.util.Map;
-
 public class ResponseDeviceInventoryAdvertisement extends Advertisement
 {
 	/**
-	 * Devices Map
+	 * Device UUID
 	 */
-	private Map<?, Device> devices;
 
-	public ResponseDeviceInventoryAdvertisement() {
+	private Device device;
+
+    public ResponseDeviceInventoryAdvertisement() {
+    }
+
+    public ResponseDeviceInventoryAdvertisement(Device device) {
+		this.device = device;
 	}
 
-	public ResponseDeviceInventoryAdvertisement(Map<?, Device> devices)
+	public Device getDevice()
 	{
-		this.devices = devices;
+		return device;
 	}
 
-	public Map<?, Device> getDevices()
+	public void setDevice(Device device)
 	{
-		return devices;
+		this.device = device;
 	}
 
-	public void setDevices(Map<String, Device> devices)
+	@Override
+	public String toString()
 	{
-		this.devices = devices;
+        return "ResponseDeviceInventoryAdvertisement {" +
+                "Device=" + device +
+                '}';
 	}
 }

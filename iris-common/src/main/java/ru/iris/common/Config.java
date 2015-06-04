@@ -150,7 +150,7 @@ public class Config
 	}
 
 	public void set(String key, String value) {
-		propertyMap.replace(key, value);
-		LOGGER.debug("Configuration key " + key + " = " + value);
+        propertyMap.put(key, value);
+        LOGGER.debug("Configuration key " + key + " = " + value);
 	}
 }

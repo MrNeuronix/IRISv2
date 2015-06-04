@@ -25,10 +25,6 @@ import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.devices.*;
-import ru.iris.common.messaging.model.devices.noolite.NooliteDeviceLevelSetAdvertisement;
-import ru.iris.common.messaging.model.devices.noolite.ResponseNooliteDeviceInventoryAdvertisement;
-import ru.iris.common.messaging.model.devices.zwave.ResponseZWaveDeviceInventoryAdvertisement;
-import ru.iris.common.messaging.model.devices.zwave.ZWaveSetDeviceLevelAdvertisement;
 import ru.iris.common.modulestatus.Status;
 
 import java.util.Map;
@@ -81,11 +77,9 @@ class CommonDeviceService
 							return;
 						}
 
-						if (device.getSource().equals("zwave")) {
-							jsonMessaging.broadcast("event.devices.zwave.value.set", new ZWaveSetDeviceLevelAdvertisement(uuid, label, level));
-						} else if (device.getSource().equals("noolite")) {
-							jsonMessaging.broadcast("event.devices.noolite.value.set", new NooliteDeviceLevelSetAdvertisement(uuid, label, level));
-						}
+                        if (!device.getSource().isEmpty()) {
+                            jsonMessaging.broadcast("event.devices." + device.getSource() + ".value.set", new SetDeviceLevelAdvertisement(uuid, label, level));
+                        }
 
 						////////////////////////////////////////////
 						//// Get inventory                      ////
@@ -104,7 +98,7 @@ class CommonDeviceService
 							query.setMapKey("internalname");
 							Map<?, Device> devices = query.findMap();
 
-							jsonMessaging.broadcast("event.devices.responseinventory", new ResponseDeviceInventoryAdvertisement(devices));
+                            jsonMessaging.broadcast("event.devices.responseinventory", new ResponseDevicesMapInventoryAdvertisement(devices));
 
 							// send one device specified by UUID
 						} else {
@@ -113,16 +107,16 @@ class CommonDeviceService
 									.where().eq("uuid", uuid).findUnique();
 
 							if (device == null) {
-								LOGGER.info("Cant find device with UUID " + uuid);
-								return;
+                                LOGGER.error("Cant find device with UUID " + uuid);
+                                return;
 							}
 
-							if (device.getSource().equals("zwave")) {
-								jsonMessaging.broadcast("event.devices.responseinventory", new ResponseZWaveDeviceInventoryAdvertisement(device));
-							} else if (device.getSource().equals("noolite")) {
-								jsonMessaging.broadcast("event.devices.responseinventory", new ResponseNooliteDeviceInventoryAdvertisement(device));
-							}
-						}
+                            if (!device.getSource().isEmpty()) {
+                                jsonMessaging.broadcast("event.devices." + device.getSource() + ".responseinventory", new ResponseDeviceInventoryAdvertisement(device));
+                            } else {
+                                LOGGER.error("Source of device is empty! UUID: " + uuid);
+                            }
+                        }
 
 						////////////////////////////////////////////
 						//// Set device name                    ////

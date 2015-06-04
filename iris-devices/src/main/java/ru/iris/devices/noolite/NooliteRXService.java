@@ -24,7 +24,8 @@ import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.helpers.DBLogger;
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.devices.noolite.*;
+import ru.iris.common.messaging.model.devices.GenericAdvertisement;
+import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
 import ru.iris.common.modulestatus.Status;
 import ru.iris.noolite4j.receiver.RX2164;
 import ru.iris.noolite4j.watchers.BatteryState;
@@ -97,8 +98,8 @@ public class NooliteRXService
 							updateValue(device, "Level", "0");
 							DBLogger.info("Device is OFF", device.getUuid());
 							SensorData.log(device.getUuid(), "Switch", "OFF");
-							messaging.broadcast("event.devices.noolite.value.changed", new NooliteDeviceLevelSetAdvertisement(device.getUuid(), "Level", "0"));
-							break;
+                            messaging.broadcast("event.devices.noolite.value.changed", new SetDeviceLevelAdvertisement(device.getUuid(), "Level", "0"));
+                            break;
 
 						case SLOW_TURN_OFF:
 							LOGGER.info("Channel " + channel + ": Got DIM command");
@@ -106,16 +107,16 @@ public class NooliteRXService
 							updateValue(device, "Level", "0");
 							DBLogger.info("Device is DIM", device.getUuid());
 							SensorData.log(device.getUuid(), "Switch", "DIM");
-							messaging.broadcast("event.devices.noolite.value.changed", new NooliteDeviceLevelDimAdvertisement(device.getUuid()));
-							break;
+                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("NooliteDeviceDim", device.getUuid()));
+                            break;
 
 						case TURN_ON:
 							LOGGER.info("Channel " + channel + ": Got ON command");
 							updateValue(device, "Level", "255");
 							DBLogger.info("Device is ON", device.getUuid());
 							SensorData.log(device.getUuid(), "Switch", "ON");
-							messaging.broadcast("event.devices.noolite.value.changed", new NooliteDeviceLevelSetAdvertisement(device.getUuid(), "Level", "255"));
-							break;
+                            messaging.broadcast("event.devices.noolite.value.changed", new SetDeviceLevelAdvertisement(device.getUuid(), "Level", "255"));
+                            break;
 
 						case SLOW_TURN_ON:
 							LOGGER.info("Channel " + channel + ": Got BRIGHT command");
@@ -123,23 +124,23 @@ public class NooliteRXService
 							updateValue(device, "Level", "255");
 							DBLogger.info("Device is BRIGHT", device.getUuid());
 							SensorData.log(device.getUuid(), "Switch", "BRIGHT");
-							messaging.broadcast("event.devices.noolite.value.changed", new NooliteDeviceLevelBrightAdvertisement(device.getUuid()));
-							break;
+                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("NooliteDeviceBright", device.getUuid()));
+                            break;
 
 						case SET_LEVEL:
 							LOGGER.info("Channel " + channel + ": Got SETLEVEL command.");
 							updateValue(device, "Level", (String) notification.getValue("level"));
 							DBLogger.info("Device get SETLEVEL: " + notification.getValue("level"), device.getUuid());
 							SensorData.log(device.getUuid(), "SetLevel", String.valueOf(notification.getValue("level")));
-							messaging.broadcast("event.devices.noolite.value.changed", new NooliteDeviceLevelSetAdvertisement(device.getUuid(), "Level", (String) notification.getValue("level")));
-							break;
+                            messaging.broadcast("event.devices.noolite.value.changed", new SetDeviceLevelAdvertisement(device.getUuid(), "Level", (String) notification.getValue("level")));
+                            break;
 
 						case STOP_DIM_BRIGHT:
 							LOGGER.info("Channel " + channel + ": Got STOPDIMBRIGHT command.");
 							DBLogger.info("Device is STOPDIMBRIGHT", device.getUuid());
 							SensorData.log(device.getUuid(), "Switch", "STOPDIMBRIGHT");
-							messaging.broadcast("event.devices.noolite.value.changed", new NooliteDeviceLevelStopDimBrightAdvertisement(device.getUuid()));
-							break;
+                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("NooliteDeviceDimBright", device.getUuid()));
+                            break;
 
 						case TEMP_HUMI:
 							BatteryState battery = (BatteryState) notification.getValue("battery");
@@ -154,8 +155,8 @@ public class NooliteRXService
 							updateValue(device, "Battery", battery.name());
 							SensorData.log(device.getUuid(), "Battery", String.valueOf(notification.getValue("battery")));
 							DBLogger.info("Battery is " + battery.name(), device.getUuid());
-							messaging.broadcast("event.devices.noolite.value.changed", new NooliteDeviceTempHumiAdvertisement(device.getUuid()));
-							break;
+                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("NooliteDeviceTempHumi", device.getUuid()));
+                            break;
 
 						default:
 							LOGGER.info("Unknown command: " + notification.getType().name());
@@ -231,26 +232,28 @@ public class NooliteRXService
 
 				jsonMessaging.setNotification(envelope -> {
 
-					if (envelope.getObject() instanceof BindRXChannelAdvertisment) {
-						LOGGER.debug("Get BindRXChannel advertisement");
+                    if (envelope.getObject() instanceof GenericAdvertisement) {
 
-						final BindRXChannelAdvertisment advertisement = envelope.getObject();
-						byte channel = (byte) advertisement.getChannel();
+                        final GenericAdvertisement advertisement = envelope.getObject();
+                        byte channel = (byte) advertisement.getFirstData();
 
-						rx.bindChannel(channel);
+                        switch (advertisement.getLabel()) {
 
-					} else if (envelope.getObject() instanceof UnbindRXChannelAdvertisment) {
-						LOGGER.debug("Get UnbindRXChannel advertisement");
+                            case "BindRXChannel":
+                                LOGGER.debug("Get BindRXChannel advertisement");
+                                rx.bindChannel(channel);
+                                break;
 
-						final UnbindRXChannelAdvertisment advertisement = envelope.getObject();
-						byte channel = (byte) advertisement.getChannel();
+                            case "UnbindRXChannel":
+                                LOGGER.debug("Get UnbindRXChannel advertisement");
+                                rx.unbindChannel(channel);
+                                break;
 
-						rx.unbindChannel(channel);
-
-					} else if (envelope.getObject() instanceof UnbindAllRXChannelAdvertisment) {
-						LOGGER.debug("Get UnbindAllRXChannel advertisement");
-
-						rx.unbindAllChannels();
+                            case "UnbindAllRXChannels":
+                                LOGGER.debug("Get UnbindAllRXChannel advertisement");
+                                rx.unbindAllChannels();
+                                break;
+                        }
 
 					} else if (envelope.getReceiverInstance() == null) {
 						// We received unknown broadcast message. Lets make generic log entry.

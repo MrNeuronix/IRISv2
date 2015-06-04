@@ -25,9 +25,8 @@ import ru.iris.common.helpers.DBLogger;
 import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.JsonNotification;
-import ru.iris.common.messaging.model.devices.noolite.BindTXChannelAdvertisment;
-import ru.iris.common.messaging.model.devices.noolite.NooliteDeviceLevelSetAdvertisement;
-import ru.iris.common.messaging.model.devices.noolite.UnbindTXChannelAdvertisment;
+import ru.iris.common.messaging.model.devices.GenericAdvertisement;
+import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
 import ru.iris.common.modulestatus.Status;
 import ru.iris.noolite4j.sender.PC1132;
 
@@ -67,11 +66,11 @@ public class NooliteTXService
 					// pause for next cmd
 					Thread.sleep(500);
 
-					if (envelope.getObject() instanceof NooliteDeviceLevelSetAdvertisement) {
-						LOGGER.debug("Get SetDeviceLevel advertisement");
+                    if (envelope.getObject() instanceof SetDeviceLevelAdvertisement) {
+                        LOGGER.debug("Get SetDeviceLevel advertisement");
 
 						// We know of service advertisement
-						final NooliteDeviceLevelSetAdvertisement advertisement = envelope.getObject();
+                        final SetDeviceLevelAdvertisement advertisement = envelope.getObject();
 
 						byte level;
 
@@ -126,29 +125,26 @@ public class NooliteTXService
 							}
 						}
 
-					} else if (envelope.getObject() instanceof BindTXChannelAdvertisment) {
+                    } else if (envelope.getObject() instanceof GenericAdvertisement) {
 
-						LOGGER.debug("Get BindTXChannel advertisement");
+                        GenericAdvertisement advertisement = envelope.getObject();
+                        byte channel = (byte) advertisement.getFirstData();
 
-						final BindTXChannelAdvertisment advertisement = envelope.getObject();
-						byte channel = (byte) advertisement.getChannel();
+                        switch (advertisement.getLabel()) {
+                            case "BindTXChannelAdvertisment":
+                                LOGGER.debug("Get BindTXChannel advertisement");
+                                LOGGER.info("Binding device to channel " + channel);
+                                DBLogger.info("Binding device to channel " + channel);
+                                pc.bindChannel(channel);
+                                break;
 
-						LOGGER.info("Binding device to channel " + channel);
-						DBLogger.info("Binding device to channel " + channel);
-
-						pc.bindChannel(channel);
-
-					} else if (envelope.getObject() instanceof UnbindTXChannelAdvertisment) {
-
-						LOGGER.debug("Get UnbindTXChannel advertisement");
-
-						final UnbindTXChannelAdvertisment advertisement = envelope.getObject();
-						byte channel = (byte) advertisement.getChannel();
-
-						LOGGER.info("Unbinding device from channel " + channel);
-						DBLogger.info("Unbinding device from channel " + channel);
-
-						pc.unbindChannel(channel);
+                            case "UnbindTXChannelAdvertisment":
+                                LOGGER.debug("Get UnbindTXChannel advertisement");
+                                LOGGER.info("Unbinding device from channel " + channel);
+                                DBLogger.info("Unbinding device from channel " + channel);
+                                pc.unbindChannel(channel);
+                                break;
+                        }
 
 					} else if (envelope.getReceiverInstance() == null) {
 						// We received unknown broadcast message. Lets make generic log entry.
