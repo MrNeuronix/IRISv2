@@ -67,7 +67,6 @@ public class NooliteTXService {
                     if (envelope.getObject() instanceof GenericAdvertisement) {
 
                         GenericAdvertisement advertisement = envelope.getObject();
-                        byte channel = (byte) advertisement.getFirstData();
                         Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getValue("uuid")).findUnique();
 
                         if (device != null && !device.getSource().equals("noolite")) {
@@ -79,6 +78,8 @@ public class NooliteTXService {
                             LOGGER.info("Cant find device with UUID " + advertisement.getValue("uuid"));
                             return;
                         }
+
+                        byte channel = Byte.valueOf(device.getValue("channel").getValue());
 
                         switch (advertisement.getLabel()) {
 
