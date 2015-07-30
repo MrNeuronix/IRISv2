@@ -32,7 +32,6 @@ import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.devices.GenericAdvertisement;
-import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
 import ru.iris.common.modulestatus.Status;
 
 import java.util.HashMap;
@@ -222,9 +221,9 @@ public class ZWaveService {
                                                     notification.getValueId().getInstance()
                                     );
 
-                                    data.put("device", device);
+                                    data.put("uuid", device.getUuid());
                                     data.put("label", Manager.get().getValueLabel(notification.getValueId()));
-                                    data.put("value", String.valueOf(Utils.getValue(notification.getValueId())));
+                                    data.put("data", String.valueOf(Utils.getValue(notification.getValueId())));
 
                                     messaging.broadcast("event.devices.zwave.value.added", new GenericAdvertisement("ZWaveValueAdded", data));
                             }
@@ -244,9 +243,9 @@ public class ZWaveService {
 
                             device.removeValue(manager.getValueLabel(notification.getValueId()));
 
-                            data.put("device", device);
+                            data.put("uuid", device.getUuid());
                             data.put("label", Manager.get().getValueLabel(notification.getValueId()));
-                            data.put("value", String.valueOf(Utils.getValue(notification.getValueId())));
+                            data.put("data", String.valueOf(Utils.getValue(notification.getValueId())));
 
                             messaging.broadcast("event.devices.zwave.value.removed", new GenericAdvertisement("ZWaveValueRemoved", data));
 
@@ -289,9 +288,9 @@ public class ZWaveService {
                             DBLogger.info("Value " + manager.getValueLabel(notification.getValueId()) + " changed: " + Utils.getValue(notification.getValueId()), device.getUuid());
                             SensorData.log(udvChg.getUuid(), Manager.get().getValueLabel(notification.getValueId()), String.valueOf(Utils.getValue(notification.getValueId())));
 
-                            data.put("device", device);
+                            data.put("uuid", device.getUuid());
                             data.put("label", Manager.get().getValueLabel(notification.getValueId()));
-                            data.put("value", String.valueOf(Utils.getValue(notification.getValueId())));
+                            data.put("data", String.valueOf(Utils.getValue(notification.getValueId())));
 
                             messaging.broadcast("event.devices.zwave.value.changed", new GenericAdvertisement("ZWaveValueChanged", data));
 
@@ -358,6 +357,7 @@ public class ZWaveService {
 
             LOGGER.info("Initialization complete.");
 
+            messaging.subscribe("event.devices.setvalue");
             messaging.subscribe("event.devices.zwave.value.set");
             messaging.subscribe("event.devices.zwave.node.add");
             messaging.subscribe("event.devices.zwave.node.remove");
@@ -369,35 +369,24 @@ public class ZWaveService {
                 @Override
                 public void onNotification(JsonEnvelope envelope) {
 
-                    if (envelope.getObject() instanceof SetDeviceLevelAdvertisement) {
-                        // We know of service advertisement
-                        final SetDeviceLevelAdvertisement advertisement = envelope.getObject();
-
-                        String uuid = advertisement.getDeviceUUID();
-                        String label = advertisement.getLabel();
-                        String level = advertisement.getValue();
-
-                        Device ZWaveDevice = Device.getDeviceByUUID(uuid);
-
-                        if (ZWaveDevice == null) {
-                            LOGGER.info("Cant find device with UUID " + uuid);
-                            return;
-                        }
-
-                        int node = ZWaveDevice.getNode();
-
-                        if (!label.isEmpty() && !level.isEmpty() && !ZWaveDevice.getStatus().equals("Dead")) {
-                            LOGGER.info("Setting value: " + level + " to label \"" + label + "\" on node " + node + " (UUID: " + uuid + ")");
-                            setValue(uuid, label, level);
-                        } else {
-                            LOGGER.info("Node: " + node + " Cant set empty value or node dead");
-                        }
-
-                    } else if (envelope.getObject() instanceof GenericAdvertisement) {
+                    if (envelope.getObject() instanceof GenericAdvertisement) {
 
                         GenericAdvertisement advertisement = envelope.getObject();
 
                         switch (advertisement.getLabel()) {
+
+                            case "DeviceOn":
+                                deviceSetLevel(advertisement);
+                                break;
+
+                            case "DeviceOff":
+                                deviceSetLevel(advertisement);
+                                break;
+
+                            case "DeviceSetLevel":
+                                deviceSetLevel(advertisement);
+                                break;
+
                             case "ZWaveAddNode":
                                 LOGGER.info("Set controller into AddDevice mode");
                                 Manager.get().beginControllerCommand(homeId, ControllerCommand.ADD_DEVICE, new CallbackListener(ControllerCommand.ADD_DEVICE), null, true);
@@ -575,6 +564,33 @@ public class ZWaveService {
         }
 
         return ZWaveDevice;
+    }
+
+    private void deviceSetLevel(GenericAdvertisement advertisement) {
+        String level = (String) advertisement.getValue("data");
+        String label = (String) advertisement.getValue("label");
+        String uuid = (String) advertisement.getValue("uuid");
+
+        Device ZWaveDevice = Device.getDeviceByUUID(uuid);
+
+        if (ZWaveDevice != null && !ZWaveDevice.getSource().equals("zwave")) {
+            // not zwave
+            return;
+        }
+
+        if (ZWaveDevice == null) {
+            LOGGER.info("Cant find device with UUID " + uuid);
+            return;
+        }
+
+        int node = ZWaveDevice.getNode();
+
+        if (!label.isEmpty() && !level.isEmpty() && !ZWaveDevice.getStatus().equals("Dead")) {
+            LOGGER.info("Setting value: " + level + " to label \"" + label + "\" on node " + node + " (UUID: " + uuid + ")");
+            setValue(uuid, label, level);
+        } else {
+            LOGGER.info("Node: " + node + " Cant set empty value or node dead");
+        }
     }
 
     private class CallbackListener implements ControllerCallback {

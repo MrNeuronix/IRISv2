@@ -25,7 +25,6 @@ import ru.iris.common.database.model.devices.DeviceValue;
 import ru.iris.common.helpers.DBLogger;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.devices.GenericAdvertisement;
-import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
 import ru.iris.common.modulestatus.Status;
 import ru.iris.noolite4j.receiver.RX2164;
 import ru.iris.noolite4j.watchers.BatteryState;
@@ -33,6 +32,8 @@ import ru.iris.noolite4j.watchers.Notification;
 import ru.iris.noolite4j.watchers.SensorType;
 import ru.iris.noolite4j.watchers.Watcher;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class NooliteRXService {
@@ -74,8 +75,6 @@ public class NooliteRXService {
                         device.setNode((short) (1000 + channel));
                         device.setUuid(UUID.randomUUID().toString());
 
-                        device.save();
-
                         // device is not sensor
                         if (sensor == null) {
                             device.setInternalType("switch");
@@ -87,7 +86,11 @@ public class NooliteRXService {
                             new DeviceValue("type", "sensor", "", "", device.getUuid(), false).save();
                             new DeviceValue("sensorname", sensor.name(), "", "", device.getUuid(), false).save();
                         }
+
+                        device.save();
                     }
+
+                    Map<String, Object> params = new HashMap<>();
 
                     // turn off
                     switch (notification.getType()) {
@@ -96,7 +99,12 @@ public class NooliteRXService {
                             updateValue(device, "Level", "0");
                             DBLogger.info("Device is OFF", device.getUuid());
                             SensorData.log(device.getUuid(), "Switch", "OFF");
-                            messaging.broadcast("event.devices.noolite.value.changed", new SetDeviceLevelAdvertisement(device.getUuid(), "Level", "0"));
+
+                            params.put("uuid", device.getUuid());
+                            params.put("label", "Level");
+                            params.put("data", 0);
+
+                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("NooliteDeviceOff", params));
                             break;
 
                         case SLOW_TURN_OFF:
@@ -113,7 +121,12 @@ public class NooliteRXService {
                             updateValue(device, "Level", "255");
                             DBLogger.info("Device is ON", device.getUuid());
                             SensorData.log(device.getUuid(), "Switch", "ON");
-                            messaging.broadcast("event.devices.noolite.value.changed", new SetDeviceLevelAdvertisement(device.getUuid(), "Level", "255"));
+
+                            params.put("uuid", device.getUuid());
+                            params.put("label", "Level");
+                            params.put("data", 255);
+
+                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceOn", params));
                             break;
 
                         case SLOW_TURN_ON:
@@ -122,7 +135,7 @@ public class NooliteRXService {
                             updateValue(device, "Level", "255");
                             DBLogger.info("Device is BRIGHT", device.getUuid());
                             SensorData.log(device.getUuid(), "Switch", "BRIGHT");
-                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("NooliteDeviceBright", device.getUuid()));
+                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceBright", device.getUuid()));
                             break;
 
                         case SET_LEVEL:
@@ -130,14 +143,19 @@ public class NooliteRXService {
                             updateValue(device, "Level", (String) notification.getValue("level"));
                             DBLogger.info("Device get SETLEVEL: " + notification.getValue("level"), device.getUuid());
                             SensorData.log(device.getUuid(), "SetLevel", String.valueOf(notification.getValue("level")));
-                            messaging.broadcast("event.devices.noolite.value.changed", new SetDeviceLevelAdvertisement(device.getUuid(), "Level", (String) notification.getValue("level")));
+
+                            params.put("uuid", device.getUuid());
+                            params.put("label", "Level");
+                            params.put("data", notification.getValue("level"));
+
+                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceSetLevel", params));
                             break;
 
                         case STOP_DIM_BRIGHT:
                             LOGGER.info("Channel " + channel + ": Got STOPDIMBRIGHT command.");
                             DBLogger.info("Device is STOPDIMBRIGHT", device.getUuid());
                             SensorData.log(device.getUuid(), "Switch", "STOPDIMBRIGHT");
-                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("NooliteDeviceDimBright", device.getUuid()));
+                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceStopDimBright", device.getUuid()));
                             break;
 
                         case TEMP_HUMI:
@@ -153,7 +171,20 @@ public class NooliteRXService {
                             updateValue(device, "Battery", battery.name());
                             SensorData.log(device.getUuid(), "Battery", String.valueOf(notification.getValue("battery")));
                             DBLogger.info("Battery is " + battery.name(), device.getUuid());
-                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("NooliteDeviceTempHumi", device.getUuid()));
+
+                            params.put("uuid", device.getUuid());
+                            params.put("temp", notification.getValue("temp"));
+                            params.put("humi", notification.getValue("humi"));
+                            params.put("battery", battery.name());
+
+                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceTempHumi", params));
+                            break;
+
+                        case BATTERY_LOW:
+                            LOGGER.info("Channel " + channel + ": Got BATTERYLOW command.");
+                            DBLogger.info("Device battery low!", device.getUuid());
+                            SensorData.log(device.getUuid(), "Battery", "BATTERYLOW");
+                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceBatteryLow", device.getUuid()));
                             break;
 
                         default:

@@ -26,7 +26,6 @@ import ru.iris.common.messaging.JsonEnvelope;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.devices.GenericAdvertisement;
-import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
 import ru.iris.common.modulestatus.Status;
 import ru.iris.noolite4j.sender.PC1132;
 
@@ -52,6 +51,7 @@ public class NooliteTXService {
 
             final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-tx");
 
+            jsonMessaging.subscribe("event.devices.setvalue");
             jsonMessaging.subscribe("event.devices.noolite.value.set");
             jsonMessaging.subscribe("event.devices.noolite.tx.bindchannel");
             jsonMessaging.subscribe("event.devices.noolite.tx.unbindchannel");
@@ -64,71 +64,103 @@ public class NooliteTXService {
                     // pause for next cmd
                     Thread.sleep(500);
 
-                    if (envelope.getObject() instanceof SetDeviceLevelAdvertisement) {
-                        LOGGER.debug("Get SetDeviceLevel advertisement");
-
-                        // We know of service advertisement
-                        final SetDeviceLevelAdvertisement advertisement = envelope.getObject();
-
-                        byte level;
-
-                        if (Integer.parseInt(advertisement.getValue()) == 255)
-                            level = 100;
-                        else
-                            level = Byte.valueOf(advertisement.getValue());
-
-                        Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getDeviceUUID()).findUnique();
-
-                        byte channel = Byte.valueOf(device.getValue("channel").getValue());
-
-                        //if noolite device dimmer (user set)
-                        if (device.getValue("type") != null && device.getValue("type").getValue().contains("dimmer")) {
-                            if (level > 99 || level == 99) {
-
-                                LOGGER.info("Turn on device on channel " + channel);
-                                updateValue(device, "Level", "255");
-                                DBLogger.info("Device is ON", device.getUuid());
-
-                                pc.turnOn(channel);
-
-                            } else if (level < 0) {
-
-                                LOGGER.info("Turn off device on channel " + channel);
-                                updateValue(device, "Level", "0");
-                                DBLogger.info("Device is OFF", device.getUuid());
-
-                                pc.turnOff(channel);
-                            } else {
-                                updateValue(device, "Level", String.valueOf(level));
-                                DBLogger.info("Device level set: " + level, device.getUuid());
-
-                                LOGGER.info("Setting device on channel " + channel + " to level " + level);
-
-                                pc.setLevel(channel, level);
-                            }
-                        } else {
-                            if (level < 0 || level == 0) {
-                                LOGGER.info("Turn off device on channel " + channel);
-                                updateValue(device, "Level", "0");
-                                DBLogger.info("Device is OFF", device.getUuid());
-
-                                pc.turnOff(channel);
-                            } else {
-                                // turn on
-                                LOGGER.info("Turn on device on channel " + channel);
-                                updateValue(device, "Level", "255");
-                                DBLogger.info("Device is ON", device.getUuid());
-
-                                pc.turnOn(channel);
-                            }
-                        }
-
-                    } else if (envelope.getObject() instanceof GenericAdvertisement) {
+                    if (envelope.getObject() instanceof GenericAdvertisement) {
 
                         GenericAdvertisement advertisement = envelope.getObject();
                         byte channel = (byte) advertisement.getFirstData();
+                        Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getValue("uuid")).findUnique();
+
+                        if (device != null && !device.getSource().equals("noolite")) {
+                            // not noolite
+                            return;
+                        }
+
+                        if (device == null) {
+                            LOGGER.info("Cant find device with UUID " + advertisement.getValue("uuid"));
+                            return;
+                        }
 
                         switch (advertisement.getLabel()) {
+
+                            case "DeviceOn":
+                                LOGGER.info("Turn on device on channel " + channel);
+                                updateValue(device, "Level", "255");
+                                DBLogger.info("Device is ON", device.getUuid());
+                                pc.turnOn(channel);
+                                break;
+
+                            case "DeviceOff":
+                                ;
+                                LOGGER.info("Turn off device on channel " + channel);
+                                updateValue(device, "Level", "0");
+                                DBLogger.info("Device is OFF", device.getUuid());
+                                pc.turnOn(channel);
+                                break;
+
+                            case "DeviceSetLevel":
+
+                                byte level;
+
+                                if ((Byte) advertisement.getValue("Level") == 255)
+                                    level = 100;
+                                else
+                                    level = (Byte) advertisement.getValue("Level");
+
+                                //if noolite device dimmer (user set)
+                                if (device.getValue("type") != null && device.getValue("type").getValue().contains("dimmer")) {
+                                    if (level > 99 || level == 99) {
+
+                                        LOGGER.info("Turn on device on channel " + channel);
+                                        updateValue(device, "Level", "255");
+                                        DBLogger.info("Device is ON", device.getUuid());
+
+                                        pc.turnOn(channel);
+
+                                    } else if (level < 0) {
+
+                                        LOGGER.info("Turn off device on channel " + channel);
+                                        updateValue(device, "Level", "0");
+                                        DBLogger.info("Device is OFF", device.getUuid());
+
+                                        pc.turnOff(channel);
+                                    } else {
+                                        updateValue(device, "Level", String.valueOf(level));
+                                        DBLogger.info("Device level set: " + level, device.getUuid());
+
+                                        LOGGER.info("Setting device on channel " + channel + " to level " + level);
+
+                                        pc.setLevel(channel, level);
+                                    }
+                                } else {
+                                    if (level < 0 || level == 0) {
+                                        LOGGER.info("Turn off device on channel " + channel);
+                                        updateValue(device, "Level", "0");
+                                        DBLogger.info("Device is OFF", device.getUuid());
+
+                                        pc.turnOff(channel);
+                                    } else {
+                                        // turn on
+                                        LOGGER.info("Turn on device on channel " + channel);
+                                        updateValue(device, "Level", "255");
+                                        DBLogger.info("Device is ON", device.getUuid());
+
+                                        pc.turnOn(channel);
+                                    }
+                                }
+                                break;
+
+                            case "DeviceDim":
+                                //TODO
+                                break;
+
+                            case "DeviceBright":
+                                //TODO
+                                break;
+
+                            case "DeviceStopDimBright":
+                                //TODO
+                                break;
+
                             case "BindTXChannelAdvertisment":
                                 LOGGER.debug("Get BindTXChannel advertisement");
                                 LOGGER.info("Binding device to channel " + channel);

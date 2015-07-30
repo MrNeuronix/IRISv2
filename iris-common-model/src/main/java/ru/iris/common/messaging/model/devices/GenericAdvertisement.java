@@ -48,6 +48,14 @@ public class GenericAdvertisement extends Advertisement {
         this.data = temp;
     }
 
+    public GenericAdvertisement(String label, String key, String value) {
+        Map<String, Object> temp = new HashMap<>();
+        temp.put(key, value);
+
+        this.label = label;
+        this.data = temp;
+    }
+
     public GenericAdvertisement(String label) {
         this.label = label;
     }
@@ -64,8 +72,16 @@ public class GenericAdvertisement extends Advertisement {
         return data;
     }
 
+    public Object getValue() {
+        return data.get("data");
+    }
+
     public Object getFirstData() {
         return data.get("data");
+    }
+
+    public Object getValue(String key) {
+        return data.get(key);
     }
 
     public void setData(Map<String, Object> data) {

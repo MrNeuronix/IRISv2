@@ -31,14 +31,13 @@ var Timer = Java.type("java.util.Timer");
 //////////////////////////////////////////////////////
 
     // advertisement
-    var label = advertisement.getLabel();
-    var value = advertisement.getValue();
-    var uuid = advertisement.getDeviceUUID();
+var value = advertisement.getValue("data");
+var uuid = advertisement.getValue("uuid");
 
     var device = Device.getDeviceByUUID(uuid);
 
     // if device state = ON and device have internalname = noolite/channel/4
-    if (label == "Level" && value == "255" && device.getInternalName() == "noolite/channel/4") {
+if (value == "255" && device.getInternalName() == "noolite/channel/4") {
         LOGGER.info("[turnOffLater] Device ON!");
 
         // lock not set
@@ -73,7 +72,7 @@ var Timer = Java.type("java.util.Timer");
         }
     }
 
-    if (label == "Level" && value == "0" && device.getInternalName() == "noolite/channel/4" && Lock.isLocked("toilet-light-on")) {
+if (value == "0" && device.getInternalName() == "noolite/channel/4" && Lock.isLocked("toilet-light-on")) {
         // release lock
         Lock.release("toilet-light-on");
         LOGGER.info("[turnOffLater] Release lock!");

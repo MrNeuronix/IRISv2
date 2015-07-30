@@ -17,8 +17,10 @@
 package ru.iris.common.helpers;
 
 import ru.iris.common.messaging.JsonMessaging;
-import ru.iris.common.messaging.model.devices.SetDeviceLevelAdvertisement;
+import ru.iris.common.messaging.model.devices.GenericAdvertisement;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -30,13 +32,20 @@ public class DeviceCtl
 {
 	private static final JsonMessaging messaging = new JsonMessaging(UUID.randomUUID());
 
-	public static void on(String uuid)
-	{
-		messaging.broadcast("event.devices.setvalue", new SetDeviceLevelAdvertisement(uuid, "Level", "255"));
-	}
+	public static void on(String uuid) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("uuid", uuid);
+        params.put("label", "Level");
+        params.put("data", 255);
+        messaging.broadcast("event.devices.setvalue", new GenericAdvertisement("event.devices.setvalue", params));
+    }
 
 	public static void off(String uuid)
 	{
-		messaging.broadcast("event.devices.setvalue", new SetDeviceLevelAdvertisement(uuid, "Level", "0"));
-	}
+        Map<String, Object> params = new HashMap<>();
+        params.put("uuid", uuid);
+        params.put("label", "Level");
+        params.put("data", 0);
+        messaging.broadcast("event.devices.setvalue", new GenericAdvertisement("event.devices.setvalue", params));
+    }
 }

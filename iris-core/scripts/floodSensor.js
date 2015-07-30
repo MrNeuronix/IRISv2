@@ -25,9 +25,9 @@
 var Device = Java.type("ru.iris.common.database.model.devices.Device");
 var Speak = Java.type("ru.iris.common.helpers.Speak");
 
-    var label = advertisement.getLabel();
-    var value = advertisement.getValue();
-    var uuid = advertisement.getDeviceUUID();
+var label = advertisement.getValue("label");
+var value = advertisement.getValue("data");
+var uuid = advertisement.getValue("uuid");
 
     var device = Device.getDeviceByUUID(uuid);
 
