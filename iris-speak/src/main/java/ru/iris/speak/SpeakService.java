@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package ru.iris.speak.google;
+package ru.iris.speak;
 
 import com.avaje.ebean.Ebean;
 import com.avaje.ebean.Expr;
-import com.darkprograms.speech.synthesiser.Synthesiser;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 import org.apache.commons.io.IOUtils;
@@ -32,6 +31,9 @@ import ru.iris.common.messaging.JsonNotification;
 import ru.iris.common.messaging.model.speak.ChangeVolumeAdvertisement;
 import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
 import ru.iris.common.modulestatus.Status;
+import ru.iris.common.voice.GoogleSynthesiser;
+import ru.iris.common.voice.Synthesiser;
+import ru.iris.common.voice.YandexSynthesiser;
 
 import java.io.*;
 import java.util.Date;
@@ -40,13 +42,12 @@ import java.util.UUID;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-public class GoogleSpeakService
+public class SpeakService
 {
-	private final Logger LOGGER = LogManager.getLogger(GoogleSpeakService.class.getName());
-	private final ArrayBlockingQueue<Speaks> speakqueue = new ArrayBlockingQueue<>(50);
+    private final Logger LOGGER = LogManager.getLogger(SpeakService.class.getName());
+    private final ArrayBlockingQueue<Speaks> speakqueue = new ArrayBlockingQueue<>(50);
 
-	public GoogleSpeakService()
-	{
+    public SpeakService() {
 		Status status = new Status("Speak");
 
 		if (status.checkExist()) {
@@ -57,10 +58,25 @@ public class GoogleSpeakService
 
 		try {
 
-			LOGGER.info("Speak service started (TTS: Google)");
+            final Config conf = Config.getInstance();
 
-			final Config conf = Config.getInstance();
-			final Synthesiser synthesiser = new Synthesiser(conf.get("language"));
+            String tts = conf.get("ttsEngine");
+
+            LOGGER.info("Speak service started (TTS: " + tts + ")");
+
+            Synthesiser synthesiser = null;
+
+            if (tts.equals("google")) {
+                synthesiser = new GoogleSynthesiser(conf.get("googleKey"));
+            } else if (tts.equals("yandex")) {
+                synthesiser = new YandexSynthesiser(conf.get("yandexKey"));
+            } else {
+                LOGGER.error("Unknown sythesiser: " + tts);
+                return;
+            }
+
+            synthesiser.setLanguage(conf.get("language"));
+            final Synthesiser synth = synthesiser;
 
 			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "speak");
 			jsonMessaging.subscribe("event.speak");
@@ -81,6 +97,9 @@ public class GoogleSpeakService
 				public void onNotification(JsonEnvelope envelope) throws IOException, JavaLayerException {
 
 					if (envelope.getObject() instanceof SpeakAdvertisement) {
+
+                        LOGGER.debug("New speak request arrived");
+
 						SpeakAdvertisement advertisement = envelope.getObject();
 
 						Speaks speak = new Speaks();
@@ -134,6 +153,8 @@ public class GoogleSpeakService
 							if (speak == null)
 								continue;
 
+                            LOGGER.debug("Something coming into the pool!");
+
 							if (conf.get("silence").equals("0")) {
 								// Here we speak only if destination - all
 								if (speak.getDevice().equals("all") || speak.getDevice().equals("server")) {
@@ -153,10 +174,16 @@ public class GoogleSpeakService
 
 									// Cache result
 									if (cacheId == 0) {
+
+                                        LOGGER.debug("Not cached - write!");
+
 										long cacheIdent = new Date().getTime();
 
 										OutputStream outputStream = new FileOutputStream(new File("data/cache-" + cacheIdent + ".mp3"));
-										result = synthesiser.getMP3Data(speak.getText());
+
+                                        LOGGER.debug("Trying to get MP3 data");
+
+                                        result = synth.getMP3Data(speak.getText());
 
 										byte[] byteArray = IOUtils.toByteArray(result);
 										InputStream resultForPlay = new ByteArrayInputStream(byteArray);

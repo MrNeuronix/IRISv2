@@ -69,13 +69,6 @@
             <directory>target</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/extensions/iris-devices/classes</outputDirectory>
-            <includes>
-                <include>**/*</include>
-            </includes>
-            <directory>../iris-devices/target/plugin-classes</directory>
-        </fileSet>
-        <fileSet>
             <outputDirectory>/extensions/iris-devices-noolite/classes</outputDirectory>
             <includes>
                 <include>**/*</include>
@@ -134,7 +127,6 @@
             <useProjectAttachments>false</useProjectAttachments>
             <scope>runtime</scope>
             <excludes>
-                <exclude>ru.iris:iris-devices</exclude>
                 <exclude>ru.iris:iris-devices-noolite</exclude>
                 <exclude>ru.iris:iris-devices-zwave</exclude>
                 <exclude>ru.iris:iris-events</exclude>

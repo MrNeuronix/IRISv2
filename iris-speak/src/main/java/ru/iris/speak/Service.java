@@ -20,9 +20,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import ro.fortsoft.pf4j.Plugin;
 import ro.fortsoft.pf4j.PluginWrapper;
-import ru.iris.common.Config;
 import ru.iris.common.helpers.Speak;
-import ru.iris.speak.google.GoogleSpeakService;
 
 public class Service extends Plugin
 {
@@ -39,18 +37,17 @@ public class Service extends Plugin
 	{
 		LOGGER.info("[Plugin] iris-speak plugin started!");
 
-		Config cfg = Config.getInstance();
+        new SpeakService();
 
-		if (cfg.get("ttsEngine").equals("google"))
-		{
-			new GoogleSpeakService();
-			Speak.say("Модуль синтеза речи Гугл запущен!");
-		}
-		else
-		{
-			LOGGER.info("No TTS feed specified in config file");
-		}
-	}
+        // sleep a little
+        try {
+            Thread.sleep(3000L);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        Speak.say("Модуль синтеза речи запущен!");
+    }
 
 	@Override
 	public void stop()

@@ -27,8 +27,14 @@ ddlRun=true
 # Silence mode
 silence=0
 
-# Voice engine (google)
+# Voice engine (google, yandex)
 ttsEngine=google
+
+# API key for Google Speak API V2
+googleKey=empty
+
+# API key for Yandex SpeechKit Cloud
+yandexKey=empty
 
 #################################
 # Zwave section
