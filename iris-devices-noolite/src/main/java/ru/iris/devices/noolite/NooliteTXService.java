@@ -91,7 +91,6 @@ public class NooliteTXService {
                                 break;
 
                             case "DeviceOff":
-                                ;
                                 LOGGER.info("Turn off device on channel " + channel);
                                 updateValue(device, "Level", "0");
                                 DBLogger.info("Device is OFF", device.getUuid());
