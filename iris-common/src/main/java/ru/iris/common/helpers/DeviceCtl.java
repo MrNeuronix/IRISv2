@@ -37,7 +37,7 @@ public class DeviceCtl
         params.put("uuid", uuid);
         params.put("label", "Level");
         params.put("data", 255);
-        messaging.broadcast("event.devices.setvalue", new GenericAdvertisement("event.devices.setvalue", params));
+        messaging.broadcast("event.devices.setvalue", new GenericAdvertisement("DeviceOn", params));
     }
 
 	public static void off(String uuid)
@@ -46,6 +46,6 @@ public class DeviceCtl
         params.put("uuid", uuid);
         params.put("label", "Level");
         params.put("data", 0);
-        messaging.broadcast("event.devices.setvalue", new GenericAdvertisement("event.devices.setvalue", params));
+        messaging.broadcast("event.devices.setvalue", new GenericAdvertisement("DeviceOff", params));
     }
 }
