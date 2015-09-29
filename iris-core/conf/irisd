@@ -1,45 +1,42 @@
 #!/bin/bash
-#
-# Run-level Startup script for the IRISv2 Instance
-#
-# chkconfig: 345
-# description: Startup/Shutdown IRISv2 instance
 
-IRIS_HOME="/iris"
-IRIS_OWNR="root"
+### BEGIN INIT INFO
+# Provides:          irisv2
+# Required-Start:    $local_fs $remote_fs $network $syslog
+# Required-Stop:     $local_fs $remote_fs $network $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     true
+# Short-Description: Start/stop IRISv2 server
+### END INIT INFO
 
-# if the executables do not exist -- display error
+IRIS_HOME=/opt/server
 
-if [ ! -f $IRIS_HOME/iris-core.jar -o ! -d $IRIS_HOME ]
-then
-        echo "IRISv2 startup: cannot start"
-        exit 1
-fi
-
-# depending on parameter -- startup, shutdown, restart
-# of the instance or usage display
-
-case "$1" in
+case $1 in
     start)
-        # IRISv2 instance startup
-        echo -n "Starting IRISv2: "
-        su - $IRIS_OWNR -c "cd $IRIS_HOME; nohup java -jar $IRIS_HOME/iris-core.jar &"
-        touch /var/lock/iris
-        echo "OK"
-        ;;
+        echo $"Starting IRISv2 server ..."
+        if [ ! -f /var/run/iris ]; then
+            cd $IRIS_HOME
+            nohup java -jar iris-core.jar 2>> /dev/null >> /dev/null &
+            echo $! > /var/run/iris
+            echo $"IRISv2 started ..."
+        else
+            echo $"IRISv2 is already running ..."
+        fi
+    ;;
     stop)
-        # IRISv2 instance shutdown
-        echo -n "Shutdown IRISv2: "
-        su - $IRIS_OWNR -c "pkill java"
-        rm -f /var/lock/iris
-        echo "OK"
-        ;;
-    reload|restart)
-        $0 stop
-        $0 start
-        ;;
-    *)
-        echo "Usage: $0 start|stop|restart|reload"
-        exit 1
+        if [ -f /var/run/iris ]; then
+            PID=$(cat /var/run/iris);
+            echo "Stopping IRISv2 server ..."
+            kill $PID;
+            echo "IRISv2 stopped ..."
+            rm /var/run/iris
+        else
+            echo "IRISv2 is not running ..."
+        fi
+    ;;
+    restart)
+        stop
+        start
+    ;;
 esac
-exit 0
