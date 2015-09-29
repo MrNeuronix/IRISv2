@@ -46,6 +46,7 @@ public class SpeakService
 {
     private final Logger LOGGER = LogManager.getLogger(SpeakService.class.getName());
     private final ArrayBlockingQueue<Speaks> speakqueue = new ArrayBlockingQueue<>(50);
+    private Synthesiser synthesiser = null;
 
     public SpeakService() {
 		Status status = new Status("Speak");
@@ -64,8 +65,6 @@ public class SpeakService
 
             LOGGER.info("Speak service started (TTS: " + tts + ")");
 
-            Synthesiser synthesiser = null;
-
             if (tts.equals("google")) {
                 synthesiser = new GoogleSynthesiser(conf.get("googleKey"));
             } else if (tts.equals("yandex")) {
@@ -76,7 +75,6 @@ public class SpeakService
             }
 
             synthesiser.setLanguage(conf.get("language"));
-            final Synthesiser synth = synthesiser;
 
 			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "speak");
 			jsonMessaging.subscribe("event.speak");
@@ -172,45 +170,42 @@ public class SpeakService
 											cacheId = speaks.getCache();
 									}
 
-									// Cache result
-									if (cacheId == 0) {
 
+                                    File f = new File("data/cache-" + cacheId + ".mp3");
+
+                                    // check cached and exist file
+                                    if (cacheId == 0 || (!f.exists() || f.isDirectory())) {
                                         LOGGER.debug("Not cached - write!");
 
-										long cacheIdent = new Date().getTime();
+                                        long cacheIdent = new Date().getTime();
 
-										OutputStream outputStream = new FileOutputStream(new File("data/cache-" + cacheIdent + ".mp3"));
+                                        OutputStream outputStream = new FileOutputStream(new File("data/cache-" + cacheIdent + ".mp3"));
 
                                         LOGGER.debug("Trying to get MP3 data");
 
-                                        result = synth.getMP3Data(speak.getText());
+                                        result = synthesiser.getMP3Data(speak.getText());
 
-										byte[] byteArray = IOUtils.toByteArray(result);
-										InputStream resultForPlay = new ByteArrayInputStream(byteArray);
-										InputStream resultForWrite = new ByteArrayInputStream(byteArray);
+                                        byte[] byteArray = IOUtils.toByteArray(result);
+                                        InputStream resultForWrite = new ByteArrayInputStream(byteArray);
 
-										player = new Player(resultForPlay);
-										player.play();
-										player.close();
+                                        int read;
+                                        byte[] bytes = new byte[1024];
 
-										int read;
-										byte[] bytes = new byte[1024];
+                                        while ((read = resultForWrite.read(bytes)) != -1) {
+                                            outputStream.write(bytes, 0, read);
+                                        }
 
-										while ((read = resultForWrite.read(bytes)) != -1) {
-											outputStream.write(bytes, 0, read);
-										}
+                                        speak.setCache(cacheIdent);
+                                        speak.save();
 
-										speak.setCache(cacheIdent);
-										speak.save();
+                                        resultForWrite.close();
+                                        result.close();
 
-										resultForPlay.close();
-										resultForWrite.close();
-										result.close();
+                                        cacheId = cacheIdent;
 
-										speaksList.add(speak);
-									}
-									// cache found - play local file
-									else {
+                                        speaksList.add(speak);
+                                    }
+
 										LOGGER.info("Playing local file: " + "data/cache-" + cacheId + ".mp3");
 
 										result = new FileInputStream("data/cache-" + cacheId + ".mp3");
@@ -218,7 +213,6 @@ public class SpeakService
 										player.play();
 										player.close();
 										speak.save();
-									}
 
 									// sleep a little
 									Thread.sleep(1000);
