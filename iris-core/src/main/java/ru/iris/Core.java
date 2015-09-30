@@ -16,23 +16,29 @@
 
 package ru.iris;
 
+import com.avaje.ebean.EbeanServerFactory;
+import com.avaje.ebean.config.DataSourceConfig;
+import com.avaje.ebean.config.ServerConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.config.ConfigurationFactory;
 import org.avaje.agentloader.AgentLoader;
 import ro.fortsoft.pf4j.DefaultPluginManager;
 import ro.fortsoft.pf4j.PluginManager;
-import ru.iris.common.database.DatabaseConnection;
+import ru.iris.common.database.model.*;
+import ru.iris.common.database.model.devices.Device;
+import ru.iris.common.database.model.devices.DeviceValue;
 
 import java.io.File;
 
 class Core
 {
-	// Specify log4j2 configuration file
-	static
+    // Specify log4j2 and ebean configuration files
+    static
 	{
-		System.setProperty(ConfigurationFactory.CONFIGURATION_FILE_PROPERTY, "./conf/log4j2.xml");
-	}
+        System.setProperty(ConfigurationFactory.CONFIGURATION_FILE_PROPERTY, "conf/log4j2.xml");
+        System.setProperty("ebean.props.file", "conf/database.properties");
+    }
 
 	private static final Logger LOGGER = LogManager.getLogger(Core.class.getName());
 
@@ -45,7 +51,31 @@ class Core
 
 		// ORM
         AgentLoader.loadAgent("lib/avaje-ebeanorm-agent-4.7.1.jar");
-        new DatabaseConnection();
+
+        ServerConfig config = new ServerConfig();
+        config.setName("iris");
+
+        DataSourceConfig ds = new DataSourceConfig();
+        ds.loadSettings("iris");
+
+        config.loadFromProperties();
+        config.setDataSourceConfig(ds);
+
+        config.addClass(Log.class);
+        config.addClass(Event.class);
+        config.addClass(Speaks.class);
+        config.addClass(Task.class);
+        config.addClass(Device.class);
+        config.addClass(DeviceValue.class);
+        config.addClass(DataSource.class);
+        config.addClass(ScriptLock.class);
+        config.addClass(SensorData.class);
+        config.addClass(ModuleStatus.class);
+
+        config.setDefaultServer(true);
+        config.setRegister(true);
+
+        EbeanServerFactory.create(config);
 
 		// Load plugins
 		PluginManager pluginManager = new DefaultPluginManager(new File("extensions"));

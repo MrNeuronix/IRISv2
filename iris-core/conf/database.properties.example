@@ -1,0 +1,18 @@
+# generate DDL files
+ebean.ddl.generate=true
+
+# run ddl drops and recreates tables
+ebean.ddl.run=true
+
+ebean.uuidStoreAsBinary=true
+ebean.databaseSequenceBatchSize=1
+
+ebean.debug.sql=false
+ebean.debug.lazyload=false
+
+datasource.default=iris
+
+datasource.iris.username=iris
+datasource.iris.password=iris
+datasource.iris.databaseUrl=jdbc:mysql://localhost/iris?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=UTF-8
+datasource.iris.databaseDriver=com.mysql.jdbc.Driver

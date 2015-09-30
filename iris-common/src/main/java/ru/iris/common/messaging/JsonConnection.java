@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import ru.iris.common.Config;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Prototype for JSON message broadcasting.
@@ -75,13 +76,11 @@ public class JsonConnection
 
 			// Create exchange
 			channel.exchangeDeclare("iris", "topic", true);
-		}
-		catch (IOException e)
-		{
+		} catch (IOException | TimeoutException e) {
 			LOGGER.error("Error while connection to AMQP broker: " + e.getMessage());
 			System.exit(1);
 		}
-	}
+    }
 
 	public Channel getChannel()
 	{

@@ -11,15 +11,6 @@ language=ru
 locale=ru-RU
 systemName=cистема
 
-dbHost=localhost
-dbName=iris
-dbUsername=root
-dbPassword=root
-
-# This generate and recreate SQL tables (with DROP!)
-ddlGenerate=true
-ddlRun=true
-
 #################################
 # Voice synth section
 #################################
