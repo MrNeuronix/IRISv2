@@ -61,6 +61,7 @@ class Core
         config.loadFromProperties();
         config.setDataSourceConfig(ds);
 
+        config.addClass(Config.class);
         config.addClass(Log.class);
         config.addClass(Event.class);
         config.addClass(Speaks.class);

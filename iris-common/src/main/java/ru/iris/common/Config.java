@@ -15,6 +15,7 @@
  */
 package ru.iris.common;
 
+import com.avaje.ebean.Ebean;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -70,8 +72,24 @@ public class Config
 					loadPropertiesFromFileSystem("./conf/main.property");
 				}
 			}
-		}
+            loadPropertiesFromDatabase();
+        }
 	}
+
+    /**
+     * Loads properties from database.
+     *
+     * @return true if load successfully.
+     */
+    private boolean loadPropertiesFromDatabase() {
+        List<ru.iris.common.database.model.Config> dbcfg = Ebean.find(ru.iris.common.database.model.Config.class).findList();
+
+        for (ru.iris.common.database.model.Config line : dbcfg) {
+            propertyMap.put(line.getParam(), line.getValue());
+        }
+
+        return true;
+    }
 
 	/**
 	 * Loads given properties file from class path.

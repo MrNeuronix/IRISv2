@@ -14,17 +14,34 @@
  * limitations under the License.
  */
 
-package ru.iris.video;
+package ru.iris.weather;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import ro.fortsoft.pf4j.Plugin;
+import ro.fortsoft.pf4j.PluginWrapper;
 
-class VideoService
+public class Service extends Plugin
 {
-	private Logger LOGGER = LogManager.getLogger(VideoService.class);
 
-	public VideoService()
+	private static final Logger LOGGER = LogManager.getLogger(Service.class);
+
+	public Service(PluginWrapper wrapper)
 	{
-
+		super(wrapper);
 	}
+
+	@Override
+	public void start()
+	{
+        LOGGER.info("[Plugin] iris-weather plugin started!");
+
+        new WeatherService();
+    }
+
+	@Override
+	public void stop()
+	{
+        LOGGER.info("[Plugin] iris-weather plugin stopped!");
+    }
 }

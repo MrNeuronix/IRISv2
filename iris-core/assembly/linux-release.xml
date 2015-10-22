@@ -90,11 +90,11 @@
             <directory>../iris-events/target/plugin-classes</directory>
         </fileSet>
         <fileSet>
-            <outputDirectory>/extensions/iris-video/classes</outputDirectory>
+            <outputDirectory>/extensions/iris-weather/classes</outputDirectory>
             <includes>
                 <include>**/*</include>
             </includes>
-            <directory>../iris-video/target/plugin-classes</directory>
+            <directory>../iris-weather/target/plugin-classes</directory>
         </fileSet>
         <fileSet>
             <outputDirectory>/extensions/iris-scheduler/classes</outputDirectory>
@@ -130,7 +130,7 @@
                 <exclude>ru.iris:iris-devices-noolite</exclude>
                 <exclude>ru.iris:iris-devices-zwave</exclude>
                 <exclude>ru.iris:iris-events</exclude>
-                <exclude>ru.iris:iris-video</exclude>
+                <exclude>ru.iris:iris-weather</exclude>
                 <exclude>ru.iris:iris-speak</exclude>
                 <exclude>ru.iris:iris-ai</exclude>
                 <exclude>ru.iris:iris-scheduler</exclude>

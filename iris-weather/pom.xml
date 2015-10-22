@@ -18,10 +18,10 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>iris-video</artifactId>
+    <artifactId>iris-weather</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>iris-video</name>
+    <name>iris-weather</name>
 
     <parent>
         <groupId>ru.iris</groupId>
@@ -31,8 +31,8 @@
     </parent>
 
     <properties>
-        <plugin.id>iris-video</plugin.id>
-        <plugin.class>ru.iris.video.Service</plugin.class>
+        <plugin.id>iris-weather</plugin.id>
+        <plugin.class>ru.iris.weather.Service</plugin.class>
         <plugin.version>0.0.1</plugin.version>
         <plugin.provider>Nikolay Viguro</plugin.provider>
         <plugin.dependencies/>
@@ -116,6 +116,11 @@
             <groupId>ru.iris</groupId>
             <artifactId>iris-common</artifactId>
             <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.dvdme</groupId>
+            <artifactId>ForecastIOLib</artifactId>
+            <version>1.5.2</version>
         </dependency>
     </dependencies>
 
