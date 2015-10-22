@@ -61,6 +61,7 @@ class WeatherService
                         DBLogger.info("Getting weather...");
 
                         GenericAdvertisement broadcast = new GenericAdvertisement();
+                        broadcast.setLabel("WeatherBroadcast");
                         broadcast.setData(getWeather());
 
                         LOGGER.info("Broadcasting weather info...");
