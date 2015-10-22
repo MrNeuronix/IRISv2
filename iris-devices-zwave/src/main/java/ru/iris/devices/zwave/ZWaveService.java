@@ -288,7 +288,6 @@ public class ZWaveService {
                             udvChg.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
 
                             device.addValue(udvChg);
-                            device.save();
 
                             DBLogger.info("Value " + manager.getValueLabel(notification.getValueId()) + " changed: " + Utils.getValue(notification.getValueId()), device.getUuid());
                             SensorData.log(device.getUuid(), Manager.get().getValueLabel(notification.getValueId()), String.valueOf(Utils.getValue(notification.getValueId())));
@@ -325,6 +324,10 @@ public class ZWaveService {
                             LOGGER.info(notification.getType().name());
                             break;
                     }
+
+                    // save device and values
+                    if (device != null)
+                        device.save();
                 }
             };
 
@@ -347,17 +350,18 @@ public class ZWaveService {
                 if (Manager.get().isNodeFailed(homeId, ZWaveDevice.getNode())) {
                     LOGGER.info("Setting node " + ZWaveDevice.getNode() + " to DEAD state");
                     ZWaveDevice.setStatus("dead");
+
+                    ZWaveDevice.save();
                 }
 
                 // Check for sleeping nodes
                 if (!Manager.get().isNodeAwake(homeId, ZWaveDevice.getNode())) {
                     LOGGER.info("Setting node " + ZWaveDevice.getNode() + " to SLEEP state");
                     ZWaveDevice.setStatus("sleeping");
-
                     Manager.get().refreshNodeInfo(homeId, ZWaveDevice.getNode());
-                }
 
-                ZWaveDevice.save();
+                    ZWaveDevice.save();
+                }
             }
 
             LOGGER.info("Initialization complete.");
@@ -532,10 +536,10 @@ public class ZWaveService {
 
             ZWaveDevice.addValue(beaming);
 
-            ZWaveDevice.save();
-
             LOGGER.info("Adding device " + type + " (node: " + notification.getNodeId() + ") to system");
+
         } else {
+
             ZWaveDevice.setManufName(manufName);
             ZWaveDevice.setProductName(productName);
             ZWaveDevice.setStatus(state);
@@ -563,7 +567,6 @@ public class ZWaveService {
             udv.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
 
             ZWaveDevice.addValue(udv);
-            ZWaveDevice.save();
         }
 
         return ZWaveDevice;

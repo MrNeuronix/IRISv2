@@ -86,8 +86,6 @@ public class NooliteRXService {
                             device.addValue(new DeviceValue("type", "sensor", "", "", device.getUuid(), false));
                             device.addValue(new DeviceValue("sensorname", sensor.name(), "", "", device.getUuid(), false));
                         }
-
-                        device.save();
                     }
 
                     Map<String, Object> params = new HashMap<>();
@@ -201,6 +199,8 @@ public class NooliteRXService {
                         default:
                             LOGGER.info("Unknown command: " + notification.getType().name());
                     }
+
+                    device.save();
                 }
             };
 
@@ -238,8 +238,6 @@ public class NooliteRXService {
         } else {
             device.setValue(label, value);
         }
-
-        device.save();
     }
 
     ///

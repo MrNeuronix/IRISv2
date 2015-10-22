@@ -176,6 +176,9 @@ public class NooliteTXService {
                                 break;
                         }
 
+                        // save device and values
+                        device.save();
+
                     } else if (envelope.getReceiverInstance() == null) {
                         // We received unknown broadcast message. Lets make generic log entry.
                         LOGGER.info("Received broadcast "
@@ -214,7 +217,5 @@ public class NooliteTXService {
         } else {
             device.setValue(label, value);
         }
-
-        device.save();
     }
 }
