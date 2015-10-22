@@ -17,14 +17,13 @@
 package ru.iris.common.database.model.devices;
 
 import com.avaje.ebean.Ebean;
-import com.avaje.ebean.Expr;
 import ru.iris.common.database.model.DBModel;
 import ru.iris.common.database.model.SensorData;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 @Entity
 @Table(name = "devices")
@@ -55,6 +54,9 @@ public class Device extends DBModel
 	private String internalName = "unknown";
 
 	private String source = "unknown";
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "device")
+    private final List<DeviceValue> deviceValues = new ArrayList<>();
 
 	public Device()
 	{
@@ -160,38 +162,74 @@ public class Device extends DBModel
 		this.status = status;
 	}
 
-	public List<DeviceValue> getValues()
-	{
-		return Ebean.find(DeviceValue.class).where().eq("uuid", uuid).findList();
-	}
-
 	public String getSource()
 	{
 		return source;
 	}
 
-	public void setSource(String source)
-	{
+    public void setSource(String source) {
 		this.source = source;
 	}
 
 	public DeviceValue getValue(String label)
 	{
-		return Ebean.find(DeviceValue.class).where().and(Expr.eq("label", label), Expr.eq("uuid", this.getUuid())).findUnique();
-	}
+        for (DeviceValue dv : deviceValues) {
+            if (dv.getLabel().equals(label))
+                return dv;
+        }
 
-	public synchronized void removeValue(DeviceValue value)
-	{
-		Ebean.delete(value);
-	}
+        return null;
+        //return Ebean.find(DeviceValue.class).where().and(Expr.eq("label", label), Expr.eq("uuid", this.getUuid())).findUnique();
+    }
 
-	public synchronized void removeValue(String valuelabel)
-	{
-		DeviceValue deviceValue = Ebean.find(DeviceValue.class).where().and(Expr.eq("label", valuelabel), Expr.eq("uuid", this.getUuid())).findUnique();
+    public void setValue(String label, String newvalue) {
+        synchronized (deviceValues) {
+            ListIterator<DeviceValue> iterator = deviceValues.listIterator();
+            while (iterator.hasNext()) {
+                DeviceValue dv = iterator.next();
+                if (dv.getLabel().equals(label)) {
+                    iterator.remove();
+                    dv.setValue(newvalue);
+                    iterator.add(dv);
+                }
+            }
+        }
+    }
 
-		if (deviceValue != null)
-			Ebean.delete(deviceValue);
-	}
+    public void addValue(DeviceValue value) {
+        synchronized (deviceValues) {
+            ListIterator<DeviceValue> iterator = deviceValues.listIterator();
+            iterator.add(value);
+        }
+    }
+
+    public void removeValue(DeviceValue value) {
+        synchronized (deviceValues) {
+            ListIterator<DeviceValue> iterator = deviceValues.listIterator();
+            while (iterator.hasNext()) {
+                DeviceValue dv = iterator.next();
+                if (dv.getLabel().equals(value.getLabel()))
+                    iterator.remove();
+            }
+        }
+
+        //Ebean.delete(value);
+    }
+
+    public void removeValue(String valuelabel) {
+        synchronized (deviceValues) {
+            ListIterator<DeviceValue> iterator = deviceValues.listIterator();
+            while (iterator.hasNext()) {
+                DeviceValue dv = iterator.next();
+                if (dv.getLabel().equals(valuelabel))
+                    iterator.remove();
+            }
+        }
+
+        //DeviceValue deviceValue = Ebean.find(DeviceValue.class).where().and(Expr.eq("label", valuelabel), Expr.eq("uuid", this.getUuid())).findUnique();
+        //if (deviceValue != null)
+        //	Ebean.delete(deviceValue);
+    }
 
 	public static Device getDeviceByUUID(String uuid)
 	{
@@ -207,7 +245,8 @@ public class Device extends DBModel
 		return Ebean.find(SensorData.class).where().eq("uuid", this.uuid).order().desc("logdate").findList();
 	}
 
-	@Override
+
+    @Override
 	public String toString() {
 		return "Device{" +
 				"name='" + name + '\'' +

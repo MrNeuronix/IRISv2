@@ -22,10 +22,7 @@ import com.google.gson.GsonBuilder;
 import org.zwave4j.ValueId;
 import ru.iris.common.database.model.DBModel;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "devicesvalues")
@@ -35,9 +32,11 @@ public class DeviceValue extends DBModel
 	@Expose(serialize = false)
 	private transient final static Gson gson = new GsonBuilder().create();
 
-	private String label = "unknown";
+    @Expose(serialize = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Device device;
 
-	private String uuid = "unknown";
+    private String label = "unknown";
 
 	private String value = "unknown";
 
@@ -78,7 +77,6 @@ public class DeviceValue extends DBModel
 		this.valueType = "";
 		this.valueUnits = valueUnits;
 		this.isReadonly = isReadonly;
-		this.uuid = uuid;
 	}
 
 	public DeviceValue(String label, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly)
@@ -90,16 +88,6 @@ public class DeviceValue extends DBModel
 
 	public DeviceValue(String label, String uuid, String value, String valueType, String valueUnits, ValueId valueId, boolean isReadonly)
 	{
-	}
-
-	public String getUuid()
-	{
-		return uuid;
-	}
-
-	public void setUuid(String uuid)
-	{
-		this.uuid = uuid;
 	}
 
 	public String getLabel()
@@ -167,14 +155,21 @@ public class DeviceValue extends DBModel
 		this.valueId = gson.toJson(valueId);
 	}
 
-	/////////////////////////////////
+    public Device getDevice() {
+        return device;
+    }
+
+    public void setDevice(Device device) {
+        this.device = device;
+    }
+
+    /////////////////////////////////
 
 	@Override public String toString()
 	{
 		return "DeviceValue{" +
 				"id=" + id +
 				", label='" + label + '\'' +
-				", uuid='" + uuid + '\'' +
 				", value='" + value + '\'' +
 				", valueType='" + valueType + '\'' +
 				", valueUnits='" + valueUnits + '\'' +

@@ -78,13 +78,13 @@ public class NooliteRXService {
                         // device is not sensor
                         if (sensor == null) {
                             device.setInternalType("switch");
-                            new DeviceValue("channel", String.valueOf(channel), "", "", device.getUuid(), true).save();
-                            new DeviceValue("type", "switch", "", "", device.getUuid(), false).save();
+                            device.addValue(new DeviceValue("channel", String.valueOf(channel), "", "", device.getUuid(), true));
+                            device.addValue(new DeviceValue("type", "switch", "", "", device.getUuid(), false));
                         } else {
                             device.setInternalType("sensor");
-                            new DeviceValue("channel", String.valueOf(channel), "", "", device.getUuid(), true).save();
-                            new DeviceValue("type", "sensor", "", "", device.getUuid(), false).save();
-                            new DeviceValue("sensorname", sensor.name(), "", "", device.getUuid(), false).save();
+                            device.addValue(new DeviceValue("channel", String.valueOf(channel), "", "", device.getUuid(), true));
+                            device.addValue(new DeviceValue("type", "sensor", "", "", device.getUuid(), false));
+                            device.addValue(new DeviceValue("sensorname", sensor.name(), "", "", device.getUuid(), false));
                         }
 
                         device.save();
@@ -177,6 +177,17 @@ public class NooliteRXService {
                             params.put("humi", notification.getValue("humi"));
                             params.put("battery", battery.name());
 
+                            // device product name unkown
+                            if (device.getProductName().equals("unknown")) {
+                                if ((int) notification.getValue("humi") == 0) {
+                                    device.setProductName("PT112");
+                                } else {
+                                    device.setProductName("PT111");
+                                }
+
+                                device.save();
+                            }
+
                             messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceTempHumi", params));
                             break;
 
@@ -208,7 +219,6 @@ public class NooliteRXService {
             if (device.getInternalName().equals("noolite/channel/" + channel)) {
                 return device;
             }
-
         }
 
         return null;
@@ -219,16 +229,17 @@ public class NooliteRXService {
 
         if (deviceValue == null) {
             deviceValue = new DeviceValue();
-
             deviceValue.setLabel(label);
-            deviceValue.setUuid(device.getUuid());
+            deviceValue.setValue(value);
             deviceValue.setReadonly(false);
             deviceValue.setValueId("{ }");
+
+            device.addValue(deviceValue);
+        } else {
+            device.setValue(label, value);
         }
 
-        deviceValue.setValue(value);
-
-        deviceValue.save();
+        device.save();
     }
 
     ///

@@ -207,15 +207,14 @@ public class NooliteTXService {
 
         if (deviceValue == null) {
             deviceValue = new DeviceValue();
-
             deviceValue.setLabel(label);
-            deviceValue.setUuid(device.getUuid());
+            deviceValue.setValue(value);
             deviceValue.setReadonly(false);
             deviceValue.setValueId("{ }");
+        } else {
+            device.setValue(label, value);
         }
 
-        deviceValue.setValue(value);
-
-        deviceValue.save();
+        device.save();
     }
 }

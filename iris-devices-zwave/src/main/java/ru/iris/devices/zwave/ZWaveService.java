@@ -275,18 +275,23 @@ public class ZWaveService {
 
                             DeviceValue udvChg = device.getValue(manager.getValueLabel(notification.getValueId()));
 
+                            if (udvChg != null)
+                                device.removeValue(udvChg);
+                            else
+                                udvChg = new DeviceValue();
+
                             udvChg.setLabel(manager.getValueLabel(notification.getValueId()));
                             udvChg.setValueType(Utils.getValueType(notification.getValueId()));
                             udvChg.setValueId(notification.getValueId());
                             udvChg.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));
                             udvChg.setValue(String.valueOf(Utils.getValue(notification.getValueId())));
                             udvChg.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
-                            udvChg.setUuid(device.getUuid());
 
-                            udvChg.save();
+                            device.addValue(udvChg);
+                            device.save();
 
                             DBLogger.info("Value " + manager.getValueLabel(notification.getValueId()) + " changed: " + Utils.getValue(notification.getValueId()), device.getUuid());
-                            SensorData.log(udvChg.getUuid(), Manager.get().getValueLabel(notification.getValueId()), String.valueOf(Utils.getValue(notification.getValueId())));
+                            SensorData.log(device.getUuid(), Manager.get().getValueLabel(notification.getValueId()), String.valueOf(Utils.getValue(notification.getValueId())));
 
                             data.put("uuid", device.getUuid());
                             data.put("label", Manager.get().getValueLabel(notification.getValueId()));
@@ -468,14 +473,13 @@ public class ZWaveService {
 
     private void setValue(String uuid, String label, String value) {
         Device device = Device.getDeviceByUUID(uuid);
+        DeviceValue zv = device.getValue(label);
 
-        for (DeviceValue zv : device.getValues()) {
-            if (zv.getLabel().equals(label)) {
-                if (!Manager.get().isValueReadOnly(gson.fromJson(zv.getValueId(), ValueId.class))) {
-                    setTypedValue(gson.fromJson(zv.getValueId(), ValueId.class), value);
-                } else {
-                    LOGGER.info("Value \"" + label + "\" is read-only! Skip.");
-                }
+        if (zv != null) {
+            if (!Manager.get().isValueReadOnly(gson.fromJson(zv.getValueId(), ValueId.class))) {
+                setTypedValue(gson.fromJson(zv.getValueId(), ValueId.class), value);
+            } else {
+                LOGGER.info("Value \"%s\" is read-only! Skip.", label);
             }
         }
     }
@@ -508,9 +512,7 @@ public class ZWaveService {
             ZWaveDevice.setProductName(productName);
             ZWaveDevice.setStatus(state);
 
-            ZWaveDevice.save();
-
-            DeviceValue udv = new DeviceValue(
+            ZWaveDevice.addValue(new DeviceValue(
                     label,
                     uuid,
                     String.valueOf(Utils.getValue(notification.getValueId())),
@@ -518,9 +520,7 @@ public class ZWaveService {
                     Manager.get().getValueUnits(notification.getValueId()),
                     notification.getValueId(),
                     Manager.get().isValueReadOnly(notification.getValueId())
-            );
-
-            udv.save();
+            ));
 
             // Check if it is beaming device
             DeviceValue beaming = new DeviceValue();
@@ -529,9 +529,10 @@ public class ZWaveService {
             beaming.setValueId("{ }");
             beaming.setValue(String.valueOf(Manager.get().isNodeBeamingDevice(homeId, ZWaveDevice.getNode())));
             beaming.setReadonly(true);
-            beaming.setUuid(ZWaveDevice.getUuid());
 
-            beaming.save();
+            ZWaveDevice.addValue(beaming);
+
+            ZWaveDevice.save();
 
             LOGGER.info("Adding device " + type + " (node: " + notification.getNodeId() + ") to system");
         } else {
@@ -547,8 +548,10 @@ public class ZWaveService {
 
             DeviceValue udv = ZWaveDevice.getValue(label);
 
-            // new device
-            if (udv == null) {
+            // remove
+            if (udv != null) {
+                ZWaveDevice.removeValue(udv);
+            } else {
                 udv = new DeviceValue();
             }
 
@@ -558,9 +561,9 @@ public class ZWaveService {
             udv.setValueUnits(Manager.get().getValueUnits(notification.getValueId()));
             udv.setValue(String.valueOf(Utils.getValue(notification.getValueId())));
             udv.setReadonly(Manager.get().isValueReadOnly(notification.getValueId()));
-            udv.setUuid(ZWaveDevice.getUuid());
 
-            udv.save();
+            ZWaveDevice.addValue(udv);
+            ZWaveDevice.save();
         }
 
         return ZWaveDevice;
