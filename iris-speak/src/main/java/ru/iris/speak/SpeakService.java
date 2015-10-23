@@ -47,6 +47,7 @@ public class SpeakService
     private final Logger LOGGER = LogManager.getLogger(SpeakService.class.getName());
     private final ArrayBlockingQueue<Speaks> speakqueue = new ArrayBlockingQueue<>(50);
     private Synthesiser synthesiser = null;
+    private JsonMessaging jsonMessaging;
 
     public SpeakService() {
 		Status status = new Status("Speak");
@@ -76,8 +77,8 @@ public class SpeakService
 
             synthesiser.setLanguage(conf.get("language"));
 
-			JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "speak");
-			jsonMessaging.subscribe("event.speak");
+            jsonMessaging = new JsonMessaging(UUID.randomUUID(), "speak");
+            jsonMessaging.subscribe("event.speak");
 			jsonMessaging.subscribe("event.speak.volume.set");
 
 			// fetch all cached speaks for this server
@@ -237,4 +238,8 @@ public class SpeakService
 			t.printStackTrace();
 		}
 	}
+
+    public void stop() {
+        jsonMessaging.close();
+    }
 }

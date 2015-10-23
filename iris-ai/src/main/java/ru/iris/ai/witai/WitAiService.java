@@ -43,6 +43,7 @@ import java.util.UUID;
 public class WitAiService
 {
 	private final Logger LOGGER = LogManager.getLogger(WitAiService.class);
+    private JsonMessaging jsonMessaging;
 
 	public WitAiService()
 	{
@@ -59,8 +60,8 @@ public class WitAiService
 
 		try
 		{
-			final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "witai");
-			jsonMessaging.subscribe("event.speak.recognized");
+            jsonMessaging = new JsonMessaging(UUID.randomUUID(), "witai");
+            jsonMessaging.subscribe("event.speak.recognized");
 			jsonMessaging.setNotification(new JsonNotification() {
 
 				@Override
@@ -133,4 +134,8 @@ public class WitAiService
 			t.printStackTrace();
 		}
 	}
+
+    public void stop() {
+        jsonMessaging.close();
+    }
 }

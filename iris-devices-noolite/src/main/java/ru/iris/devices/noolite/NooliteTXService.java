@@ -32,7 +32,10 @@ import ru.iris.noolite4j.sender.PC1132;
 import java.util.UUID;
 
 public class NooliteTXService {
+
     private final Logger LOGGER = LogManager.getLogger(NooliteTXService.class.getName());
+    private JsonMessaging jsonMessaging;
+    private PC1132 pc;
 
     public NooliteTXService() {
         Status status = new Status("Noolite-TX");
@@ -46,10 +49,10 @@ public class NooliteTXService {
         try {
 
             // Initialize the libusb context
-            final PC1132 pc = new PC1132();
+            pc = new PC1132();
             pc.open();
 
-            final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-tx");
+            jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-tx");
 
             jsonMessaging.subscribe("event.devices.setvalue");
             jsonMessaging.subscribe("event.devices.noolite.value.set");
@@ -217,5 +220,10 @@ public class NooliteTXService {
         } else {
             device.setValue(label, value);
         }
+    }
+
+    public void stop() {
+        jsonMessaging.close();
+        pc.close();
     }
 }

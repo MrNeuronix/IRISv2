@@ -28,8 +28,11 @@ import ro.fortsoft.pf4j.PluginManager;
 import ru.iris.common.database.model.*;
 import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.database.model.devices.DeviceValue;
+import ru.iris.common.messaging.JsonMessaging;
+import ru.iris.common.messaging.model.devices.GenericAdvertisement;
 
 import java.io.File;
+import java.util.UUID;
 
 class Core
 {
@@ -83,5 +86,47 @@ class Core
 		pluginManager.loadPlugins();
 		pluginManager.startPlugins();
 
-	}
+        LOGGER.info("Starting plugins management");
+
+        JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "plugins");
+        jsonMessaging.subscribe("event.plugin.start");
+        jsonMessaging.subscribe("event.plugin.stop");
+        jsonMessaging.subscribe("event.plugin.restart");
+        jsonMessaging.subscribe("event.plugin");
+
+        jsonMessaging.setNotification(envelope -> {
+
+            if (envelope.getObject() instanceof GenericAdvertisement) {
+                GenericAdvertisement advertisement = envelope.getObject();
+
+                switch (advertisement.getLabel()) {
+                    case "StartPlugin":
+                        LOGGER.info("Plugin manager: Requested to start " + advertisement.getValue().toString());
+                        pluginManager.startPlugin(advertisement.getValue().toString());
+                        break;
+                    case "StopPlugin":
+                        LOGGER.info("Plugin manager: Requested to stop " + advertisement.getValue().toString());
+                        pluginManager.stopPlugin(advertisement.getValue().toString());
+                        break;
+                    case "RestartPlugin":
+                        LOGGER.info("Plugin manager: Requested to restart " + advertisement.getValue().toString());
+                        pluginManager.stopPlugin(advertisement.getValue().toString());
+                        pluginManager.startPlugin(advertisement.getValue().toString());
+                        break;
+                    default:
+                        LOGGER.error("Unknown command: " + advertisement.getLabel());
+                }
+            } else {
+                // We received unknown request message. Lets make generic log entry.
+                LOGGER.info("Received request "
+                        + " from " + envelope.getSenderInstance()
+                        + " to " + envelope.getReceiverInstance()
+                        + " at '" + envelope.getSubject()
+                        + ": " + envelope.getObject());
+            }
+
+        });
+
+        jsonMessaging.start();
+    }
 }

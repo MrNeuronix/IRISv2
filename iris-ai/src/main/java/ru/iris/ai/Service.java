@@ -26,6 +26,7 @@ import ru.iris.common.Config;
 public class Service extends Plugin
 {
 	private static final Logger LOGGER = LogManager.getLogger(Service.class);
+    private WitAiService witai;
 
 	public Service(PluginWrapper wrapper)
 	{
@@ -41,8 +42,8 @@ public class Service extends Plugin
 
 		if (cfg.get("witaiEnabled").equals("1"))
 		{
-			new WitAiService();
-		}
+            witai = new WitAiService();
+        }
 		else
 		{
 			LOGGER.info("No AI specified in config file");
@@ -53,5 +54,8 @@ public class Service extends Plugin
 	public void stop()
 	{
 		LOGGER.info("[Plugin] iris-ai plugin stopped!");
-	}
+
+        if (witai != null)
+            witai.stop();
+    }
 }

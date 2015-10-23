@@ -25,6 +25,8 @@ import ru.iris.common.Config;
 public class Service extends Plugin {
 
     private static final Logger LOGGER = LogManager.getLogger(Service.class);
+    private NooliteRXService rxService;
+    private NooliteTXService txService;
 
     public Service(PluginWrapper wrapper) {
         super(wrapper);
@@ -40,11 +42,11 @@ public class Service extends Plugin {
             LOGGER.info("NooLite support enabled. Starting");
             if (config.get("nooliteTXPresent").equals("1")) {
                 LOGGER.info("NooLite TX support enabled. Starting");
-                new NooliteTXService();
+                txService = new NooliteTXService();
             }
             if (config.get("nooliteRXPresent").equals("1")) {
                 LOGGER.info("NooLite RX support enabled. Starting");
-                new NooliteRXService();
+                rxService = new NooliteRXService();
             }
         }
     }
@@ -52,5 +54,11 @@ public class Service extends Plugin {
     @Override
     public void stop() {
         LOGGER.info("[Plugin] iris-devices-noolite plugin stopped!");
+
+        if (txService != null)
+            txService.stop();
+
+        if (rxService != null)
+            rxService.stop();
     }
 }

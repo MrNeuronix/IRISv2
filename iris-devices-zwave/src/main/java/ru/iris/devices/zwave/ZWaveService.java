@@ -44,6 +44,9 @@ public class ZWaveService {
     private long homeId;
     private boolean ready = false;
     private JsonMessaging messaging;
+    private Manager manager;
+    private NotificationWatcher watcher;
+    private final Config config = Config.getInstance();
 
     public ZWaveService() {
         Status status = new Status("ZWave");
@@ -55,9 +58,6 @@ public class ZWaveService {
         }
 
         try {
-
-            Config config = Config.getInstance();
-
             messaging = new JsonMessaging(UUID.randomUUID(), "devices-zwave");
 
             NativeLibraryLoader.loadLibrary(ZWave4j.LIBRARY_NAME, ZWave4j.class);
@@ -67,9 +67,9 @@ public class ZWaveService {
             options.addOptionString("UserPath", "conf/", true);
             options.lock();
 
-            final Manager manager = Manager.create();
+            manager = Manager.create();
 
-            final NotificationWatcher watcher = new NotificationWatcher() {
+            watcher = new NotificationWatcher() {
 
                 @Override
                 public void onNotification(Notification notification, Object context) {
@@ -402,7 +402,7 @@ public class ZWaveService {
                                 break;
                             case "ZWaveRemoveNode":
                                 LOGGER.info("Set controller into RemoveDevice mode");
-                                Manager.get().beginControllerCommand(homeId, ControllerCommand.REMOVE_DEVICE, new CallbackListener(ControllerCommand.REMOVE_DEVICE), null, true, (short) advertisement.getFirstData());
+                                Manager.get().beginControllerCommand(homeId, ControllerCommand.REMOVE_DEVICE, new CallbackListener(ControllerCommand.REMOVE_DEVICE), null, true, (short) advertisement.getValue());
                                 break;
                             case "ZWaveCancelCommand":
                                 LOGGER.info("Canceling controller command");
@@ -623,5 +623,11 @@ public class ZWaveService {
                 Manager.get().healNetwork(homeId, true);
             }
         }
+    }
+
+    public void stop() {
+        messaging.close();
+        manager.removeWatcher(watcher, null);
+        manager.removeDriver(config.get("zwavePort"));
     }
 }

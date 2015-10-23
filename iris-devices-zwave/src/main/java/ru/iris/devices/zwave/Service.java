@@ -23,8 +23,8 @@ import ro.fortsoft.pf4j.PluginWrapper;
 import ru.iris.common.Config;
 
 public class Service extends Plugin {
-
     private static final Logger LOGGER = LogManager.getLogger(Service.class);
+    private ZWaveService service;
 
     public Service(PluginWrapper wrapper) {
         super(wrapper);
@@ -38,13 +38,15 @@ public class Service extends Plugin {
 
         if (config.get("zwaveEnabled").equals("1")) {
             LOGGER.info("ZWave support enabled. Starting");
-            new ZWaveService();
+            service = new ZWaveService();
         }
-
     }
 
     @Override
     public void stop() {
         LOGGER.info("[Plugin] iris-devices-zwave plugin stopped!");
+
+        if (service != null)
+            service.stop();
     }
 }

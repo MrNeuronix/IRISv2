@@ -25,6 +25,7 @@ public class Service extends Plugin
 {
 
 	private static final Logger LOGGER = LogManager.getLogger(Service.class);
+    private WeatherService service;
 
 	public Service(PluginWrapper wrapper)
 	{
@@ -35,13 +36,15 @@ public class Service extends Plugin
 	public void start()
 	{
         LOGGER.info("[Plugin] iris-weather plugin started!");
-
-        new WeatherService();
+        service = new WeatherService();
     }
 
 	@Override
 	public void stop()
 	{
         LOGGER.info("[Plugin] iris-weather plugin stopped!");
+
+        if (service != null)
+            service.stop();
     }
 }

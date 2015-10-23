@@ -23,8 +23,8 @@ import ro.fortsoft.pf4j.PluginWrapper;
 
 public class Service extends Plugin
 {
-
 	private static final Logger LOGGER = LogManager.getLogger(Service.class);
+    private ScheduleService service;
 
 	public Service(PluginWrapper wrapper)
 	{
@@ -36,12 +36,15 @@ public class Service extends Plugin
 	{
 		LOGGER.info("[Plugin] iris-scheduler plugin started!");
 
-		new ScheduleService();
-	}
+        service = new ScheduleService();
+    }
 
 	@Override
 	public void stop()
 	{
 		LOGGER.info("[Plugin] iris-scheduler plugin stopped!");
-	}
+
+        if (service != null)
+            service.stop();
+    }
 }

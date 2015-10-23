@@ -26,6 +26,7 @@ public class Service extends Plugin
 {
 
 	private static final Logger LOGGER = LogManager.getLogger(Service.class);
+    private SpeakService service;
 
 	public Service(PluginWrapper wrapper)
 	{
@@ -37,11 +38,11 @@ public class Service extends Plugin
 	{
 		LOGGER.info("[Plugin] iris-speak plugin started!");
 
-        new SpeakService();
+        service = new SpeakService();
 
         // sleep a little
         try {
-            Thread.sleep(3000L);
+            Thread.sleep(2000L);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -53,5 +54,8 @@ public class Service extends Plugin
 	public void stop()
 	{
 		LOGGER.info("[Plugin] iris-speak plugin stopped!");
-	}
+
+        if (service != null)
+            service.stop();
+    }
 }

@@ -23,8 +23,8 @@ import ro.fortsoft.pf4j.PluginWrapper;
 
 public class Service extends Plugin
 {
-
 	private static final Logger LOGGER = LogManager.getLogger(Service.class);
+    private EventsService service;
 
 	public Service(PluginWrapper wrapper)
 	{
@@ -35,12 +35,15 @@ public class Service extends Plugin
 	public void start()
 	{
 		LOGGER.info("[Plugin] iris-events plugin started!");
-		new EventsService();
-	}
+        service = new EventsService();
+    }
 
 	@Override
 	public void stop()
 	{
 		LOGGER.info("[Plugin] iris-events plugin stopped!");
-	}
+
+        if (service != null)
+            service.stop();
+    }
 }

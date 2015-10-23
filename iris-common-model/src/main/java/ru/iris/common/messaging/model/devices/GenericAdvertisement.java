@@ -30,7 +30,7 @@ public class GenericAdvertisement extends Advertisement {
 	/**
      * Data map
      */
-    protected Map<String, Object> data;
+    protected Map<String, Object> data = new HashMap<>();
 
     public GenericAdvertisement() {
     }
@@ -41,19 +41,13 @@ public class GenericAdvertisement extends Advertisement {
     }
 
     public GenericAdvertisement(String label, Object data) {
-        Map<String, Object> temp = new HashMap<>();
-        temp.put("data", data);
-
         this.label = label;
-        this.data = temp;
+        this.data.put("data", data);
     }
 
     public GenericAdvertisement(String label, String key, String value) {
-        Map<String, Object> temp = new HashMap<>();
-        temp.put(key, value);
-
         this.label = label;
-        this.data = temp;
+        this.data.put(key, value);
     }
 
     public GenericAdvertisement(String label) {
@@ -76,8 +70,8 @@ public class GenericAdvertisement extends Advertisement {
         return data.get("data");
     }
 
-    public Object getFirstData() {
-        return data.get("data");
+    public void setValue(Object value) {
+        data.put("data", value);
     }
 
     public Object getValue(String key) {

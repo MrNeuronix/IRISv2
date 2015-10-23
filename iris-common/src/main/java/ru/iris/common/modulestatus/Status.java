@@ -42,7 +42,7 @@ public class Status {
     }
 
     public void crashed() {
-        update("STOPPED");
+        update("CRASHED");
     }
 
     private void update(String state) {
@@ -51,6 +51,7 @@ public class Status {
         if (status != null) {
             status.setLastseen(new Timestamp(new Date().getTime()));
             status.setStatus(state);
+            status.save();
         } else {
             LOGGER.error("Error update module status! Module not found in DB!");
         }

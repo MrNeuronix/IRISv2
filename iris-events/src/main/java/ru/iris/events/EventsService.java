@@ -321,4 +321,8 @@ public class EventsService
 		}
         return states[N];
     }
+
+    public void stop() {
+        jsonMessaging.close();
+    }
 }

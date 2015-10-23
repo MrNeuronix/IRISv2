@@ -39,6 +39,8 @@ import java.util.UUID;
 public class NooliteRXService {
     private final Logger LOGGER = LogManager.getLogger(NooliteRXService.class.getName());
     private RX2164 rx;
+    private JsonMessaging messaging;
+    private InternalCommands internalCommands;
 
     public NooliteRXService() {
         Status status = new Status("Noolite-RX");
@@ -49,10 +51,10 @@ public class NooliteRXService {
             status.addIntoDB("Noolite RX", "Service that check incoming Noolite commands");
         }
 
-        new InternalCommands();
+        internalCommands = new InternalCommands();
 
         try {
-            JsonMessaging messaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-rx");
+            messaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-rx");
             rx = new RX2164();
             rx.open();
 
@@ -102,6 +104,11 @@ public class NooliteRXService {
                             params.put("label", "Level");
                             params.put("data", 0);
 
+                            // device product name unkown
+                            if (device.getProductName().equals("unknown")) {
+                                device.setProductName("Generic Switch");
+                            }
+
                             messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("NooliteDeviceOff", params));
                             break;
 
@@ -124,6 +131,11 @@ public class NooliteRXService {
                             params.put("label", "Level");
                             params.put("data", 255);
 
+                            // device product name unkown
+                            if (device.getProductName().equals("unknown")) {
+                                device.setProductName("Generic Switch");
+                            }
+
                             messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceOn", params));
                             break;
 
@@ -145,6 +157,11 @@ public class NooliteRXService {
                             params.put("uuid", device.getUuid());
                             params.put("label", "Level");
                             params.put("data", notification.getValue("level"));
+
+                            // device product name unkown
+                            if (device.getProductName().equals("unknown") || device.getProductName().equals("Generic Switch")) {
+                                device.setProductName("Generic Dimmer");
+                            }
 
                             messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceSetLevel", params));
                             break;
@@ -182,8 +199,6 @@ public class NooliteRXService {
                                 } else {
                                     device.setProductName("PT111");
                                 }
-
-                                device.save();
                             }
 
                             messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceTempHumi", params));
@@ -193,6 +208,13 @@ public class NooliteRXService {
                             LOGGER.info("Channel " + channel + ": Got BATTERYLOW command.");
                             DBLogger.info("Device battery low!", device.getUuid());
                             SensorData.log(device.getUuid(), "Battery", "BATTERYLOW");
+
+                            // device product name unkown
+                            if (device.getProductName().equals("Generic Switch")) {
+                                device.setProductName("PM111");
+                                device.setInternalType("sensor");
+                            }
+
                             messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceBatteryLow", device.getUuid()));
                             break;
 
@@ -245,6 +267,9 @@ public class NooliteRXService {
     ///
 
     private class InternalCommands {
+
+        private JsonMessaging jsonMessaging;
+
         public InternalCommands() {
             Status status = new Status("Noolite-RX-Internal");
 
@@ -256,7 +281,7 @@ public class NooliteRXService {
 
             try {
 
-                final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-rx-internal");
+                jsonMessaging = new JsonMessaging(UUID.randomUUID(), "devices-noolite-rx-internal");
 
                 jsonMessaging.subscribe("event.devices.noolite.rx.bindchannel");
                 jsonMessaging.subscribe("event.devices.noolite.rx.unbindchannel");
@@ -267,7 +292,7 @@ public class NooliteRXService {
                     if (envelope.getObject() instanceof GenericAdvertisement) {
 
                         final GenericAdvertisement advertisement = envelope.getObject();
-                        byte channel = (byte) advertisement.getFirstData();
+                        byte channel = (byte) advertisement.getValue();
 
                         switch (advertisement.getLabel()) {
 
@@ -311,5 +336,15 @@ public class NooliteRXService {
                 t.printStackTrace();
             }
         }
+
+        public void stop() {
+            jsonMessaging.close();
+        }
+    }
+
+    public void stop() {
+        messaging.close();
+        internalCommands.stop();
+        rx.close();
     }
 }

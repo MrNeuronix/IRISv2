@@ -49,6 +49,7 @@ public class ScheduleService
 	private List<Task> cronevents = null;
 	private List<DataSource> sources = null;
 	private Scheduler scheduler = null;
+    private JsonMessaging jsonMessaging;
 
 	public ScheduleService()
 	{
@@ -68,8 +69,8 @@ public class ScheduleService
 			readSources();
 			readAndScheduleTasks();
 
-			final JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "events");
-			jsonMessaging.subscribe("event.scheduler.reload.tasks");
+            jsonMessaging = new JsonMessaging(UUID.randomUUID(), "events");
+            jsonMessaging.subscribe("event.scheduler.reload.tasks");
 			jsonMessaging.subscribe("event.scheduler.reload.sources");
 			jsonMessaging.subscribe("event.scheduler.stop");
 			jsonMessaging.subscribe("event.scheduler.start");
@@ -240,4 +241,14 @@ public class ScheduleService
 
 				LOGGER.info("Scheduled " + scheduler.getJobKeys(GroupMatcher.jobGroupEquals("scheduler-cron")).size() + " cron jobs!");
 		}
+
+    public void stop() {
+        jsonMessaging.close();
+        try {
+            scheduler.clear();
+            scheduler.shutdown();
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+    }
 }

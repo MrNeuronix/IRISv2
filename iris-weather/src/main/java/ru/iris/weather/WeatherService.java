@@ -34,6 +34,7 @@ class WeatherService
 {
     private Logger LOGGER = LogManager.getLogger(WeatherService.class);
     private final Config conf = Config.getInstance();
+    private JsonMessaging jsonMessaging;
 
     public WeatherService() {
         Status status = new Status("Weather");
@@ -46,7 +47,7 @@ class WeatherService
 
         LOGGER.info("Weather service started (LAT: " + conf.get("weatherLatitude") + ", LON: " + conf.get("weatherLongitude") + ")");
 
-        JsonMessaging jsonMessaging = new JsonMessaging(UUID.randomUUID(), "weather");
+        jsonMessaging = new JsonMessaging(UUID.randomUUID(), "weather");
         jsonMessaging.subscribe("event.weather.get");
 
         jsonMessaging.setNotification(envelope -> {
@@ -56,27 +57,41 @@ class WeatherService
 
                 switch (advertisement.getLabel()) {
 
-                    case "GetWeatherBroadcast":
-                        LOGGER.info("Getting weather...");
-                        DBLogger.info("Getting weather...");
-
-                        GenericAdvertisement broadcast = new GenericAdvertisement();
-                        broadcast.setLabel("WeatherBroadcast");
-                        broadcast.setData(getWeather());
-
-                        LOGGER.info("Broadcasting weather info...");
-                        jsonMessaging.broadcast("event.weather", broadcast);
-                        break;
-
                     case "GetWeather":
                         LOGGER.info("Getting weather...");
                         DBLogger.info("Getting weather...");
 
-                        GenericAdvertisement response = new GenericAdvertisement();
-                        response.setData(getWeather());
+                        ForecastIO fio = new ForecastIO(conf.get("weatherApi"));
+                        fio.setUnits(ForecastIO.UNITS_SI);
+                        fio.getForecast(conf.get("weatherLatitude"), conf.get("weatherLongitude"));
+                        fio.setLang(ForecastIO.LANG_RUSSIAN);
 
-                        LOGGER.info("Responce weather info...");
+                        FIOCurrently currently = new FIOCurrently(fio);
+
+                        Map<String, Object> data = new HashMap<>();
+
+                        data.put("temperature", currently.get().temperature());
+                        data.put("humidity", currently.get().humidity());
+                        data.put("icon", currently.get().icon());
+                        data.put("time", currently.get().time());
+                        data.put("clouds", currently.get().cloudCover());
+                        data.put("pressure", currently.get().pressure());
+                        data.put("sunrise", currently.get().sunriseTime());
+                        data.put("sunset", currently.get().sunsetTime());
+
+                        GenericAdvertisement response = new GenericAdvertisement();
+                        response.setData(data);
+
+                        LOGGER.info("Response weather info...");
                         jsonMessaging.response(envelope, response);
+
+                        GenericAdvertisement broadcast = new GenericAdvertisement();
+                        broadcast.setLabel("WeatherBroadcast");
+                        broadcast.setData(data);
+
+                        LOGGER.info("Broadcasting weather info...");
+                        jsonMessaging.broadcast("event.weather", broadcast);
+
                         break;
 
                     default:
@@ -94,28 +109,9 @@ class WeatherService
         });
 
         jsonMessaging.start();
-
     }
 
-    private Map<String, Object> getWeather() {
-        ForecastIO fio = new ForecastIO(conf.get("weatherApi"));
-        fio.setUnits(ForecastIO.UNITS_SI);
-        fio.getForecast(conf.get("weatherLatitude"), conf.get("weatherLongitude"));
-        fio.setLang(ForecastIO.LANG_RUSSIAN);
-
-        FIOCurrently currently = new FIOCurrently(fio);
-
-        Map<String, Object> data = new HashMap<>();
-
-        data.put("temperature", currently.get().temperature());
-        data.put("humidity", currently.get().humidity());
-        data.put("icon", currently.get().icon());
-        data.put("time", currently.get().time());
-        data.put("clouds", currently.get().cloudCover());
-        data.put("pressure", currently.get().pressure());
-        data.put("sunrise", currently.get().sunriseTime());
-        data.put("sunset", currently.get().sunsetTime());
-
-        return data;
+    public void stop() {
+        jsonMessaging.close();
     }
 }
