@@ -48,6 +48,8 @@ public class Device extends DBModel
 
 	private String uuid = "unknown";
 
+	private String friendlyname = "not set";
+
 	private String status = "unknown";
 
 	@Column(name = "internalname")
@@ -245,8 +247,15 @@ public class Device extends DBModel
 		return Ebean.find(SensorData.class).where().eq("uuid", this.uuid).order().desc("logdate").findList();
 	}
 
+	public String getFriendlyname() {
+		return friendlyname;
+	}
 
-    @Override
+	public void setFriendlyname(String friendlyname) {
+		this.friendlyname = friendlyname;
+	}
+
+	@Override
 	public String toString() {
 		return "Device{" +
 				"name='" + name + '\'' +

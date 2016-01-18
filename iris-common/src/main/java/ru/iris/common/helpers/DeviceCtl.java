@@ -16,6 +16,10 @@
 
 package ru.iris.common.helpers;
 
+import com.avaje.ebean.Ebean;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.devices.GenericAdvertisement;
 
@@ -31,21 +35,28 @@ import java.util.UUID;
 public class DeviceCtl
 {
 	private static final JsonMessaging messaging = new JsonMessaging(UUID.randomUUID());
+    private static final Logger LOGGER = LogManager.getLogger(DeviceCtl.class.getName());
 
-	public static void on(String uuid) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("uuid", uuid);
-        params.put("label", "Level");
-        params.put("data", 255);
-        messaging.broadcast("event.devices.setvalue", new GenericAdvertisement("DeviceOn", params));
+    public static void on(String name) {
+        set(name, 255);
     }
 
-	public static void off(String uuid)
-	{
+    public static void off(String name) {
+        set(name, 0);
+    }
+
+    public static void set(String name, int value) {
         Map<String, Object> params = new HashMap<>();
-        params.put("uuid", uuid);
+
+        Device device = Ebean.find(Device.class).where().eq("friendlyname", name).findUnique();
+
+        if (device == null) {
+            LOGGER.error("Device not found: " + name);
+            return;
+        }
+        params.put("uuid", device.getFriendlyname());
         params.put("label", "Level");
-        params.put("data", 0);
-        messaging.broadcast("event.devices.setvalue", new GenericAdvertisement("DeviceOff", params));
+        params.put("data", value);
+        messaging.broadcast("event.devices.setvalue", new GenericAdvertisement("DeviceOn", params));
     }
 }
