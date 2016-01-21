@@ -207,7 +207,7 @@ public class EventsService
 											LOGGER.error("Error! Script " + event.getScript() + " is NULL!");
 
 									} catch (ScriptException e) {
-										LOGGER.error("Error in script scripts/command/" + event.getScript() + ".js: " + e.toString());
+										LOGGER.error("Error in script scripts/command/" + event.getScript() + ": " + e.toString());
 										e.printStackTrace();
 									}
 								}

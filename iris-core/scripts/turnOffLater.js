@@ -30,50 +30,48 @@ var Timer = Java.type("java.util.Timer");
 
 //////////////////////////////////////////////////////
 
-    // advertisement
+// advertisement
 var value = advertisement.getValue("data");
 var uuid = advertisement.getValue("uuid");
 
-    var device = Device.getDeviceByUUID(uuid);
+var device = Device.getDeviceByUUID(uuid);
 
-    // if device state = ON and device have internalname = noolite/channel/4
+// if device state = ON and device have internalname = noolite/channel/4
 if (value == "255" && device.getInternalName() == "noolite/channel/4") {
-        LOGGER.info("[turnOffLater] Device ON!");
+    LOGGER.info("[turnOffLater] Device ON!");
 
-        // lock not set
-        if (!Lock.isLocked("toilet-light-on")) {
-            LOGGER.info("[turnOffLater] Lock not set. Run timer");
+    // lock not set
+    if (!Lock.isLocked("toilet-light-on")) {
+        LOGGER.info("[turnOffLater] Lock not set. Run timer");
 
-            // lock task
-            var lock = new Lock("toilet-light-on");
-            var reluuid = uuid;
-            lock.lock();
+        // lock task
+        var lock = new Lock("toilet-light-on");
+        lock.lock();
 
-            var timer = new Timer("turnOffLaterTimer", true);
+        var timer = new Timer("turnOffLaterTimer", true);
 
-            // turn off past 20 minutes
-            timer.schedule(function()
-            {
-                if (Lock.isLocked("toilet-light-on")) {
+        // turn off past 20 minutes
+        timer.schedule(function () {
+            if (Lock.isLocked("toilet-light-on")) {
 
-                    LOGGER.info("[turnOffLater] Times up! Release lock and turn off device " + reluuid);
+                LOGGER.info("[turnOffLater] Times up! Release lock and turn off device " + reluuid);
 
-                    // release lock
-                    Lock.release("toilet-light-on");
+                // release lock
+                Lock.release("toilet-light-on");
 
-                    // turn off device
-                    DeviceCtl.off(reluuid);
+                // turn off device, toilet - pseudoname of device (configured in web interface)
+                DeviceCtl.off("toilet");
 
-                    // lets speak!
-                    Speak.say("Кто-то опять забыл выключить свет! Прошло 20 минут, выключаю сам");
-                }
-            }, 1200000);
+                // lets speak!
+                Speak.say("Кто-то опять забыл выключить свет! Прошло 20 минут, выключаю сам");
+            }
+        }, 1200000);
 
-        }
     }
+}
 
 if (value == "0" && device.getInternalName() == "noolite/channel/4" && Lock.isLocked("toilet-light-on")) {
-        // release lock
-        Lock.release("toilet-light-on");
-        LOGGER.info("[turnOffLater] Release lock!");
-    }
+    // release lock
+    Lock.release("toilet-light-on");
+    LOGGER.info("[turnOffLater] Release lock!");
+}

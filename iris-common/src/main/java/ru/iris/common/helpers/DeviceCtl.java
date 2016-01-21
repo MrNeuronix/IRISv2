@@ -54,7 +54,7 @@ public class DeviceCtl
             LOGGER.error("Device not found: " + name);
             return;
         }
-        params.put("uuid", device.getFriendlyname());
+        params.put("uuid", device.getUuid());
         params.put("label", "Level");
         params.put("data", value);
         messaging.broadcast("event.devices.setvalue", new GenericAdvertisement("DeviceOn", params));
