@@ -32,6 +32,7 @@ import ru.iris.common.messaging.model.speak.ChangeVolumeAdvertisement;
 import ru.iris.common.messaging.model.speak.SpeakAdvertisement;
 import ru.iris.common.modulestatus.Status;
 import ru.iris.common.voice.GoogleSynthesiser;
+import ru.iris.common.voice.IvonaSynthesiser;
 import ru.iris.common.voice.Synthesiser;
 import ru.iris.common.voice.YandexSynthesiser;
 
@@ -66,14 +67,20 @@ public class SpeakService
 
             LOGGER.info("Speak service started (TTS: " + tts + ")");
 
-            if (tts.equals("google")) {
-                synthesiser = new GoogleSynthesiser(conf.get("googleKey"));
-            } else if (tts.equals("yandex")) {
-                synthesiser = new YandexSynthesiser(conf.get("yandexKey"));
-            } else {
-                LOGGER.error("Unknown sythesiser: " + tts);
-                return;
-            }
+			switch (tts) {
+				case "google":
+					synthesiser = new GoogleSynthesiser(conf.get("googleKey"));
+					break;
+				case "yandex":
+					synthesiser = new YandexSynthesiser(conf.get("yandexKey"));
+					break;
+				case "ivona":
+					synthesiser = new IvonaSynthesiser();
+					break;
+				default:
+					LOGGER.error("Unknown synthesiser: " + tts);
+					return;
+			}
 
             synthesiser.setLanguage(conf.get("language"));
 

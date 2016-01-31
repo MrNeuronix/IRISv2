@@ -18,7 +18,7 @@ systemName=cистема
 # Silence mode
 silence=0
 
-# Voice engine (google, yandex)
+# Voice engine (google, yandex, ivona)
 ttsEngine=google
 
 # API key for Google Speak API V2
@@ -26,6 +26,15 @@ googleKey=empty
 
 # API key for Yandex SpeechKit Cloud
 yandexKey=empty
+
+# IVONA voice (Tatyana, Maxim)
+ivonaVoice=Tatyana
+
+# Access key for IVONA
+ivonaAccessKey=empty
+
+# Secret key for IVONA
+ivonaSecretKey=empty
 
 #################################
 # Zwave section
