@@ -70,19 +70,28 @@ public class NooliteTXService {
                     if (envelope.getObject() instanceof GenericAdvertisement) {
 
                         GenericAdvertisement advertisement = envelope.getObject();
-                        Device device = Ebean.find(Device.class).where().eq("uuid", advertisement.getValue("uuid")).findUnique();
 
-                        if (device != null && !device.getSource().equals("noolite")) {
-                            // not noolite
-                            return;
+                        Device device = null;
+                        byte channel;
+
+                        if (!advertisement.getLabel().equals("BindTXChannel") && !advertisement.getLabel().equals("UnbindTXChannel")) {
+
+                            device = Ebean.find(Device.class).where().eq("uuid", advertisement.getValue("uuid")).findUnique();
+
+                            if (device != null && !device.getSource().equals("noolite")) {
+                                LOGGER.info("Device with UUID " + advertisement.getValue("uuid") + " is not Noolite!");
+                                return;
+                            }
+
+                            if (device == null) {
+                                LOGGER.info("Cant find device with UUID " + advertisement.getValue("uuid"));
+                                return;
+                            }
+
+                            channel = Byte.valueOf(device.getValue("channel").getValue());
+                        } else {
+                            channel = Double.valueOf(advertisement.getValue().toString()).byteValue();
                         }
-
-                        if (device == null) {
-                            LOGGER.info("Cant find device with UUID " + advertisement.getValue("uuid"));
-                            return;
-                        }
-
-                        byte channel = Byte.valueOf(device.getValue("channel").getValue());
 
                         switch (advertisement.getLabel()) {
 
@@ -164,23 +173,28 @@ public class NooliteTXService {
                                 //TODO
                                 break;
 
-                            case "BindTXChannelAdvertisment":
+                            case "BindTXChannel":
                                 LOGGER.debug("Get BindTXChannel advertisement");
                                 LOGGER.info("Binding device to channel " + channel);
                                 DBLogger.info("Binding device to channel " + channel);
                                 pc.bindChannel(channel);
                                 break;
 
-                            case "UnbindTXChannelAdvertisment":
+                            case "UnbindTXChannel":
                                 LOGGER.debug("Get UnbindTXChannel advertisement");
                                 LOGGER.info("Unbinding device from channel " + channel);
                                 DBLogger.info("Unbinding device from channel " + channel);
                                 pc.unbindChannel(channel);
                                 break;
+
+                            default:
+                                LOGGER.debug("Unknown command type: " + advertisement.getLabel());
+                                break;
                         }
 
                         // save device and values
-                        device.save();
+                        if (device != null)
+                            device.save();
 
                     } else if (envelope.getReceiverInstance() == null) {
                         // We received unknown broadcast message. Lets make generic log entry.

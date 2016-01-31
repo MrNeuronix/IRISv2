@@ -292,22 +292,25 @@ public class NooliteRXService {
                     if (envelope.getObject() instanceof GenericAdvertisement) {
 
                         final GenericAdvertisement advertisement = envelope.getObject();
-                        byte channel = (byte) advertisement.getValue();
+                        byte channel = Double.valueOf(advertisement.getValue().toString()).byteValue();
 
                         switch (advertisement.getLabel()) {
 
                             case "BindRXChannel":
-                                LOGGER.debug("Get BindRXChannel advertisement");
+                                LOGGER.debug("Get BindRXChannel advertisement (channel " + channel + ")");
+                                LOGGER.info("Binding device to RX channel " + channel);
                                 rx.bindChannel(channel);
                                 break;
 
                             case "UnbindRXChannel":
-                                LOGGER.debug("Get UnbindRXChannel advertisement");
+                                LOGGER.debug("Get UnbindRXChannel advertisement (channel " + channel + ")");
+                                LOGGER.info("Unbinding device from RX channel " + channel);
                                 rx.unbindChannel(channel);
                                 break;
 
                             case "UnbindAllRXChannels":
                                 LOGGER.debug("Get UnbindAllRXChannel advertisement");
+                                LOGGER.info("Unbinding all RX channels");
                                 rx.unbindAllChannels();
                                 break;
                         }
