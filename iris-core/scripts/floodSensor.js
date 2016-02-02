@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Nikolay A. Viguro
+ * Copyright 2012-2016 Nikolay A. Viguro
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ var label = advertisement.getValue("label");
 var value = advertisement.getValue("data");
 var uuid = advertisement.getValue("uuid");
 
-    var device = Device.getDeviceByUUID(uuid);
+var device = Device.getDeviceByUUID(uuid);
 
 // if flood state = ON and device have internalname = zwave/alarmsensor/2
     if (label == "Flood" && value == "255" && device.getInternalName() == "zwave/alarmsensor/2") {

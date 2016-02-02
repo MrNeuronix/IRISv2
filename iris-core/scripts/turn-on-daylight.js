@@ -16,28 +16,28 @@
 
 /**
  * @author Nikolay A. Viguro
- * Date: 27.11.13
- * Time: 12:19
+ * Date: 02.02.16
+ * Time: 20:49
  * This is test script for event engine of IRISv2
  */
 
 // importing all classes in package (like import ru.iris.common.* in java)
-var Speak = Java.type("ru.iris.common.helpers.Speak");
 
-    var action = advertisement.getResponse().getOutcome().getEntities().get("action").getValue();
+if (advertisement.getLabel() == "DeviceBright" || advertisement.getLabel() == "DeviceDim") {
+    var Device = Java.type("ru.iris.common.database.model.devices.Device");
+    var DeviceCtl = Java.type("ru.iris.common.helpers.DeviceCtl");
 
-    if (action == "on") {
-        Speak.say("Включаю свет!");
+    var uuid = advertisement.getValue();
+    var device = Device.getDeviceByUUID(uuid);
+
+    if (device.getInternalName() == "noolite/channel/3") {
+        if (advertisement.getLabel() == "DeviceBright") {
+            LOGGER.info("[turn-on-daylight] Turn on kitchen daylight");
+            DeviceCtl.on("daylightkitchen");
+        }
+        else {
+            LOGGER.info("[turn-on-daylight] Turn off kitchen dayligh");
+            DeviceCtl.off("daylightkitchen");
+        }
     }
-    else if (action == "off") {
-        Speak.say("Выключаю свет!");
-    }
-    else if (action == "dim") {
-        Speak.say("Приглушаю свет!");
-    }
-    else if (action == "bright") {
-        Speak.say("Делаю ярче свет!");
-    }
-    else {
-        Speak.say("Неизвестная команда!");
-    }
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Nikolay A. Viguro
+ * Copyright 2012-2016 Nikolay A. Viguro
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,11 @@ var Timer = Java.type("java.util.Timer");
 //////////////////////////////////////////////////////
 
 // advertisement
-var value = advertisement.getValue("data");
-var uuid = advertisement.getValue("uuid");
-
+var uuid = advertisement.getValue();
 var device = Device.getDeviceByUUID(uuid);
 
 // if device state = ON and device have internalname = noolite/channel/4
-if (value == "255" && device.getInternalName() == "noolite/channel/4") {
+if (advertisement.getLabel() == "DeviceOn" && device.getInternalName() == "noolite/channel/4") {
     LOGGER.info("[turnOffLater] Device ON!");
 
     // lock not set
@@ -70,7 +68,7 @@ if (value == "255" && device.getInternalName() == "noolite/channel/4") {
     }
 }
 
-if (value == "0" && device.getInternalName() == "noolite/channel/4" && Lock.isLocked("toilet-light-on")) {
+if (advertisement.getLabel() == "DeviceOff" && device.getInternalName() == "noolite/channel/4" && Lock.isLocked("toilet-light-on")) {
     // release lock
     Lock.release("toilet-light-on");
     LOGGER.info("[turnOffLater] Release lock!");

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014 Nikolay A. Viguro
+ * Copyright 2012-2016 Nikolay A. Viguro
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,28 +23,21 @@
 
 // importing all classes in package (like import ru.iris.common.* in java)
 
-var Device = Java.type("ru.iris.common.database.model.devices.Device");
-var Speak = Java.type("ru.iris.common.helpers.Speak");
+if (advertisement.getLabel() == "DeviceOn" || advertisement.getLabel() == "DeviceOff") {
+    var Device = Java.type("ru.iris.common.database.model.devices.Device");
+    var Speak = Java.type("ru.iris.common.helpers.Speak");
 
-var label = advertisement.getValue("label");
-var value = advertisement.getValue("data");
-var uuid = advertisement.getValue("uuid");
-
+    var uuid = advertisement.getValue();
     var device = Device.getDeviceByUUID(uuid);
     var phrase;
 
-    if (label == "Level") {
-
-        if(value == "0")
-        {
-            phrase = "выключено";
-        }
-        else
-        {
-            phrase = "включено";
-        }
-
-        // lets speak!
-        Speak.say("Устройство " + device.getName() + " " + phrase);
+    if (advertisement.getLabel() == "DeviceOn") {
+        phrase = "выключено";
+    }
+    else {
+        phrase = "включено";
     }
 
+    // lets speak!
+    Speak.say("Устройство " + device.getName() + " " + phrase);
+}
