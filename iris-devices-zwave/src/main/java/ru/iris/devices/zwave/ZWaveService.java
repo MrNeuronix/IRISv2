@@ -385,15 +385,15 @@ public class ZWaveService {
                         switch (advertisement.getLabel()) {
 
                             case "DeviceOn":
-                                deviceSetLevel(advertisement);
+                                deviceSetLevel(advertisement, 255);
                                 break;
 
                             case "DeviceOff":
-                                deviceSetLevel(advertisement);
+                                deviceSetLevel(advertisement, 0);
                                 break;
 
                             case "DeviceSetLevel":
-                                deviceSetLevel(advertisement);
+                                deviceSetLevel(advertisement, null);
                                 break;
 
                             case "ZWaveAddNode":
@@ -475,13 +475,13 @@ public class ZWaveService {
         }
     }
 
-    private void setValue(String uuid, String label, String value) {
+    private void setValue(String uuid, String label, Integer value) {
         Device device = Device.getDeviceByUUID(uuid);
         DeviceValue zv = device.getValue(label);
 
         if (zv != null) {
             if (!Manager.get().isValueReadOnly(gson.fromJson(zv.getValueId(), ValueId.class))) {
-                setTypedValue(gson.fromJson(zv.getValueId(), ValueId.class), value);
+                setTypedValue(gson.fromJson(zv.getValueId(), ValueId.class), String.valueOf(value));
             } else {
                 LOGGER.info("Value \"%s\" is read-only! Skip.", label);
             }
@@ -572,10 +572,18 @@ public class ZWaveService {
         return ZWaveDevice;
     }
 
-    private void deviceSetLevel(GenericAdvertisement advertisement) {
-        String level = (String) advertisement.getValue("data");
-        String label = (String) advertisement.getValue("label");
-        String uuid = (String) advertisement.getValue("uuid");
+    private void deviceSetLevel(GenericAdvertisement advertisement, Integer level) {
+
+        String label = "Level";
+        String uuid;
+
+        if (level == null) {
+            level = (Integer) advertisement.getValue("data");
+            label = (String) advertisement.getValue("label");
+            uuid = (String) advertisement.getValue();
+        } else {
+            uuid = (String) advertisement.getValue();
+        }
 
         Device ZWaveDevice = Device.getDeviceByUUID(uuid);
 
@@ -591,7 +599,7 @@ public class ZWaveService {
 
         int node = ZWaveDevice.getNode();
 
-        if (!label.isEmpty() && !level.isEmpty() && !ZWaveDevice.getStatus().equals("Dead")) {
+        if (!ZWaveDevice.getStatus().equals("Dead")) {
             LOGGER.info("Setting value: " + level + " to label \"" + label + "\" on node " + node + " (UUID: " + uuid + ")");
             setValue(uuid, label, level);
         } else {
