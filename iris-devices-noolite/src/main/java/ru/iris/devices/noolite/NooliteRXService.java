@@ -100,16 +100,12 @@ public class NooliteRXService {
                             DBLogger.info("Device is OFF", device.getUuid());
                             SensorData.log(device.getUuid(), "Switch", "OFF");
 
-                            params.put("uuid", device.getUuid());
-                            params.put("label", "Level");
-                            params.put("data", 0);
-
                             // device product name unkown
                             if (device.getProductName().equals("unknown")) {
                                 device.setProductName("Generic Switch");
                             }
 
-                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("NooliteDeviceOff", params));
+                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceOff", device.getUuid()));
                             break;
 
                         case SLOW_TURN_OFF:
@@ -118,7 +114,7 @@ public class NooliteRXService {
                             updateValue(device, "Level", "0");
                             DBLogger.info("Device is DIM", device.getUuid());
                             SensorData.log(device.getUuid(), "Switch", "DIM");
-                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("NooliteDeviceDim", device.getUuid()));
+                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceDim", device.getUuid()));
                             break;
 
                         case TURN_ON:
@@ -127,16 +123,12 @@ public class NooliteRXService {
                             DBLogger.info("Device is ON", device.getUuid());
                             SensorData.log(device.getUuid(), "Switch", "ON");
 
-                            params.put("uuid", device.getUuid());
-                            params.put("label", "Level");
-                            params.put("data", 255);
-
                             // device product name unkown
                             if (device.getProductName().equals("unknown")) {
                                 device.setProductName("Generic Switch");
                             }
 
-                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceOn", params));
+                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceOn", device.getUuid()));
                             break;
 
                         case SLOW_TURN_ON:
@@ -215,7 +207,7 @@ public class NooliteRXService {
                                 device.setInternalType("sensor");
                             }
 
-                            messaging.broadcast("event.devices.noolite.value.changed", new GenericAdvertisement("DeviceBatteryLow", device.getUuid()));
+                            messaging.broadcast("event.devices.noolite.battery.replace", new GenericAdvertisement("DeviceBatteryLow", device.getUuid()));
                             break;
 
                         default:
