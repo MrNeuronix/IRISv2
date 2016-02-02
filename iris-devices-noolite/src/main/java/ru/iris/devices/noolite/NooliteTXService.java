@@ -73,18 +73,22 @@ public class NooliteTXService {
 
                         Device device = null;
                         byte channel;
+                        String uuid = (String) advertisement.getValue("uuid");
+
+                        if (uuid == null)
+                            uuid = (String) advertisement.getValue();
 
                         if (!advertisement.getLabel().equals("BindTXChannel") && !advertisement.getLabel().equals("UnbindTXChannel")) {
 
-                            device = Ebean.find(Device.class).where().eq("uuid", advertisement.getValue("uuid")).findUnique();
+                            device = Ebean.find(Device.class).where().eq("uuid", uuid).findUnique();
 
                             if (device != null && !device.getSource().equals("noolite")) {
-                                LOGGER.info("Device with UUID " + advertisement.getValue("uuid") + " is not Noolite!");
+                                LOGGER.info("Device with UUID " + uuid + " is not Noolite!");
                                 return;
                             }
 
                             if (device == null) {
-                                LOGGER.info("Cant find device with UUID " + advertisement.getValue("uuid"));
+                                LOGGER.info("Cant find device with UUID " + uuid);
                                 return;
                             }
 
