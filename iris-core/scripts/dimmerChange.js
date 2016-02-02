@@ -31,7 +31,7 @@ if (advertisement.getLabel() == "DeviceOn" || advertisement.getLabel() == "Devic
     var device = Device.getDeviceByUUID(uuid);
     var phrase;
 
-    if (advertisement.getLabel() == "DeviceOn") {
+    if (advertisement.getLabel() == "DeviceOff") {
         phrase = "выключено";
     }
     else {
