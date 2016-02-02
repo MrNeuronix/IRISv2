@@ -23,8 +23,6 @@ import ru.iris.common.database.model.devices.Device;
 import ru.iris.common.messaging.JsonMessaging;
 import ru.iris.common.messaging.model.devices.GenericAdvertisement;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -46,17 +44,15 @@ public class DeviceCtl
     }
 
     public static void set(String name, int value) {
-        Map<String, Object> params = new HashMap<>();
-
         Device device = Ebean.find(Device.class).where().eq("friendlyname", name).findUnique();
 
         if (device == null) {
             LOGGER.error("Device not found: " + name);
             return;
         }
-        params.put("uuid", device.getUuid());
-        params.put("label", "Level");
-        params.put("data", value);
-        messaging.broadcast("event.devices.setvalue", new GenericAdvertisement("DeviceOn", params));
+        if (value == 255)
+            messaging.broadcast("event.devices.setvalue", new GenericAdvertisement("DeviceOn", device.getUuid()));
+        else
+            messaging.broadcast("event.devices.setvalue", new GenericAdvertisement("DeviceOff", device.getUuid()));
     }
 }
