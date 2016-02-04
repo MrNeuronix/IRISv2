@@ -21,24 +21,20 @@
  * This is test script for event engine of IRISv2
  */
 
+var Device = Java.type("ru.iris.common.database.model.devices.Device");
+var Lock = Java.type("ru.iris.common.database.Lock");
+
+var uuid = advertisement.getValue();
+var device = Device.getDeviceByUUID(uuid);
+
 var d = new Date();
 var hour = d.getHours();
 
 //////////////////////////////////////////////////////
 
 // if device state = ON and device have internalname = noolite/channel/6
-if (advertisement.getLabel() == "DeviceOn" && device.getInternalName() == "noolite/channel/6" && hour == 7) {
+if (advertisement.getLabel() == "DeviceOn" && device.getInternalName() == "noolite/channel/6" && !Lock.isLocked("morning-light-on") && hour == 7) {
     LOGGER.info("[morning] Detected movement!");
-
-    // imports
-    var Device = Java.type("ru.iris.common.database.model.devices.Device");
-    var Lock = Java.type("ru.iris.common.database.Lock");
-    var Speak = Java.type("ru.iris.common.helpers.Speak");
-    var DeviceCtl = Java.type("ru.iris.common.helpers.DeviceCtl");
-    var Timer = Java.type("java.util.Timer");
-
-    var uuid = advertisement.getValue();
-    var device = Device.getDeviceByUUID(uuid);
 
     // lock not set
     if (!Lock.isLocked("morning-light-on")) {
@@ -49,6 +45,10 @@ if (advertisement.getLabel() == "DeviceOn" && device.getInternalName() == "nooli
         lock.lock();
     }
     else {
+        // imports
+        var Speak = Java.type("ru.iris.common.helpers.Speak");
+        var DeviceCtl = Java.type("ru.iris.common.helpers.DeviceCtl");
+
         // turn on light in bathroom
         DeviceCtl.on("bathroom");
         Speak.say("Доброе утро!");

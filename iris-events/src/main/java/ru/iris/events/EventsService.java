@@ -79,7 +79,6 @@ public class EventsService
 			// Pass jsonmessaging instance to js engine
 			Bindings bindings = new SimpleBindings();
 			bindings.put("jsonMessaging", jsonMessaging);
-			bindings.put("out", System.out);
 			bindings.put("LOGGER", scriptLogger);
 
 			// subscribe to events from db
