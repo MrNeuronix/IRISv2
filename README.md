@@ -1,3 +1,5 @@
+*** DEPRECATED! Look at https://travis-ci.org/Neuronix2/IRISv3 ***
+
 # IRISv2
 
 A new version of IRIS-X (home automation system) with strong modular system.
