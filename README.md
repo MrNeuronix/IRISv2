@@ -1,4 +1,4 @@
-# DEPRECATED! Look at https://travis-ci.org/Neuronix2/IRISv3
+# DEPRECATED! Look at https://github.com/Neuronix2/IRISv3
 
 # IRISv2
 
